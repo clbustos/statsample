@@ -1,11 +1,11 @@
-require '../lib/rubyss.rb'
+require File.dirname(__FILE__)+'/../lib/rubyss.rb'
 require 'test/unit'
 
 class RubySSColumnTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
 		super
-		@c = RubySS::Column.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :scale)
+		@c = RubySS::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :scale)
 		@c.missing_values=[-99]
 	end
 	def test_missing_values

@@ -6,7 +6,7 @@ end
 
 module RubySS
 	VERSION = '0.1.2'
-	class Column < DelegateClass(Array)
+	class Vector < DelegateClass(Array)
 		attr_reader :type, :data, :valid_data, :missing_values, :missing_data
 		def initialize(data=[],t=:nominal)
 			@data=data
