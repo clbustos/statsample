@@ -5,6 +5,7 @@ class Numeric
 end
 
 module RubySS
+	VERSION = '0.1.2'
 	class Column < DelegateClass(Array)
 		attr_reader :type, :data, :valid_data, :missing_values, :missing_data
 		def initialize(data=[],t=:nominal)
@@ -111,9 +112,4 @@ module RubySS
 	end
 end
 
-c=RubySS::Column.new([3,3,3,3,3,1,nil,-99,-99], :scale)
-c.missing_values=[-99]
-p c.mode
-p c.median
-p c.mean
-p c.range
+

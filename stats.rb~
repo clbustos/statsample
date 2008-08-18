@@ -1,0 +1,85 @@
+#!/usr/bin/ruby
+require 'delegate'
+class Numeric
+  def square ; self * self ; end
+end
+
+module Stats
+	class Column < DelegateClass(Array)
+		attr_reader :type, :data, :valid_data, :missing_values, :missing_data
+		def initialize(data=[])
+			@data=data
+			@valid_data=[]
+			@missing_values=[]
+			@missing_data=[]
+			set_valid_data
+			@type=:nominal
+			@delegate=Type::Nominal.new(@valid_data)
+			super(@delegate)
+		end
+		def set_valid_data
+			@valid_data.clear
+			@missing_data.clear
+			@data.each do |n|
+				if n.nil? or @missing_values.include? n
+					@missing_data.push(n)
+				else
+					@valid_data.push(n)
+				end
+			end
+		end
+		def missing_values=(vals)
+			@missing_values = vals
+			set_valid_data
+		end
+		def type=(t)
+			case t
+			when :nominal
+				@delegate=Type::Nominal.new(@valid_data)
+			when :ordinal
+				@delegate=Type::Ordinal.new(@valid_data)
+			when :scale
+				@delegate=Type::Scale.new(@valid_data)
+			else
+				raise "Type doesn't exists"
+			end
+			__setobj__(@delegate)
+			@type=t			
+		end
+	end
+	module Type
+		class Nominal
+			def initialize(data)
+				@data=data
+			end
+			def [](i)
+				@data[i]
+			end
+			def sample_with_replacement(n=1) 
+				(0...n).collect{ @data[rand(@data.size)] }
+			end
+		end
+		class Ordinal <Nominal
+		end
+		class Scale <Ordinal
+			def sum ; @data.inject(0){|a,x|x+a} ; end
+			def mean ; sum.to_f/@data.size ; end
+			def squares ; @data.inject(0){|a,x|x.square+a} ; end
+			def variance ; squares.to_f/@data.size - mean.square; end
+				def variance_n_1
+			end
+			def deviation ; Math::sqrt( variance ) ; end
+
+		end
+	end
+end
+
+c=Stats::Column.new([1,2,3,4,5,10,20,nil,-99,-99])
+c.missing_values=[-99]
+c.type=:scale
+p c.mean
+puts "Cambiando valores faltantes"
+p c.mean
+p c.squares
+p c.variance
+p c.deviation

@@ -1,0 +1,10 @@
+=== 0.1.1 / 2008-08-18
+
+* Included several methods on Ruby::Type classes
+* Organized dirs with sow
+
+
+=== 0.1.0 / 2008-08-12
+
+* First version.
+
