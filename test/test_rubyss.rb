@@ -34,6 +34,8 @@ class RubySSColumnTestCase < Test::Unit::TestCase
 		assert_equal(@c.n,15)
 	end
 	def test_ordinal
-		assert_equal(@c.median,5)
+		assert_equal(5,@c.median)
+		assert_equal(4,@c.percentil(25))
+		assert_equal(7,@c.percentil(75))
 	end
 end
