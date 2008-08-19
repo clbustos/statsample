@@ -4,4 +4,5 @@ README.txt
 Rakefile
 bin/rubyss
 lib/rubyss.rb
-test/test_rubyss.rb
+lib/rubyss/vector.rb
+test/test_vector.rb
