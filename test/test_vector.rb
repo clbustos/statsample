@@ -5,7 +5,7 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
 		super
-		@c = RubySS::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :scale)
+		@c = RubySS::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :nominal)
 		@c.missing_values=[-99]
 	end
     def test_enumerable
@@ -20,6 +20,10 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 		@c.missing_values=[]
 		assert_equal(@c.valid_data.sort,[-99,-99,1,2,3,4,5,5,5,5,5,6,6,7,8,9,10])
 	end
+    def test_labeled
+        @c.labels={5=>'FIVE'}
+        assert_equal(["FIVE","FIVE","FIVE","FIVE","FIVE",6,6,7,8,9,10,1,2,3,4,nil,-99, -99],@c.vector_labeled.to_a)
+    end
     def test_split_by_separator
         a = RubySS::Vector.new(["a","a,b","c,d","a,d",10,nil],:nominal)
         b=a.split_by_separator(",")
@@ -48,17 +52,30 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 	end
 	def test_nominal
 		assert_equal(@c[1],5)
-		assert_equal(@c.frequencies,{ 1=>1,2=>1,3=>1,4=>1,5=>5,6=>2,7=>1,8=>1, 9=>1,10=>1})
+		assert_equal({ 1=>1,2=>1,3=>1,4=>1,5=>5,6=>2,7=>1,8=>1, 9=>1,10=>1},@c.frequencies)
 		assert_equal({ 1 => 1.to_f/15 ,2=>1.to_f/15, 3=>1.to_f/15,4=>1.to_f/15,5=>5.to_f/15,6=>2.to_f/15,7=>1.to_f/15,8=>1.to_f/15, 9=>1.to_f/15,10=>1.to_f/15}, @c.proportions)
 		assert_equal(@c.factors.sort,[1,2,3,4,5,6,7,8,9,10])
 		assert_equal(@c.mode,5)
 		assert_equal(@c.n_valid,15)
 	end
 	def test_ordinal
+        @c.type=:ordinal
 		assert_equal(5,@c.median)
 		assert_equal(4,@c.percentil(25))
 		assert_equal(7,@c.percentil(75))
 	end
+    def test_scale
+        a=RubySS::Vector.new([1,2,3,4,"STRING"], :scale)
+        assert_equal(10,a.sum)
+    end
+    def test_summary
+        @c.type=:nominal
+        assert_match(/Distribution/, @c.summary())
+        @c.type=:ordinal
+        assert_match(/median/, @c.summary())
+        @c.type=:scale
+        assert_match(/mean/, @c.summary())
+    end
     def test_add
         a=RubySS::Vector.new([1,2,3,4,5], :scale)
         b=RubySS::Vector.new([11,12,13,14,15], :scale)

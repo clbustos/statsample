@@ -1,7 +1,6 @@
 require 'rubyss/vector'
 module RubySS
     class Dataset
-        extend Enumerable
         attr_reader :vectors,:fields, :cases
         def initialize(vectors,fields=false)
             @vectors=vectors
@@ -12,8 +11,9 @@ module RubySS
         def col(c)
             @vectors[c]
         end
+        alias_method :vector, :col
         def add_vector(name,vector)
-            raise Exception, "Vector have different size" if vector.size!=@cases 
+            raise ArgumentError, "Vector have different size" if vector.size!=@cases 
             @vectors[name]=vector
             check_order
         end
@@ -21,7 +21,7 @@ module RubySS
             @fields.delete(name)
             @vectors.delete(name)
         end
-        def split_by_separator(name,join='-',sep=",")
+        def add_vectors_by_split(name,join='-',sep=",")
             split=@vectors[name].split_by_separator(sep)
             split.each{|k,v|
                 add_vector(name+join+k,v)
@@ -38,12 +38,27 @@ module RubySS
             }
             @cases=size
         end
+        def case_as_hash(c)
+            @fields.inject({}) {|a,x|
+                    a[x]=@vectors[x][c]
+                    a
+        }
+        end
+        def case_as_array(c)
+            @fields.inject([]) {|a,x|
+                    a.push(@vectors[x][c])
+                    a
+            }
+        end
         def each
             0.upto(@cases-1) {|i|
-                row=@order.inject({}) {|a,x|
-                    a[x]=@vectors[x][i]
-                    a
-                }
+                row=case_as_hash(i)
+                yield row
+            }
+        end
+        def each_array
+            0.upto(@cases-1) {|i|
+                row=case_as_array(i)
                 yield row
             }
         end
@@ -95,7 +110,13 @@ module RubySS
                 }
                 Dataset.new(fd,fields)
             end
-            def write(dataset,filename)
+            def self.write(dataset,filename)
+                writer=::CSV.open(filename,'w')
+                writer << dataset.fields
+                dataset.each_array{|row|
+                    writer << row
+                }
+                writer.close
             end
     end
 end

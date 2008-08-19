@@ -1,6 +1,8 @@
 module RubySS
 class Vector < DelegateClass(Array)
-		attr_reader :type, :data, :valid_data, :missing_values, :missing_data
+    include Enumerable
+        attr_reader :type, :data, :valid_data, :missing_values, :missing_data
+        attr_accessor :labels
         # Creates a new 
         # data = Array of data
         # t = level of meausurement. Could be: 
@@ -17,11 +19,6 @@ class Vector < DelegateClass(Array)
 			self.type=t
 			super(@delegate)
 		end
-        def collect
-            @data.collect{|x|
-                yield x
-            }
-        end
         def each
             @data.each{|x|
                 yield x
@@ -38,6 +35,17 @@ class Vector < DelegateClass(Array)
 				end
 			end
 		end
+        # Returns a Vector with the data with labels replaced by the label
+        def vector_labeled
+            d=@data.collect{|x|
+                if @labels.has_key? x
+                    @labels[x]
+                else
+                    x
+                end
+            }
+            Vector.new(d,@type)
+        end
         def size
             @data.size
         end
@@ -58,11 +66,11 @@ class Vector < DelegateClass(Array)
 		def type=(t)
 			case t
 			when :nominal
-				@delegate=Type::Nominal.new(@valid_data)
+				@delegate=Nominal.new(@valid_data)
 			when :ordinal
-				@delegate=Type::Ordinal.new(@valid_data)
+				@delegate=Ordinal.new(@valid_data)
 			when :scale
-				@delegate=Type::Scale.new(@valid_data)
+				@delegate=Scale.new(@valid_data)
 			else
 				raise "Type doesn't exists"
 			end
@@ -166,7 +174,7 @@ class Vector < DelegateClass(Array)
 
     end
         
-	module Type
+	
 		class Nominal
 			def initialize(data)
 				@data=data
@@ -206,6 +214,16 @@ class Vector < DelegateClass(Array)
                     a
                 }
             end
+            def summary(out="")
+                out << sprintf("n valid:%d\n",n_valid)
+                out <<  sprintf("factors:%s\n",factors.join(","))
+                out <<  "mode:"+mode.to_s+"\n"
+                out <<  "Distribution:\n"
+                frequencies.sort.each{|k,v|
+                    out <<  sprintf("%s : %s (%0.2f%%)\n",k,v, (v.to_f / n_valid)*100)
+                }
+                out
+            end
 		end
         
 		class Ordinal <Nominal
@@ -223,8 +241,20 @@ class Vector < DelegateClass(Array)
 			def median
 				percentil(50)
 			end
+            def summary(out="")
+                out << sprintf("n valid:%d\n",n_valid)
+                out <<  "median:"+median.to_s+"\n"
+                out <<  "percentil 25:"+percentil(25).to_s+"\n"
+                out <<  "percentil 75:"+percentil(75).to_s+"\n"
+                out
+            end
 		end
 		class Scale <Ordinal
+            def initialize(data)
+				@data=data.collect{|x|
+                    x.to_f
+                }
+			end
             # The range of the data (max - min)
 			def range; @data.max - @data.min; end
             # The sum of values for the data
@@ -262,10 +292,21 @@ class Vector < DelegateClass(Array)
 			def coefficient_of_variation
 				standard_deviation_sample / mean
 			end
+            def summary(out="")
+                out << sprintf("n valid:%d\n",n_valid)
+                out <<  "mean:"+mean.to_s+"\n"
+                out <<  "sum:"+sum.to_s+"\n"
+                out <<  "range:"+range.to_s+"\n"
+                out <<  "variance (pop):"+variance_population.to_s+"\n"
+                out <<  "sd (pop):"+sdp.to_s+"\n"
+                out <<  "variance (sample):"+variance_sample.to_s+"\n"
+                out <<  "sd (sample):"+sds.to_s+"\n"
+                
+                out
+            end
             
 			alias_method :sdp, :standard_deviation_population
 			alias_method :sds, :standard_deviation_sample			
 			alias_method :cov, :coefficient_of_variation
 		end
-	end
 end
