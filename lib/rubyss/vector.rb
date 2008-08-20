@@ -20,19 +20,21 @@ class Vector < DelegateClass(Array)
 	
     include Enumerable
         attr_reader :type, :data, :valid_data, :missing_values, :missing_data
-        attr_accessor :labels
+        attr_accessor :labels, :population_size
         # Creates a new 
         # data = Array of data
         # t = level of meausurement. Could be: 
         # [:nominal] : Nominal level of measurement
         # [:ordinal] : Ordinal level of measurement
         # [:scale]   : Scale level of meausurement
+        #
 		def initialize(data=[],t=:nominal)
 			@data=data
 			@valid_data=[]
 			@missing_values=[]
 			@missing_data=[]
 			@labels={}
+            @population_size=@data.size
 			set_valid_data
 			self.type=t
 			super(@delegate)
@@ -189,7 +191,42 @@ class Vector < DelegateClass(Array)
                 s
             }
         end
-
+        
+        # Returns an random sample of size n, with replacement,
+        # only with valid data.
+        #
+        # In all the trails, every item have the same probability
+        # of been selected
+		def sample_with_replacement(sample=1)
+            Vector.new( (0...sample).collect{ @valid_data[rand(@valid_data.size)] },@type)
+        end
+        # Returns an random sample of size n, without replacement,
+        # only with valid data.
+        #
+        # Every element could only be selected once
+        # A sample of the same size of the vector is the vector itself
+            
+        def sample_without_replacement(sample=1)
+                raise ArgumentError, "Sample size couldn't be greater than n" if sample>@valid_data.size
+                out=[]
+                while out.size<sample
+                    value=rand(@valid_data.size)
+                    out.push(value) if !out.include?value
+                end
+                Vector.new(out.collect{|i|@valid_data[i]},@type)
+         end
+         
+            def count(x=false)
+                if block_given?
+                    r=@data.inject(0) {|s, i|
+                        r=yield i
+                        s+(r ? 1 : 0)
+                    }
+                    r.nil? ? 0 : r
+                else
+                    frequencies[x].nil? ? 0 : frequencies[x]
+                end
+            end
     end
         
 	
@@ -197,12 +234,9 @@ class Vector < DelegateClass(Array)
 			def initialize(data)
 				@data=data
 			end
-            # Returns an random sample, with replacement, of size n
-            # In all the trails, every item have the same probability
-            # of been selected
-			def sample_with_replacement(n=1) 
-				(0...n).collect{ @data[rand(@data.size)] }
-			end
+            
+            
+            
             # Returns a hash with the distribution of frecuencies of
             # the sample
 			def frequencies
@@ -212,6 +246,7 @@ class Vector < DelegateClass(Array)
 					a
 				}
 			end
+            
             # Return an array of the different values of the data
 			def factors
 				@data.uniq

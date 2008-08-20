@@ -5,7 +5,6 @@ require 'test/unit'
 class RubySSDatasetTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
-        
         @ds=RubySS::Dataset.new({'id' => RubySS::Vector.new([1,2,3,4,5]), 'name'=>RubySS::Vector.new(%w{Alex Claude Peter Franz George}), 'age'=>RubySS::Vector.new([20,23,25,27,5]),
         'city'=>RubySS::Vector.new(['New York','London','London','Paris','Tome']),
         'a1'=>RubySS::Vector.new(['a,b','b,c','a',nil,'a,b,c'])}, ['id','name','age','city','a1'])

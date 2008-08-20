@@ -108,6 +108,14 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_equal([nil,11,nil,10,10,10], (b-a).to_a)
         assert_equal([nil,11,nil,10,10,10], (b-a.to_a).to_a)
     end
+    def test_samples
+        srand(1)
+        assert_equal(100,@c.sample_with_replacement(100).size)
+        assert_equal(@c.valid_data.to_a.sort,@c.sample_without_replacement(15).sort)
+        assert_raise  ArgumentError do
+			@c.sample_without_replacement(20)
+		end
+    end
 	def test_vector_iterator
 		v1=%w{a a a b b b c c}.to_vector
 		v2=%w{1 3 4 5 6 4 3 2}.to_vector

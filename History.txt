@@ -1,4 +1,9 @@
-=== 0.1.1 / 2008-08-18
+=== 0.1.3 / 2008-08-19
+
+* First operational version of Vector and Dataset
+* Read and write CSV files
+
+=== 0.1.1 - 0.1.2 / 2008-08-18
 
 * Included several methods on Ruby::Type classes
 * Organized dirs with sow

@@ -19,7 +19,7 @@ class RubySSCSVTestCase < Test::Unit::TestCase
         i=0
         ds2.each_array{|row|
             assert_equal(@ds.case_as_array(i),row)
-                i+=1
+               i+=1
         }
     end
 end
