@@ -45,10 +45,7 @@ module RubySS
         }
         end
         def case_as_array(c)
-            @fields.inject([]) {|a,x|
-                    a.push(@vectors[x][c])
-                    a
-            }
+            @fields.collect {|x| @vectors[x][c]}
         end
         def each
             0.upto(@cases-1) {|i|

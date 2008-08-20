@@ -1,5 +1,23 @@
+class Array
+	def to_vector
+		RubySS::Vector.new(self)
+	end
+end
+
 module RubySS
+	def self.vector_matrix(*vs)
+		# test
+		size=vs[0].size
+		vs.each{|v|
+			raise ArgumentError,"Arguments should be Vector" unless v.instance_of? RubySS::Vector
+			raise ArgumentError,"Vectors size should be the same" if v.size!=size
+		}
+		(0...size).to_a.collect() {|i|
+			vs.collect{|v| v[i]}
+		}
+	end
 class Vector < DelegateClass(Array)
+	
     include Enumerable
         attr_reader :type, :data, :valid_data, :missing_values, :missing_data
         attr_accessor :labels

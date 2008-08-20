@@ -18,5 +18,3 @@ end
 module RubySS
 	VERSION = '0.1.3'
 end
-
-

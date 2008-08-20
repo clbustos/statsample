@@ -108,4 +108,11 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_equal([nil,11,nil,10,10,10], (b-a).to_a)
         assert_equal([nil,11,nil,10,10,10], (b-a.to_a).to_a)
     end
+	def test_vector_iterator
+		v1=%w{a a a b b b c c}.to_vector
+		v2=%w{1 3 4 5 6 4 3 2}.to_vector
+		v3=%w{1 0 0 0 1 1 1 0}.to_vector
+		ex=[["a", "1", "1"], ["a", "3", "0"], ["a", "4", "0"], ["b", "5", "0"], ["b", "6", "1"], ["b", "4", "1"], ["c", "3", "1"], ["c", "2", "0"]]
+		assert_equal(ex,RubySS.vector_iterator(v1,v2,v3))
+	end
 end
