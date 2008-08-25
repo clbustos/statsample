@@ -2,11 +2,22 @@ require 'rubyss/vector'
 module RubySS
     class Dataset
         attr_reader :vectors,:fields, :cases
-        def initialize(vectors,fields=false)
-            @vectors=vectors
-            @fields=fields if fields
-            check_order
-            check_length
+        # To create a dataset
+        # * Dataset.new()
+        # * Dataset.new(%w{v1 v2 v3})
+        # * Dataset.new({'v1'=>%w{1 2 3}.to_vector, 'v2'=>%w{4 5 6}.to_vector})
+        # * Dataset.new({'v2'=>v2,'v1'=>v1},['v1','v2'])
+        #
+        def initialize(vectors={},fields=[])
+            if vectors.instance_of? Array
+                    @fields=vectors.dup
+                    @vectors=vectors.inject({}){|a,x| a[x]=RubySS::Vector.new(); a}
+            else
+                    @vectors=vectors
+                    @fields=fields
+                    check_order
+                    check_length
+            end
         end
         def col(c)
             @vectors[c]
@@ -16,6 +27,31 @@ module RubySS
             raise ArgumentError, "Vector have different size" if vector.size!=@cases 
             @vectors[name]=vector
             check_order
+        end
+        def add_case(v,uvd=true)
+            case v
+            when Array
+                if (v[0].is_a? Array)
+                    v.each{|subv| add_case(subv,false)}
+                else
+                    raise ArgumentError, "Array size should be equal to fields number" if @fields.size!=v.size
+                    (0...v.size).each{|i| @vectors[@fields[i]].add(v[i],false)}
+                end
+            when Hash
+                raise ArgumentError, "Hash keys should be equal to fields" if @fields!=v.keys.sort
+                @fields.each{|f| @vectors[f].add(v[f],false)}
+            else
+                raise TypeError, 'Value must be a Array or a Hash'
+            end
+            if uvd
+                update_valid_data
+            end
+                
+        end
+        def update_valid_data
+           @fields.each{|f| @vectors[f].set_valid_data}
+           check_length
+
         end
         def delete_vector(name)
             @fields.delete(name)
@@ -87,25 +123,17 @@ module RubySS
                 first_row=true
                 fields=[]
                 fields_data={}
+                ds=nil
                 ::CSV.open(filename,'r') do |row|
                     if first_row
-                        fields=row
-                        fields_data=fields.inject({}) {|a,x|
-                            a[x]=[]
-                            a
-                        }
+                        ds=RubySS::Dataset.new(row)
                         first_row=false
                     else
-                        0.upto(fields.size-1) {|x|
-                            fields_data[fields[x]].push(row[x])
-                        }
+                        ds.add_case(row,false)
                     end
                 end
-                fd=fields_data.inject({}) {|a,x|
-                    a[x[0]]=Vector.new(x[1],:nominal)
-                    a
-                }
-                Dataset.new(fd,fields)
+                ds.update_valid_data
+                ds
             end
             def self.write(dataset,filename)
                 writer=::CSV.open(filename,'w')

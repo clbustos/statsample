@@ -52,4 +52,14 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         assert_equal([1,1,0,nil,1],@ds.col('a1_b').to_a)
         assert_equal([0,1,0,nil,1],@ds.col('a1_c').to_a)
     end
+    def test_add_case
+        ds=RubySS::Dataset.new({'a'=>[].to_vector, 'b'=>[].to_vector, 'c'=>[].to_vector})
+        ds.add_case([1,2,3])
+        ds.add_case({'a'=>4,'b'=>5,'c'=>6})
+        ds.add_case([[7,8,9],%w{a b c}])
+        assert_equal({'a'=>1,'b'=>2,'c'=>3},ds.case_as_hash(0))
+        assert_equal([4,5,6],ds.case_as_array(1))
+        assert_equal([7,8,9],ds.case_as_array(2))
+        assert_equal(['a','b','c'],ds.case_as_array(3))
+    end
 end

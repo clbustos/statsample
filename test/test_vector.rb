@@ -116,11 +116,13 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 			@c.sample_without_replacement(20)
 		end
     end
-	def test_vector_iterator
+    
+    
+	def test_vector_matrix
 		v1=%w{a a a b b b c c}.to_vector
 		v2=%w{1 3 4 5 6 4 3 2}.to_vector
 		v3=%w{1 0 0 0 1 1 1 0}.to_vector
-		ex=[["a", "1", "1"], ["a", "3", "0"], ["a", "4", "0"], ["b", "5", "0"], ["b", "6", "1"], ["b", "4", "1"], ["c", "3", "1"], ["c", "2", "0"]]
-		assert_equal(ex,RubySS.vector_iterator(v1,v2,v3))
+		ex=Matrix.rows([["a", "1", "1"], ["a", "3", "0"], ["a", "4", "0"], ["b", "5", "0"], ["b", "6", "1"], ["b", "4", "1"], ["c", "3", "1"], ["c", "2", "0"]])
+		assert_equal(ex,RubySS.vector_cols_matrix(v1,v2,v3))
 	end
 end

@@ -5,16 +5,20 @@ class Array
 end
 
 module RubySS
-	def self.vector_matrix(*vs)
+    # Create a matrix using vectors as columns
+    # Use:
+    #
+    # matrix=RubySS.vector_cols_matrix(v1,v2)
+	def self.vector_cols_matrix(*vs)
 		# test
 		size=vs[0].size
 		vs.each{|v|
 			raise ArgumentError,"Arguments should be Vector" unless v.instance_of? RubySS::Vector
 			raise ArgumentError,"Vectors size should be the same" if v.size!=size
 		}
-		(0...size).to_a.collect() {|i|
+		Matrix.rows((0...size).to_a.collect() {|i|
 			vs.collect{|v| v[i]}
-		}
+		})
 	end
 class Vector < DelegateClass(Array)
 	
@@ -39,10 +43,19 @@ class Vector < DelegateClass(Array)
 			self.type=t
 			super(@delegate)
 		end
+        def recode
+            @data.collect!{|x|
+                yield x
+            }
+        end
         def each
             @data.each{|x|
                 yield x
             }
+        end
+        def add(v,update_valid=true)
+            @data.push(v)
+            set_valid_data if update_valid
         end
 		def set_valid_data
 			@valid_data.clear
@@ -99,8 +112,9 @@ class Vector < DelegateClass(Array)
 		end
         def n; @data.size ; end
         def to_a
-            @data
+            @data.dup
         end
+        alias_method :to_ary, :to_a 
         # Vector sum. 
         # - If v is a scalar, add this value to all elements
         # - If v is a Array or a Vector, should be of the same size of this vector
@@ -149,7 +163,9 @@ class Vector < DelegateClass(Array)
             else
                 raise TypeError,"You should pass a scalar or a array/vector"
             end
+            
         end
+        
         # Returns a hash of Vectors, defined by the different values
         # defined on the fields
         # Example:
@@ -227,6 +243,10 @@ class Vector < DelegateClass(Array)
                     frequencies[x].nil? ? 0 : frequencies[x]
                 end
             end
+            def to_s
+                "Vector"+@data.to_s
+            end
+            
     end
         
 	
