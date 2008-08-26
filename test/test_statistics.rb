@@ -2,7 +2,7 @@ require File.dirname(__FILE__)+'/../lib/rubyss.rb'
 require 'rubyss/dataset'
 require 'test/unit'
 
-class RubySSCSVTestCase < Test::Unit::TestCase
+class RubySSStatisicsTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
 		super
