@@ -7,7 +7,7 @@ v.type=:scale
 p v.slow_variance_sample
 p v.variance_sample
 
- n = 50
+ n = 400
     Benchmark.bm(7) do |x|
 		x.report("mean")   { for i in 1..n; v.mean; end }
 		x.report("slow_mean")   { for i in 1..n; v.slow_mean; end }

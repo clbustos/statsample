@@ -3,7 +3,6 @@ require 'rubyss/dataset'
 require 'test/unit'
 
 class RubySSDatasetTestCase < Test::Unit::TestCase
-
 	def initialize(*args)
         @ds=RubySS::Dataset.new({'id' => RubySS::Vector.new([1,2,3,4,5]), 'name'=>RubySS::Vector.new(%w{Alex Claude Peter Franz George}), 'age'=>RubySS::Vector.new([20,23,25,27,5]),
         'city'=>RubySS::Vector.new(['New York','London','London','Paris','Tome']),
@@ -13,6 +12,24 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
     def test_basic
         assert_equal(5,@ds.cases)
         assert_equal(%w{id name age city a1},@ds.fields)
+    end
+    def test_fields
+        @ds.fields=%w{name a1 id age city}
+        assert_equal(%w{name a1 id age city}, @ds.fields)
+        @ds.fields=%w{id name age}
+        assert_equal(%w{id name age a1 city}, @ds.fields)
+        
+    end
+    def test_equality
+        v1=[1,2,3,4].to_vector
+        v2=[5,6,7,8].to_vector
+        ds1=RubySS::Dataset.new({'v1'=>v1,'v2'=>v2}, %w{v2 v1})
+        v3=[1,2,3,4].to_vector
+        v4=[5,6,7,8].to_vector
+        ds2=RubySS::Dataset.new({'v1'=>v3,'v2'=>v4}, %w{v2 v1})
+        assert_equal(ds1,ds2)
+        ds2.fields=%w{v1 v2}
+        assert_not_equal(ds1,ds2)
     end
     def test_add_vector
         v=RubySS::Vector.new(%w{a b c d e})
@@ -61,5 +78,9 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         assert_equal([4,5,6],ds.case_as_array(1))
         assert_equal([7,8,9],ds.case_as_array(2))
         assert_equal(['a','b','c'],ds.case_as_array(3))
+    end
+    def test_marshaling
+        ds_marshal=Marshal.load(Marshal.dump(@ds))
+        assert_equal(ds_marshal,@ds)
     end
 end

@@ -1,7 +1,7 @@
 require 'rubyss/vector'
 module RubySS
     class Dataset
-        attr_reader :vectors,:fields, :cases
+        attr_reader :vectors, :fields, :cases
         # To create a dataset
         # * Dataset.new()
         # * Dataset.new(%w{v1 v2 v3})
@@ -18,6 +18,21 @@ module RubySS
                     check_order
                     check_length
             end
+        end
+        # We have the same datasets if the labels and vectors are the same 
+        def ==(d2)
+            @vectors==d2.vectors and @fields==d2.fields
+        end
+        def self.load(filename)
+            fp=File.open(filename,"r")
+            o=Marshal.load(fp)
+            fp.close
+            o
+        end
+        def save(filename)
+            fp=File.open(filename,"w")
+            Marshal.dump(self,fp)
+            fp.close
         end
         def col(c)
             @vectors[c]
@@ -95,10 +110,14 @@ module RubySS
                 yield row
             }
         end
+        def fields=(f)
+            @fields=f
+            check_order
+        end
         def check_order
             if(@vectors.keys.sort!=@fields.sort)
                 @fields=@fields&@vectors.keys
-                @fields+=@vectors.keys-@fields
+                @fields+=@vectors.keys.sort-@fields
             end
         end
         def[](i)
@@ -125,11 +144,14 @@ module RubySS
                 fields_data={}
                 ds=nil
                 ::CSV.open(filename,'r') do |row|
+                    row.collect!{|c|
+                        c.to_s
+                    }
                     if first_row
-                        ds=RubySS::Dataset.new(row)
+                        ds=RubySS::Dataset.new(row.to_a)
                         first_row=false
                     else
-                        ds.add_case(row,false)
+                        ds.add_case(row.to_a,false)
                     end
                 end
                 ds.update_valid_data

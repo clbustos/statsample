@@ -1,6 +1,6 @@
 class Array
-	def to_vector
-		RubySS::Vector.new(self)
+	def to_vector(*args)
+		RubySS::Vector.new(self,*args)
 	end
 end
 
@@ -32,21 +32,35 @@ class Vector < DelegateClass(Array)
         # [:ordinal] : Ordinal level of measurement
         # [:scale]   : Scale level of meausurement
         #
-		def initialize(data=[],t=:nominal)
+		def initialize(data=[],t=:nominal,missing_values=[],labels={},population_size=nil)
 			@data=data
+			@missing_values=missing_values
+			@labels=labels
+            @population_size=(population_size.nil? or population_size<@data.size) ? @data.size : population_size.to_i
+
 			@valid_data=[]
-			@missing_values=[]
 			@missing_data=[]
-			@labels={}
-            @population_size=@data.size
 			set_valid_data
 			self.type=t
 			super(@delegate)
 		end
+        # Vector equality
+        # Two vector will be the same if their data, missing values, type, labels and population_size are equals
+        def ==(v2)
+            @data==v2.data and @missing_values==v2.missing_values and @type==v2.type and @labels=v2.labels and @population_size=v2.population_size
+        end
+        def _dump(i)
+            Marshal.dump({'data'=>@data,'missing_values'=>@missing_values, 'labels'=>@labels, 'population_size'=>@population_size, 'type'=>@type})
+        end
+        def self._load(data)
+            h=Marshal.load(data)
+            Vector.new(h['data'], h['type'], h['missing_values'], h['labels'], h['population_size'])
+        end
         def recode
             @data.collect!{|x|
                 yield x
             }
+            set_valid_data
         end
         def each
             @data.each{|x|
@@ -244,9 +258,9 @@ class Vector < DelegateClass(Array)
                 end
             end
             def to_s
-                "Vector"+@data.to_s
+                sprintf("Vector(type:%s, n:%d, N:%d)[%s]",@type.to_s,@data.size, @population_size,@data.join(","))
             end
-            
+
     end
         
 	
@@ -297,6 +311,7 @@ class Vector < DelegateClass(Array)
                 }
                 out
             end
+
 		end
         
 		class Ordinal <Nominal
@@ -329,9 +344,18 @@ class Vector < DelegateClass(Array)
                     x.to_f
                 }
 				if HAS_GSL
-				@gsl=GSL::Vector.alloc(@data)
+                    @gsl=GSL::Vector.alloc(@data)
 				end
 			end
+            def _dump(i)
+                Marshal.dump(@data)
+            end
+            def _load(data)
+                @data=Marshal.restore(data)
+				if HAS_GSL
+                    @gsl=GSL::Vector.alloc(@data)
+				end                
+            end
             # The range of the data (max - min)
 			def range; @data.max - @data.min; end
             # The sum of values for the data
@@ -371,9 +395,10 @@ class Vector < DelegateClass(Array)
 			end
 			
 			if HAS_GSL
-				alias_method :slow_variance_sample, :variance_sample
-				alias_method :slow_sds, :standard_deviation_sample
-				alias_method :slow_mean, :mean
+                %w{variance_sample standard_deviation_sample mean sum}.each{|m|
+                    m_nuevo=("slow_"+m).intern
+                    alias_method m_nuevo, m.intern
+                }
 				def sum
 					@gsl.sum
 				end

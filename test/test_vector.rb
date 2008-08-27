@@ -58,6 +58,19 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 		assert_equal(@c.mode,5)
 		assert_equal(@c.n_valid,15)
 	end
+    def test_equality
+        v1=[1,2,3].to_vector
+        v2=[1,2,3].to_vector
+        assert_equal(v1,v2)
+        v1=[1,2,3].to_vector(:nominal)
+        v2=[1,2,3].to_vector(:ordinal)
+        assert_not_equal(v1,v2)
+        v1=[1,2,3].to_vector()
+        v2=[1,2,3].to_vector()
+        assert_equal(v1,v2)
+
+        
+    end
 	def test_ordinal
         @c.type=:ordinal
 		assert_equal(5,@c.median)
@@ -122,19 +135,24 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 			a=RubySS::Vector.new([1,2,3,4,"STRING"], :scale)
 			assert_equal(2,a.mean)
 			assert_equal(a.slow_variance_sample,a.variance_sample)
-			assert_equal(a.slow_sds,a.sds)
+			assert_equal(a.slow_standard_deviation_sample,a.sds)
 			a=[1,2,3,4].to_vector
 			b=[4,3,2,1].to_vector
 			a.type=:scale
 			b.type=:scale
-			assert_equal(-1,a.correlation(b))
+            assert_in_delta(-1.0,a.correlation(b).to_f,0.01)
 		end
 	end
-	def test_vector_matrix
+	def test_vector_matrix        
 		v1=%w{a a a b b b c c}.to_vector
 		v2=%w{1 3 4 5 6 4 3 2}.to_vector
 		v3=%w{1 0 0 0 1 1 1 0}.to_vector
 		ex=Matrix.rows([["a", "1", "1"], ["a", "3", "0"], ["a", "4", "0"], ["b", "5", "0"], ["b", "6", "1"], ["b", "4", "1"], ["c", "3", "1"], ["c", "2", "0"]])
 		assert_equal(ex,RubySS.vector_cols_matrix(v1,v2,v3))
 	end
+    def test_marshalling
+        v1=(0..100).to_a.collect{|n| rand(100)}.to_vector(:scale)
+        v2=Marshal.load(Marshal.dump(v1))
+        assert_equal(v1,v2)
+    end
 end

@@ -210,6 +210,22 @@ VALUE mRubySS_t_p(VALUE self, VALUE v_t,VALUE v_df) {
     cdft(&which,&p,&q,&t,&df, &status,&bound);
     return rb_float_new(p);
 }
+
+/**
+* Return the upper limit of integration of t for a given 
+* probability integration for the cdf t distribution 
+*
+* call-seq:
+*   RubySS.t_t (p,df)
+*
+* [p]   The integral from 0 to X of the t distribution.
+*       Input range: [0, 1].
+* [df]  Degrees of freedom of the t-distribution.
+*       Input range: (0, +infinity).
+*       Search range: [1e-300, 1E10]
+*/
+
+
 VALUE mRubySS_t_t(VALUE self, VALUE v_p,VALUE v_df) {
     int which=2;
     double p,q,t,df,bound;
@@ -304,6 +320,3 @@ VALUE mRubySS_normal_sd(VALUE self, VALUE v_p,VALUE v_x,VALUE v_mean) {
     cdfnor(&which,&p,&q,&x, &mean,&sd,&status,&bound);
     return rb_float_new(sd);
 }
-
-
-

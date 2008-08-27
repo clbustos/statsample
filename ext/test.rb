@@ -8,5 +8,3 @@ delta=0.56
 
 p RubySS.tnc(t,df,delta)
 p RubySS.t_p(t,df)
-
-
