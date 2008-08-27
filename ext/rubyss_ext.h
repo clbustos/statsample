@@ -17,8 +17,18 @@ VALUE mRubySS_alngam2(VALUE self, VALUE x);
 VALUE mRubySS_alnorm(VALUE self, VALUE x, VALUE upper);
 VALUE mRubySS_betain(VALUE self, VALUE x, VALUE p,VALUE q, VALUE beta);
 VALUE mRubySS_tnc(VALUE self, VALUE t, VALUE df,VALUE delta);
-VALUE mRubySS_chi_square_p(VALUE self, VALUE x,VALUE df, VALUE bound);
-VALUE mRubySS_chi_square_x(VALUE self, VALUE p,VALUE df, VALUE bound);
-VALUE mRubySS_chi_square_df(VALUE self, VALUE p,VALUE x, VALUE bound);
+VALUE mRubySS_chi_square_p(VALUE self, VALUE x,VALUE df);
+VALUE mRubySS_chi_square_x(VALUE self, VALUE p,VALUE df);
+VALUE mRubySS_chi_square_df(VALUE self, VALUE p,VALUE x);
+VALUE mRubySS_t_p(VALUE self, VALUE t,VALUE df);
+VALUE mRubySS_t_t(VALUE self, VALUE p,VALUE df);
+VALUE mRubySS_t_df(VALUE self, VALUE p,VALUE t);
+VALUE mRubySS_gamma_p(VALUE self, VALUE x,VALUE shape,VALUE scale);
+VALUE mRubySS_gamma_x(VALUE self, VALUE p,VALUE shape,VALUE scale);
+
+VALUE mRubySS_normal_p(VALUE self, VALUE x,VALUE mean,VALUE sd);
+VALUE mRubySS_normal_x(VALUE self, VALUE p,VALUE mean,VALUE sd);
+VALUE mRubySS_normal_mean(VALUE self, VALUE p,VALUE x,VALUE sd);
+VALUE mRubySS_normal_sd(VALUE self, VALUE p,VALUE x,VALUE mean);
 
 

@@ -16,10 +16,16 @@ class Numeric
   def square ; self * self ; end
 end
 
+# Process files and databases for statistical purposes, with focus on 
+# estimation of parameters for several types of samples (simple random, 
+# stratified and multistage sampling).
+
+
 module RubySS
-	VERSION = '0.1.3'
+	VERSION = '0.1.4'
     class << self
-        def chi_square(real,expected)
+		# Calculate chi square for two Matrix
+        def matrix_chi_square(real,expected)
             raise TypeError, "Both argument should be Matrix" unless real.is_a? Matrix and expected.is_a?Matrix
             sum=0
             (0...real.row_size).each {|row_i|

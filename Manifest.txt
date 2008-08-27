@@ -3,7 +3,16 @@ Manifest.txt
 README.txt
 Rakefile
 bin/rubyss
+ext/asa243.c
+ext/cdflib.h
+ext/dcdflib.c
+ext/extconf.rb
+ext/ipmpar.c
+ext/rubyss_ext.c
+ext/rubyss_ext.h
+ext/test.rb
 lib/rubyss.rb
+lib/rubyss/chidistribution.rb
 lib/rubyss/crosstab.rb
 lib/rubyss/dataset.rb
 lib/rubyss/resample.rb
@@ -13,4 +22,5 @@ test/test_csv.csv
 test/test_csv.rb
 test/test_dataset.rb
 test/test_resample.rb
+test/test_statistics.rb
 test/test_vector.rb

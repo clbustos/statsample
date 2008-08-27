@@ -1,8 +1,15 @@
+=== 0.1.4 / 2008-08-27
+
+* New extension, with cdf functions for
+  chi-square, t, gamma and normal distributions. 
+  Based on dcdflib (http://www.netlib.org/random/)
+  Also, has a function to calculate the tail for a noncentral T distribution
+
 === 0.1.3 / 2008-08-22
 
 * Operational versions of Vector, Dataset, Crosstab and Resample
 * Read and write CSV files
-* Calculate chi-square
+* Calculate chi-square for 2 matrixes
 
 === 0.1.1 - 0.1.2 / 2008-08-18
 

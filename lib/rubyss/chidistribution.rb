@@ -2,7 +2,6 @@ module RubySS
     # Based on Babatunde, Iyiola & Eni () : 
     # "A Numerical Procedure for Computing Chi-Square Percentage Points"
     # 
-
     module ChiDistribution
         class << self
             def steps(av, bv, itv)
