@@ -323,10 +323,14 @@ class Vector < DelegateClass(Array)
             end
 		end
 		class Scale <Ordinal
+			attr_reader :gsl 
             def initialize(data)
 				@data=data.collect{|x|
                     x.to_f
                 }
+				if HAS_GSL
+				@gsl=GSL::Vector.alloc(@data)
+				end
 			end
             # The range of the data (max - min)
 			def range; @data.max - @data.min; end
@@ -334,10 +338,11 @@ class Vector < DelegateClass(Array)
             def sum
                 @data.inject(0){|a,x|x+a} ; end
             # The arithmetical mean of data
-            def mean
-                sum.to_f/ n_valid
-            end
+			def mean
+					sum.to_f/ n_valid
+			end
             # Sum of squares
+			
 			def squares
                 @data.inject(0){|a,x|x.square+a}
             end
@@ -345,21 +350,57 @@ class Vector < DelegateClass(Array)
             def variance_population
                 squares.to_f / n_valid - mean.square
             end
+			
+		
             # Population Standard deviation (divided by n)
             def standard_deviation_population
                 Math::sqrt( variance_population )
             end
             # Sample Variance (divided by n-1)
             
-			def variance_sample
-				m=mean
+			def variance_sample(m=false)
+				m=mean unless m
 				@data.inject(0){|a,x|a+(x-m).square} / (n_valid - 1)
 			end
+
             # Sample Standard deviation (divided by n-1)
             
-			def standard_deviation_sample
-				Math::sqrt(variance_sample)
+			def standard_deviation_sample(m=false)
+				m=mean unless m
+				Math::sqrt(variance_sample(m))
 			end
+			
+			if HAS_GSL
+				alias_method :slow_variance_sample, :variance_sample
+				alias_method :slow_sds, :standard_deviation_sample
+				alias_method :slow_mean, :mean
+				def sum
+					@gsl.sum
+				end
+				def mean
+					@gsl.mean
+				end				
+				def variance_sample(m=false)
+					m=mean unless m
+					@gsl.variance_m
+				end
+				def standard_deviation_sample(m=false)
+					m=mean unless m
+					@gsl.sd(m)
+				end
+				def skew
+					@gsl.skew
+				end
+				def kurtosis
+					@gsl.kurtosis
+				end
+				def correlation(v2)
+					raise ArgumentError, "Vector should be of the same size" if(v2.size!=@data.size)
+					GSL::Stats::correlation(@gsl,v2.gsl)
+				end
+				
+			end
+			
             # Coefficient of variation
             # Calculed with the sample standard deviation
 			def coefficient_of_variation

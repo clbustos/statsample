@@ -11,7 +11,8 @@
 $:.unshift(File.dirname(__FILE__))
 require 'delegate'
 require 'matrix'
-require 'rubyss/vector'
+
+
 class Numeric
   def square ; self * self ; end
 end
@@ -20,8 +21,16 @@ end
 # estimation of parameters for several types of samples (simple random, 
 # stratified and multistage sampling).
 
-
+	begin
+		require 'rbgsl'
+		HAS_GSL=true
+	rescue LoadError
+		HAS_GSL=false
+	end
+require 'rubyss/vector'
+	
 module RubySS
+	
 	VERSION = '0.1.4'
     class << self
 		# Calculate chi square for two Matrix

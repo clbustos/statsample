@@ -117,7 +117,19 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 		end
     end
     
-    
+    def test_gsl
+		if HAS_GSL
+			a=RubySS::Vector.new([1,2,3,4,"STRING"], :scale)
+			assert_equal(2,a.mean)
+			assert_equal(a.slow_variance_sample,a.variance_sample)
+			assert_equal(a.slow_sds,a.sds)
+			a=[1,2,3,4].to_vector
+			b=[4,3,2,1].to_vector
+			a.type=:scale
+			b.type=:scale
+			assert_equal(-1,a.correlation(b))
+		end
+	end
 	def test_vector_matrix
 		v1=%w{a a a b b b c c}.to_vector
 		v2=%w{1 3 4 5 6 4 3 2}.to_vector
