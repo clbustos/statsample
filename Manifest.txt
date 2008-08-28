@@ -11,6 +11,8 @@ ext/distributions/ipmpar.c
 ext/distributions/rubyss_ext.c
 ext/distributions/rubyss_ext.h
 ext/distributions/test.rb
+ext/optimization/extconf.rb
+ext/optimization/rubyssopt.c
 lib/rubyss.rb
 lib/rubyss/chidistribution.rb
 lib/rubyss/crosstab.rb

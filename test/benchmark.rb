@@ -1,4 +1,5 @@
-require File.dirname(__FILE__)+'/../lib/rubyss.rb'
+#require File.dirname(__FILE__)+'/../lib/rubyss.rb'
+require "rubyss.rb"
 require 'benchmark'
 v=(0..10000).collect{|n|
 	rand(100)

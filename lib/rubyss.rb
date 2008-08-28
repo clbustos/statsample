@@ -9,8 +9,7 @@
 # Claudio Bustos mailto:clbustos@gmail.com
 
 $:.unshift(File.dirname(__FILE__))
-$:.unshift(File.dirname(__FILE__)+"/../ext/optimization")
-$:.unshift(File.dirname(__FILE__)+"/../ext/distributions")
+$:.unshift(File.expand_path(File.dirname(__FILE__)+"/../ext"))
 
 require 'delegate'
 require 'matrix'
@@ -32,7 +31,7 @@ end
 	end
     
     begin 
-        require 'rubyssopt'
+        require 'rubyss/rubyssopt'
     rescue LoadError
         module RubySS
             OPTIMIZED=false

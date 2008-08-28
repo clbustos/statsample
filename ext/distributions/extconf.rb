@@ -1,3 +1,3 @@
 require "mkmf"
 $CFLAGS+=" -Wall "
-create_makefile("distributions")
+create_makefile("cdf")

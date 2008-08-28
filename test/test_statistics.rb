@@ -1,4 +1,4 @@
-require File.dirname(__FILE__)+'/../lib/rubyss.rb'
+require File.dirname(__FILE__)+'/../lib/rubyss'
 require 'rubyss/dataset'
 require 'test/unit'
 

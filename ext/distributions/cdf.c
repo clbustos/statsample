@@ -1,42 +1,40 @@
-#include "rubyss_ext.h"
+#include "cdf.h"
 #include "cdflib.h"
 
 /**
-* Extension in C for RubySS
-* Mostly comulative distribution function for several distributions
-*
+* CDF Distributions
+* Cumulative distribution function for several distributions
 */
 
-void Init_rubyss_ext()
+void Init_cdf()
 {
-    VALUE mRubySS = rb_define_module("RubySS");
-    
-    rb_define_module_function(mRubySS, "alngam2", mRubySS_alngam2, 1);
-    rb_define_module_function(mRubySS, "alnorm", mRubySS_alnorm, 2);
-    rb_define_module_function(mRubySS, "beatin", mRubySS_betain, 4);
-    rb_define_module_function(mRubySS, "tnc", mRubySS_tnc, 3);
-    rb_define_module_function(mRubySS, "chi_square_p",mRubySS_chi_square_p, 2);
-    rb_define_module_function(mRubySS, "chi_square_x",mRubySS_chi_square_x,2);
-    rb_define_module_function(mRubySS, "chi_square_df",mRubySS_chi_square_df,2);
-    rb_define_module_function(mRubySS, "t_p",mRubySS_t_p, 2);
-    rb_define_module_function(mRubySS, "t_t",mRubySS_t_t,2);
-    rb_define_module_function(mRubySS, "t_df",mRubySS_t_df,2);
-    rb_define_module_function(mRubySS, "gamma_p",mRubySS_gamma_p,3);
-    rb_define_module_function(mRubySS, "gamma_x",mRubySS_gamma_x,3);
-    rb_define_module_function(mRubySS, "normal_p",mRubySS_normal_p,3);
-    rb_define_module_function(mRubySS, "normal_x",mRubySS_normal_x,3);
-    rb_define_module_function(mRubySS, "normal_mean",mRubySS_normal_mean,3);
-    rb_define_module_function(mRubySS, "normal_sd",mRubySS_normal_sd,3);
+    VALUE mCdf = rb_define_module("CdfDistributions");
+    rb_define_module_function(mCdf, "alngam2", mCdf_alngam2, 1);
+    rb_define_module_function(mCdf, "alnorm", mCdf_alnorm, 2);
+    rb_define_module_function(mCdf, "beatin", mCdf_betain, 4);
+    rb_define_module_function(mCdf, "tnc", mCdf_tnc, 3);
+    rb_define_module_function(mCdf, "chi_square_p",mCdf_chi_square_p, 2);
+    rb_define_module_function(mCdf, "chi_square_x",mCdf_chi_square_x,2);
+    rb_define_module_function(mCdf, "chi_square_df",mCdf_chi_square_df,2);
+    rb_define_module_function(mCdf, "t_p",mCdf_t_p, 2);
+    rb_define_module_function(mCdf, "t_t",mCdf_t_t,2);
+    rb_define_module_function(mCdf, "t_df",mCdf_t_df,2);
+    rb_define_module_function(mCdf, "gamma_p",mCdf_gamma_p,3);
+    rb_define_module_function(mCdf, "gamma_x",mCdf_gamma_x,3);
+    rb_define_module_function(mCdf, "normal_p",mCdf_normal_p,3);
+    rb_define_module_function(mCdf, "normal_x",mCdf_normal_x,3);
+    rb_define_module_function(mCdf, "normal_mean",mCdf_normal_mean,3);
+    rb_define_module_function(mCdf, "normal_sd",mCdf_normal_sd,3);
 }
 
 /**
 * alngam2 computes the logarithm of the gamma function.
 * 
 * call-seq:
-*   RubySS.alngam2(x)       -> Float
+*   alngam2(x)       -> Float
 * 
 */
-VALUE mRubySS_alngam2(VALUE self, VALUE xvalue) {
+VALUE mCdf_alngam2(VALUE self, VALUE xvalue) {
 	int ifault;
 	double ag;
 	ag=alngam2 ( NUM2DBL(xvalue), &ifault);
@@ -56,7 +54,7 @@ VALUE mRubySS_alngam2(VALUE self, VALUE xvalue) {
 /**
 * Computes the cumulative density of the standard normal distribution
 * call-seq:
-*   RubySS.alnorm(x,upper)       -> Float
+*   alnorm(x,upper)       -> Float
 *
 * - x: is one endpoint of the semi-infinite interval 
 *   over which the integration takes place.
@@ -66,14 +64,14 @@ VALUE mRubySS_alngam2(VALUE self, VALUE xvalue) {
 *     - false => integrate from - Infinity to X.
 */
 
-VALUE mRubySS_alnorm (VALUE self, VALUE x, VALUE upper ) {
+VALUE mCdf_alnorm (VALUE self, VALUE x, VALUE upper ) {
     bool upper_bool=RTEST(upper);
         
     double an= alnorm( NUM2DBL(x), upper_bool);
     return rb_float_new(an);
 }
 
-VALUE mRubySS_betain(VALUE self, VALUE x, VALUE p,VALUE q, VALUE beta) {
+VALUE mCdf_betain(VALUE self, VALUE x, VALUE p,VALUE q, VALUE beta) {
     int ifault;
     double bin=betain(NUM2DBL(x), NUM2DBL(x), NUM2DBL(x), NUM2DBL(x), &ifault);
     if(ifault) {
@@ -85,16 +83,16 @@ VALUE mRubySS_betain(VALUE self, VALUE x, VALUE p,VALUE q, VALUE beta) {
 /**
 * TNC computes the tail of the noncentral T distribution.
 * call-seq:
-*   RubySS.tnc(t,df,delta)       -> Float
+*   tnc(t,df,delta)       -> Float
 *
 * [t] the point whose cumulative probability is desired.
 * [df] the number of degrees of freedom.
 * [delta]  the noncentrality parameter. 
 *
-* When delta=0, RubySS.tnc = RubySS.t_p 
+* When delta=0, tnc = t_p 
 */
 
-VALUE mRubySS_tnc(VALUE self, VALUE t, VALUE df,VALUE delta) {
+VALUE mCdf_tnc(VALUE self, VALUE t, VALUE df,VALUE delta) {
     int ifault;
     double tn=tnc(NUM2DBL(t), NUM2DBL(df), NUM2DBL(delta), &ifault);
     if(ifault==1) {
@@ -107,7 +105,7 @@ VALUE mRubySS_tnc(VALUE self, VALUE t, VALUE df,VALUE delta) {
 * the cdf CHI-Square distribution 
 *
 * call-seq:
-*   RubySS.chi_square_p (x,df)
+*   chi_square_p (x,df)
 *
 * [x]   Upper limit of integration of the non-central
 *       chi-square distribution.
@@ -118,7 +116,7 @@ VALUE mRubySS_tnc(VALUE self, VALUE t, VALUE df,VALUE delta) {
 *       Input range: (0, +infinity).
 *       Search range: [ 1E-300, 1E300]
 */
-VALUE mRubySS_chi_square_p(VALUE self, VALUE v_x,VALUE v_df) {
+VALUE mCdf_chi_square_p(VALUE self, VALUE v_x,VALUE v_df) {
     int which=1;
     double p,q,x,df,bound;
     int status;
@@ -133,7 +131,7 @@ VALUE mRubySS_chi_square_p(VALUE self, VALUE v_x,VALUE v_df) {
 * the cdf CHI-Square distribution 
 *
 * call-seq:
-*   RubySS.chi_square_x (p,df)
+*   chi_square_x (p,df)
 *
 * [p]   The integral from 0 to X of the chi-square
 *       distribution.
@@ -145,7 +143,7 @@ VALUE mRubySS_chi_square_p(VALUE self, VALUE v_x,VALUE v_df) {
 */
 
 
-VALUE mRubySS_chi_square_x(VALUE self, VALUE v_p,VALUE v_df) {
+VALUE mCdf_chi_square_x(VALUE self, VALUE v_p,VALUE v_df) {
     int which=2;
     double p,q,x,df,bound;
     int status;
@@ -162,7 +160,7 @@ VALUE mRubySS_chi_square_x(VALUE self, VALUE v_p,VALUE v_df) {
 * chi square value for the cdf CHI-Square distribution 
 *
 * call-seq:
-*   RubySS.chi_square_x (p,x)
+*   chi_square_x (p,x)
 *
 * [p]   The integral from 0 to X of the chi-square
 *       distribution.
@@ -174,7 +172,7 @@ VALUE mRubySS_chi_square_x(VALUE self, VALUE v_p,VALUE v_df) {
 */
 
 
-VALUE mRubySS_chi_square_df(VALUE self, VALUE v_p,VALUE v_x) {
+VALUE mCdf_chi_square_df(VALUE self, VALUE v_p,VALUE v_x) {
     int which=3;
     double p,q,x,df,bound;
     int status;
@@ -190,7 +188,7 @@ VALUE mRubySS_chi_square_df(VALUE self, VALUE v_p,VALUE v_x) {
 * the cdf t distribution 
 *
 * call-seq:
-*   RubySS.t_p (t,df)
+*   t_p (t,df)
 *
 * [t]   Upper limit of integration of the t-density.
 *       Input range: ( -infinity, +infinity).
@@ -201,7 +199,7 @@ VALUE mRubySS_chi_square_df(VALUE self, VALUE v_p,VALUE v_x) {
 */
 
 
-VALUE mRubySS_t_p(VALUE self, VALUE v_t,VALUE v_df) {
+VALUE mCdf_t_p(VALUE self, VALUE v_t,VALUE v_df) {
     int which=1;
     double p,q,t,df,bound;
     int status;
@@ -216,7 +214,7 @@ VALUE mRubySS_t_p(VALUE self, VALUE v_t,VALUE v_df) {
 * probability integration for the cdf t distribution 
 *
 * call-seq:
-*   RubySS.t_t (p,df)
+*   t_t (p,df)
 *
 * [p]   The integral from 0 to X of the t distribution.
 *       Input range: [0, 1].
@@ -226,7 +224,7 @@ VALUE mRubySS_t_p(VALUE self, VALUE v_t,VALUE v_df) {
 */
 
 
-VALUE mRubySS_t_t(VALUE self, VALUE v_p,VALUE v_df) {
+VALUE mCdf_t_t(VALUE self, VALUE v_p,VALUE v_df) {
     int which=2;
     double p,q,t,df,bound;
     int status;
@@ -237,7 +235,7 @@ VALUE mRubySS_t_t(VALUE self, VALUE v_p,VALUE v_df) {
     return rb_float_new(t);
 
 }
-VALUE mRubySS_t_df(VALUE self, VALUE v_p,VALUE v_t) {
+VALUE mCdf_t_df(VALUE self, VALUE v_p,VALUE v_t) {
     int which=3;
     double p,q,t,df,bound;
     int status;
@@ -249,7 +247,7 @@ VALUE mRubySS_t_df(VALUE self, VALUE v_p,VALUE v_t) {
 }
 
 
-VALUE mRubySS_gamma_p(VALUE self, VALUE v_x,VALUE v_shape,VALUE v_scale) {
+VALUE mCdf_gamma_p(VALUE self, VALUE v_x,VALUE v_shape,VALUE v_scale) {
     int which=1;
     double p,q,x,shape,scale,bound;
     int status;
@@ -259,7 +257,7 @@ VALUE mRubySS_gamma_p(VALUE self, VALUE v_x,VALUE v_shape,VALUE v_scale) {
     cdfgam(&which,&p,&q,&x,&shape,&scale, &status,&bound);
     return rb_float_new(p);
 }
-VALUE mRubySS_gamma_x(VALUE self, VALUE v_p,VALUE v_shape,VALUE v_scale) {
+VALUE mCdf_gamma_x(VALUE self, VALUE v_p,VALUE v_shape,VALUE v_scale) {
     int which=2;
     double p,q,x,shape,scale,bound;
     int status;
@@ -275,7 +273,7 @@ VALUE mRubySS_gamma_x(VALUE self, VALUE v_p,VALUE v_shape,VALUE v_scale) {
     return rb_float_new(x);
 }
 
-VALUE mRubySS_normal_p(VALUE self, VALUE v_x,VALUE v_mean,VALUE v_sd) {
+VALUE mCdf_normal_p(VALUE self, VALUE v_x,VALUE v_mean,VALUE v_sd) {
     int which=1;
     double p,q,x,mean,sd,bound;
     int status;
@@ -286,7 +284,7 @@ VALUE mRubySS_normal_p(VALUE self, VALUE v_x,VALUE v_mean,VALUE v_sd) {
      return rb_float_new(p);
 }
 
-VALUE mRubySS_normal_x(VALUE self, VALUE v_p,VALUE v_mean,VALUE v_sd) {
+VALUE mCdf_normal_x(VALUE self, VALUE v_p,VALUE v_mean,VALUE v_sd) {
     int which=2;
     double p,q,x,mean,sd,bound;
     int status;
@@ -297,7 +295,7 @@ VALUE mRubySS_normal_x(VALUE self, VALUE v_p,VALUE v_mean,VALUE v_sd) {
     cdfnor(&which,&p,&q,&x, &mean,&sd,&status,&bound);
     return rb_float_new(x);
 }
-VALUE mRubySS_normal_mean(VALUE self, VALUE v_p,VALUE v_x,VALUE v_sd) {
+VALUE mCdf_normal_mean(VALUE self, VALUE v_p,VALUE v_x,VALUE v_sd) {
     int which=3;
     double p,q,x,mean,sd,bound;
     int status;
@@ -309,7 +307,7 @@ VALUE mRubySS_normal_mean(VALUE self, VALUE v_p,VALUE v_x,VALUE v_sd) {
     return rb_float_new(mean);
 }
 
-VALUE mRubySS_normal_sd(VALUE self, VALUE v_p,VALUE v_x,VALUE v_mean) {
+VALUE mCdf_normal_sd(VALUE self, VALUE v_p,VALUE v_x,VALUE v_mean) {
     int which=4;
     double p,q,x,mean,sd,bound;
     int status;
