@@ -37,16 +37,26 @@ class Vector < DelegateClass(Array)
 			@missing_values=missing_values
 			@labels=labels
             @population_size=(population_size.nil? or population_size<@data.size) ? @data.size : population_size.to_i
-
+            @type=t
 			@valid_data=[]
 			@missing_data=[]
-			set_valid_data
+			_set_valid_data
 			self.type=t
 			super(@delegate)
 		end
+        def dup
+            Vector.new(@data.dup,@type,@missing_values.dup,@labels.dup,@population_size)
+        end
+        # Returns an empty duplicate of the vector. Maintains the type, missing
+        # values, labels and population_size
+        def dup_empty
+            Vector.new([],@type,@missing_values.dup,@labels.dup,@population_size)
+
+        end
         # Vector equality
         # Two vector will be the same if their data, missing values, type, labels and population_size are equals
         def ==(v2)
+            raise TypeError,"Argument should be a Vector" unless v2.instance_of? RubySS::Vector
             @data==v2.data and @missing_values==v2.missing_values and @type==v2.type and @labels=v2.labels and @population_size=v2.population_size
         end
         def _dump(i)
@@ -74,14 +84,18 @@ class Vector < DelegateClass(Array)
 		def set_valid_data
 			@valid_data.clear
 			@missing_data.clear
-			@data.each do |n|
-				if n.nil? or @missing_values.include? n
-					@missing_data.push(n)
-				else
+            _set_valid_data
+            @delegate.set_gsl if(@type==:scale)
+		end
+        def _set_valid_data
+            @data.each do |n|
+				if is_valid? n
 					@valid_data.push(n)
+				else
+                    @missing_data.push(n)
 				end
 			end
-		end
+        end
         # Returns a Vector with the data with labels replaced by the label
         def vector_labeled
             d=@data.collect{|x|
@@ -269,17 +283,17 @@ class Vector < DelegateClass(Array)
 				@data=data
 			end
             
-            
-            
             # Returns a hash with the distribution of frecuencies of
             # the sample
-			def frequencies
-				@data.inject(Hash.new) {|a,x|
-					a[x]=0 if a[x].nil?
-					a[x]=a[x]+1
-					a
-				}
-			end
+            if !RubySS::OPTIMIZED
+                def frequencies
+                    @data.inject(Hash.new) {|a,x|
+                        a[x]=0 if a[x].nil?
+                        a[x]=a[x]+1
+                        a
+                    }
+                end
+            end
             
             # Return an array of the different values of the data
 			def factors
@@ -297,7 +311,7 @@ class Vector < DelegateClass(Array)
             # the sample
             def proportions
                 frequencies.inject({}){|a,v|
-                    a[v[0]] = v[1].to_f / n_valid
+                    a[v[0]] = v[1].to_f / @data.size
                     a
                 }
             end
@@ -340,21 +354,26 @@ class Vector < DelegateClass(Array)
 		class Scale <Ordinal
 			attr_reader :gsl 
             def initialize(data)
-				@data=data.collect{|x|
+                data.collect!{|x|
                     x.to_f
                 }
-				if HAS_GSL
-                    @gsl=GSL::Vector.alloc(@data)
-				end
+                @data=data
+                set_gsl
 			end
+            def delegate_data
+                @data
+            end
             def _dump(i)
                 Marshal.dump(@data)
             end
             def _load(data)
                 @data=Marshal.restore(data)
-				if HAS_GSL
-                    @gsl=GSL::Vector.alloc(@data)
-				end                
+                set_gsl
+            end
+            def set_gsl
+                if HAS_GSL
+                    @gsl=GSL::Vector.alloc(@data) if @data.size>0
+				end
             end
             # The range of the data (max - min)
 			def range; @data.max - @data.min; end
@@ -418,12 +437,7 @@ class Vector < DelegateClass(Array)
 				end
 				def kurtosis
 					@gsl.kurtosis
-				end
-				def correlation(v2)
-					raise ArgumentError, "Vector should be of the same size" if(v2.size!=@data.size)
-					GSL::Stats::correlation(@gsl,v2.gsl)
-				end
-				
+				end				
 			end
 			
             # Coefficient of variation

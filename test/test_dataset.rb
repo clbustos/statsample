@@ -83,4 +83,35 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         ds_marshal=Marshal.load(Marshal.dump(@ds))
         assert_equal(ds_marshal,@ds)
     end
+    def test_dup
+        v1=[1,2,3,4].to_vector
+        v2=[5,6,7,8].to_vector
+        ds1=RubySS::Dataset.new({'v1'=>v1,'v2'=>v2}, %w{v2 v1})
+        ds2=ds1.dup
+        assert_equal(ds1,ds2)
+        assert_not_same(ds1,ds2)
+        assert_equal(ds1['v1'],ds2['v1'])
+        assert_not_same(ds1['v1'],ds2['v1'])
+        assert_equal(ds1.fields,ds2.fields)
+        assert_not_same(ds1.fields,ds2.fields)
+        ds1['v1'].type=:scale
+        # empty
+        ds3=ds1.dup_empty
+        assert_not_equal(ds1,ds3)
+        assert_not_equal(ds1['v1'],ds3['v1'])
+        assert_equal([],ds3['v1'].data)
+        assert_equal([],ds3['v2'].data)
+        assert_equal(:scale,ds3['v1'].type)
+        assert_equal(ds1.fields,ds2.fields)
+        assert_not_same(ds1.fields,ds2.fields)
+    end
+    def test_dup_only_valid
+        v1=[1,nil,3,4].to_vector(:scale)
+        v2=[5,6,nil,8].to_vector(:scale)
+        v3=[9,10,11,12].to_vector(:scale)
+        ds1=RubySS::Dataset.new({'v1'=>v1,'v2'=>v2,'v3'=>v3})
+        ds2=ds1.dup_only_valid
+        expected=RubySS::Dataset.new({'v1'=>[1,4].to_vector(:scale), 'v2'=> [5,8].to_vector(:scale), 'v3'=>[9, 12].to_vector(:scale)})
+        assert_equal(expected,ds2)
+    end
 end

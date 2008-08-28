@@ -136,11 +136,14 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 			assert_equal(2,a.mean)
 			assert_equal(a.slow_variance_sample,a.variance_sample)
 			assert_equal(a.slow_standard_deviation_sample,a.sds)
-			a=[1,2,3,4].to_vector
-			b=[4,3,2,1].to_vector
-			a.type=:scale
-			b.type=:scale
-            assert_in_delta(-1.0,a.correlation(b).to_f,0.01)
+            assert_nothing_raised do
+                a=[].to_vector(:scale)
+            end
+            a.add(1,false)
+            a.add(2,false)
+            a.set_valid_data
+            
+            assert_equal(3,a.sum)
 		end
 	end
 	def test_vector_matrix        
@@ -155,4 +158,33 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         v2=Marshal.load(Marshal.dump(v1))
         assert_equal(v1,v2)
     end
+    def test_dup
+        v1=%w{a a a b b b c c}.to_vector
+        v2=v1.dup
+        assert_equal(v1.data,v2.data)
+        assert_not_same(v1.data,v2.data)
+        assert_equal(v1.type,v2.type)
+        
+        v1.type=:ordinal
+        assert_not_equal(v1.type,v2.type)
+        assert_equal(v1.missing_values,v2.missing_values)
+        assert_not_same(v1.missing_values,v2.missing_values)
+        assert_equal(v1.labels,v2.labels)
+        assert_not_same(v1.labels,v2.labels)
+        
+        v3=v1.dup_empty
+        assert_equal([],v3.data)
+        assert_not_equal(v1.data,v3.data)
+        assert_not_same(v1.data,v3.data)
+        assert_equal(v1.type,v3.type)
+        v1.type=:ordinal
+        v3.type=:nominal
+        assert_not_equal(v1.type,v3.type)
+        assert_equal(v1.missing_values,v3.missing_values)
+        assert_not_same(v1.missing_values,v3.missing_values)
+        assert_equal(v1.labels,v3.labels)
+        assert_not_same(v1.labels,v3.labels)
+        
+    end
+     
 end

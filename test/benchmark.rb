@@ -1,13 +1,12 @@
 require File.dirname(__FILE__)+'/../lib/rubyss.rb'
 require 'benchmark'
 v=(0..10000).collect{|n|
-	rand(10000)
+	rand(100)
 }.to_vector
 v.type=:scale
-p v.slow_variance_sample
-p v.variance_sample
 
- n = 400
+ n = 200
+ if (false)
     Benchmark.bm(7) do |x|
 		x.report("mean")   { for i in 1..n; v.mean; end }
 		x.report("slow_mean")   { for i in 1..n; v.slow_mean; end }
@@ -19,4 +18,13 @@ p v.variance_sample
 		x.report("variance_slow")   { for i in 1..n; v.slow_variance_sample; end }
 
     end
+end
+
+    Benchmark.bm(7) do |x|
+		
+		x.report("Nominal.frequencies")   { for i in 1..n; v.frequencies; end }
+		x.report("_frequencies")   { for i in 1..n; RubySS._frequencies(v.valid_data); end }
+
+    end
+
 

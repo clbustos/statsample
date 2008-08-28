@@ -9,6 +9,9 @@
 # Claudio Bustos mailto:clbustos@gmail.com
 
 $:.unshift(File.dirname(__FILE__))
+$:.unshift(File.dirname(__FILE__)+"/../ext/optimization")
+$:.unshift(File.dirname(__FILE__)+"/../ext/distributions")
+
 require 'delegate'
 require 'matrix'
 
@@ -27,6 +30,14 @@ end
 	rescue LoadError
 		HAS_GSL=false
 	end
+    
+    begin 
+        require 'rubyssopt'
+    rescue LoadError
+        module RubySS
+            OPTIMIZED=false
+        end
+    end
 require 'rubyss/vector'
 	
 module RubySS

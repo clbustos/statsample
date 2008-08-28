@@ -10,14 +10,39 @@ module RubySS
         #
         def initialize(vectors={},fields=[])
             if vectors.instance_of? Array
-                    @fields=vectors.dup
-                    @vectors=vectors.inject({}){|a,x| a[x]=RubySS::Vector.new(); a}
+                @fields=vectors.dup
+                @vectors=vectors.inject({}){|a,x| a[x]=RubySS::Vector.new(); a}
             else
-                    @vectors=vectors
-                    @fields=fields
-                    check_order
-                    check_length
+                @vectors=vectors
+                @fields=fields
+                check_order
+                check_length
             end
+        end
+        # Creates a copy of the given dataset, deleting all the cases with
+        # missing data on one of the vectors
+        def dup_only_valid
+            ds=dup_empty
+            each {|c|
+                ds.add_case(c,false) unless @fields.find{|f| !@vectors[f].is_valid? c[f]}
+            }
+            ds.update_valid_data
+            ds
+        end
+        def dup
+            vectors=@vectors.inject({}) {|a,v|
+                a[v[0]]=v[1].dup
+                a
+            }
+            Dataset.new(vectors,@fields.dup)
+        end
+        # Creates a copy of the given dataset, without data on vectors
+        def dup_empty
+            vectors=@vectors.inject({}) {|a,v|
+                a[v[0]]=v[1].dup_empty
+                a
+            }
+            Dataset.new(vectors,@fields.dup)
         end
         # We have the same datasets if the labels and vectors are the same 
         def ==(d2)
@@ -61,12 +86,10 @@ module RubySS
             if uvd
                 update_valid_data
             end
-                
         end
         def update_valid_data
            @fields.each{|f| @vectors[f].set_valid_data}
            check_length
-
         end
         def delete_vector(name)
             @fields.delete(name)
@@ -89,14 +112,16 @@ module RubySS
             }
             @cases=size
         end
-        def case_as_hash(c)
-            @fields.inject({}) {|a,x|
-                    a[x]=@vectors[x][c]
-                    a
-        }
-        end
-        def case_as_array(c)
-            @fields.collect {|x| @vectors[x][c]}
+        if !RubySS::OPTIMIZED
+            def case_as_hash(c)
+                @fields.inject({}) {|a,x|
+                        a[x]=@vectors[x][c]
+                        a
+            }
+            end
+            def case_as_array(c)
+                @fields.collect {|x| @vectors[x][c]}
+            end            
         end
         def each
             0.upto(@cases-1) {|i|
