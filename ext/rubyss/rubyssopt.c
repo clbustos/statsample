@@ -1,5 +1,7 @@
 #include <ruby.h>
-
+/**
+* Document-class: RubySSOpt
+*/
 void Init_rubyssopt();
 VALUE nominal_frequencies(VALUE self);
 VALUE rubyss_frequencies(VALUE self, VALUE data);
@@ -8,8 +10,8 @@ VALUE dataset_case_as_array(VALUE self, VALUE index);
 
 void Init_rubyssopt()
 {
+    VALUE mRubySS = rb_define_module("RubySS"); 
 
-    VALUE mRubySS = rb_define_module("RubySS");
     VALUE cNominal = rb_define_class_under(mRubySS,"Nominal",rb_cObject);
     VALUE cDataset = rb_define_class_under(mRubySS,"Dataset",rb_cObject);
     rb_define_const(mRubySS,"OPTIMIZED",Qtrue);
@@ -22,12 +24,11 @@ void Init_rubyssopt()
 }
 
 /**
-@data.inject(Hash.new) {|a,x|
-					a[x]=0 if a[x].nil?
-					a[x]=a[x]+1
-					a
-				}
-			end
+* The same as Nominal#frequencies, but with an array
+*
+* call-seq:
+*   _frequencies(ary)       -> hash    
+* 
 */
 
 VALUE rubyss_frequencies(VALUE self, VALUE data) {
@@ -47,11 +48,11 @@ VALUE rubyss_frequencies(VALUE self, VALUE data) {
     }
     return h;
 }
+
 VALUE nominal_frequencies(VALUE self) {
     VALUE data=rb_iv_get(self,"@data");
     return rubyss_frequencies(self,data);
 }
-
 VALUE dataset_case_as_hash(VALUE self, VALUE index) {
     VALUE vector,data,key;
     VALUE fields=rb_iv_get(self,"@fields");
@@ -67,7 +68,6 @@ VALUE dataset_case_as_hash(VALUE self, VALUE index) {
     }
     return h;
 }
-
 VALUE dataset_case_as_array(VALUE self, VALUE index) {
     VALUE vector,data,key;
     VALUE fields=rb_iv_get(self,"@fields");

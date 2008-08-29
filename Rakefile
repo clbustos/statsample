@@ -1,3 +1,4 @@
+#!/usr/bin/ruby
 # -*- ruby -*-
 
 require 'rubygems'
@@ -10,9 +11,9 @@ EXT2 = "ext/rubyss/rubyssopt.#{Hoe::DLEXT}"
 Hoe.new('rubyss', RubySS::VERSION) do |p|
   # p.rubyforge_name = 'rubyssx' # if different than lowercase project name
   p.developer('Claudio Bustos', 'clbustos@gmail.com')
-  p.spec_extras[:extensions] = ["ext/rubyss/extconf.rb","ext/optimization/extconf.rb"]
+  p.spec_extras[:extensions] = ["ext/rubyss/extconf.rb","ext/rubyss/extconf.rb"]
   p.clean_globs << EXT1 << EXT2 << "ext/distributions/*.o" << "ext/distributions/Makefile" << "ext/rubyss/*.o" << "ext/rubyss/Makefile"
-
+  p.rdoc_pattern = /^(lib|bin|ext\/distributions)|txt$/
 end
 
 task :test => [EXT1, EXT2]

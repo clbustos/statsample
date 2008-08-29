@@ -8,7 +8,7 @@
 
 void Init_cdf()
 {
-    VALUE mCdf = rb_define_module("CdfDistributions");
+    VALUE mCdf = rb_define_module("Cdf");
     rb_define_module_function(mCdf, "alngam2", mCdf_alngam2, 1);
     rb_define_module_function(mCdf, "alnorm", mCdf_alnorm, 2);
     rb_define_module_function(mCdf, "beatin", mCdf_betain, 4);

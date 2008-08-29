@@ -142,8 +142,12 @@ class RubySSVectorTestCase < Test::Unit::TestCase
             a.add(1,false)
             a.add(2,false)
             a.set_valid_data
-            
             assert_equal(3,a.sum)
+            b=[1,2,nil,3,4,5,nil,6].to_vector(:scale)
+            assert_equal(21,b.sum)
+            assert_equal(3.5,b.mean)
+            assert_equal(6,b.gsl.size)
+            
 		end
 	end
 	def test_vector_matrix        

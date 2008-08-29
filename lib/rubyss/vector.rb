@@ -283,9 +283,10 @@ class Vector < DelegateClass(Array)
 				@data=data
 			end
             
-            # Returns a hash with the distribution of frecuencies of
-            # the sample
+
             if !RubySS::OPTIMIZED
+                # Returns a hash with the distribution of frecuencies of
+                # the sample                
                 def frequencies
                     @data.inject(Hash.new) {|a,x|
                         a[x]=0 if a[x].nil?
@@ -329,20 +330,33 @@ class Vector < DelegateClass(Array)
 		end
         
 		class Ordinal <Nominal
-			# Return the value of the percentil q
+        # Return the value of the percentil q
             def percentil(q)
-				sorted=@data.sort
-				v= (n_valid.to_f * q / 100)
-				if(v.to_i!=v)
-					sorted[v.to_i]
-				else
-					(sorted[(v-0.5).to_i].to_f + sorted[(v+0.5).to_i]) / 2
-				end
-			end
+                sorted=@data.sort
+                v= (n_valid.to_f * q / 100)
+                if(v.to_i!=v)
+                    sorted[v.to_i]
+                else
+                    (sorted[(v-0.5).to_i].to_f + sorted[(v+0.5).to_i]) / 2
+                end
+            end
             # Return the median (percentil 50)
-			def median
-				percentil(50)
-			end
+            def median
+                percentil(50)
+            end
+            if HAS_GSL
+                %w{median}.each{|m|
+                    m_nuevo=("slow_"+m).intern
+                    alias_method m_nuevo, m.intern
+                }
+                
+                #def percentil(p)
+                #    GSL::Stats::quantile_from_sorted_data(GSL::Vector.alloc(@data.sort),p)
+                #end
+                def median # :nodoc:
+                    GSL::Stats::median_from_sorted_data(GSL::Vector.alloc(@data.sort))
+                end
+            end
             def summary(out="")
                 out << sprintf("n valid:%d\n",n_valid)
                 out <<  "median:"+median.to_s+"\n"
@@ -370,7 +384,7 @@ class Vector < DelegateClass(Array)
                 @data=Marshal.restore(data)
                 set_gsl
             end
-            def set_gsl
+            def set_gsl # :nodoc:
                 if HAS_GSL
                     @gsl=GSL::Vector.alloc(@data) if @data.size>0
 				end
@@ -418,17 +432,17 @@ class Vector < DelegateClass(Array)
                     m_nuevo=("slow_"+m).intern
                     alias_method m_nuevo, m.intern
                 }
-				def sum
+				def sum # :nodoc:
 					@gsl.sum
 				end
-				def mean
+				def mean # :nodoc:
 					@gsl.mean
 				end				
-				def variance_sample(m=false)
+				def variance_sample(m=false) # :nodoc:
 					m=mean unless m
 					@gsl.variance_m
 				end
-				def standard_deviation_sample(m=false)
+				def standard_deviation_sample(m=false) # :nodoc:
 					m=mean unless m
 					@gsl.sd(m)
 				end
@@ -437,7 +451,7 @@ class Vector < DelegateClass(Array)
 				end
 				def kurtosis
 					@gsl.kurtosis
-				end				
+				end
 			end
 			
             # Coefficient of variation
