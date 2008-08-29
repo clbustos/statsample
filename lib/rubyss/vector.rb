@@ -295,7 +295,29 @@ class Vector < DelegateClass(Array)
                     }
                 end
             end
-            
+            def plot_frequencies
+                require 'gnuplot'
+                x=[]
+                y=[]
+                self.frequencies.sort.each{|k,v|
+                    x.push(k)
+                    y.push(v) 
+                }
+                Gnuplot.open do |gp|
+                Gnuplot::Plot.new( gp ) do |plot|
+                    plot.boxwidth("0.9 absolute")
+                    plot.yrange("[0:#{y.max}]")
+                    plot.style("fill  solid 1.00 border -1")
+                    plot.set("xtics border in scale 1,0.5 nomirror rotate by -45  offset character 0, 0, 0")
+                    plot.style("histogram")
+                    plot.style("data histogram")
+                    i=-1
+                    plot.set("xtics","("+x.collect{|v| i+=1; sprintf("\"%s\" %d",v,i)}.join(",")+")")
+                    plot.data << Gnuplot::DataSet.new( [y] ) do |ds|
+                    end
+                end
+                end
+            end
             # Return an array of the different values of the data
 			def factors
 				@data.uniq
@@ -452,6 +474,13 @@ class Vector < DelegateClass(Array)
 				def kurtosis
 					@gsl.kurtosis
 				end
+                def histogram(bins=10)
+                    h=GSL::Histogram.alloc(bins,[@data.min-10,@data.max+10])
+                    h.increment(@gsl)
+                end
+                def plot_histogram(bins=10,options="")
+                    self.histogram(bins).graph(options)
+                end
 			end
 			
             # Coefficient of variation

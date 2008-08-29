@@ -41,7 +41,7 @@ class RubySSCrosstabTestCase < Test::Unit::TestCase
         fc=@ct.frequencies_by_col
         assert_equal(2,fc.size)
         assert_equal(%w{man woman},fc.keys)
-        assert_equal(Matrix.rows([[3,4],[3,0],[1,0],[1,1]]),@ct.matrix)
+        assert_equal(Matrix.rows([[3,4],[3,0],[1,0],[1,1]]),@ct.to_matrix)
 	end
     def test_expected
         v1=%w{1 1 1 1 1 0 0 0 0 0}.to_vector

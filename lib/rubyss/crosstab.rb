@@ -33,7 +33,7 @@ module RubySS
 			}
 			base.update(RubySS::vector_cols_matrix(@v_rows,@v_cols).to_a.to_vector.frequencies)
 		end
-        def matrix
+        def to_matrix
             f=frequencies
             rn=rows_names
             cn=cols_names

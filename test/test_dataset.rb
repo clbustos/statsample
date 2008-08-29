@@ -13,6 +13,11 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         assert_equal(5,@ds.cases)
         assert_equal(%w{id name age city a1},@ds.fields)
     end
+    def test_matrix
+        matrix=Matrix[[1,2],[3,4],[5,6]]
+        ds=RubySS::Dataset.new('v1'=>[1,3,5].to_vector,'v2'=>[2,4,6].to_vector)
+        assert_equal(matrix,ds.to_matrix)
+    end        
     def test_fields
         @ds.fields=%w{name a1 id age city}
         assert_equal(%w{name a1 id age city}, @ds.fields)

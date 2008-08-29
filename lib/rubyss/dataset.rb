@@ -1,4 +1,5 @@
 require 'rubyss/vector'
+require 'gnuplot'
 module RubySS
     class Dataset
         attr_reader :vectors, :fields, :cases
@@ -155,6 +156,13 @@ module RubySS
             else
                 raise ArgumentError,"Should pass a RubySS::Vector"
             end
+        end
+        def to_matrix
+            rows=[]
+            self.each_array{|c|
+                rows.push(c)
+            }
+            Matrix.rows(rows)
         end
     end
     class CSV
