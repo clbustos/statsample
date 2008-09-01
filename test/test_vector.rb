@@ -134,8 +134,11 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 		if HAS_GSL
 			a=RubySS::Vector.new([1,2,3,4,"STRING"], :scale)
 			assert_equal(2,a.mean)
-			assert_equal(a.slow_variance_sample,a.variance_sample)
-			assert_equal(a.slow_standard_deviation_sample,a.sds)
+			assert_equal(a.variance_sample_slow,a.variance_sample)
+			assert_equal(a.standard_deviation_sample_slow,a.sds)
+			assert_equal(a.variance_population_slow,a.variance_population)
+			assert_equal(a.standard_deviation_population_slow,a.standard_deviation_population)
+
             assert_nothing_raised do
                 a=[].to_vector(:scale)
             end

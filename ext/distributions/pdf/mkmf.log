@@ -1,0 +1,11 @@
+find_header: checking for #include <gsl/gsl_randist.h>
+... -------------------- yes
+
+"i686-pc-linux-gnu-gcc -E -I. -I/usr/lib/ruby/1.8/i686-linux -I.  -O2 -march=athlon-xp -m3dnow -msse -mfpmath=sse -mmmx -pipe -fno-strict-aliasing  -fPIC -Wall   conftest.c -o conftest.i"
+checked program was:
+/* begin */
+1: #include <gsl/gsl_randist.h>
+/* end */
+
+--------------------
+

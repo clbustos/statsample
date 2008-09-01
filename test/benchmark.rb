@@ -1,5 +1,4 @@
-#require File.dirname(__FILE__)+'/../lib/rubyss.rb'
-require "rubyss.rb"
+require File.dirname(__FILE__)+'/../lib/rubyss.rb'
 require 'benchmark'
 v=(0..10000).collect{|n|
 	rand(100)
@@ -24,6 +23,8 @@ end
     Benchmark.bm(7) do |x|
 		
 		x.report("Nominal.frequencies")   { for i in 1..n; v.frequencies; end }
+		x.report("Nominal.frequencies_slow")   { for i in 1..n; v.frequencies_slow; end }
+
 		x.report("_frequencies")   { for i in 1..n; RubySS._frequencies(v.valid_data); end }
 
     end

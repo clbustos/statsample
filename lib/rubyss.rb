@@ -31,7 +31,7 @@ end
 	end
     
     begin 
-        require 'rubyss/rubyssopt'
+       require 'rubyss/rubyssopt'
     rescue LoadError
         module RubySS
             OPTIMIZED=false

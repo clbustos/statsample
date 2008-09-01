@@ -11,8 +11,13 @@ EXT2 = "ext/rubyss/rubyssopt.#{Hoe::DLEXT}"
 Hoe.new('rubyss', RubySS::VERSION) do |p|
   # p.rubyforge_name = 'rubyssx' # if different than lowercase project name
   p.developer('Claudio Bustos', 'clbustos@gmail.com')
-  p.spec_extras[:extensions] = ["ext/rubyss/extconf.rb","ext/rubyss/extconf.rb"]
-  p.clean_globs << EXT1 << EXT2 << "ext/distributions/*.o" << "ext/distributions/Makefile" << "ext/rubyss/*.o" << "ext/rubyss/Makefile"
+  p.spec_extras[:extensions] = ["ext/rubyss/extconf.rb","ext/distributions/extconf.rb"]
+  p.extra_deps << ["gnuplot",">= 2.2"]
+  
+  p.clean_globs << EXT1 << EXT2
+  %w{distributions rubyss}.each do |ext|
+  	p.clean_globs << "ext/#{ext}/*.o" << "ext/#{ext}/Makefile"
+  end
   p.rdoc_pattern = /^(lib|bin|ext\/distributions)|txt$/
 end
 
@@ -32,5 +37,6 @@ file EXT2 => ["ext/rubyss/extconf.rb", "ext/rubyss/rubyssopt.c"] do
     sh "make"
   end
 end
+
 
 # vim: syntax=Ruby

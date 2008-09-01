@@ -282,18 +282,14 @@ class Vector < DelegateClass(Array)
 			def initialize(data)
 				@data=data
 			end
-            
-
-            if !RubySS::OPTIMIZED
-                # Returns a hash with the distribution of frecuencies of
+			# Returns a hash with the distribution of frecuencies of
                 # the sample                
-                def frequencies
+            def frequencies_slow
                     @data.inject(Hash.new) {|a,x|
                         a[x]=0 if a[x].nil?
                         a[x]=a[x]+1
                         a
                     }
-                end
             end
             def plot_frequencies
                 require 'gnuplot'
@@ -348,7 +344,12 @@ class Vector < DelegateClass(Array)
                 }
                 out
             end
-
+			self.instance_methods.find_all{|met| met=~/_slow/}.each{|met|
+				met_or=met.gsub("_slow","")
+				if !self.method_defined?(met_or)
+					alias_method met_or, met
+				end
+			}
 		end
         
 		class Ordinal <Nominal
@@ -368,7 +369,7 @@ class Vector < DelegateClass(Array)
             end
             if HAS_GSL
                 %w{median}.each{|m|
-                    m_nuevo=("slow_"+m).intern
+                    m_nuevo=(m+"_slow").intern
                     alias_method m_nuevo, m.intern
                 }
                 
@@ -450,8 +451,8 @@ class Vector < DelegateClass(Array)
 			end
 			
 			if HAS_GSL
-                %w{variance_sample standard_deviation_sample mean sum}.each{|m|
-                    m_nuevo=("slow_"+m).intern
+                %w{variance_sample standard_deviation_sample variance_population standard_deviation_population mean sum}.each{|m|
+                    m_nuevo=(m+"_slow").intern
                     alias_method m_nuevo, m.intern
                 }
 				def sum # :nodoc:
@@ -468,6 +469,16 @@ class Vector < DelegateClass(Array)
 					m=mean unless m
 					@gsl.sd(m)
 				end
+				
+				def variance_population(m=false) # :nodoc:
+					m=mean unless m
+					@gsl.variance_with_fixed_mean(m)
+				end
+				def standard_deviation_population(m=false) # :nodoc:
+					m=mean unless m
+					@gsl.sd_with_fixed_mean(m)
+				end				
+				
 				def skew
 					@gsl.skew
 				end

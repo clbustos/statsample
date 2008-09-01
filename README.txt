@@ -12,7 +12,7 @@ This package allows to process files and databases for statistical purposes, wit
 
 == SYNOPSIS:
 
-c=RubySS::Column.new([3,3,3,3,3,1,nil,-99,-99], :scale)
+c=RubySS::Vector.new([3,3,3,3,3,1,nil,-99,-99], :scale)
 c.missing_values=[-99]
 p c.mode
 p c.median
@@ -20,6 +20,11 @@ p c.mean
 p c.range
 
 == REQUIREMENTS:
+
+Optional: 
+
+* Plotting: gnuplot and rbgnuplot
+* Advanced Statistical: gsl and rb-gsl
 
 
 
