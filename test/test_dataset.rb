@@ -67,6 +67,14 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         @ds.col('age').type=:scale
         assert_equal(:scale,@ds.col('age').type)
     end
+    def test_split_by_separator_recode
+        @ds.add_vectors_by_split_recode("a1","_")
+        assert_equal(%w{id name age city a1 a1_1 a1_2 a1_3},@ds.fields)
+        assert_equal([1,0,1,nil,1],@ds.col('a1_1').to_a)
+        assert_equal([1,1,0,nil,1],@ds.col('a1_2').to_a)
+        assert_equal([0,1,0,nil,1],@ds.col('a1_3').to_a)
+        assert_equal({'a1_1'=>'a1:a', 'a1_2'=>'a1:b', 'a1_3'=>'a1:c'},@ds.labels)
+    end
     def test_split_by_separator
         @ds.add_vectors_by_split("a1","_")
         assert_equal(%w{id name age city a1 a1_a a1_b a1_c},@ds.fields)
@@ -74,6 +82,7 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         assert_equal([1,1,0,nil,1],@ds.col('a1_b').to_a)
         assert_equal([0,1,0,nil,1],@ds.col('a1_c').to_a)
     end
+    
     def test_add_case
         ds=RubySS::Dataset.new({'a'=>[].to_vector, 'b'=>[].to_vector, 'c'=>[].to_vector})
         ds.add_case([1,2,3])

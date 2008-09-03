@@ -38,7 +38,15 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_equal([0,0,1,0,0,nil],b['c'].to_a)
         assert_equal([0,0,1,1,0,nil],b['d'].to_a)
         assert_equal([0,0,0,0,1,nil],b[10].to_a)
-        
+        assert_equal({'a'=>3,'b'=>1,'c'=>1,'d'=>2,10=>1}, a.split_by_separator_freq())
+
+        a = RubySS::Vector.new(["a","a*b","c*d","a*d",10,nil],:nominal)
+        b=a.split_by_separator("*")
+        assert_equal([1,1,0,1,0,nil],b['a'].to_a)
+        assert_equal([0,1,0,0,0,nil],b['b'].to_a)
+        assert_equal([0,0,1,0,0,nil],b['c'].to_a)
+        assert_equal([0,0,1,1,0,nil],b['d'].to_a)
+        assert_equal([0,0,0,0,1,nil],b[10].to_a)
     end
 	def test_types
 		@c.type=:nominal

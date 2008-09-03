@@ -2,8 +2,6 @@ require File.dirname(__FILE__)+'/../lib/rubyss'
 require 'rbgsl'
 require 'rubyss/resample'
 require 'rubyss/test'
-require 'distributions/cdf'
-require 'distributions/pdf'
 require 'matrix'
 ideal=Matrix[[30,30,40]]
 tests=3000
@@ -37,11 +35,11 @@ v.frequencies.sort.each{|k,v1|
 	x.push(k)
 	y.push(prev+v1)
 	prev=prev+v1
-	cdf_chi=Cdf.chi_square_p(k,2)
+	cdf_chi=GSL::Cdf.chisq_P(k,2)
 	y2.push(cdf_chi*tests)
 	y3.push(v1.to_f/(tests/4))
 	#y3.push(0)
-	y4.push(Pdf.chi_square(k,2))
+	y4.push(GSL::Ran.chisq_pdf(k,2))
 }
 
 

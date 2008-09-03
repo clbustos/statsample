@@ -209,7 +209,7 @@ class Vector < DelegateClass(Array)
                 if x.nil?
                     nil
                 elsif (x.respond_to? :split)
-                    x.split(",")
+                    x.split(sep)
                 else
                     [x]
                 end
@@ -233,6 +233,12 @@ class Vector < DelegateClass(Array)
             out.inject({}){|s,v|
                 s[v[0]]=Vector.new(v[1],:nominal)
                 s
+            }
+        end
+        def split_by_separator_freq(sep=",")
+            split_by_separator(sep).inject({}) {|a,v|
+                a[v[0]]=v[1].inject {|s,x| s+x.to_i}
+                a
             }
         end
         
@@ -260,38 +266,50 @@ class Vector < DelegateClass(Array)
                 Vector.new(out.collect{|i|@valid_data[i]},@type)
          end
          
-            def count(x=false)
-                if block_given?
-                    r=@data.inject(0) {|s, i|
-                        r=yield i
-                        s+(r ? 1 : 0)
-                    }
-                    r.nil? ? 0 : r
-                else
-                    frequencies[x].nil? ? 0 : frequencies[x]
-                end
+        def count(x=false)
+            if block_given?
+                r=@data.inject(0) {|s, i|
+                    r=yield i
+                    s+(r ? 1 : 0)
+                }
+                r.nil? ? 0 : r
+            else
+                frequencies[x].nil? ? 0 : frequencies[x]
             end
+        end
+        # returns the real type for the vector, according to its content
+        def db_type(dbs='mysql')
+            # first, detect any character not number
+            if @data.find {|v|  v.to_s=~/[^0-9e.-]/ }
+                return "VARCHAR (255)"
+            elsif @data.find {|v| v.to_s=~/\./}
+                return "DOUBLE"
+            else
+                return "INTEGER"
+            end
+        end
             def to_s
                 sprintf("Vector(type:%s, n:%d, N:%d)[%s]",@type.to_s,@data.size, @population_size,@data.join(","))
             end
-
+            
     end
         
 	
-		class Nominal
-			def initialize(data)
-				@data=data
-			end
-			# Returns a hash with the distribution of frecuencies of
-                # the sample                
-            def frequencies_slow
+	
+	class Nominal
+	def initialize(data)
+		@data=data
+	end
+	# Returns a hash with the distribution of frecuencies of
+	# the sample                
+	def frequencies_slow
                     @data.inject(Hash.new) {|a,x|
                         a[x]=0 if a[x].nil?
                         a[x]=a[x]+1
                         a
                     }
-            end
-            def plot_frequencies
+	end
+        def plot_frequencies
                 require 'gnuplot'
                 x=[]
                 y=[]
@@ -299,20 +317,20 @@ class Vector < DelegateClass(Array)
                     x.push(k)
                     y.push(v) 
                 }
-                Gnuplot.open do |gp|
-                Gnuplot::Plot.new( gp ) do |plot|
-                    plot.boxwidth("0.9 absolute")
-                    plot.yrange("[0:#{y.max}]")
-                    plot.style("fill  solid 1.00 border -1")
-                    plot.set("xtics border in scale 1,0.5 nomirror rotate by -45  offset character 0, 0, 0")
-                    plot.style("histogram")
-                    plot.style("data histogram")
-                    i=-1
-                    plot.set("xtics","("+x.collect{|v| i+=1; sprintf("\"%s\" %d",v,i)}.join(",")+")")
-                    plot.data << Gnuplot::DataSet.new( [y] ) do |ds|
-                    end
-                end
-                end
+		Gnuplot.open do |gp|
+			Gnuplot::Plot.new( gp ) do |plot|
+			plot.boxwidth("0.9 absolute")
+			plot.yrange("[0:#{y.max}]")
+			plot.style("fill  solid 1.00 border -1")
+			plot.set("xtics border in scale 1,0.5 nomirror rotate by -45  offset character 0, 0, 0")
+			plot.style("histogram")
+			plot.style("data histogram")
+			i=-1
+			plot.set("xtics","("+x.collect{|v| i+=1; sprintf("\"%s\" %d",v,i)}.join(",")+")")
+			plot.data << Gnuplot::DataSet.new( [y] ) do |ds|
+				end
+			end
+		end
             end
             # Return an array of the different values of the data
 			def factors
@@ -343,16 +361,17 @@ class Vector < DelegateClass(Array)
                     out <<  sprintf("%s : %s (%0.2f%%)\n",k,v, (v.to_f / n_valid)*100)
                 }
                 out
-            end
-			self.instance_methods.find_all{|met| met=~/_slow/}.each{|met|
+	end
+	self.instance_methods.find_all{|met| met=~/_slow$/}.each{|met|
 				met_or=met.gsub("_slow","")
+				puts met_or
 				if !self.method_defined?(met_or)
 					alias_method met_or, met
 				end
 			}
-		end
+	end
         
-		class Ordinal <Nominal
+	class Ordinal <Nominal
         # Return the value of the percentil q
             def percentil(q)
                 sorted=@data.sort
@@ -394,9 +413,9 @@ class Vector < DelegateClass(Array)
                 data.collect!{|x|
                     x.to_f
                 }
-                @data=data
+		super(data)
                 set_gsl
-			end
+		end
             def delegate_data
                 @data
             end

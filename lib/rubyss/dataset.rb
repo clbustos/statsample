@@ -3,13 +3,14 @@ require 'gnuplot'
 module RubySS
     class Dataset
         attr_reader :vectors, :fields, :cases
+        attr_accessor :labels
         # To create a dataset
         # * Dataset.new()
         # * Dataset.new(%w{v1 v2 v3})
         # * Dataset.new({'v1'=>%w{1 2 3}.to_vector, 'v2'=>%w{4 5 6}.to_vector})
         # * Dataset.new({'v2'=>v2,'v1'=>v1},['v1','v2'])
         #
-        def initialize(vectors={},fields=[])
+        def initialize(vectors={},fields=[],labels={})
             if vectors.instance_of? Array
                 @fields=vectors.dup
                 @vectors=vectors.inject({}){|a,x| a[x]=RubySS::Vector.new(); a}
@@ -19,6 +20,7 @@ module RubySS
                 check_order
                 check_length
             end
+            @labels=labels
         end
         # Creates a copy of the given dataset, deleting all the cases with
         # missing data on one of the vectors
@@ -35,7 +37,7 @@ module RubySS
                 a[v[0]]=v[1].dup
                 a
             }
-            Dataset.new(vectors,@fields.dup)
+            Dataset.new(vectors,@fields.dup,@labels.dup)
         end
         # Creates a copy of the given dataset, without data on vectors
         def dup_empty
@@ -43,7 +45,7 @@ module RubySS
                 a[v[0]]=v[1].dup_empty
                 a
             }
-            Dataset.new(vectors,@fields.dup)
+            Dataset.new(vectors,@fields.dup,@labels.dup)
         end
         # We have the same datasets if the labels and vectors are the same 
         def ==(d2)
@@ -96,12 +98,22 @@ module RubySS
             @fields.delete(name)
             @vectors.delete(name)
         end
+        def add_vectors_by_split_recode(name,join='-',sep=",")
+            split=@vectors[name].split_by_separator(sep)
+            i=1
+            split.each{|k,v|
+                new_field=name+join+i.to_s
+                @labels[new_field]=name+":"+k
+                add_vector(new_field,v)
+                i+=1
+            }
+        end
         def add_vectors_by_split(name,join='-',sep=",")
             split=@vectors[name].split_by_separator(sep)
             split.each{|k,v|
                 add_vector(name+join+k,v)
             }
-        end
+        end        
         def check_length
             size=nil
             @vectors.each{|k,v|
@@ -164,6 +176,33 @@ module RubySS
             }
             Matrix.rows(rows)
         end
+        def to_s
+            "#<"+self.class.to_s+":"+self.object_id.to_s+" @fields=["+@fields.join(",")+"] labels="+@labels.inspect+" cases="+@vectors[@fields[0]].size.to_s
+        end
+        def inspect
+            self.to_s
+        end
+    end
+    class Database
+        require 'dbi'
+        def self.read(dbh,table,query="WHERE 1")
+            
+        end
+        def self.insert(ds, dbh,table)
+            query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"
+            sth=dbh.prepare(query)
+            ds.each_array{|c|
+                sth.execute(*c)
+            }
+        end
+        def self.create_sql(ds,table)
+            sql="CREATE TABLE #{table} ("
+            fields=ds.fields.collect{|f|
+                v=ds[f]
+                f+" "+v.db_type
+            }
+            sql+fields.join(",\n ")+")"
+        end
     end
     class CSV
         require 'csv'
@@ -181,7 +220,8 @@ module RubySS
                         c.to_s
                     }
                     if first_row
-                        ds=RubySS::Dataset.new(row.to_a)
+                        fields=row.to_a.collect{|c| c.downcase}
+                        ds=RubySS::Dataset.new(fields)
                         first_row=false
                     else
                         ds.add_case(row.to_a,false)
