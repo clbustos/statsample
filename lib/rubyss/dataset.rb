@@ -185,8 +185,21 @@ module RubySS
     end
     class Database
         require 'dbi'
-        def self.read(dbh,table,query="WHERE 1")
-            
+        def self.read(dbh,query)
+            sth=dbh.execute(query)
+            vectors={}
+            fields=[]
+            sth.column_info.each {|c|
+                vectors[c['name']]=RubySS::Vector.new([])
+                vectors[c['name']].type= (c['type_name']=='INTEGER') ? :scale : :nominal
+                fields.push(c['name'])
+            }
+            ds=RubySS::Dataset.new(vectors,fields)
+            sth.fetch do |row|
+                ds.add_case(row.to_a, false )
+            end
+            ds.update_valid_data
+            ds
         end
         def self.insert(ds, dbh,table)
             query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"

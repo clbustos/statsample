@@ -96,6 +96,9 @@ class Vector < DelegateClass(Array)
 				end
 			end
         end
+        def labeling(x)
+            @labels.has_key?(x) ? @labels[x].to_s : x.to_s
+        end
         # Returns a Vector with the data with labels replaced by the label
         def vector_labeled
             d=@data.collect{|x|
@@ -116,7 +119,8 @@ class Vector < DelegateClass(Array)
         # Return true if a value is valid (not nil and not included on missing values)
         
         def is_valid?(x)
-            !x.nil? and !@missing_values.include?x
+            !(x.nil? or @missing_values.include?x)
+            
         end
         # Set missing_values
 		def missing_values=(vals)
@@ -364,7 +368,6 @@ class Vector < DelegateClass(Array)
 	end
 	self.instance_methods.find_all{|met| met=~/_slow$/}.each{|met|
 				met_or=met.gsub("_slow","")
-				puts met_or
 				if !self.method_defined?(met_or)
 					alias_method met_or, met
 				end

@@ -61,6 +61,11 @@ module RubySS
                 sc
             }
         end
+        # Chi square, based on expected and real matrix
+        def chi_square
+            require 'rubyss/test'
+            RubySS::Test.chi_square(self.to_matrix,matrix_expected)
+        end
         # Useful to obtain chi square
         def matrix_expected
             rn=rows_names
@@ -79,21 +84,37 @@ module RubySS
             fq=frequencies
             rn=rows_names
             cn=cols_names
-            max_row_size = rn.inject(0) {|s,x| x.to_s.size>s ? x.to_s.size : s}
-            max_col_size = cn.inject(0) {|s,x| x.to_s.size>s ? x.to_s.size : s}
+            total=0
+            total_cols=cn.inject({}) {|a,x| a[x]=0;a}
+            max_row_size = rn.inject(0) {|s,x| sl=@v_rows.labeling(x).size; sl>s ? sl : s}
+            max_col_size = cn.inject(0) {|s,x| sl=@v_cols.labeling(x).size; sl>s ? sl : s}
             max_col_size = frequencies.inject(max_col_size) {|s,x| x[1].to_s.size>s ? x[1].to_s.size : s}
             
             out=""
-            out << " " * (max_row_size+2) << "|" << cn.collect{|c| c=c.to_s; " "+c+(" "*(max_col_size-c.size))+" "}.join("|") << "|\n"
-            out << "-" * (max_row_size+2) << "|" << ("-"*(max_col_size+2) +"|")*cn.size << "\n"
+            out << " " * (max_row_size+2) << "|" << cn.collect{|c| name=@v_cols.labeling(c); " "+name+(" "*(max_col_size-name.size))+" "}.join("|") << "| Total\n"
+            linea="-" * (max_row_size+2) << "|" << ("-"*(max_col_size+2) +"|")*cn.size << "-"*7 << "\n"
+            out << linea
             rn.each{|row|
-                out << " " +row.to_s  << " "*(max_row_size-row.to_s.size) << " | "
+                total_row=0;
+                name=@v_rows.labeling(row)
+                out << " " +name  << " "*(max_row_size-name.size) << " | "
                 cn.each{|col|
                     data=fq[[row,col]].to_s
+                    total_row+=fq[[row,col]]
+                    total+=fq[[row,col]]                    
+                    total_cols[col]+=fq[[row,col]]                    
                     out << " " << data << " "*(max_col_size-data.size) << "| "
                 }
+                out << " " << total_row.to_s
             out << "\n"
             }
+            out << linea
+            out << " Total " << " "*(max_row_size-5) << "| "
+            cn.each{|v|
+                data=total_cols[v].to_s
+                out << " " << data << " "*(max_col_size-data.size) << "| "
+            }
+            out << " " << total.to_s
             out
         end
 	end

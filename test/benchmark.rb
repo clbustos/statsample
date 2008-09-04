@@ -1,11 +1,17 @@
 require File.dirname(__FILE__)+'/../lib/rubyss.rb'
 require 'benchmark'
 v=(0..10000).collect{|n|
-	rand(100)
+	r=rand(100)
+    if(r<90)
+    r 
+    else
+        nil
+    end
 }.to_vector
+v.missing_values=[5,10,20]
 v.type=:scale
 
- n = 200
+ n = 1000
  if (false)
     Benchmark.bm(7) do |x|
 		x.report("mean")   { for i in 1..n; v.mean; end }
@@ -18,7 +24,7 @@ v.type=:scale
 		x.report("variance_slow")   { for i in 1..n; v.slow_variance_sample; end }
 
     end
-end
+
 
     Benchmark.bm(7) do |x|
 		
@@ -29,4 +35,10 @@ end
 
     end
 
+end
+
+    Benchmark.bm(10) do |x|
+		x.report("is_valid_and")   { for i in 1..n; v.is_valid?(10);v.is_valid?(20); v.is_valid?(30); end }
+		x.report("is_valid_or")   { for i in 1..n; v.is_valid2?(10);v.is_valid2?(20); v.is_valid2?(30); end }
+    end
 
