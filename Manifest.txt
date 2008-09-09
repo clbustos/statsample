@@ -18,6 +18,7 @@ lib/rubyss/chidistribution.rb
 lib/rubyss/correlation.rb
 lib/rubyss/crosstab.rb
 lib/rubyss/dataset.rb
+lib/rubyss/multiset.rb
 lib/rubyss/resample.rb
 lib/rubyss/test.rb
 lib/rubyss/vector.rb

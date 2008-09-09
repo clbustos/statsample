@@ -1,5 +1,13 @@
 require 'rubyss/vector'
 require 'gnuplot'
+
+class Hash
+	def to_dataset(*args)
+		RubySS::Dataset.new(self,*args)
+	end
+end
+
+
 module RubySS
     class Dataset
         attr_reader :vectors, :fields, :cases
@@ -32,6 +40,7 @@ module RubySS
             ds.update_valid_data
             ds
         end
+        # Returns a duplicate of the Database
         def dup
             vectors=@vectors.inject({}) {|a,v|
                 a[v[0]]=v[1].dup
@@ -70,6 +79,9 @@ module RubySS
             raise ArgumentError, "Vector have different size" if vector.size!=@cases 
             @vectors[name]=vector
             check_order
+        end
+        def has_vector? (v)
+            return @vectors.has_key?(v)
         end
         def add_case(v,uvd=true)
             case v
@@ -176,6 +188,19 @@ module RubySS
             }
             Matrix.rows(rows)
         end
+        def to_multiset_by_split(field)
+            require 'rubyss/multiset'
+            raise ArgumentError,"Should use a correct field name" if !@fields.include? field
+            factors=@vectors[field].factors
+            ms=Multiset.new_empty_vectors(@fields,factors)
+            each {|c|
+                ms[c[field]].add_case(c,false)
+            }
+            ms.datasets.each {|k,v|
+                v.update_valid_data
+            }
+            ms
+        end
         def to_s
             "#<"+self.class.to_s+":"+self.object_id.to_s+" @fields=["+@fields.join(",")+"] labels="+@labels.inspect+" cases="+@vectors[@fields[0]].size.to_s
         end
@@ -185,6 +210,7 @@ module RubySS
     end
     class Database
         require 'dbi'
+        # Read a databasa query and returns a Dataset
         def self.read(dbh,query)
             sth=dbh.execute(query)
             vectors={}
@@ -201,6 +227,7 @@ module RubySS
             ds.update_valid_data
             ds
         end
+        # Insert each case of the Dataset on the selected table
         def self.insert(ds, dbh,table)
             query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"
             sth=dbh.prepare(query)
@@ -208,13 +235,14 @@ module RubySS
                 sth.execute(*c)
             }
         end
-        def self.create_sql(ds,table)
+        # Create a sql, basen on a given Dataset
+        def self.create_sql(ds,table,charset="UTF8")
             sql="CREATE TABLE #{table} ("
             fields=ds.fields.collect{|f|
                 v=ds[f]
                 f+" "+v.db_type
             }
-            sql+fields.join(",\n ")+")"
+            sql+fields.join(",\n ")+") CHARACTER SET=#{charset};"
         end
     end
     class CSV

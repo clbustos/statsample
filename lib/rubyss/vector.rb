@@ -252,7 +252,7 @@ class Vector < DelegateClass(Array)
         # In all the trails, every item have the same probability
         # of been selected
 		def sample_with_replacement(sample=1)
-            Vector.new( (0...sample).collect{ @valid_data[rand(@valid_data.size)] },@type)
+            Vector.new(@delegate.sample_with_replacement(sample) ,@type)
         end
         # Returns an random sample of size n, without replacement,
         # only with valid data.
@@ -261,13 +261,7 @@ class Vector < DelegateClass(Array)
         # A sample of the same size of the vector is the vector itself
             
         def sample_without_replacement(sample=1)
-                raise ArgumentError, "Sample size couldn't be greater than n" if sample>@valid_data.size
-                out=[]
-                while out.size<sample
-                    value=rand(@valid_data.size)
-                    out.push(value) if !out.include?value
-                end
-                Vector.new(out.collect{|i|@valid_data[i]},@type)
+            Vector.new(@delegate.sample_without_replacement(sample),@type)
          end
          
         def count(x=false)
@@ -284,7 +278,9 @@ class Vector < DelegateClass(Array)
         # returns the real type for the vector, according to its content
         def db_type(dbs='mysql')
             # first, detect any character not number
-            if @data.find {|v|  v.to_s=~/[^0-9e.-]/ }
+            if @data.find {|v|  v.to_s=~/\d{2,2}-\d{2,2}-\d{4,4}/}
+                return "DATE"
+            elsif @data.find {|v|  v.to_s=~/[^0-9e.-]/ }
                 return "VARCHAR (255)"
             elsif @data.find {|v| v.to_s=~/\./}
                 return "DOUBLE"
@@ -356,6 +352,10 @@ class Vector < DelegateClass(Array)
                     a
                 }
             end
+            # Proportion of a given value.
+            def proportion(v=1)
+                frequencies[v].to_f / @data.size
+            end
             def summary(out="")
                 out << sprintf("n valid:%d\n",n_valid)
                 out <<  sprintf("factors:%s\n",factors.join(","))
@@ -365,7 +365,47 @@ class Vector < DelegateClass(Array)
                     out <<  sprintf("%s : %s (%0.2f%%)\n",k,v, (v.to_f / n_valid)*100)
                 }
                 out
-	end
+            end
+            
+            # Returns an random sample of size n, with replacement,
+            # only with valid data.
+            #
+            # In all the trails, every item have the same probability
+            # of been selected
+            def sample_with_replacement(sample)
+                (0...sample).collect{ @data[rand(@data.size)] }
+            end
+            # Returns an random sample of size n, without replacement,
+            # only with valid data.
+            #
+            # Every element could only be selected once
+            # A sample of the same size of the vector is the vector itself
+                
+            def sample_without_replacement(sample)
+                    raise ArgumentError, "Sample size couldn't be greater than n" if sample>@data.size
+                    out=[]
+                    size=@data.size
+                    while out.size<sample
+                        value=rand(size)
+                        out.push(value) if !out.include?value
+                    end
+                    out.collect{|i|@data[i]}
+             end
+            
+            
+            # Variance of p, according to poblation size
+            def variance_proportion(n_poblation, v=1)
+                RubySS::proportion_variance_sample(self.proportion(v), @data.size, n_poblation)
+            end
+            def variance_total(n_poblation, v=1)
+                RubySS::total_variance_sample(self.proportion(v), @data.size, n_poblation)
+            end
+            def proportion_confidence_interval_t(n_poblation,margin=0.95,v=1)
+                RubySS::proportion_confidence_interval_t(proportion(v), @data.size, n_poblation, margin)
+            end
+            def proportion_confidence_interval_z(n_poblation,margin=0.95,v=1)
+                RubySS::proportion_confidence_interval_z(proportion(v), @data.size, n_poblation, margin)
+            end            
 	self.instance_methods.find_all{|met| met=~/_slow$/}.each{|met|
 				met_or=met.gsub("_slow","")
 				if !self.method_defined?(met_or)
@@ -396,12 +436,15 @@ class Vector < DelegateClass(Array)
                 }
                 
                 #def percentil(p)
-                #    GSL::Stats::quantile_from_sorted_data(GSL::Vector.alloc(@data.sort),p)
+                #    v=GSL::Vector.alloc(@data.sort)
+                #    v.stats_quantile_from_sorted_data(p)
                 #end
                 def median # :nodoc:
                     GSL::Stats::median_from_sorted_data(GSL::Vector.alloc(@data.sort))
                 end
             end
+            
+            
             def summary(out="")
                 out << sprintf("n valid:%d\n",n_valid)
                 out <<  "median:"+median.to_s+"\n"
@@ -513,6 +556,14 @@ class Vector < DelegateClass(Array)
                 end
                 def plot_histogram(bins=10,options="")
                     self.histogram(bins).graph(options)
+                end
+                def sample_with_replacement(k)
+                    r = GSL::Rng.alloc(GSL::Rng::MT19937,rand(10000))
+                    r.sample(@gsl, k)
+                end
+                def sample_without_replacement(k)
+                    r = GSL::Rng.alloc(GSL::Rng::MT19937,rand(10000))
+                    r.choose(@gsl, k)
                 end
 			end
 			

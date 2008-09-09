@@ -62,6 +62,8 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 		assert_equal(@c[1],5)
 		assert_equal({ 1=>1,2=>1,3=>1,4=>1,5=>5,6=>2,7=>1,8=>1, 9=>1,10=>1},@c.frequencies)
 		assert_equal({ 1 => 1.to_f/15 ,2=>1.to_f/15, 3=>1.to_f/15,4=>1.to_f/15,5=>5.to_f/15,6=>2.to_f/15,7=>1.to_f/15,8=>1.to_f/15, 9=>1.to_f/15,10=>1.to_f/15}, @c.proportions)
+        assert_equal(@c.proportion, 1.to_f/15)
+        assert_equal(@c.proportion(2), 1.to_f/15)
 		assert_equal(@c.factors.sort,[1,2,3,4,5,6,7,8,9,10])
 		assert_equal(@c.mode,5)
 		assert_equal(@c.n_valid,15)
@@ -76,8 +78,6 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         v1=[1,2,3].to_vector()
         v2=[1,2,3].to_vector()
         assert_equal(v1,v2)
-
-        
     end
 	def test_ordinal
         @c.type=:ordinal
@@ -136,6 +136,11 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_raise  ArgumentError do
 			@c.sample_without_replacement(20)
 		end
+        @c.type=:scale
+        srand(1)
+        assert_equal(100,@c.sample_with_replacement(100).size)
+        assert_equal(@c.valid_data.to_a.sort,@c.sample_without_replacement(15).sort)
+        
     end
     
     def test_gsl
