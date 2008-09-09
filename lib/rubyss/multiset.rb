@@ -95,6 +95,7 @@ module RubySS
             }
             (1/@population_size.to_f)*Math::sqrt(sum)
         end
+        
         def proportion_standard_error(field,v=1)
             sum=@ms.datasets.inject(0) {|a,da|
                 stratum_name=da[0]

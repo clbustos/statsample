@@ -42,12 +42,15 @@ require 'rubyss/vector'
 module RubySS
 	VERSION = '0.1.6'
     class << self
-        # Finite sample correction
+        # Finite sample correction for variance
         # Source: Cochran(1972)
-        def fsc(sam,pob)
-            ((pob - sam).to_f / ( pob - 1))
+        def fsc(sam,pop)
+            ((pop - sam).to_f / ( pop - 1))
         end
-
+        # 1 - sample fraction
+        def qf(sam,pop)
+            1-(sam.to_f/pop)
+        end
               
         
         ########################
@@ -73,9 +76,9 @@ module RubySS
         # Proportion confidence interval with x value
         # Uses estimated proportion, sample without replacement
         
-        def proportion_confidence_interval(p,n_sample,n_population, x)
-            f=n_sample.to_f/n_population
-            one_range=x * Math::sqrt(((1-f) * p * (1-p)) / (n_sample-1)) + (1/(n_sample*2.0))
+        def proportion_confidence_interval(p,sam,pop, x)
+            f=sam.to_f/pop
+            one_range=x * Math::sqrt((qf(sam, pop) * p * (1-p)) / (sam-1)) + (1/(sam * 2.0))
             [p-one_range, p+one_range]
         end
         # Standard deviation for sample distribution of a proportion
@@ -125,11 +128,39 @@ module RubySS
         # Mean stimation
         #
         ########################
+
         
-        def standard_error_sample(s,n_sample,n_population)
-            f=n_sample.to_f / n_population
-            (s.to_f/Math::sqrt(n_sample))*Math::sqrt(1-f)
+        # Standard error. Known variance, sample with replacement.
+        def standard_error_ksd_wr(s,sam,pop)
+            #s.to_f/Math::sqrt(sam)
+            (s.to_f/Math::sqrt(sam)) * Math::sqrt((pop-1).to_f / pop)
         end
+        
+        # Standard error of the mean. Known variance, sample w/o replacement
+        def standard_error_ksd_wor(s,sam,pop)
+            (s.to_f/Math::sqrt(sam)) * Math::sqrt(qf(sam,pop)) 
+            #* (pop.to_f/(pop-1))
+        end
+        
+        alias_method :standard_error_esd_wr, :standard_error_ksd_wr
+        
+        # Standard error of the mean. 
+        # Estimated variance, without replacement
+        # Cochran (1972) p.47
+        def standard_error_esd_wor(s,sam,pop)
+            (s.to_f / Math::sqrt(sam)) * Math::sqrt(qf(sam,pop))
+        end
+        
+        alias_method :standard_error, :standard_error_esd_wor
+        alias_method :se, :standard_error_esd_wor
+
+        
+        def standard_error_total(s,sam,pop)
+            pop*se(s,sam,pop)
+        end
+
+        # Confidence Interval using T-Student
+        # Use with samples < 60.
         def mean_confidence_interval_t(mean,s,n_sample,n_population,margin=0.95)
             t=GSL::Cdf.tdist_Pinv(1-((1-margin) / 2),n_sample-1)
             mean_confidence_interval(mean,s,n_sample,n_population,t)
@@ -139,9 +170,17 @@ module RubySS
             mean_confidence_interval(mean,s,n_sample,n_population, t)
         end
         def mean_confidence_interval(mean,s,n_sample,n_population,t)
-            range=t*standard_error_sample(s,n_sample,n_population)
+            range=t*se(s,n_sample,n_population)
             [mean-range,mean+range]
         end
+        
+        #########################################
+        #
+        # Mean stimation for stratified sample
+        #
+        #########################################
+        
+        
     end
     
 end

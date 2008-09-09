@@ -11,8 +11,6 @@ prop=poblacion.proportion(1.0)
 puts "Estadísticos"
 puts "DE con reemplazo:"+RubySS::proportion_sd_kp_wr(prop, sample_size).to_s
 puts "DE sin reemplazo:"+RubySS::proportion_sd_kp_wor(prop, sample_size,poblacion.size).to_s
-puts "DE estimado con reemplazo:"+RubySS::proportion_sd_ep_wr(prop, sample_size).to_s
-puts "DE estimado sin reemplazo:"+RubySS::proportion_sd_ep_wor(prop, sample_size,poblacion.size).to_s
 
 sd_with=[]
 sd_without=[]
