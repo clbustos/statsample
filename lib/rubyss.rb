@@ -42,45 +42,89 @@ require 'rubyss/vector'
 module RubySS
 	VERSION = '0.1.6'
     class << self
-        def continuity_correction(n_sample,n_poblation)
-            ((n_poblation - n_sample) / ( n_poblation - 1))
+        # Finite sample correction
+        # Source: Cochran(1972)
+        def fsc(sam,pob)
+            ((pob - sam).to_f / ( pob - 1))
         end
-        # Varianza de p para poblacion
-		def proportion_variance_poblation(proportion, n_sample, n_poblation)
-            q=1.0-proportion
-            ((proportion*q) / n_sample ) * continuity_correction(n_sample,n_poblation)
-        end
-        # Estimación del total, de acuerdo a poblacion
-        def total_variance_poblation(proportion, n_sample, n_poblation)
-            q=1.0-proportion
-            ((n_poblation**2 * (proportion*q)) / n_sample) * continuity_correction(n_sample,n_poblation)
-        end
-        def proportion_variance_sample(proportion, n_sample, n_poblation)
-            q=1.0-proportion
-            ((n_poblation-n_sample) / ((n_sample - 1)*n_poblation))* proportion*q 
-        end
-        def total_variance_sample(proportion, n_sample, n_poblation)
-            q=1.0-proportion
-            ((n_poblation*(n_poblation-n_sample)) / (n_sample-1))*proportion*q
-        end
+
+              
+        
+        ########################
+        #
+        # Proportion estimation
+        #
+        ########################
+        
+        
+        # Proportion confidence interval with t values
+        # Uses estimated proportion, sample without replacement.
+        
         def proportion_confidence_interval_t(p, n_sample, n_population, margin=0.95)
             t=GSL::Cdf.tdist_Pinv(1-((1-margin) / 2),n_sample-1)
             proportion_confidence_interval(p,n_sample,n_population, t)
         end
+        # Proportion confidence interval with z values
+        # Uses estimated proportion, sample without replacement.
         def proportion_confidence_interval_z(p, n_sample, n_population, margin=0.95)
-            t=GSL::Cdf.ugaussian_Pinv(1-((1-margin) / 2))
-            proportion_confidence_interval(p,n_sample,n_population, t)
+            z=GSL::Cdf.ugaussian_Pinv(1-((1-margin) / 2))
+            proportion_confidence_interval(p,n_sample,n_population, z)
         end
+        # Proportion confidence interval with x value
+        # Uses estimated proportion, sample without replacement
+        
         def proportion_confidence_interval(p,n_sample,n_population, x)
-            f=n_sample.to_f / n_population
-            one_range=(x * Math::sqrt(1-f) * Math::sqrt(p * (1-p) / (n_sample-1))) + (1 / 2*n_sample)
+            f=n_sample.to_f/n_population
+            one_range=x * Math::sqrt(((1-f) * p * (1-p)) / (n_sample-1)) + (1/(n_sample*2.0))
             [p-one_range, p+one_range]
         end
-        def proportion_standard_deviation(p, n_sample,n_population)
-            f=n_sample.to_f / n_population
-            (Math::sqrt(1-f) * Math::sqrt(p * (1-p) / (n_sample-1))) + (1 / 2*n_sample)
+        # Standard deviation for sample distribution of a proportion
+        # Know proportion, sample with replacement.
+        # Based on http://stattrek.com/Lesson6/SRS.aspx
+        def proportion_sd_kp_wr(p, n_sample)
+            Math::sqrt(p*(1-p) / n_sample)
+        end
+        # Standard deviation for sample distribution of a proportion
+        # Know proportion, sample without replacement.
+        # Sources: 
+        # - http://stattrek.com/Lesson6/SRS.aspx
+        # - Cochran
+        def proportion_sd_kp_wor(p, sam, pop)
+            Math::sqrt(RubySS::fsc(sam,pop) * p*(1-p) / sam.to_f)
+        end
+        # Standard deviation for sample distribution of a proportion
+        # Estimated proportion, sample with replacement
+        # Based on http://stattrek.com/Lesson6/SRS.aspx.
+        def proportion_sd_ep_wr(p, n_sample)
+            Math::sqrt(p*(1-p) / (n_sample-1))
+        end                                       
+        # Standard deviation for sample distribution of a proportion.
+        # Estimated proportion, sample without replacement.
+        # Source: Cochran, 1972, Técnicas de muestreo
+        def proportion_sd_ep_wor(p, sam,pop)
+            fsc=(pop-sam).to_f / ((sam-1)*pop)
+            Math::sqrt(fsc*p*(1-p))
         end
         
+         # Total estimation sd based on sample. 
+        # Known proportion, sample without replacement
+        # Source: Cochran(1972)
+        def proportion_total_sd_kp_wor(prop, sam, pop)
+            pob * proportion_sd_kp_wor(p, sam, pop)
+        end
+        # Total estimation sd based on sample. 
+        # Estimated proportion, sample without replacement
+        # Source: Cochran(1972)
+        def proportion_total_sd_ep_wor(prop, sam, pop)
+            fsc=((pop - sam).to_f / ( sam - 1))
+            Math::sqrt(fsc*pop*prop*(1-prop))
+        end 
+        
+        ########################
+        #
+        # Mean stimation
+        #
+        ########################
         
         def standard_error_sample(s,n_sample,n_population)
             f=n_sample.to_f / n_population

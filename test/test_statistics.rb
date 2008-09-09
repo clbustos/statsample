@@ -34,22 +34,23 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         assert_equal(50,v.size)
         assert_equal(1471,v.sum())
         limits=RubySS::mean_confidence_interval_z(v.mean(),v.sds(),v.size,676,0.80)
-        p limits[0]*(676)
+       
     end
     def test_estimation_proportion
-        assert_in_delta(6686, RubySS::total_variance_sample(0.19,200,3042),0.1)
-        v=([1]*38+[0]*162).to_vector
-        assert_in_delta(6686, v.variance_total(3042) , 0.1)
-        limits=RubySS::proportion_confidence_interval_t(0.37, 100, 500, 0.95)
-        assert_in_delta(0.280,limits[0] ,0.005)
-        assert_in_delta(0.460,limits[1] ,0.005)
-        v=([1]*37+[0]*63).to_vector
-        limits=v.proportion_confidence_interval_t(500, 0.95)
-        assert_in_delta(0.280,limits[0] ,0.005)
-        assert_in_delta(0.460,limits[1] ,0.005)
-        limits=v.proportion_confidence_interval_z(500, 0.95)
-        assert_in_delta(0.280,limits[0] ,0.005)
-        assert_in_delta(0.460,limits[1] ,0.005)        
+        # total
+        pop=3042
+        sam=200
+        prop=0.19
+        assert_in_delta(81.8, RubySS::proportion_total_sd_ep_wor(prop, sam, pop), 0.1)
+        
+        # confidence limits
+        pop=500
+        sam=100
+        prop=0.37
+        a=0.95
+        l= RubySS::proportion_confidence_interval_z(prop, sam, pop, a)
+        assert_in_delta(0.28,l[0],0.01)
+        assert_in_delta(0.46,l[1],0.01)
     end
     
 end
