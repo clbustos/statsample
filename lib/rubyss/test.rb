@@ -8,8 +8,10 @@ module RubySS
                 sum=0
                 (0...real.row_size).each {|row_i|
                     (0...real.column_size).each {|col_i|
+					
                         val=((real[row_i,col_i].to_f - expected[row_i,col_i].to_f)**2) / expected[row_i,col_i].to_f
-                        # p val
+                        # puts "Real: #{real[row_i,col_i].to_f} ; esperado: #{expected[row_i,col_i].to_f}"
+						# puts "Diferencial al cuadrado: #{(real[row_i,col_i].to_f - expected[row_i,col_i].to_f)**2}"
                         sum+=val
                     }
                 }

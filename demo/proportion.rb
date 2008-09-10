@@ -1,5 +1,5 @@
 require File.dirname(__FILE__)+"/../lib/rubyss"
-require 'rubyss/multiset'
+require 'rubyss/srs'
 require 'rubyss/resample'
 require 'gnuplot'
 
@@ -9,21 +9,21 @@ sample_size=100
 poblacion=([1]*500+[0]*500).to_vector(:scale)
 prop=poblacion.proportion(1.0)
 puts "Estadísticos"
-puts "DE con reemplazo:"+RubySS::proportion_sd_kp_wr(prop, sample_size).to_s
-puts "DE sin reemplazo:"+RubySS::proportion_sd_kp_wor(prop, sample_size,poblacion.size).to_s
+puts "DE con reemplazo:"+RubySS::SRS.proportion_sd_kp_wr(prop, sample_size).to_s
+puts "DE sin reemplazo:"+RubySS::SRS.proportion_sd_kp_wor(prop, sample_size,poblacion.size).to_s
 
 sd_with=[]
 sd_without=[]
 monte_with=RubySS::Resample.repeat_and_save(tests) {
     pob= poblacion.sample_with_replacement(sample_size)
-    sd_with.push(RubySS::proportion_sd_ep_wr(pob.mean,sample_size))
+    sd_with.push(RubySS::SRS.proportion_sd_ep_wr(pob.mean,sample_size))
     pob.mean
 }
 
 
 monte_without=RubySS::Resample.repeat_and_save(tests) {
     pob= poblacion.sample_without_replacement(sample_size)
-    sd_without.push(RubySS::proportion_sd_ep_wor(pob.mean,sample_size,poblacion.size))
+    sd_without.push(RubySS::SRS.proportion_sd_ep_wor(pob.mean,sample_size,poblacion.size))
     pob.mean
 }
 

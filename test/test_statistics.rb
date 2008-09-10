@@ -1,5 +1,6 @@
 require File.dirname(__FILE__)+'/../lib/rubyss'
 require 'rubyss/dataset'
+require 'rubyss/srs'
 require 'rubyss/test'
 require 'rubyss/correlation'
 require 'test/unit'
@@ -33,7 +34,7 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         v=([42]*23+[41]*4+[36]*1+[32]*1+[29]*1+[27]*2+[23]*1+[19]*1+[16]*2+[15]*2+[14,11,10,9,7]+ [6]*3+[5]*2+[4,3]).to_vector(:scale)
         assert_equal(50,v.size)
         assert_equal(1471,v.sum())
-        limits=RubySS::mean_confidence_interval_z(v.mean(),v.sds(),v.size,676,0.80)
+        limits=RubySS::SRS.mean_confidence_interval_z(v.mean(),v.sds(),v.size,676,0.80)
        
     end
     def test_estimation_proportion
@@ -41,14 +42,14 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         pop=3042
         sam=200
         prop=0.19
-        assert_in_delta(81.8, RubySS::proportion_total_sd_ep_wor(prop, sam, pop), 0.1)
+        assert_in_delta(81.8, RubySS::SRS.proportion_total_sd_ep_wor(prop, sam, pop), 0.1)
         
         # confidence limits
         pop=500
         sam=100
         prop=0.37
         a=0.95
-        l= RubySS::proportion_confidence_interval_z(prop, sam, pop, a)
+        l= RubySS::SRS.proportion_confidence_interval_z(prop, sam, pop, a)
         assert_in_delta(0.28,l[0],0.01)
         assert_in_delta(0.46,l[1],0.01)
     end

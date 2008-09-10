@@ -31,11 +31,30 @@ module RubySS
                 @datasets[key]=ds
             end
         end
+		def sum_field(field)
+			@datasets.inject(0) {|a,da|
+				stratum_name=da[0]
+                vector=da[1][field]
+				val=yield stratum_name,vector
+				a+val
+			}
+		end
         def[](i)
             @datasets[i]
         end
     end
     class StratifiedSample
+		class << self
+			# mean for an array of vectors
+			def mean(*v)
+				n_total=0
+				a=v.inject(0){|a,v|
+					n_total+=v.size
+					a+v.sum
+				}
+				a.to_f/n_total
+			end
+		end
         def initialize(ms,strata_sizes)
             raise TypeError,"ms should be a Multiset" unless ms.is_a? RubySS::Multiset
             @ms=ms
@@ -64,11 +83,9 @@ module RubySS
         end
         # Population proportion based on strata
         def proportion(field, v=1)
-            @ms.datasets.inject(0){|a,da|
-                s_name=da[0]
-                d=da[1]
-                a+(stratum_ponderation(s_name)*d[field].proportion(v))
-            }
+			@ms.sum_field(field) {|s_name,vector|
+				stratum_ponderation(s_name)*vector.proportion(v)
+			}
         end
         # Stratum ponderation.
         # Symbol: W\<sub>h\</sub>
@@ -79,20 +96,17 @@ module RubySS
         
         # Population mean based on strata
         def mean(field)
-            @ms.datasets.inject(0){|a,da|
-                d=da[1]
-                a+(stratum_ponderation(da[0])*d[field].mean)
-            }
+			@ms.sum_field(field) {|s_name,vector|
+				stratum_ponderation(s_name)*vector.mean
+			}
         end
         # Standard error with estimated population variance and without replacement.
         # Source: http://stattrek.com/Lesson6/STRAnalysis.aspx
         def standard_error(field)
-            sum=@ms.datasets.inject(0) {|a,da|
-                dn=da[0]
-                s_size=@strata_sizes[dn]
-                d=da[1]
-                a+ (s_size**2 * (1-(d.cases.to_f/s_size)) * d[field].variance_sample / d.cases.to_f)
-            }
+			sum=@ms.sum_field(field) {|s_name,vector|
+                s_size=@strata_sizes[s_name]
+				(s_size**2 * (1-(vector.size.to_f / s_size)) * vector.variance_sample / vector.size.to_f)
+			}
             (1/@population_size.to_f)*Math::sqrt(sum)
         end
         
