@@ -5,10 +5,10 @@ require 'rubyss/resample'
 require 'gnuplot'
 
 tests=3000
-sample_size=50
+sample_size=20
 
-a=[10]*50+[12]*10+[14]*20+[16]*10+[19]*10
-b=[11000]*50+[11050]*10+[11100]*20+[11300]*10+[11240]*10
+a=[1]*50+[0]*950
+b=[1]*900+[0]*100
 a_size=a.size
 b_size=b.size
 av=a.to_vector(:scale)
@@ -24,13 +24,16 @@ ss=RubySS::StratifiedSample.new(m,{'a'=>a.size,'b'=>b.size})
 
 es=[{'N'=>a_size,'n'=>sample_size/2,'s'=>av.standard_deviation_population}, {'N'=>b_size,'n'=>sample_size/2,'s'=>bv.standard_deviation_population}]
 
+esp=[{'N'=>a_size,'n'=>sample_size/2,'p'=>av.proportion(1.0)}, {'N'=>b_size,'n'=>sample_size/2,'p'=>bv.proportion(1.0)}]
+
 
 
 sd_estimated_wr=RubySS::StratifiedSample.standard_error_ksd_wr(es)
 
 sd_estimated_wor = RubySS::StratifiedSample.standard_error_ksd_wor(es)
 
-
+sd_estimated_wor_p = RubySS::StratifiedSample.proportion_sd_ksd_wor(esp)
+sd_estimated_wr_p = RubySS::StratifiedSample.proportion_sd_ksd_wr(esp)
 
 pop=(a+b).to_vector(:scale)
 s=pop.standard_deviation_population
@@ -46,12 +49,18 @@ puts "SD:"+s.to_s
 puts "EE con reemplazo:"+RubySS::SRS.standard_error_ksd_wr(s, sample_size, pop.size).to_s
 puts "EE sin reemplazo:"+RubySS::SRS.standard_error_ksd_wor(s, sample_size,pop.size).to_s
 
+
+
 puts "EE estratified con reemplazo:"+sd_estimated_wr.to_s
 puts "EE estratified sin reemplazo:"+sd_estimated_wor.to_s
+puts "EE estratified con reemplazo(p):"+sd_estimated_wr_p.to_s
+puts "EE estratified sin reemplazo(p):"+sd_estimated_wor_p.to_s
+
 sd_with=[]
 sd_without=[]
 sd_strat_wr=[]
-sd_strat_wor=[]
+sd_strat_wor_1=[]
+sd_strat_wor_2=[]
 monte_with=RubySS::Resample.repeat_and_save(tests) {
     sample= pop.sample_with_replacement(sample_size)
     sd_with.push(RubySS::SRS.standard_error_esd_wr(sample.sds,sample_size,pop.size))
@@ -74,7 +83,8 @@ stratum_wor=RubySS::Resample.repeat_and_save(tests) {
     m.add_dataset('a',a_sample)
     m.add_dataset('b',b_sample)
     ss=RubySS::StratifiedSample.new(m,{'a'=>a_size,'b'=>b_size})
-    sd_strat_wor.push(ss.standard_error_wor('data'))
+    sd_strat_wor_1.push(ss.standard_error_wor('data'))
+    sd_strat_wor_2.push(ss.proportion_sd_esd_wor('data',1.0))
     ss.mean('data')    
 }.to_vector(:scale)
 
@@ -94,8 +104,8 @@ stratum_wr=RubySS::Resample.repeat_and_save(tests) {
 v_sd_with=sd_with.to_vector(:scale)
 v_sd_without=sd_without.to_vector(:scale)
 v_sd_strat_wr=sd_strat_wr.to_vector(:scale)
-v_sd_strat_wor=sd_strat_wor.to_vector(:scale)
-
+v_sd_strat_wor_1=sd_strat_wor_1.to_vector(:scale)
+v_sd_strat_wor_2=sd_strat_wor_2.to_vector(:scale)
 
 v_with=monte_with.to_vector(:scale)
 v_without=monte_without.to_vector(:scale)
@@ -119,11 +129,12 @@ puts "=============="
 puts "Estratificado Sin reemplazo"
 puts "Mean:"+stratum_wor.mean.to_s
 puts "Sd:"+stratum_wor.sds.to_s
-puts "Sd (estimated):"+v_sd_strat_wor.mean.to_s
-
-p v_without.plot_histogram
+puts "Sd (estimated scale):"+v_sd_strat_wor_1.mean.to_s
+puts "Sd (estimated prop):"+v_sd_strat_wor_2.mean.to_s
 
 =begin
+
+
 
 
 

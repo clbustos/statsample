@@ -39,6 +39,11 @@ module RubySS
 				a+val
 			}
 		end
+        def collect_vector(field)
+            @datasets.collect {|k,v|
+                yield k, v[field]
+            }
+        end
         def[](i)
             @datasets[i]
         end
@@ -54,6 +59,118 @@ module RubySS
 				}
 				a.to_f/n_total
 			end
+            
+            
+            def standard_error_ksd_wr(es)
+                n_total=0
+                sum=es.inject(0){|a,h|
+                    n_total+=h['N']
+                    a+((h['N']**2 * h['s']**2) / h['n'].to_f)
+                }
+                (1.to_f / n_total)*Math::sqrt(sum)
+            end
+            
+            
+            def variance_ksd_wr(es)
+                standard_error_ksd_wr(es)**2
+            end
+            
+            # Source : Cochran (1972)
+            
+            def variance_ksd_wor(es)
+                n_total=es.inject(0) {|a,h|
+                    a+h['N']
+                }    
+                es.inject(0){|a,h|
+                    val=((h['N'].to_f / n_total)**2) * (h['s']**2 / h['n'].to_f) * (1 - (h['n'].to_f / h['N']))
+                    a+val
+                }
+            end
+            def standard_error_ksd_wor(es)
+                Math::sqrt(variance_ksd_wor(es))
+            end
+            
+            
+            
+            def variance_esd_wor(es)
+                n_total=es.inject(0) {|a,h|
+                    a+h['N']
+                }
+                
+                sum=es.inject(0){|a,h|
+                    val=h['N']*(h['N']-h['n'])*(h['s']**2 / h['n'].to_f)
+                    a+val
+                }
+                (1.0/(n_total**2))*sum
+            end
+            
+            
+            def standard_error_esd_wor(es)
+                Math::sqrt(variance_ksd_wor(es))
+            end
+            # Based on http://stattrek.com/Lesson6/STRAnalysis.aspx
+            def variance_esd_wr(es)
+                n_total=es.inject(0) {|a,h|
+                    a+h['N']
+                }
+                
+                sum=es.inject(0){|a,h|
+                    val= ((h['s']**2 * h['N']**2) / h['n'].to_f)
+                    a+val
+                }
+                (1.0/(n_total**2))*sum
+            end
+            def standard_error_esd_wr(es)
+                Math::sqrt(variance_esd_wr(es))
+            end
+            
+            def proportion_variance_ksd_wor(es)
+                n_total=es.inject(0) {|a,h|
+                    a+h['N']
+                }
+                
+                es.inject(0){|a,h|
+                    val= (((h['N'].to_f / n_total)**2 * h['p']*(1-h['p'])) / (h['n'])) * (1- (h['n'].to_f / h['N']))
+                    a+val
+                }
+            end
+            def proportion_sd_ksd_wor(es)
+                Math::sqrt(proportion_variance_ksd_wor(es))
+            end
+            
+            
+            def proportion_sd_ksd_wr(es)
+                n_total=es.inject(0) {|a,h|
+                    a+h['N']
+                }
+                
+                sum=es.inject(0){|a,h|
+                    val= (h['N']**2 * h['p']*(1-h['p'])) / h['n'].to_f
+                    a+val
+                }
+                Math::sqrt(sum) * (1.0/n_total)
+            end
+            def proportion_variance_ksd_wr(es)
+                proportion_variance_ksd_wor(es)**2
+            end
+            
+            def proportion_variance_esd_wor(es)
+                n_total=es.inject(0) {|a,h|
+                    a+h['N']
+                }
+                
+                sum=es.inject(0){|a,h|
+                    a=(h['N']**2 * (h['N']-h['n']) * h['p']*(1.0-h['p'])) / ((h['n']-1)*(h['N']-1))
+                    a+val
+                }
+                Math::sqrt(sum) * (1.0/n_total**2)
+            end
+            def proportion_sd_esd_wor(es)
+                Math::sqrt(proportion_variance_ksd_wor(es))
+            end
+            
+            
+            
 		end
         def initialize(ms,strata_sizes)
             raise TypeError,"ms should be a Multiset" unless ms.is_a? RubySS::Multiset
@@ -101,8 +218,19 @@ module RubySS
 			}
         end
         # Standard error with estimated population variance and without replacement.
+        # Source: Cochran (1972)
+        def standard_error_wor(field)
+            es=@ms.collect_vector(field) {|s_n, vector|
+                {'N'=>@strata_sizes[s_n],'n'=>vector.size, 's'=>vector.sds}
+            }
+            
+            StratifiedSample.standard_error_esd_wor(es)
+        end
+
+        # Standard error with estimated population variance and without replacement.
         # Source: http://stattrek.com/Lesson6/STRAnalysis.aspx
-        def standard_error(field)
+
+        def standard_error_wor_2(field)
 			sum=@ms.sum_field(field) {|s_name,vector|
                 s_size=@strata_sizes[s_name]
 				(s_size**2 * (1-(vector.size.to_f / s_size)) * vector.variance_sample / vector.size.to_f)
@@ -110,16 +238,29 @@ module RubySS
             (1/@population_size.to_f)*Math::sqrt(sum)
         end
         
-        def proportion_standard_error(field,v=1)
-            sum=@ms.datasets.inject(0) {|a,da|
-                stratum_name=da[0]
-                ds=da[1]
-                nh=ds.cases.to_f
-                s_size=@strata_sizes[stratum_name]
-                prop=proportion(field,v)
-                a+ (s_size**2 * (1-(nh/s_size)) * prop * (1-prop) / (nh -1 ))
+        def standard_error_wr(field)
+            es=@ms.collect_vector(field) {|s_n, vector|
+                {'N'=>@strata_sizes[s_n],'n'=>vector.size, 's'=>vector.sds}
             }
-            (1/@population_size.to_f)*Math::sqrt(sum)
+            
+            StratifiedSample.standard_error_esd_wr(es)
+        end
+        def proportion_sd_esd_wor(field,v=1)
+            es=@ms.collect_vector(field) {|s_n, vector|
+                {'N'=>@strata_sizes[s_n],'n'=>vector.size, 'p'=>vector.proportion(v)}
+            }
+            
+            StratifiedSample.proportion_sd_esd_wor(es)
+        end
+        
+        def proportion_standard_error(field,v=1)
+            prop=proportion(field,v)
+            sum=@ms.sum_field(field) {|s_name,vector|
+                nh=vector.size
+                s_size=@strata_sizes[s_name]
+                (s_size**2 * (1-(nh/s_size)) * prop * (1-prop) / (nh -1 ))
+            }
+            (1/@population_size.to_f) * Math::sqrt(sum)
         end
         # Cochran(1971), p. 150 
         def variance_pst(field,v=1)
