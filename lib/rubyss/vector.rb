@@ -406,12 +406,12 @@ class Vector < DelegateClass(Array)
             def proportion_confidence_interval_z(n_poblation,margin=0.95,v=1)
                 RubySS::proportion_confidence_interval_z(proportion(v), @data.size, n_poblation, margin)
             end            
-	self.instance_methods.find_all{|met| met=~/_slow$/}.each{|met|
-				met_or=met.gsub("_slow","")
-				if !self.method_defined?(met_or)
-					alias_method met_or, met
-				end
-			}
+		self.instance_methods.find_all{|met| met=~/_slow$/}.each{|met|
+			met_or=met.gsub("_slow","")
+			if !self.method_defined?(met_or)
+				alias_method met_or, met
+			end
+		}
 	end
         
 	class Ordinal <Nominal

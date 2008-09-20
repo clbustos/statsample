@@ -38,7 +38,7 @@ class RubySSMultisetTestCase < Test::Unit::TestCase
         assert_equal(ms2['male'],ms['male'])
         assert_equal(ms2['female'],ms['female'])        
     end
-    def test_to_multiset_by_split
+    def test_to_multiset_by_split_one
         sex=%w{m m m m m f f f f m}.to_vector(:nominal)
         city=%w{London Paris NY London Paris NY London Paris NY Tome}.to_vector(:nominal)
         age=[10,10,20,30,34,34,33,35,36,40].to_vector(:scale)
@@ -51,6 +51,19 @@ class RubySSMultisetTestCase < Test::Unit::TestCase
         assert_equal(%w{London Paris NY London Paris Tome},ms['m']['city'].to_a)
         assert_equal([34,33,35,36],ms['f']['age'].to_a)        
     end
+    def test_to_multiset_by_split_multiple
+        sex=%w{m m m m m m m m m m f f f f f f f f f f}.to_vector(:nominal)
+        city=%w{London London London Paris Paris London London London Paris Paris London London London Paris Paris London London London Paris Paris}.to_vector(:nominal)
+		hair=%w{blonde blonde black black blonde blonde black black blonde blonde black black blonde blonde black black blonde blonde black black}.to_vector(:nominal)
+        age=[10,10,20,30,34,34,33,35,36,40, 10,10,20,30,34,34,33,35,36,40].to_vector(:scale)
+        ds={'sex'=>sex,'city'=>city,'hair'=>hair,'age'=>age}.to_dataset(%w{sex city hair age})
+        ms=ds.to_multiset_by_split('sex','city','hair')
+        assert_equal(8,ms.n_datasets)
+		assert_equal(3,ms[%w{m London blonde}].cases)
+		assert_equal(3,ms[%w{m London blonde}].cases)
+		assert_equal(1,ms[%w{m Paris black}].cases)		
+    end
+	
     def test_stratum_proportion
         ds1={'q1'=>[1,1,1,1,1,0,0,0,0,0,0,0].to_vector}.to_dataset
         ds2={'q1'=>[1,1,1,1,1,1,1,0,0].to_vector}.to_dataset

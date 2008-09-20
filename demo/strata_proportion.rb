@@ -5,7 +5,7 @@ require 'rubyss/resample'
 require 'gnuplot'
 
 tests=3000
-sample_size=20
+sample_size=100
 
 a=[1]*50+[0]*950
 b=[1]*900+[0]*100

@@ -93,7 +93,7 @@ module RubySS
                     (0...v.size).each{|i| @vectors[@fields[i]].add(v[i],false)}
                 end
             when Hash
-                raise ArgumentError, "Hash keys should be equal to fields" if @fields!=v.keys.sort
+                raise ArgumentError, "Hash keys should be equal to fields" if @fields.sort!=v.keys.sort
                 @fields.each{|f| @vectors[f].add(v[f],false)}
             else
                 raise TypeError, 'Value must be a Array or a Hash'
@@ -188,8 +188,15 @@ module RubySS
             }
             Matrix.rows(rows)
         end
-        def to_multiset_by_split(field)
-            require 'rubyss/multiset'
+		def to_multiset_by_split(*fields)
+			require 'rubyss/multiset'
+			if fields.size==1
+				to_multiset_by_split_one_field(fields[0])
+			else
+				to_multiset_by_split_multiple_fields(*fields)
+			end
+		end
+        def to_multiset_by_split_one_field(field)
             raise ArgumentError,"Should use a correct field name" if !@fields.include? field
             factors=@vectors[field].factors
             ms=Multiset.new_empty_vectors(@fields,factors)
@@ -201,6 +208,35 @@ module RubySS
             }
             ms
         end
+		def to_multiset_by_split_multiple_fields(*fields)
+			factors_total=nil
+			fields.each{|f|
+				if factors_total.nil?
+					factors_total=@vectors[f].factors.collect{|c|
+						[c]
+					}
+				else
+					suma=[]
+					factors=@vectors[f].factors
+					factors_total.each{|f1|
+						factors.each{|f2|
+							suma.push(f1+[f2])
+						}
+					}
+					factors_total=suma
+				end
+			}
+			ms=Multiset.new_empty_vectors(@fields,factors_total)
+			p1=eval "Proc.new {|c| ms[["+fields.collect{|f| "c['#{f}']"}.join(",")+"]].add_case(c,false) }"
+			each{|c|
+				p1.call(c)
+			}
+            ms.datasets.each {|k,v|
+                v.update_valid_data
+            }
+            ms
+			
+		end
         def to_s
             "#<"+self.class.to_s+":"+self.object_id.to_s+" @fields=["+@fields.join(",")+"] labels="+@labels.inspect+" cases="+@vectors[@fields[0]].size.to_s
         end
