@@ -198,6 +198,11 @@ module RubySS
         def stratum_size(h)
             @strata_sizes[h]
         end
+        def vectors_by_field(field)
+            @ms.datasets.collect{|k,ds|
+                ds[field]
+            }
+        end
         # Population proportion based on strata
         def proportion(field, v=1)
 			@ms.sum_field(field) {|s_name,vector|

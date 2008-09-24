@@ -136,7 +136,12 @@ module RubySS
                 end
             }
             @cases=size
-        end
+            end
+            def each_vector
+                @vectors.each{|k,v|
+                    yield k,v
+                }
+            end
         if !RubySS::OPTIMIZED
             def case_as_hash(c)
                 @fields.inject({}) {|a,x|
@@ -203,8 +208,13 @@ module RubySS
             each {|c|
                 ms[c[field]].add_case(c,false)
             }
-            ms.datasets.each {|k,v|
-                v.update_valid_data
+            puts "Ingreso a los dataset"
+            ms.datasets.each {|k,ds|
+                ds.update_valid_data
+                ds.vectors.each{|k1,v1|
+                    puts "Vector #{k1}:"+v1.to_s
+                    v1.type=@vectors[k1].type
+                }
             }
             ms
         end
@@ -231,8 +241,12 @@ module RubySS
 			each{|c|
 				p1.call(c)
 			}
-            ms.datasets.each {|k,v|
-                v.update_valid_data
+            ms.datasets.each {|k,ds|
+                ds.update_valid_data
+                ds.vectors.each{|k1,v1|
+                    puts "Vector #{k1}:"+v1.to_s
+                    v1.type=@vectors[k1].type
+                }
             }
             ms
 			

@@ -288,10 +288,13 @@ class Vector < DelegateClass(Array)
                 return "INTEGER"
             end
         end
-            def to_s
-                sprintf("Vector(type:%s, n:%d, N:%d)[%s]",@type.to_s,@data.size, @population_size,@data.join(","))
-            end
-            
+        def summary(out="")
+            @delegate.summary(@labels,out)
+        end
+        def to_s
+            sprintf("Vector(type:%s, n:%d, N:%d)[%s]",@type.to_s,@data.size, @population_size,@data.join(","))
+        end
+        
     end
         
 	
@@ -303,11 +306,11 @@ class Vector < DelegateClass(Array)
 	# Returns a hash with the distribution of frecuencies of
 	# the sample                
 	def frequencies_slow
-                    @data.inject(Hash.new) {|a,x|
-                        a[x]=0 if a[x].nil?
-                        a[x]=a[x]+1
-                        a
-                    }
+        @data.inject(Hash.new) {|a,x|
+            a[x]=0 if a[x].nil?
+            a[x]=a[x]+1
+            a
+        }
 	end
         def plot_frequencies
                 require 'gnuplot'
@@ -356,13 +359,14 @@ class Vector < DelegateClass(Array)
             def proportion(v=1)
                 frequencies[v].to_f / @data.size
             end
-            def summary(out="")
+            def summary(labels,out="")
                 out << sprintf("n valid:%d\n",n_valid)
                 out <<  sprintf("factors:%s\n",factors.join(","))
                 out <<  "mode:"+mode.to_s+"\n"
                 out <<  "Distribution:\n"
                 frequencies.sort.each{|k,v|
-                    out <<  sprintf("%s : %s (%0.2f%%)\n",k,v, (v.to_f / n_valid)*100)
+                    key=labels.has_key?(k) ? labels[k]:k
+                    out <<  sprintf("%s : %s (%0.2f%%)\n",key,v, (v.to_f / n_valid)*100)
                 }
                 out
             end
@@ -445,7 +449,7 @@ class Vector < DelegateClass(Array)
             end
             
             
-            def summary(out="")
+            def summary(labels,out="")
                 out << sprintf("n valid:%d\n",n_valid)
                 out <<  "median:"+median.to_s+"\n"
                 out <<  "percentil 25:"+percentil(25).to_s+"\n"
@@ -459,7 +463,8 @@ class Vector < DelegateClass(Array)
                 data.collect!{|x|
                     x.to_f
                 }
-		super(data)
+                # puts "Inicializando Scale..."
+                super(data)
                 set_gsl
 		end
             def delegate_data
@@ -472,7 +477,7 @@ class Vector < DelegateClass(Array)
                 @data=Marshal.restore(data)
                 set_gsl
             end
-            def set_gsl # :nodoc:
+            def set_gsl # :nodoc
                 if HAS_GSL
                     @gsl=GSL::Vector.alloc(@data) if @data.size>0
 				end
@@ -572,7 +577,7 @@ class Vector < DelegateClass(Array)
 			def coefficient_of_variation
 				standard_deviation_sample / mean
 			end
-            def summary(out="")
+            def summary(labels,out="")
                 out << sprintf("n valid:%d\n",n_valid)
                 out <<  "mean:"+mean.to_s+"\n"
                 out <<  "sum:"+sum.to_s+"\n"
