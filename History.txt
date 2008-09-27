@@ -1,3 +1,9 @@
+=== 0.1.6 / 2008-09-26
+* New modules for SRS and stratified sampling
+* RubySS::Database for read and write onto databases.
+  You could use Database and CSV on-tandem for mass-editing and reimport
+  of databases
+
 === 0.1.5 / 2008-08-29
 * New extension rubyssopt for optimizing some functions on RubySS submodules
 * New submodules Correlation and Test

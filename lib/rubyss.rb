@@ -38,7 +38,7 @@ end
         end
     end
 require 'rubyss/vector'
-
+require 'rubyss/converters'
 module RubySS
 	VERSION = '0.1.6'
 	module Util

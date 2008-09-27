@@ -257,77 +257,18 @@ module RubySS
         def inspect
             self.to_s
         end
+		def summary
+			out=""
+			out << "Summary for dataset\n"
+			@vectors.each{|k,v|
+				out << "###############\n"
+				out << "Vector #{k}:\n"
+				out << v.summary
+				out << "###############\n"
+				
+			}
+			out 
+		end
     end
-    class Database
-        require 'dbi'
-        # Read a databasa query and returns a Dataset
-        def self.read(dbh,query)
-            sth=dbh.execute(query)
-            vectors={}
-            fields=[]
-            sth.column_info.each {|c|
-                vectors[c['name']]=RubySS::Vector.new([])
-                vectors[c['name']].type= (c['type_name']=='INTEGER') ? :scale : :nominal
-                fields.push(c['name'])
-            }
-            ds=RubySS::Dataset.new(vectors,fields)
-            sth.fetch do |row|
-                ds.add_case(row.to_a, false )
-            end
-            ds.update_valid_data
-            ds
-        end
-        # Insert each case of the Dataset on the selected table
-        def self.insert(ds, dbh,table)
-            query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"
-            sth=dbh.prepare(query)
-            ds.each_array{|c|
-                sth.execute(*c)
-            }
-        end
-        # Create a sql, basen on a given Dataset
-        def self.create_sql(ds,table,charset="UTF8")
-            sql="CREATE TABLE #{table} ("
-            fields=ds.fields.collect{|f|
-                v=ds[f]
-                f+" "+v.db_type
-            }
-            sql+fields.join(",\n ")+") CHARACTER SET=#{charset};"
-        end
-    end
-    class CSV
-        require 'csv'
-        # Returns a Dataset  based on a csv file
-        #
-        # USE:
-        #     ds=RubySS::CSV.read("test_csv.csv")
-        def self.read(filename)
-                first_row=true
-                fields=[]
-                fields_data={}
-                ds=nil
-                ::CSV.open(filename,'r') do |row|
-                    row.collect!{|c|
-                        c.to_s
-                    }
-                    if first_row
-                        fields=row.to_a.collect{|c| c.downcase}
-                        ds=RubySS::Dataset.new(fields)
-                        first_row=false
-                    else
-                        ds.add_case(row.to_a,false)
-                    end
-                end
-                ds.update_valid_data
-                ds
-            end
-            def self.write(dataset,filename)
-                writer=::CSV.open(filename,'w')
-                writer << dataset.fields
-                dataset.each_array{|row|
-                    writer << row
-                }
-                writer.close
-            end
-    end
+    
 end
