@@ -208,11 +208,11 @@ module RubySS
             each {|c|
                 ms[c[field]].add_case(c,false)
             }
-            puts "Ingreso a los dataset"
+            #puts "Ingreso a los dataset"
             ms.datasets.each {|k,ds|
                 ds.update_valid_data
                 ds.vectors.each{|k1,v1|
-                    puts "Vector #{k1}:"+v1.to_s
+            #        puts "Vector #{k1}:"+v1.to_s
                     v1.type=@vectors[k1].type
                 }
             }
@@ -244,7 +244,7 @@ module RubySS
             ms.datasets.each {|k,ds|
                 ds.update_valid_data
                 ds.vectors.each{|k1,v1|
-                    puts "Vector #{k1}:"+v1.to_s
+            #        puts "Vector #{k1}:"+v1.to_s
                     v1.type=@vectors[k1].type
                 }
             }

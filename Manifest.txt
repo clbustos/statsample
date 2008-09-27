@@ -7,6 +7,7 @@ demo/benchmark.rb
 demo/chi-square.rb
 demo/distribution_t.rb
 demo/graph.rb
+demo/mean.rb
 demo/proportion.rb
 demo/strata_proportion.rb
 demo/stratum.rb
@@ -17,6 +18,9 @@ ext/distributions/cdflib.h
 ext/distributions/dcdflib.c
 ext/distributions/extconf.rb
 ext/distributions/ipmpar.c
+ext/distributions/pdf.rb
+ext/distributions/pdf/extconf.rb
+ext/distributions/pdf/pdf.c
 ext/distributions/test.rb
 ext/rubyss/extconf.rb
 ext/rubyss/rubyssopt.c
