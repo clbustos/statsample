@@ -59,8 +59,7 @@ module RubySS
 				}
 				a.to_f/n_total
 			end
-            
-            
+
             def standard_error_ksd_wr(es)
                 n_total=0
                 sum=es.inject(0){|a,h|

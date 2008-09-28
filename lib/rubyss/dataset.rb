@@ -129,10 +129,14 @@ module RubySS
         def check_length
             size=nil
             @vectors.each{|k,v|
+                raise Exception, "Data #{v.class} is not a vector on key #{k}" if !v.is_a? RubySS::Vector
                 if size.nil?
                     size=v.size
                 else
-                    raise Exception, "Vector #{k} have different size" if v.size!=size
+                    if v.size!=size
+                        p v.to_a.size
+                        raise Exception, "Vector #{k} have size #{v.size} and dataset have size #{size}"
+                    end
                 end
             }
             @cases=size
@@ -244,7 +248,7 @@ module RubySS
             ms.datasets.each {|k,ds|
                 ds.update_valid_data
                 ds.vectors.each{|k1,v1|
-            #        puts "Vector #{k1}:"+v1.to_s
+                #   puts "Vector #{k1}:"+v1.to_s
                     v1.type=@vectors[k1].type
                 }
             }
@@ -270,5 +274,4 @@ module RubySS
 			out 
 		end
     end
-    
 end

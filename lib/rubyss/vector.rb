@@ -20,11 +20,12 @@ module RubySS
 			vs.collect{|v| v[i]}
 		})
 	end
+
 class Vector < DelegateClass(Array)
 	
     include Enumerable
         attr_reader :type, :data, :valid_data, :missing_values, :missing_data
-        attr_accessor :labels, :population_size
+        attr_accessor :labels
         # Creates a new 
         # data = Array of data
         # t = level of meausurement. Could be: 
@@ -32,11 +33,11 @@ class Vector < DelegateClass(Array)
         # [:ordinal] : Ordinal level of measurement
         # [:scale]   : Scale level of meausurement
         #
-		def initialize(data=[],t=:nominal,missing_values=[],labels={},population_size=nil)
+		def initialize(data=[],t=:nominal,missing_values=[],labels={})
 			@data=data
 			@missing_values=missing_values
 			@labels=labels
-            @population_size=(population_size.nil? or population_size<@data.size) ? @data.size : population_size.to_i
+
             @type=t
 			@valid_data=[]
 			@missing_data=[]
@@ -45,26 +46,26 @@ class Vector < DelegateClass(Array)
 			super(@delegate)
 		end
         def dup
-            Vector.new(@data.dup,@type,@missing_values.dup,@labels.dup,@population_size)
+            Vector.new(@data.dup,@type,@missing_values.dup,@labels.dup)
         end
         # Returns an empty duplicate of the vector. Maintains the type, missing
-        # values, labels and population_size
+        # values, labels
         def dup_empty
-            Vector.new([],@type,@missing_values.dup,@labels.dup,@population_size)
+            Vector.new([],@type,@missing_values.dup,@labels.dup)
 
         end
         # Vector equality
-        # Two vector will be the same if their data, missing values, type, labels and population_size are equals
+        # Two vector will be the same if their data, missing values, type, labels are equals
         def ==(v2)
             raise TypeError,"Argument should be a Vector" unless v2.instance_of? RubySS::Vector
-            @data==v2.data and @missing_values==v2.missing_values and @type==v2.type and @labels=v2.labels and @population_size=v2.population_size
+            @data==v2.data and @missing_values==v2.missing_values and @type==v2.type and @labels=v2.labels
         end
         def _dump(i)
-            Marshal.dump({'data'=>@data,'missing_values'=>@missing_values, 'labels'=>@labels, 'population_size'=>@population_size, 'type'=>@type})
+            Marshal.dump({'data'=>@data,'missing_values'=>@missing_values, 'labels'=>@labels, 'type'=>@type})
         end
         def self._load(data)
             h=Marshal.load(data)
-            Vector.new(h['data'], h['type'], h['missing_values'], h['labels'], h['population_size'])
+            Vector.new(h['data'], h['type'], h['missing_values'], h['labels'])
         end
         def recode
             @data.collect!{|x|
@@ -278,7 +279,7 @@ class Vector < DelegateClass(Array)
         # returns the real type for the vector, according to its content
         def db_type(dbs='mysql')
             # first, detect any character not number
-            if @data.find {|v|  v.to_s=~/\d{2,2}-\d{2,2}-\d{4,4}/}
+            if @data.find {|v|  v.to_s=~/\d{2,2}-\d{2,2}-\d{4,4}/} or @data.find {|v|  v.to_s=~/\d{4,4}-\d{2,2}-\d{2,2}/}
                 return "DATE"
             elsif @data.find {|v|  v.to_s=~/[^0-9e.-]/ }
                 return "VARCHAR (255)"
@@ -292,7 +293,7 @@ class Vector < DelegateClass(Array)
             @delegate.summary(@labels,out)
         end
         def to_s
-            sprintf("Vector(type:%s, n:%d, N:%d)[%s]",@type.to_s,@data.size, @population_size,@data.join(","))
+            sprintf("Vector(type:%s, n:%d, N:%d)[%s]",@type.to_s,@data.size, @data.join(","))
         end
         
     end
@@ -591,7 +592,7 @@ class Vector < DelegateClass(Array)
             end
             
 			alias_method :sdp, :standard_deviation_population
-			alias_method :sds, :standard_deviation_sample			
+			alias_method :sds, :standard_deviation_sample	
 			alias_method :cov, :coefficient_of_variation
 		end
 end
