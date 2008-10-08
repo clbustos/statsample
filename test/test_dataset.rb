@@ -53,6 +53,12 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         }
         assert_equal(expected,out)
     end
+    def test_recode
+        @ds['age'].type=:scale
+        @ds.recode!("age") {|c| c['id']*2}
+        expected=[2,4,6,8,10].to_vector(:scale)
+        assert_equal(expected,@ds['age'])
+    end
     def test_case_as
         assert_equal({'id'=>1,'name'=>'Alex','city'=>'New York','age'=>20,'a1'=>'a,b'},@ds.case_as_hash(0))
         assert_equal([5,'George',5,'Tome','a,b,c'],@ds.case_as_array(4))

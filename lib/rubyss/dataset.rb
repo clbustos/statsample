@@ -110,7 +110,7 @@ module RubySS
             @fields.delete(name)
             @vectors.delete(name)
         end
-        def add_vectors_by_split_recode(name,join='-',sep=",")
+        def add_vectors_by_split_recode(name,join='-',sep=RubySS::SPLIT_TOKEN)
             split=@vectors[name].split_by_separator(sep)
             i=1
             split.each{|k,v|
@@ -120,7 +120,7 @@ module RubySS
                 i+=1
             }
         end
-        def add_vectors_by_split(name,join='-',sep=",")
+        def add_vectors_by_split(name,join='-',sep=RubySS::SPLIT_TOKEN)
             split=@vectors[name].split_by_separator(sep)
             split.each{|k,v|
                 add_vector(name+join+k,v)
@@ -181,6 +181,13 @@ module RubySS
         end
         def[](i)
             @vectors[i]
+        end
+        # recode a vector based on another vector
+        def recode!(vector_name)
+            0.upto(@cases-1) {|i|
+                @vectors[vector_name].data[i]=yield case_as_hash(i)
+            }
+            @vectors[vector_name].set_valid_data
         end
         def[]=(i,v)
             if v.instance_of? RubySS::Vector

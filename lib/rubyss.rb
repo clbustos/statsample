@@ -41,6 +41,7 @@ require 'rubyss/vector'
 require 'rubyss/converters'
 module RubySS
 	VERSION = '0.1.6'
+    SPLIT_TOKEN = ","
 	module Util
 		# Finite population correction
         # Source: Cochran(1972)

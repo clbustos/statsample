@@ -67,7 +67,7 @@ class Vector < DelegateClass(Array)
             h=Marshal.load(data)
             Vector.new(h['data'], h['type'], h['missing_values'], h['labels'])
         end
-        def recode
+        def recode!
             @data.collect!{|x|
                 yield x
             }
@@ -166,6 +166,17 @@ class Vector < DelegateClass(Array)
         def -(v)
             _vector_ari("-",v)
         end
+        # Reports all values that doesn't comply with a condition
+        # Returns a hash with the index of data and the invalid data
+        def verify
+            h={}
+            (0...@data.size).to_a.each{|i|
+                if !(yield @data[i])
+                    h[i]=@data[i]
+                end
+            }
+            h
+        end
         
         def _vector_ari(method,v) # :nodoc:
             if(v.is_a? Vector or v.is_a? Array)
@@ -198,7 +209,21 @@ class Vector < DelegateClass(Array)
             end
             
         end
-        
+        # Return an array with the data splitted by a separator
+        # a=Vector.new(["a,b","c,d","a,b","d"])
+        # a.splitted
+        # [["a","b"],["c","d"],["a","b"],["d"]]
+        def splitted(sep=RubySS::SPLIT_TOKEN)
+            @data.collect{|x|
+                if x.nil?
+                    nil
+                elsif (x.respond_to? :split)
+                    x.split(sep)
+                else
+                    [x]
+                end
+            }
+        end
         # Returns a hash of Vectors, defined by the different values
         # defined on the fields
         # Example:
@@ -209,22 +234,14 @@ class Vector < DelegateClass(Array)
         #     "b"=>#<RubySS::Type::Nominal:0x7f2dbcc09c48 @data=[1, 1, 0]>,
         #     "c"=>#<RubySS::Type::Nominal:0x7f2dbcc09b08 @data=[0, 1, 1]>}
         #
-        def split_by_separator(sep=",")
-            splitted=@data.collect{|x|
-                if x.nil?
-                    nil
-                elsif (x.respond_to? :split)
-                    x.split(sep)
-                else
-                    [x]
-                end
-            }
-            factors=splitted.flatten.uniq.compact
+        def split_by_separator(sep=RubySS::SPLIT_TOKEN)
+            split_data=splitted(sep)
+            factors=split_data.flatten.uniq.compact
             out=factors.inject({}) {|a,x|
                 a[x]=[]
                 a
             }
-            splitted.each{|r|
+            split_data.each{|r|
                 if r.nil?
                     factors.each{|f|
                         out[f].push(nil)
@@ -240,7 +257,7 @@ class Vector < DelegateClass(Array)
                 s
             }
         end
-        def split_by_separator_freq(sep=",")
+        def split_by_separator_freq(sep=RubySS::SPLIT_TOKEN)
             split_by_separator(sep).inject({}) {|a,v|
                 a[v[0]]=v[1].inject {|s,x| s+x.to_i}
                 a

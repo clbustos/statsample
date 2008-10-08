@@ -24,6 +24,15 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         @c.labels={5=>'FIVE'}
         assert_equal(["FIVE","FIVE","FIVE","FIVE","FIVE",6,6,7,8,9,10,1,2,3,4,nil,-99, -99],@c.vector_labeled.to_a)
     end
+    def test_split
+        a = RubySS::Vector.new(["a","a,b","c,d","a,d","d",10,nil],:nominal)
+        assert_equal([%w{a},%w{a b},%w{c d},%w{a d},%w{d},[10],nil], a.splitted)
+    end
+    def test_verify
+        h=@c.verify{|d| !d.nil? and d>0}
+        e={15=>nil,16=>-99,17=>-99}
+        assert_equal(e,h)
+    end
     def test_split_by_separator
         a = RubySS::Vector.new(["a","a,b","c,d","a,d",10,nil],:nominal)
         b=a.split_by_separator(",")
