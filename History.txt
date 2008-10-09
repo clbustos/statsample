@@ -1,3 +1,6 @@
+=== 0.1.7 / 2008-10-?
+* New module for codification
+* ...
 === 0.1.6 / 2008-09-26
 * New modules for SRS and stratified sampling
 * RubySS::Database for read and write onto databases.

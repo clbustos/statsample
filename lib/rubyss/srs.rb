@@ -40,9 +40,10 @@ module RubySS
         end
         # Standard deviation for sample distribution of a proportion
         # Know proportion, sample without replacement.
+        #
         # Sources: 
-        # - http://stattrek.com/Lesson6/SRS.aspx
-        # - Cochran
+        # * http://stattrek.com/Lesson6/SRS.aspx
+        # * Cochran(1972)
         def proportion_sd_kp_wor(p, sam, pop)
             Math::sqrt(fpc(sam,pop) * p*(1-p) / sam.to_f)
         end
@@ -105,23 +106,29 @@ module RubySS
         alias_method :standard_error, :standard_error_esd_wor
         alias_method :se, :standard_error_esd_wor
 
+        # Standard error of total estimation
         
         def standard_error_total(s,sam,pop)
             pop*se(s,sam,pop)
         end
 
         # Confidence Interval using T-Student
-        # Use with samples < 60.
+        # Use with n < 60
         def mean_confidence_interval_t(mean,s,n_sample,n_population,margin=0.95)
             t=GSL::Cdf.tdist_Pinv(1-((1-margin) / 2),n_sample-1)
             mean_confidence_interval(mean,s,n_sample,n_population,t)
         end
+        # Confidente Interval using Z
+        # Use with n > 60
         def mean_confidence_interval_z(mean,s,n_sample,n_population,margin=0.95)
-            t=GSL::Cdf.ugaussian_Pinv(1-((1-margin) / 2))
-            mean_confidence_interval(mean,s,n_sample,n_population, t)
+            z=GSL::Cdf.ugaussian_Pinv(1-((1-margin) / 2))
+            mean_confidence_interval(mean,s,n_sample,n_population, z)
         end
-        def mean_confidence_interval(mean,s,n_sample,n_population,t)
-            range=t*se(s,n_sample,n_population)
+        # Confidente interval using X.
+        #
+        # Better use mean_confidence_interval_z or mean_confidence_interval_t
+        def mean_confidence_interval(mean,s,n_sample,n_population,x)
+            range=x*se(s,n_sample,n_population)
             [mean-range,mean+range]
         end
 		end

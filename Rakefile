@@ -18,7 +18,7 @@ Hoe.new('rubyss', RubySS::VERSION) do |p|
   %w{distributions rubyss}.each do |ext|
   	p.clean_globs << "ext/#{ext}/*.o" << "ext/#{ext}/Makefile"
   end
-  p.rdoc_pattern = /^(lib|bin|ext\/distributions)|txt$/
+#  p.rdoc_pattern = /^(lib|bin|ext\/distributions)|txt$/
 end
 
 task :test => [EXT1, EXT2]

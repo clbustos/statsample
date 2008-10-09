@@ -1,8 +1,15 @@
 module RubySS
+    # Create and dumps Datasets on a database
 	module Database
         require 'dbi'
 		class << self
-        # Read a databasa query and returns a Dataset
+        # Read a database query and returns a Dataset
+        #
+        # USE:
+        #
+        #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
+        #  RubySS.read(dbh, "SELECT * FROM test")
+        #
         def read(dbh,query)
             sth=dbh.execute(query)
             vectors={}
@@ -20,6 +27,13 @@ module RubySS
             ds
         end
         # Insert each case of the Dataset on the selected table
+        #
+        # USE:
+        #        
+        #  ds={'id'=>[1,2,3].to_vector, 'name'=>["a","b","c"].to_vector}.to_dataset
+        #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
+        #  RubySS.insert(ds,dbh,"test")
+        #
         def insert(ds, dbh,table)
             query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"
             sth=dbh.prepare(query)
@@ -28,6 +42,11 @@ module RubySS
             }
         end
         # Create a sql, basen on a given Dataset
+        #
+        # USE:
+        #        
+        # RubySS.create_sql(ds,"test")
+        # 
         def create_sql(ds,table,charset="UTF8")
             sql="CREATE TABLE #{table} ("
             fields=ds.fields.collect{|f|
@@ -65,6 +84,10 @@ module RubySS
                 ds.update_valid_data
                 ds
             end
+        # Save a Dataset on a csv file
+        #
+        # USE:
+        #     RubySS::CSV.write(ds,"test_csv.csv")            
             def write(dataset,filename)
                 writer=::CSV.open(filename,'w')
                 writer << dataset.fields

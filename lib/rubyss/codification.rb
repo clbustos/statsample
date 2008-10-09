@@ -1,5 +1,8 @@
 require 'yaml'
+
+module RubySS
 # Codification
+#
 # This tool aids to code open questions
 # * Load one or more vectors on the workflow, to create a file on yaml of values. If data have RubySS::SEPARATOR_TOKEN, the value will be splitted on two or more values 
 # * Edit the yaml and replace the values with your codes. If you need to create two or mores codes for an answer, use the separator (default RubySS::SEPARATOR_TOKEN)
@@ -8,22 +11,22 @@ require 'yaml'
 #   * Instead of load new recoded vectors, create many vectors as values, as add_vectors_by_split
 #
 # Usage:
-# recode_file="recodification.yaml"
-# if first_pass
-# File.open(recode_file,"w") {|fp|
-# RubySS::Codification.create_yaml(ds,%w{vector1 vector2}, ",",fp)
-# }
-# elsif second_pass 
-# File.open(recode_file,"r") {|fp|
-# RubySS::Codification.verify(fp,['vector1'])
-# }
-# elsif third_pass
-# File.open(recode_file,"r") {|fp|
-# RubySS::Codification.recode_dataset_split!(ds,fp,"*")
-# }
-# 
-
-module RubySS
+#   recode_file="recodification.yaml"
+#
+#   if first_pass
+#       File.open(recode_file,"w") {|fp|
+#   RubySS::Codification.create_yaml(ds,%w{vector1 vector2}, ",",fp)
+#   } # Edit the file recodification.yaml
+#   elsif second_pass 
+#       File.open(recode_file,"r") {|fp|
+#       RubySS::Codification.verify(fp,['vector1'])
+#       }
+#   elsif third_pass
+#       File.open(recode_file,"r") {|fp|
+#   RubySS::Codification.recode_dataset_split!(ds,fp,"*")
+#   }
+#   end
+#     
     module Codification
         class << self
             # Create a yaml dump for a hash, based on vectors
@@ -112,7 +115,6 @@ module RubySS
                     YAML.dump(inverse.sort,io)
                 }
             end
-            
         end
     end
 end

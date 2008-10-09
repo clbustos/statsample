@@ -179,10 +179,11 @@ module RubySS
                 @fields+=@vectors.keys.sort-@fields
             end
         end
+        # Returns the vector named i
         def[](i)
             @vectors[i]
         end
-        # recode a vector based on another vector
+        # Recode a vector based on a block
         def recode!(vector_name)
             0.upto(@cases-1) {|i|
                 @vectors[vector_name].data[i]=yield case_as_hash(i)

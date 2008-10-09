@@ -4,20 +4,20 @@
 
 == DESCRIPTION:
 
-This package allows to process files and databases for statistical purposes, with focus on estimation of parameters for several types of samples (simple random, stratified and multistage sampling).
+This package allows to process files and databases for statistical purposes, with focus on validation, recodification and estimation of parameters for several types of samples (simple random, stratified and multistage sampling).
 
 == FEATURES/PROBLEMS:
 
 
 
 == SYNOPSIS:
-
-c=RubySS::Vector.new([3,3,3,3,3,1,nil,-99,-99], :scale)
-c.missing_values=[-99]
-p c.mode
-p c.median
-p c.mean
-p c.range
+    
+    c=RubySS::Vector.new([3,3,3,3,3,1,nil,-99,-99], :scale)
+    c.missing_values=[-99]
+    p c.mode
+    p c.median
+    p c.mean
+    p c.range
 
 == REQUIREMENTS:
 
@@ -26,12 +26,10 @@ Optional:
 * Plotting: gnuplot and rbgnuplot
 * Advanced Statistical: gsl and rb-gsl
 
-
-
 == INSTALL:
 
-
+sudo gem install rubyss-VERSION.gem
 
 == LICENSE:
 
-GPL 2
+GPL-2

@@ -8,6 +8,8 @@
 #
 # Claudio Bustos mailto:clbustos@gmail.com
 
+# :stopdoc:
+
 $:.unshift(File.dirname(__FILE__))
 $:.unshift(File.expand_path(File.dirname(__FILE__)+"/../ext"))
 
@@ -39,8 +41,11 @@ end
     end
 require 'rubyss/vector'
 require 'rubyss/converters'
+#
+# :startdoc:
+#
 module RubySS
-	VERSION = '0.1.6'
+    VERSION = '0.1.7'
     SPLIT_TOKEN = ","
 	module Util
 		# Finite population correction
@@ -54,4 +59,3 @@ module RubySS
         end
 	end    
 end
-
