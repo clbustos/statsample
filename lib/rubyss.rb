@@ -40,6 +40,8 @@ end
         end
     end
 require 'rubyss/vector'
+require 'rubyss/dataset'
+require 'rubyss/resample'
 require 'rubyss/converters'
 #
 # :startdoc:

@@ -1,5 +1,3 @@
-require 'rubyss/vector'
-
 module RubySS
 	# Class to create crosstab of data
 	# With this, you can create reports and do chi square test

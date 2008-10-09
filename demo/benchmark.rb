@@ -36,9 +36,3 @@ v.type=:scale
     end
 
 end
-
-    Benchmark.bm(10) do |x|
-		x.report("is_valid_and")   { for i in 1..n; v.is_valid?(10);v.is_valid?(20); v.is_valid?(30); end }
-		x.report("is_valid_or")   { for i in 1..n; v.is_valid2?(10);v.is_valid2?(20); v.is_valid2?(30); end }
-    end
-

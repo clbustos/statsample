@@ -1,35 +1,28 @@
 #include <ruby.h>
 /**
-* Document-class: RubySSOpt
+* :stopdoc:
 */
 void Init_rubyssopt();
 VALUE nominal_frequencies(VALUE self);
 VALUE rubyss_frequencies(VALUE self, VALUE data);
 VALUE dataset_case_as_hash(VALUE self, VALUE index);
 VALUE dataset_case_as_array(VALUE self, VALUE index);
-
 void Init_rubyssopt()
 {
     VALUE mRubySS = rb_define_module("RubySS"); 
 
     VALUE cNominal = rb_define_class_under(mRubySS,"Nominal",rb_cObject);
     VALUE cDataset = rb_define_class_under(mRubySS,"Dataset",rb_cObject);
+    
     rb_define_const(mRubySS,"OPTIMIZED",Qtrue);
+    
     rb_define_module_function(mRubySS,"_frequencies",rubyss_frequencies,1);
-
     rb_define_method(cNominal,"frequencies",nominal_frequencies,0);
     rb_define_method(cDataset,"case_as_hash",dataset_case_as_hash,1);
     rb_define_method(cDataset,"case_as_array",dataset_case_as_array,1);
 
 }
 
-/**
-* The same as Nominal#frequencies, but with an array
-*
-* call-seq:
-*   _frequencies(ary)       -> hash    
-* 
-*/
 
 VALUE rubyss_frequencies(VALUE self, VALUE data) {
     VALUE h=rb_hash_new();
@@ -83,3 +76,4 @@ VALUE dataset_case_as_array(VALUE self, VALUE index) {
     }
     return ar;
 }
+

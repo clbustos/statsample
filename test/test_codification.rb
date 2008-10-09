@@ -1,7 +1,6 @@
 require File.dirname(__FILE__)+'/../lib/rubyss'
 require 'rubyss/codification'
 require 'tempfile'
-require 'rubyss/dataset'
 require 'test/unit'
 
 class RubySSCodificationTestCase < Test::Unit::TestCase

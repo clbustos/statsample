@@ -1,5 +1,4 @@
 require File.dirname(__FILE__)+'/../lib/rubyss'
-require 'rubyss/dataset'
 require 'rubyss/srs'
 require 'rubyss/test'
 require 'rubyss/correlation'

@@ -1,4 +1,3 @@
-require 'rubyss/dataset'
 module RubySS
     # Multiset joins multiple dataset with the same fields and vectors
     # but with different number of cases. 

@@ -1,5 +1,4 @@
-require File.dirname(__FILE__)+'/../lib/rubyss.rb'
-require 'rubyss/dataset'
+require File.dirname(__FILE__)+'/../lib/rubyss'
 require 'test/unit'
 
 class RubySSDatasetTestCase < Test::Unit::TestCase

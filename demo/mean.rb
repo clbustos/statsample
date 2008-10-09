@@ -1,6 +1,7 @@
 require File.dirname(__FILE__)+"/../lib/rubyss"
 require 'rubyss/multiset'
 require 'rubyss/resample'
+require 'rubyss/srs'
 require 'gnuplot'
 
 tests=10000
@@ -19,21 +20,21 @@ s=pop.standard_deviation_population
 puts "Estadísticos:"
 puts "Mean:"+pop.mean.to_s
 puts "SD:"+s.to_s
-puts "EE con reemplazo:"+RubySS::standard_error_ksd_wr(s, sample_size, pop.size).to_s
-puts "EE sin reemplazo:"+RubySS::standard_error_ksd_wor(s, sample_size,pop.size).to_s
+puts "EE con reemplazo:"+RubySS::SRS.standard_error_ksd_wr(s, sample_size, pop.size).to_s
+puts "EE sin reemplazo:"+RubySS::SRS.standard_error_ksd_wor(s, sample_size,pop.size).to_s
 
 sd_with=[]
 sd_without=[]
 monte_with=RubySS::Resample.repeat_and_save(tests) {
     sample= pop.sample_with_replacement(sample_size)
-    sd_with.push(RubySS::standard_error_esd_wr(sample.sds,sample_size,pop.size))
+    sd_with.push(RubySS::SRS.standard_error_esd_wr(sample.sds,sample_size,pop.size))
     sample.mean
 }
 
 
 monte_without=RubySS::Resample.repeat_and_save(tests) {
     sample= pop.sample_without_replacement(sample_size)
-    sd_without.push(RubySS::standard_error_esd_wor(sample.sds,sample_size,pop.size))
+    sd_without.push(RubySS::SRS.standard_error_esd_wor(sample.sds,sample_size,pop.size))
     sample.mean
 }
 

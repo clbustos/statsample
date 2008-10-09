@@ -1,5 +1,4 @@
 require File.dirname(__FILE__)+'/../lib/rubyss'
-require 'rubyss/resample'
 require 'test/unit'
 
 class RubySSResampleTestCase < Test::Unit::TestCase

@@ -82,7 +82,7 @@ class Vector < DelegateClass(Array)
             @data.push(v)
             set_valid_data if update_valid
         end
-		def set_valid_data
+	def set_valid_data
 			@valid_data.clear
 			@missing_data.clear
             _set_valid_data
@@ -120,8 +120,7 @@ class Vector < DelegateClass(Array)
         # Return true if a value is valid (not nil and not included on missing values)
         
         def is_valid?(x)
-            !(x.nil? or @missing_values.include?x)
-            
+            !(x.nil? or @missing_values.include? x)
         end
         # Set missing_values
 		def missing_values=(vals)
