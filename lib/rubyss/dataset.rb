@@ -181,6 +181,7 @@ module RubySS
         end
         # Returns the vector named i
         def[](i)
+        raise Exception,"Vector '#{i}' doesn't exists on dataset" unless @vectors.has_key?(i)
             @vectors[i]
         end
         # Recode a vector based on a block
@@ -189,6 +190,9 @@ module RubySS
                 @vectors[vector_name].data[i]=yield case_as_hash(i)
             }
             @vectors[vector_name].set_valid_data
+        end
+        def crosstab(v1,v2)
+            RubySS::Crosstab.new(@vectors[v1],@vectors[v2])
         end
         def[]=(i,v)
             if v.instance_of? RubySS::Vector
@@ -213,6 +217,15 @@ module RubySS
 				to_multiset_by_split_multiple_fields(*fields)
 			end
 		end
+        # create a new dataset with all the data which the block returns true
+        def filter
+            ds=self.dup_empty
+            each {|c|
+                ds.add_case(c,false) if yield c
+            }
+            ds.update_valid_data
+            ds
+        end
         def to_multiset_by_split_one_field(field)
             raise ArgumentError,"Should use a correct field name" if !@fields.include? field
             factors=@vectors[field].factors

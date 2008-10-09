@@ -85,6 +85,9 @@ module RubySS
             total=0
             total_cols=cn.inject({}) {|a,x| a[x]=0;a}
             max_row_size = rn.inject(0) {|s,x| sl=@v_rows.labeling(x).size; sl>s ? sl : s}
+            
+            max_row_size=max_row_size<6 ? 6 : max_row_size
+            
             max_col_size = cn.inject(0) {|s,x| sl=@v_cols.labeling(x).size; sl>s ? sl : s}
             max_col_size = frequencies.inject(max_col_size) {|s,x| x[1].to_s.size>s ? x[1].to_s.size : s}
             

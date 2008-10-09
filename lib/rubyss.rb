@@ -43,6 +43,7 @@ require 'rubyss/vector'
 require 'rubyss/dataset'
 require 'rubyss/resample'
 require 'rubyss/converters'
+require 'rubyss/crosstab'
 #
 # :startdoc:
 #

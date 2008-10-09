@@ -75,6 +75,9 @@ module RubySS
                     }
                     if first_row
                         fields=row.to_a.collect{|c| c.downcase}
+                        if fields.size!=fields.uniq.size
+                            raise "There are some repeated fields on the header. Please, fix" 
+                        end
                         ds=RubySS::Dataset.new(fields)
                         first_row=false
                     else

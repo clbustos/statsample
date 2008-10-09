@@ -133,4 +133,15 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         expected=RubySS::Dataset.new({'v1'=>[1,4].to_vector(:scale), 'v2'=> [5,8].to_vector(:scale), 'v3'=>[9, 12].to_vector(:scale)})
         assert_equal(expected,ds2)
     end
+    def test_filter
+        @ds['age'].type=:scale
+        filtered=@ds.filter{|c| c['id']==2 or c['id']==4}
+        expected=RubySS::Dataset.new({'id' => RubySS::Vector.new([2,4]), 'name'=>RubySS::Vector.new(%w{Claude Franz}), 'age'=>RubySS::Vector.new([23,27],:scale),
+        'city'=>RubySS::Vector.new(['London','Paris']),
+        'a1'=>RubySS::Vector.new(['b,c',nil,])}, ['id','name','age','city','a1'])
+        assert_equal(expected,filtered)
+        
+        
+        
+    end
 end
