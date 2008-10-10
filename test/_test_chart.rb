@@ -1,17 +1,16 @@
 require File.dirname(__FILE__)+'/../lib/rubyss'
 require 'tempfile'
 require 'test/unit'
-require 'GDChart'
+require 'rubyss/chart/gdchart'
+# Not included on default test, because GDChart send a lot of warnings!
 class RubySSChartTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
 		@image_path=File.dirname(__FILE__)+"/images"
 		super
 	end
-	def test_base
-		assert(true)
-	end
-	def atest_base_chart
+
+	def test_base_chart
 		file=@image_path+"/base_bar_1.jpg"
 		width=500
 		height=300
@@ -35,7 +34,7 @@ class RubySSChartTestCase < Test::Unit::TestCase
 			assert(File.exists?(file))
 		}
 	end
-    def atest_vector
+    def test_vector
 		file=@image_path+"/bar.jpg"
 		ar=[]
 		(1..1000).each {|a|

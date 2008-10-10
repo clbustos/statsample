@@ -47,21 +47,7 @@ module RubySS
     VERSION = '0.1.7'
     SPLIT_TOKEN = ","
 	module Util
-		class << self
-		def chart_gdchart(file,width,height,chart_type, labels, options,num_datasets,data)
-				require 'GDChart'
-				gdc=GDChart.new
-				gdc.title="Generic title"
-				gdc.bg_color=0xFFFFFF
-				gdc.image_type=GDChart::JPEG
-				options.each{|k,v|
-					gdc.send(k+"=",v)
-				}
-				f=File.open(file,"w") {|f|
-					gdc.out_graph(width,height,f,chart_type, data.length/num_datasets,labels,num_datasets,data)
-				}
-		end
-		end
+		
 		# Finite population correction
         # Source: Cochran(1972)
         def fpc(sam,pop)
