@@ -12,12 +12,13 @@ Hoe.new('rubyss', RubySS::VERSION) do |p|
   # p.rubyforge_name = 'rubyssx' # if different than lowercase project name
   p.developer('Claudio Bustos', 'clbustos@gmail.com')
   p.spec_extras[:extensions] = ["ext/rubyss/extconf.rb","ext/distributions/extconf.rb"]
-  p.extra_deps << ["gnuplot",">= 2.2"]
+  p.extra_deps << ["gnuplot",">= 2.2"] << ["ruby-gdchart"]
   
-  p.clean_globs << EXT1 << EXT2
+  p.clean_globs << EXT1 << EXT2 
   %w{distributions rubyss}.each do |ext|
   	p.clean_globs << "ext/#{ext}/*.o" << "ext/#{ext}/Makefile"
   end
+  p.clean_globs << "test/images/*" 
 #  p.rdoc_pattern = /^(lib|bin|ext\/distributions)|txt$/
 end
 

@@ -213,7 +213,6 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_not_same(v1.missing_values,v3.missing_values)
         assert_equal(v1.labels,v3.labels)
         assert_not_same(v1.labels,v3.labels)
-        
     end
      
 end

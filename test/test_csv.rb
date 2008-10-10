@@ -2,7 +2,6 @@ require File.dirname(__FILE__)+'/../lib/rubyss'
 require 'test/unit'
 
 class RubySSCSVTestCase < Test::Unit::TestCase
-
 	def initialize(*args)
         @ds=RubySS::CSV.read(File.dirname(__FILE__)+"/test_csv.csv")
 		super

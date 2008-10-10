@@ -317,18 +317,19 @@ class Vector < DelegateClass(Array)
 	
 	
 	class Nominal
-	def initialize(data)
-		@data=data
-	end
-	# Returns a hash with the distribution of frecuencies of
-	# the sample                
-	def frequencies_slow
-        @data.inject(Hash.new) {|a,x|
-            a[x]=0 if a[x].nil?
-            a[x]=a[x]+1
-            a
-        }
-	end
+		def initialize(data)
+			@data=data
+		end
+		# Returns a hash with the distribution of frecuencies of
+		# the sample                
+		def frequencies_slow
+			@data.inject(Hash.new) {|a,x|
+				a[x]=0 if a[x].nil?
+				a[x]=a[x]+1
+				a
+			}
+		end
+		# Plot frequencies on a chart, using gnuplot
         def plot_frequencies
                 require 'gnuplot'
                 x=[]
@@ -351,7 +352,18 @@ class Vector < DelegateClass(Array)
 				end
 			end
 		end
+		
             end
+# Saves a chart of frequencies, using ruby-gdchart
+			def chart_frequencies(file, width=300, height=150, chart_type=GDChart::BAR, options={})
+				labels,data=[],[]
+				self.frequencies.sort.each{|k,v|
+					labels.push(k.to_s)
+					data.push(v) 
+				}
+				options['ext_color']=[0xFF3399,0xFF9933,0xFFEE33,0x33FF33, 0x9966FF]
+				RubySS::Util.chart_gdchart(file,width,height,chart_type, labels,options,1,data)
+			end			
             # Return an array of the different values of the data
 			def factors
 				@data.uniq
@@ -537,6 +549,7 @@ class Vector < DelegateClass(Array)
 				Math::sqrt(variance_sample(m))
 			end
 			
+			
 			if HAS_GSL
                 %w{variance_sample standard_deviation_sample variance_population standard_deviation_population mean sum}.each{|m|
                     m_nuevo=(m+"_slow").intern
@@ -573,9 +586,21 @@ class Vector < DelegateClass(Array)
 					@gsl.kurtosis
 				end
                 def histogram(bins=10)
-                    h=GSL::Histogram.alloc(bins,[@data.min-10,@data.max+10])
+                    h=GSL::Histogram.alloc(bins,[@data.min,@data.max])
                     h.increment(@gsl)
+					h
                 end
+				def chart_histogram(bins,file, width=300, height=150, chart_type=GDChart::BAR, options={})
+					labels=[]
+					h=histogram(bins)
+					data=[]
+					(0...bins).each{|bin|
+						data.push(h[bin])
+						range=h.get_range(bin)
+						labels.push(((range[0]+range[1]) / 2.to_f).to_s)
+					}
+					RubySS::Util.chart_gdchart(file, width, height, chart_type, labels,options, 1,data)
+				end
                 def plot_histogram(bins=10,options="")
                     self.histogram(bins).graph(options)
                 end
