@@ -6,6 +6,71 @@ require 'SVG/Graph/Line'
 module RubySS
 	module Graph
 		class SvgHistogram < SVG::Graph::BarBase
+def get_css
+        return <<EOL
+/* default fill styles for multiple datasets (probably only use a single dataset on this graph though) */
+.key1,.fill1{
+	fill: #ff0000;
+	stroke: black;
+	stroke-width: 0.5px;	
+}
+.key2,.fill2{
+	fill: #0000ff;
+	stroke: none;
+	stroke-width: 1px;	
+}
+.key3,.fill3{
+	fill: #00ff00;
+	stroke: none;
+	stroke-width: 1px;	
+}
+.key4,.fill4{
+	fill: #ffcc00;
+	stroke: none;
+	stroke-width: 1px;	
+}
+.key5,.fill5{
+	fill: #00ccff;
+	stroke: none;
+	stroke-width: 1px;	
+}
+.key6,.fill6{
+	fill: #ff00ff;
+	stroke: none;
+	stroke-width: 1px;	
+}
+.key7,.fill7{
+	fill: #00ffff;
+	stroke: none;
+	stroke-width: 1px;	
+}
+.key8,.fill8{
+	fill: #ffff00;
+	stroke: none;
+	stroke-width: 1px;	
+}
+.key9,.fill9{
+	fill: #cc6666;
+	stroke: none;
+	stroke-width: 1px;	
+}
+.key10,.fill10{
+	fill: #663399;
+	stroke: none;
+	stroke-width: 1px;	
+}
+.key11,.fill11{
+	fill: #339900;
+	stroke: none;
+	stroke-width: 1px;	
+}
+.key12,.fill12{
+	fill: #9966FF;
+	stroke: none;
+	stroke-width: 1px;	
+}
+EOL
+      	end
 		include REXML
 		
 		# See Graph::initialize and BarBase::set_defaults
@@ -48,10 +113,11 @@ module RubySS
 		def draw_data
 		minvalue = min_value
 		fieldwidth = field_width
-		
+
 		unit_size =  (@graph_height.to_f - font_size*2*top_font) / 
 					  (get_y_labels.max - get_y_labels.min)
-		bargap = bar_gap ? (fieldwidth < 10 ? fieldwidth / 2 : 10) : 0
+	    left_gap=fieldwidth/2				  
+		bargap = 0
 		
 		bar_width = fieldwidth - bargap
 		bar_width /= @data.length if stack == :side
@@ -60,6 +126,7 @@ module RubySS
 		bottom = @graph_height
 		
 		field_count = 0
+
 		@config[:fields].each_index { |i|
 		dataset_count = 0
 		for dataset in @data

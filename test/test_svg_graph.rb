@@ -34,7 +34,7 @@ class RubySSSvgGraphTestCase < Test::Unit::TestCase
 		assert(File.exists?(file))		
 		vector.type=:scale
 		file=@image_path+"/svggraph_histogram.svg"		
-		vector.svggraph_histogram(5,file,300,400,SVG::Graph::BarNoOp,:graph_title=>'Histogram')
+		vector.svggraph_histogram(5,file,300,400,RubySS::Graph::SvgHistogram,:graph_title=>'Histogram')
 		assert(File.exists?(file))
 	end
 end
