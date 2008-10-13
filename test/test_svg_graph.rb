@@ -23,17 +23,20 @@ class RubySSSvgGraphTestCase < Test::Unit::TestCase
         file=@image_path+"/svgchart_default.svg"
 		vector.svgchart_frequencies(file)
         file=@image_path+"/svgchart_default.png"
-		vector.svgchart_frequencies(file,500,400,SVG::Graph::Bar)
+		vector.svgchart_frequencies(file)
         
 		file=@image_path+"/svgchart_Bar.svg"
-		vector.svgchart_frequencies(file,800,600,SVG::Graph::Bar,:graph_title=>'Bar')
+		vector.svgchart_frequencies(file,800,600,SVG::Graph::BarNoOp,:graph_title=>'Bar')
 		assert(File.exists?(file))
 		file=@image_path+"/svgchart_BarHorizontal.svg"
-		vector.svgchart_frequencies(file,800,600,SVG::Graph::BarHorizontal,:graph_title=>'Horizontal Bar')
+		vector.svgchart_frequencies(file,800,600,SVG::Graph::BarHorizontalNoOp,:graph_title=>'Horizontal Bar')
 		assert(File.exists?(file))
+		file=@image_path+"/svgchart_Pie.svg"
+		vector.svgchart_frequencies(file,800,600,SVG::Graph::PieNoOp,:graph_title=>'Pie')
+		assert(File.exists?(file))		
 		vector.type=:scale
 		file=@image_path+"/svgchart_histogram.svg"		
-		vector.svgchart_histogram(5,file,300,400,SVG::Graph::Bar,:graph_title=>'Histogram')
+		vector.svgchart_histogram(5,file,300,400,SVG::Graph::BarNoOp,:graph_title=>'Histogram')
 		assert(File.exists?(file))
 	end
 end
