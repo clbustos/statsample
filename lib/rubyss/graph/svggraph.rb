@@ -4,9 +4,100 @@ require 'SVG/Graph/Pie'
 require 'SVG/Graph/Line'
 
 module RubySS
+	module Graph
+		class SvgHistogram < SVG::Graph::BarBase
+		include REXML
+		
+		# See Graph::initialize and BarBase::set_defaults
+		def set_defaults 
+		super
+		self.top_align = self.top_font = 1
+		end
+		
+		protected
+		
+		def get_x_labels
+		@config[:fields]
+		end
+		
+		def get_y_labels
+		maxvalue = max_value
+		minvalue = min_value
+		range = maxvalue - minvalue
+		
+		top_pad = range == 0 ? 10 : range / 20.0
+		scale_range = (maxvalue + top_pad) - minvalue
+		
+		scale_division = scale_divisions || (scale_range / 10.0)
+		
+		if scale_integers
+		scale_division = scale_division < 1 ? 1 : scale_division.round
+		end
+		
+		rv = []
+		maxvalue = maxvalue%scale_division == 0 ? 
+		maxvalue : maxvalue + scale_division
+		minvalue.step( maxvalue, scale_division ) {|v| rv << v}
+		return rv
+		end
+		
+		def x_label_offset( width )
+		width / 2.0
+		end
+		
+		def draw_data
+		minvalue = min_value
+		fieldwidth = field_width
+		
+		unit_size =  (@graph_height.to_f - font_size*2*top_font) / 
+					  (get_y_labels.max - get_y_labels.min)
+		bargap = bar_gap ? (fieldwidth < 10 ? fieldwidth / 2 : 10) : 0
+		
+		bar_width = fieldwidth - bargap
+		bar_width /= @data.length if stack == :side
+		x_mod = (@graph_width-bargap)/2 - (stack==:side ? bar_width/2 : 0)
+		
+		bottom = @graph_height
+		
+		field_count = 0
+		@config[:fields].each_index { |i|
+		dataset_count = 0
+		for dataset in @data
+		
+		# cases (assume 0 = +ve):
+		#   value  min  length
+		#    +ve   +ve  value - min
+		#    +ve   -ve  value - 0
+		#    -ve   -ve  value.abs - 0
+		
+		value = dataset[:data][i]
+		
+		left = (fieldwidth * field_count)
+		
+		length = (value.abs - (minvalue > 0 ? minvalue : 0)) * unit_size
+		# top is 0 if value is negative
+		top = bottom - (((value < 0 ? 0 : value) - minvalue) * unit_size)
+		left += bar_width * dataset_count if stack == :side
+		
+		@graph.add_element( "rect", {
+		  "x" => left.to_s,
+		  "y" => top.to_s,
+		  "width" => bar_width.to_s,
+		  "height" => length.to_s,
+		  "class" => "fill#{dataset_count+1}"
+		})
+		
+		make_datapoint_text(left + bar_width/2.0, top - 6, value.to_s)
+		dataset_count += 1
+		end
+		field_count += 1
+		}
+		end
+		end
+	end
 	class Nominal
 		# Creates a barchart using ruby-gdchart
-		def svgchart_frequencies(file, width=600, height=300, chart_type=SVG::Graph::BarNoOp, options={})
+		def svggraph_frequencies(file, width=600, height=300, chart_type=SVG::Graph::BarNoOp, options={})
 			labels,data=[],[]
 			self.frequencies.sort.each{|k,v|
 				labels.push(k.to_s)
@@ -26,7 +117,7 @@ module RubySS
 		end
 	end
 	class Scale < Ordinal
-		def svgchart_histogram(bins,file, width=600, height=300, chart_type=SVG::Graph::BarNoOp, options={})
+		def svggraph_histogram(bins,file, width=600, height=300, chart_type=RubySS::Graph::SvgHistogram, options={})
             labels=[]
             h=histogram(bins)
             data=[]
