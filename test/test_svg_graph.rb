@@ -20,11 +20,9 @@ class RubySSSvgGraphTestCase < Test::Unit::TestCase
 		vector=ar.to_vector
         file=@image_path+"/svggraph_default.svg"
 		vector.svggraph_frequencies(file)
-        file=@image_path+"/svggraph_default.png"
-		vector.svggraph_frequencies(file)
         
 		file=@image_path+"/svggraph_Bar.svg"
-		vector.svggraph_frequencies(file,800,600,SVG::Graph::BarNoOp,:graph_title=>'Bar')
+		vector.svggraph_frequencies(file,800,600,SVG::Graph::Bar,:graph_title=>'Bar')
 		assert(File.exists?(file))
 		file=@image_path+"/svggraph_BarHorizontal.svg"
 		vector.svggraph_frequencies(file,800,600,SVG::Graph::BarHorizontalNoOp,:graph_title=>'Horizontal Bar')
@@ -34,7 +32,7 @@ class RubySSSvgGraphTestCase < Test::Unit::TestCase
 		assert(File.exists?(file))		
 		vector.type=:scale
 		file=@image_path+"/svggraph_histogram.svg"		
-		vector.svggraph_histogram(5,file,300,400,RubySS::Graph::SvgHistogram,:graph_title=>'Histogram')
+		vector.svggraph_histogram(5,file,600,400)
 		assert(File.exists?(file))
 	end
 end
