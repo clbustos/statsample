@@ -10,7 +10,19 @@ class RubySSSvgGraphTestCase < Test::Unit::TestCase
 		@image_path=File.dirname(__FILE__)+"/images"
 		super
 	end
-
+    def test_histogram
+        
+        ar=(1..1000).to_a.collect {|a|
+			rand(10)
+		}.to_vector(:scale)
+        h=ar.histogram([0,2,5,11])
+        file=@image_path+"/svg_histogram_only.svg"
+        graph = RubySS::Graph::SvgHistogram.new(:graph_title=>"Histograma")
+        graph.histogram=h
+        File.open(file,"w") {|f|
+              f.puts(graph.burn)
+        }
+    end
     def test_vector
 		file=@image_path+"/gdchart_bar.jpg"
 		ar=[]

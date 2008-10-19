@@ -172,6 +172,16 @@ class RubySSVectorTestCase < Test::Unit::TestCase
             assert_equal(21,b.sum)
             assert_equal(3.5,b.mean)
             assert_equal(6,b.gsl.size)
+            # histogram
+            a=[11,12,13,15,21,22,23,32,33].to_vector(:scale)
+            h=a.histogram(3)
+            assert_equal(4,h[0])
+            assert_equal(3,h[1])
+            assert_equal(2,h[2])
+            h=a.histogram([10,20,30,40])
+            assert_equal(4,h[0])
+            assert_equal(3,h[1])
+            assert_equal(2,h[2])
             
 		end
 	end

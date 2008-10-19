@@ -576,12 +576,20 @@ class Vector < DelegateClass(Array)
 				def kurtosis
 					@gsl.kurtosis
 				end
+                # Create a GSL::Histogram
+                # With a fixnum, creates X bins within the range of data
+                # With an Array, every value will be a cut point for every bin
                 def histogram(bins=10)
-                    h=GSL::Histogram.alloc(bins,[@data.min,@data.max])
+                    if bins.is_a? Array
+                        h=GSL::Histogram.alloc(bins)                        
+                    else
+                        # ugly patch. The upper limit for a bin has the form
+                        # x < range
+                        h=GSL::Histogram.alloc(bins,[@data.min,@data.max+0.0001])
+                    end
                     h.increment(@gsl)
 					h
                 end
-				
                 def plot_histogram(bins=10,options="")
                     self.histogram(bins).graph(options)
                 end
