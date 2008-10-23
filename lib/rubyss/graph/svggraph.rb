@@ -28,7 +28,7 @@ module RubySS
 	end
 	class Scale < Ordinal
 		def svggraph_histogram(bins,file, width=600, height=300, options={})
-            options={:height=>height,:width=>width, :title=>"Histogram", :show_graph_title=>true}.merge! options
+            options={:height=>height,:width=>width, :graph_title=>"Histogram", :show_graph_title=>true}.merge! options
             graph = RubySS::Graph::SvgHistogram.new(options)
             graph.histogram=histogram(bins)
             File.open(file,"w") {|f|

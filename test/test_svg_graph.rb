@@ -17,7 +17,7 @@ class RubySSSvgGraphTestCase < Test::Unit::TestCase
 		}.to_vector(:scale)
         h=ar.histogram([0,2,5,11])
         file=@image_path+"/svg_histogram_only.svg"
-        graph = RubySS::Graph::SvgHistogram.new(:graph_title=>"Histograma")
+        graph = RubySS::Graph::SvgHistogram.new({})
         graph.histogram=h
         File.open(file,"w") {|f|
               f.puts(graph.burn)

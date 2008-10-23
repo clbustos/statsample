@@ -1,18 +1,26 @@
 module RubySS
     module Graph
 class SvgHistogram < SVG::Graph::BarBase
+    attr_accessor :inner_margin
         def initialize(config)
             config[:fields]=[:dummy]
             super
+            
+            @histogram=nil
         end
 		include REXML
 		
-		# See Graph::initialize and BarBase::set_defaults
+			# In addition to the defaults set in Graph::initialize, sets
+			# [inner_margin] 14
+			# [key] false
 		def set_defaults 
-		super
-		self.top_align = self.top_font = 0
-        self.key=false
-        @histogram=nil
+		 super
+		 self.top_align = self.top_font = 0
+         init_with({
+            :inner_margin=>16,
+            :key=>false
+            })
+         
 		end
 		
         def histogram=(h)
@@ -47,8 +55,32 @@ class SvgHistogram < SVG::Graph::BarBase
             return rv
 		end
 		
-
-	
+        def unit_width
+            (@graph_width-(@inner_margin*2)) / (@histogram.max-@histogram.min).to_f
+        end
+        def draw_x_label(v)
+            left = (v - @histogram.min)*unit_width                    
+            x=@inner_margin+left
+            text = @graph.add_element( "text" )
+            text.attributes["class"] = "xAxisLabels"
+            text.text = sprintf("%0.2f",v)
+            y = @graph_height + x_label_font_size + 3
+            text.attributes["x"] = x.to_s
+            text.attributes["y"] = y.to_s
+            
+        end
+	    def draw_x_labels
+            if show_x_labels
+                (0...@histogram.bins).each { |i|
+                    value = @histogram[i]
+                    range = @histogram.get_range(i)
+                    draw_x_label(range[0])
+                    if(i==(@histogram.bins)-1)
+                        draw_x_label(range[1])
+                    end
+                }
+            end
+        end
 		def draw_data
 		minvalue = min_value
 		fieldwidth = field_width
@@ -56,7 +88,7 @@ class SvgHistogram < SVG::Graph::BarBase
 		unit_size =  (@graph_height.to_f - font_size*2*top_font) / 
 					  (get_y_labels.max - get_y_labels.min)		
 		bottom = @graph_height
-		unit_width=@graph_width / (@histogram.max-@histogram.min).to_f
+        left_margin=@inner_margin
 		field_count = 0
 
 		(0...@histogram.bins).each { |i|
@@ -76,14 +108,14 @@ class SvgHistogram < SVG::Graph::BarBase
 		# top is 0 if value is negative
 		top = bottom - (((value < 0 ? 0 : value) - minvalue) * unit_size)
 		@graph.add_element( "rect", {
-          "x" => left.to_s,
+          "x" => (left_margin+left).to_s,
 		  "y" => top.to_s,
 		  "width" => bar_width.to_s,
 		  "height" => length.to_s,
 		  "class" => "fill#{dataset_count+1}"
 		})
 		
-		make_datapoint_text(left + (bar_width/2), top - 6, value.to_s)
+		make_datapoint_text(left + left_margin+ (bar_width/2), top - 6, value.to_s)
 		field_count += 1
 		}
 	end
