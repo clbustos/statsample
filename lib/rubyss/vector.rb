@@ -20,7 +20,23 @@ module RubySS
 			vs.collect{|v| v[i]}
 		})
 	end
-
+	# Returns a duplicate of the input vectors, without missing data
+	# for any of the vectors
+	# 
+	#  a=[1,2,3,6,7,nil,3,5].to_vector(:scale)
+	#  b=[nil,nil,5,6,4,5,10,2].to_vector(:scale)
+	#  c=[2,4,6,7,4,5,6,7].to_vector(:scale)
+	#  a2,b2,c2=RubySS.only_valid(a,b,c)
+	#  => [#<RubySS::Scale:0xb748c8c8 @data=[3, 6, 7, 3, 5]>, 
+	#        #<RubySS::Scale:0xb748c814 @data=[5, 6, 4, 10, 2]>, 
+	#        #<RubySS::Scale:0xb748c760 @data=[6, 7, 4, 6, 7]>]
+	#
+	def self.only_valid(*vs)
+		i=1
+		h=vs.inject({}) {|a,v| a["v#{i}"]=v;i+=1;a}
+		ds=RubySS::Dataset.new(h).dup_only_valid
+		ds.vectors.values
+	end
 class Vector < DelegateClass(Array)
 	
     include Enumerable

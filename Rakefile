@@ -5,6 +5,11 @@ require 'rubygems'
 require 'hoe'
 require './lib/rubyss.rb'
 
+if File.exists? './local_rakefile.rb'
+	require './local_rakefile'
+end
+	
+	
 EXT1 = "ext/distributions/cdf.#{Hoe::DLEXT}"  
 EXT2 = "ext/rubyss/rubyssopt.#{Hoe::DLEXT}"  
 
@@ -38,6 +43,5 @@ file EXT2 => ["ext/rubyss/extconf.rb", "ext/rubyss/rubyssopt.c"] do
     sh "make"
   end
 end
-
 
 # vim: syntax=Ruby

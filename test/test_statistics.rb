@@ -25,8 +25,8 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
         v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
         assert_in_delta(0.53,RubySS::Correlation.pearson(v1,v2),0.01)
-        v3=[6,2,  5,4,7,8,4,3,2,nil].to_vector(:scale)
-        v4=[2,nil,3,7,8,6,4,3,2,500].to_vector(:scale)
+        v3=[6,2,  1000,1000,5,4,7,8,4,3,2,nil].to_vector(:scale)
+        v4=[2,nil,nil,nil,  3,7,8,6,4,3,2,500].to_vector(:scale)
         assert_in_delta(0.53,RubySS::Correlation.pearson(v3,v4),0.01)
     end
     def test_estimation_mean              

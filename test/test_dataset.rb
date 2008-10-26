@@ -132,6 +132,7 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         ds2=ds1.dup_only_valid
         expected=RubySS::Dataset.new({'v1'=>[1,4].to_vector(:scale), 'v2'=> [5,8].to_vector(:scale), 'v3'=>[9, 12].to_vector(:scale)})
         assert_equal(expected,ds2)
+		assert_equal(expected.vectors.values,RubySS::only_valid(v1,v2,v3))
     end
     def test_filter
         @ds['age'].type=:scale

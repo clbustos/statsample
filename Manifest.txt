@@ -31,11 +31,15 @@ lib/rubyss/converters.rb
 lib/rubyss/correlation.rb
 lib/rubyss/crosstab.rb
 lib/rubyss/dataset.rb
+lib/rubyss/graph/gdchart.rb
+lib/rubyss/graph/svggraph.rb
+lib/rubyss/graph/svghistogram.rb
 lib/rubyss/multiset.rb
 lib/rubyss/resample.rb
 lib/rubyss/srs.rb
 lib/rubyss/test.rb
 lib/rubyss/vector.rb
+test/_test_chart.rb
 test/test_codification.rb
 test/test_crosstab.rb
 test/test_csv.csv
@@ -46,4 +50,5 @@ test/test_multiset.rb
 test/test_resample.rb
 test/test_statistics.rb
 test/test_stratified.rb
+test/test_svg_graph.rb
 test/test_vector.rb

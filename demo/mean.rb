@@ -1,7 +1,6 @@
 require File.dirname(__FILE__)+"/../lib/rubyss"
-require 'rubyss/multiset'
-require 'rubyss/resample'
 require 'rubyss/srs'
+require 'rubyss/multiset'
 require 'gnuplot'
 
 tests=10000
@@ -17,11 +16,11 @@ a=[]
 
 pop=a.to_vector(:scale)
 s=pop.standard_deviation_population
-puts "Estadísticos:"
+puts "Parameters:"
 puts "Mean:"+pop.mean.to_s
 puts "SD:"+s.to_s
-puts "EE con reemplazo:"+RubySS::SRS.standard_error_ksd_wr(s, sample_size, pop.size).to_s
-puts "EE sin reemplazo:"+RubySS::SRS.standard_error_ksd_wor(s, sample_size,pop.size).to_s
+puts "SE with replacement:"+RubySS::SRS.standard_error_ksd_wr(s, sample_size, pop.size).to_s
+puts "SE without replacement:"+RubySS::SRS.standard_error_ksd_wor(s, sample_size,pop.size).to_s
 
 sd_with=[]
 sd_without=[]
@@ -45,25 +44,11 @@ v_sd_without=sd_without.to_vector(:scale)
 v_with=monte_with.to_vector(:scale)
 v_without=monte_without.to_vector(:scale)
 puts "=============="
-puts "Con reemplazo"
+puts "Sample distribution - with Replacement"
 puts "Mean:"+v_with.mean.to_s
 puts "Sd:"+v_with.sds.to_s
 puts "Sd (estimated):"+v_sd_with.mean.to_s
-puts "Sin reemplazo"
+puts "Sample distribution - without Replacement"
 puts "Mean:"+v_without.mean.to_s
 puts "Sd:"+v_without.sds.to_s
 puts "Sd (estimated):"+v_sd_without.mean.to_s
-=begin
-
-x=[]
-y=[]
-y2=[]
-prev=0
-prev_chi=0
-v.frequencies.sort.each{|k,v1|
-	x.push(k)
-	y.push(prev+v1)
-	prev=prev+v1
-}
-GSL::graph(GSL::Vector.alloc(x),  GSL::Vector.alloc(y))
-=end
