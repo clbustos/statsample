@@ -1,6 +1,5 @@
 require File.dirname(__FILE__)+'/../lib/rubyss'
 require 'rubyss/multiset'
-require 'rubyss/srs'
 require 'test/unit'
 
 class RubySSStratifiedTestCase < Test::Unit::TestCase

@@ -1,5 +1,5 @@
 module RubySS
-    class Resample
+    module Resample
         class << self
             def repeat_and_save(times,&action)
                 (1..times).inject([]) {|a,x|

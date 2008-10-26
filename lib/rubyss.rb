@@ -46,6 +46,13 @@ end
 module RubySS
     VERSION = '0.1.7'
     SPLIT_TOKEN = ","
+	autoload(:Database, 'rubyss/converters')
+	autoload(:CSV, 'rubyss/converters')
+	autoload(:Resample, 'rubyss/resample')
+	autoload(:SRS, 'rubyss/srs')
+	autoload(:Codification, 'rubyss/codification')
+	autoload(:Correlation, 'rubyss/correlation')
+	autoload(:Test, 'rubyss/test')
 	module Util
 		
 		# Finite population correction
@@ -58,12 +65,12 @@ module RubySS
             1-(sam.to_f/pop)
         end
 
-	end    
+	end
 end
-
 
 require 'rubyss/vector'
 require 'rubyss/dataset'
-require 'rubyss/resample'
-require 'rubyss/converters'
 require 'rubyss/crosstab'
+
+
+

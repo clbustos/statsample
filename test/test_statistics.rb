@@ -1,7 +1,4 @@
 require File.dirname(__FILE__)+'/../lib/rubyss'
-require 'rubyss/srs'
-require 'rubyss/test'
-require 'rubyss/correlation'
 require 'test/unit'
 
 class RubySSStatisicsTestCase < Test::Unit::TestCase
