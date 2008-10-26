@@ -45,8 +45,10 @@ module RubySS
         #
         # USE:
         #        
-        # RubySS.create_sql(ds,"test")
-        # 
+        #  ds={'id'=>[1,2,3,4,5].to_vector,'name'=>%w{Alex Peter Susan Mary John}.to_vector}.to_dataset
+	#  RubySS::Database.create_sql(ds,'names')
+        #   ==>"CREATE TABLE names (id INTEGER,\n name VARCHAR (255)) CHARACTER SET=UTF8;"
+	# 
         def create_sql(ds,table,charset="UTF8")
             sql="CREATE TABLE #{table} ("
             fields=ds.fields.collect{|f|
