@@ -88,35 +88,26 @@ class SvgHistogram < SVG::Graph::BarBase
 		unit_size =  (@graph_height.to_f - font_size*2*top_font) / 
 					  (get_y_labels.max - get_y_labels.min)		
 		bottom = @graph_height
-        left_margin=@inner_margin
 		field_count = 0
-
+		hist_min=@histogram.min
 		(0...@histogram.bins).each { |i|
-		dataset_count = 0
-		# cases (assume 0 = +ve):
-		#   value  min  length
-		#    +ve   +ve  value - min
-		#    +ve   -ve  value - 0
-		#    -ve   -ve  value.abs - 0
-		
-		value = @histogram[i]
-		range = @histogram.get_range(i)
-		left = (range[0] - @histogram.min)*unit_width
-        bar_width = (range[1] - @histogram.min)*unit_width - left
-		
-		length = (value.abs - (minvalue > 0 ? minvalue : 0)) * unit_size
-		# top is 0 if value is negative
-		top = bottom - (((value < 0 ? 0 : value) - minvalue) * unit_size)
-		@graph.add_element( "rect", {
-          "x" => (left_margin+left).to_s,
-		  "y" => top.to_s,
-		  "width" => bar_width.to_s,
-		  "height" => length.to_s,
-		  "class" => "fill#{dataset_count+1}"
-		})
-		
-		make_datapoint_text(left + left_margin+ (bar_width/2), top - 6, value.to_s)
-		field_count += 1
+			dataset_count = 0
+			value = @histogram[i]
+			range = @histogram.get_range(i)
+			left = (range[0] - hist_min)*unit_width
+			bar_width = (range[1] - hist_min)*unit_width - left
+			length = (value.abs - (minvalue > 0 ? minvalue : 0)) * unit_size
+			# top is 0 if value is negative
+			top = bottom - (((value < 0 ? 0 : value) - minvalue) * unit_size)
+			@graph.add_element( "rect", {
+				"x" => (@inner_margin+left).to_s,
+				"y" => top.to_s,
+				"width" => bar_width.to_s,
+				"height" => length.to_s,
+				"class" => "fill#{dataset_count+1}"
+			})
+			make_datapoint_text(left + @inner_margin+ (bar_width/2), top - 6, value.to_s)
+			field_count += 1
 		}
 	end
     
