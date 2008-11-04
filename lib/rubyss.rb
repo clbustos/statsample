@@ -52,6 +52,7 @@ module RubySS
 	autoload(:SRS, 'rubyss/srs')
 	autoload(:Codification, 'rubyss/codification')
 	autoload(:Correlation, 'rubyss/correlation')
+	autoload(:Regression, 'rubyss/regression')
 	autoload(:Test, 'rubyss/test')
 	module Util
 		

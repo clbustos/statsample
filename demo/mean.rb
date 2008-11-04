@@ -1,8 +1,9 @@
-require File.dirname(__FILE__)+"/../lib/rubyss"
+basedir=File.dirname(__FILE__)
+require basedir+"/../lib/rubyss"
 require 'rubyss/srs'
 require 'rubyss/multiset'
 require 'gnuplot'
-
+require 'rubyss/graph/svggraph.rb'
 tests=10000
 sample_size=100
 
@@ -15,6 +16,9 @@ a=[]
 
 
 pop=a.to_vector(:scale)
+
+pop.svggraph_histogram(10,basedir+"/images/mean_pop.svg")
+
 s=pop.standard_deviation_population
 puts "Parameters:"
 puts "Mean:"+pop.mean.to_s
@@ -52,3 +56,5 @@ puts "Sample distribution - without Replacement"
 puts "Mean:"+v_without.mean.to_s
 puts "Sd:"+v_without.sds.to_s
 puts "Sd (estimated):"+v_sd_without.mean.to_s
+
+v_without.svggraph_histogram(10,basedir+"/images/mean_wo_hist.svg")
