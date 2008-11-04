@@ -94,6 +94,11 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 		assert_equal(4,@c.percentil(25))
 		assert_equal(7,@c.percentil(75))
 	end
+	def test_ranked
+		v1=[0.8,1.2,1.2,2.3,18].to_vector(:ordinal)
+		expected=[1,2.5,2.5,4,5].to_vector(:ordinal)
+		assert_equal(expected,v1.ranked)
+	end
     def test_scale
         a=RubySS::Vector.new([1,2,3,4,"STRING"], :scale)
         assert_equal(10,a.sum)
