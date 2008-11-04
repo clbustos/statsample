@@ -466,7 +466,7 @@ class Vector < DelegateClass(Array)
                 end
             end
 			# Returns a ranked vector
-			def ranked
+			def ranked(type=:ordinal)
 				i=0
 				r=frequencies.sort.inject({}){|a,v|
 					a[v[0]]=((i+1 + i+v[1]) / 2.0)
@@ -475,7 +475,7 @@ class Vector < DelegateClass(Array)
 				}
 				@data.collect {|c|
 					r[c]
-				}.to_vector(:ordinal)
+				}.to_vector(type)
 			end
             # Return the median (percentil 50)
             def median
