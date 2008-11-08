@@ -141,8 +141,12 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         'city'=>RubySS::Vector.new(['London','Paris']),
         'a1'=>RubySS::Vector.new(['b,c',nil,])}, ['id','name','age','city','a1'])
         assert_equal(expected,filtered)
-        
-        
-        
-    end
+    end                                  
+	def test_filter_field
+		@ds['age'].type=:scale
+        filtered=@ds.filter_field('id') {|c| c['id']==2 or c['id']==4}
+        expected=[2,4].to_vector
+        assert_equal(expected,filtered)
+		
+	end
 end

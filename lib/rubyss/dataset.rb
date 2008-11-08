@@ -226,6 +226,14 @@ module RubySS
             ds.update_valid_data
             ds
         end
+		# creates a new vector with the data of a given field which the block returns true
+		def filter_field(field)
+			a=[]
+			each {|c|
+				a.push(c[field]) if yield c
+			}
+			a.to_vector(@vectors[field].type)
+		end
         def to_multiset_by_split_one_field(field)
             raise ArgumentError,"Should use a correct field name" if !@fields.include? field
             factors=@vectors[field].factors

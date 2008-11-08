@@ -35,6 +35,7 @@ lib/rubyss/graph/gdchart.rb
 lib/rubyss/graph/svggraph.rb
 lib/rubyss/graph/svghistogram.rb
 lib/rubyss/multiset.rb
+lib/rubyss/regression.rb
 lib/rubyss/resample.rb
 lib/rubyss/srs.rb
 lib/rubyss/test.rb

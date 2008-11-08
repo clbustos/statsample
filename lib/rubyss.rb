@@ -55,7 +55,6 @@ module RubySS
 	autoload(:Regression, 'rubyss/regression')
 	autoload(:Test, 'rubyss/test')
 	module Util
-		
 		# Finite population correction
         # Source: Cochran(1972)
         def fpc(sam,pop)
@@ -65,7 +64,6 @@ module RubySS
         def qf(sam,pop)
             1-(sam.to_f/pop)
         end
-
 	end
 end
 
