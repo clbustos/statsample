@@ -5,11 +5,12 @@ class Array
 end
 
 module RubySS
-    # Create a matrix using vectors as columns
+    class << self
+	# Create a matrix using vectors as columns
     # Use:
     #
     # matrix=RubySS.vector_cols_matrix(v1,v2)
-	def self.vector_cols_matrix(*vs)
+	def vector_cols_matrix(*vs)
 		# test
 		size=vs[0].size
 		vs.each{|v|
@@ -19,6 +20,7 @@ module RubySS
 		Matrix.rows((0...size).to_a.collect() {|i|
 			vs.collect{|v| v[i]}
 		})
+	end
 	end
 	# Returns a duplicate of the input vectors, without missing data
 	# for any of the vectors

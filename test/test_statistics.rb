@@ -42,7 +42,19 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
 	def test_tau
 		v1=[1,2,3,4,5,6,7,8,9,10,11].to_vector(:ordinal)
 		v2=[1,3,4,5,7,8,2,9,10,6,11].to_vector(:ordinal)
-		assert_in_delta(0.6727,RubySS::Correlation.tau(v1,v2),0.001)
+		assert_in_delta(0.6727,RubySS::Correlation.tau_a(v1,v2),0.001)
+		assert_in_delta(0.6727,RubySS::Correlation.tau_b((RubySS::Crosstab.new(v1,v2).to_matrix)),0.001)
+		v1=[12,14,14,17,19,19,19,19,19,20,21,21,21,21,21,22,23,24,24,24,26,26,27].to_vector(:ordinal)
+		v2=[11,4,4,2,0,0,0,0,0,0,4,0,4,0,0,0,0,4,0,0,0,0,0].to_vector(:ordinal)
+		assert_in_delta(-0.376201540231705, RubySS::Correlation.tau_b(RubySS::Crosstab.new(v1,v2).to_matrix),0.001)
+	end
+	def test_gamma
+		m=Matrix[[10,5,2],[10,15,20]]
+		assert_in_delta(0.636,RubySS::Correlation.gamma(m),0.001)
+		m2=Matrix[[15,12,6,5],[12,8,10,8],[4,6,9,10]]
+		assert_in_delta(0.349,RubySS::Correlation.gamma(m2),0.001)
+		
+
 	end
     def test_estimation_mean              
         v=([42]*23+[41]*4+[36]*1+[32]*1+[29]*1+[27]*2+[23]*1+[19]*1+[16]*2+[15]*2+[14,11,10,9,7]+ [6]*3+[5]*2+[4,3]).to_vector(:scale)
