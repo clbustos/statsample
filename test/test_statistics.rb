@@ -87,10 +87,13 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
     def test_linear_regression
 		a=[1,2,3,4,5,6].to_vector(:scale)
 		b=[6,2,4,10,12,8].to_vector(:scale)
-		reg= RubySS::Regression::LinearRegression.new_from_vectors(a,b)
-		p reg.sse
-		assert_equal(2.4,reg.a)
+		reg = RubySS::Regression::LinearRegression.new_from_vectors(a,b)
+        assert_in_delta((reg.ssr+reg.sse).to_f,reg.sst,0.001)
+        assert_in_delta(RubySS::Correlation.pearson(a,b),reg.r,0.001)
+		assert_in_delta(2.4,reg.a,0.01)
 		assert_in_delta(1.314,reg.b,0.001)
-		
+		assert_in_delta(0.657,reg.r,0.001)
+		assert_in_delta(0.432,reg.r2,0.001)
+        
 	end
 end
