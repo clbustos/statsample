@@ -541,13 +541,14 @@ class Vector < DelegateClass(Array)
 			def mean
 					sum.to_f/ n_valid
 			end
-            # Sum of squares
-			
-			def squares
-                @data.inject(0){|a,x|x.square+a}
-            end
+			# Sum of squared deviation
+			def sum_of_squared_deviation
+				@data.inject(0) {|a,x| x.square+a} - (sum.square.to_f / n_valid)
+				
+			end
             # Population variance (divided by n)
             def variance_population
+				squares=@data.inject(0){|a,x| x.square+a}
                 squares.to_f / n_valid - mean.square
             end
 			

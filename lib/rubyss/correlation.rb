@@ -4,9 +4,12 @@ module RubySS
         class << self
             # Calculate Pearson correlation coefficient between 2 vectors
             def pearson(v1,v2)
-                raise "You need Ruby/GSL" unless HAS_GSL
 				v1a,v2a=RubySS.only_valid(v1,v2)
-                GSL::Stats::correlation(v1a.gsl, v2a.gsl)
+				if HAS_GSL
+					GSL::Stats::correlation(v1a.gsl, v2a.gsl)
+				else
+					sum_of_codeviated(v1a,v2a) / Math::sqrt(v1a.sum_of_squared_deviation * v2a.sum_of_squared_deviation)
+				end
             end
 			# Calculate Spearman correlation coefficient between 2 vectors
 			def spearman(v1,v2)
@@ -28,6 +31,7 @@ module RubySS
 				((m0.mean-m1.mean).to_f / ds['c'].sdp) * Math::sqrt(m0.size*m1.size.to_f / ds.cases**2)
 			end
 			# Kendall Rank Correlation Coefficient.
+			#
 			# Based on Hervé Adbi article
 			def tau_a(v1,v2)
 				v1a,v2a=RubySS.only_valid(v1,v2)
@@ -38,18 +42,22 @@ module RubySS
 				delta= o1.size*2-(o2  & o1).size*2
 				1-(delta * 2 / (n*(n-1)).to_f)				
 			end
-			# Calculates Tau b correlation
+			# Calculates Tau b correlation.
+			#
 			# Tau-b defines perfect association as strict monotonicity.
 			# Although it requires strict monotonicity to reach 1.0, 
 			# it does not penalize ties as much as some other measures. 
+			#
 			# Source: http://faculty.chass.ncsu.edu/garson/PA765/assocordinal.htm
 			def tau_b(matrix)
 				v=pairs(matrix)
 				((v['P']-v['Q']).to_f / Math::sqrt((v['P']+v['Q']+v['Y'])*(v['P']+v['Q']+v['X'])).to_f)
 			end
-			# Calculates Goodman and Kruskal's gamma
+			# Calculates Goodman and Kruskal's gamma.
+			# 
 			# Gamma is the surplus of concordant pairs over discordant pairs, 
-			# as a percentage of all pairs ignoring ties
+			# as a percentage of all pairs ignoring ties.
+			# 
 			# Source: http://faculty.chass.ncsu.edu/garson/PA765/assocordinal.htm			
 			def gamma(matrix)
 				v=pairs(matrix)
@@ -108,6 +116,14 @@ module RubySS
 				}
 			}
 			a
+			end
+			def sum_of_codeviated(v1,v2)
+				v1a,v2a=RubySS.only_valid(v1,v2)
+				sum=0
+				(0...v1a.size).each{|i|
+					sum+=v1a[i]*v2a[i]
+				}
+				sum-((v1a.sum*v2a.sum) / v1a.size.to_f)
 			end
         end
     end

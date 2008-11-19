@@ -143,6 +143,10 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_equal([nil,11,nil,10,10,10], (b-a).to_a)
         assert_equal([nil,11,nil,10,10,10], (b-a.to_a).to_a)
     end
+	def test_sum_of_squares
+		a=[1,2,3,4,5,6].to_vector(:scale)
+		assert_equal(17.5, a.sum_of_squared_deviation)
+	end
     def test_samples
         srand(1)
         assert_equal(100,@c.sample_with_replacement(100).size)

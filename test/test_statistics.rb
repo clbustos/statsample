@@ -18,6 +18,11 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         chi=RubySS::Test.chi_square(real,expected)
         assert_in_delta(32.53,chi,0.1)
     end
+	def test_sum_of_codeviated
+		v1=[1,2,3,4,5,6].to_vector(:scale)
+		v2=[6,2,4,10,12,8].to_vector(:scale)
+		assert_equal(23.0, RubySS::Correlation.sum_of_codeviated(v1,v2))
+	end
     def test_pearson
         v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
         v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
@@ -79,5 +84,13 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         assert_in_delta(0.28,l[0],0.01)
         assert_in_delta(0.46,l[1],0.01)
     end
-    
+    def test_linear_regression
+		a=[1,2,3,4,5,6].to_vector(:scale)
+		b=[6,2,4,10,12,8].to_vector(:scale)
+		reg= RubySS::Regression::LinearRegression.new_from_vectors(a,b)
+		p reg.sse
+		assert_equal(2.4,reg.a)
+		assert_in_delta(1.314,reg.b,0.001)
+		
+	end
 end
