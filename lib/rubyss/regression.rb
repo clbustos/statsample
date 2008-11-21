@@ -6,7 +6,7 @@ module RubySS
 		# * <tt> LinearRegression.new_from_vectors(vx,vy)</tt>
 		# * <tt> LinearRegression.new_from_gsl(gsl) </tt>
 		#
-		class LinearRegression
+		class SimpleRegression
 			attr_accessor :a,:b,:cov00, :cov01, :covx1, :chisq, :status
 			private_class_method :new
 			def initialize(init_method, *argv)
@@ -36,6 +36,7 @@ module RubySS
             def sst
                 @vy.sum_of_squared_deviation
             end
+            # 
             def r
                 @b * (@vx.sds / @vy.sds)
             end
@@ -47,16 +48,21 @@ module RubySS
 					new(:init_gsl, *ar)
 				end
 				def new_from_vectors(vx,vy)
-					@vx,@vy=RubySS.only_valid(vx,vy)
-					r_gsl=GSL::Fit.linear(@vx.gsl, @vy.gsl)
-					new(:init_gsl_vectors, @vx,@vy,r_gsl)
+                    new(:init_vectors,vx,vy)
 				end
 			end
-			def init_gsl_vectors(vx,vy,r_gsl)
-				@vx=vx
-				@vy=vy
-				init_gsl(*r_gsl)
-			end
+            def init_vectors(vx,vy)
+                @vx,@vy=RubySS.only_valid(vx,vy)
+                x_m=@vx.mean
+                y_m=@vy.mean
+                num=den=0
+                (0...@vx.size).each {|i|
+                    num+=(@vx[i]-x_m)*(@vy[i]-y_m)
+                    den+=(@vx[i]-x_m)**2
+                }
+                @b=num.to_f/den
+                @a=y_m - @b*x_m
+            end
 			def init_gsl(a,b,cov00, cov01, covx1, chisq, status)
 				@a=a
 				@b=b
@@ -67,6 +73,36 @@ module RubySS
 				@status=status
 			end
 		end
+        # Multiple Regression
+        # Based on GSL algorithm
+        
+        # I don't know if is correct
+        class MultipleRegression
+            attr_reader :c,:cov,:chisq,:status
+            private_class_method :new
+			def initialize(init_method, *argv)
+				self.send(init_method, *argv)
+			end
+            class << self
+				def new_from_vectors(vxs,vy)
+                    new(:init_vectors,vxs,vy)
+				end
+			end
+            def init_vectors(vxs,vy)
+                
+                @vxs=vxs
+                @vy=vy
+                dim=vxs.size
+                n=vy.size
+                matrix = GSL::Matrix.alloc(n, dim)
+                for x in 0...n
+                    for y in 0...dim
+                        matrix.set(x, y, vxs[y][x])
+                    end
+                end
+                @c, @cov, @chisq, @status = GSL::MultiFit.linear(matrix, vy.gsl)
+            end
+        end
         class << self
 			
 			def r2_adjusted(r2,n,k)
