@@ -51,6 +51,7 @@ module RubySS
 	autoload(:Resample, 'rubyss/resample')
 	autoload(:SRS, 'rubyss/srs')
 	autoload(:Codification, 'rubyss/codification')
+	autoload(:Reliability, 'rubyss/reliability')
 	autoload(:Correlation, 'rubyss/correlation')
 	autoload(:Regression, 'rubyss/regression')
 	autoload(:Test, 'rubyss/test')

@@ -327,8 +327,11 @@ class Vector < DelegateClass(Array)
             @delegate.summary(@labels,out)
         end
         def to_s
-            sprintf("Vector(type:%s, n:%d, N:%d)[%s]",@type.to_s,@data.size, @data.join(","))
+            sprintf("Vector(type:%s, n:%d)[%s]",@type.to_s,@data.size, @data.collect{|d| d.nil? ? "nil":d}.join(","))
         end
+		def inspect
+			self.to_s
+		end
         
     end
         

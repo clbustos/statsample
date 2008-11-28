@@ -125,7 +125,28 @@ module RubySS
             split.each{|k,v|
                 add_vector(name+join+k,v)
             }
-        end        
+        end
+		def vector_by_calculation(type=:scale)
+			a=[]
+			each {|row|
+				a.push(yield(row))
+			}
+			a.to_vector(type)
+		end
+		# Add a vector with the sum of fields, with a given name
+		# if fields parameter is empty, sum all fields 
+		def vector_sum(fields=nil)
+			a=[]
+			fields||=@fields
+			each {|row|
+				if(fields.find{|f| !@vectors[f].is_valid? row[f]})
+					a.push(nil)
+				else
+					a.push(fields.inject(0) {|ac,v| ac+row[v]})
+				end
+			}
+			a.to_vector(:scale)
+		end
         def check_length
             size=nil
             @vectors.each{|k,v|

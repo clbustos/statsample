@@ -44,6 +44,33 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
             @ds.add_vector('new2',x)
         end
     end
+	def test_vector_by_calculation
+		a1=[1,2,3,4,5,6,7].to_vector(:scale)
+		a2=[10,20,30,40,50,60,70].to_vector(:scale)
+		a3=[100,200,300,400,500,600,700].to_vector(:scale)
+		ds={'a1'=>a1,'a2'=>a2,'a3'=>a3}.to_dataset
+		total=ds.vector_by_calculation() {|row|
+			row['a1']+row['a2']+row['a3']
+		}
+		expected=[111,222,333,444,555,666,777].to_vector(:scale)
+		assert_equal(expected,total)
+	end
+	def test_vector_sum
+		a1=[1  ,2 ,3 ,4  , 5,nil].to_vector(:scale)
+		a2=[10 ,10,20,20 ,20,30].to_vector(:scale)
+		b1=[nil,1 ,1 ,1  ,1 ,2].to_vector(:scale)
+		b2=[2  ,2 ,2 ,nil,2 ,3].to_vector(:scale)
+		ds={'a1'=>a1,'a2'=>a2,'b1'=>b1,'b2'=>b2}.to_dataset
+		total=ds.vector_sum
+		a=ds.vector_sum(['a1','a2'])
+		b=ds.vector_sum(['b1','b2'])
+		expected_a=[11,12,23,24,25,nil].to_vector(:scale)
+		expected_b=[nil,3,3,nil,3,5].to_vector(:scale)
+		expected_total=[nil,15,26,nil,28,nil].to_vector(:scale)
+		assert_equal(expected_a, a)
+		assert_equal(expected_b, b)
+		assert_equal(expected_total, total)
+	end
     def test_each_array
         expected=[[1,'Alex',20,'New York','a,b'], [2,'Claude',23,'London','b,c'], [3,'Peter',25,'London','a'],[4,'Franz', 27,'Paris',nil],[5,'George',5,'Tome','a,b,c']]
         out=[]

@@ -96,7 +96,7 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
 		assert_in_delta(0.432,reg.r2,0.001)
         
 	end
-    def test_multiple_regression
+    def a_test_multiple_regression
         x1=[1,2,3,4,5,6].to_vector(:scale)
         x2=[3,5,8,9,10,20].to_vector(:scale)
         x3=[100,90,50,30,50,10].to_vector(:scale)
@@ -104,5 +104,6 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         reg=RubySS::Regression::MultipleRegression.new_from_vectors([x1,x2,x3],y)
         p reg
     end
+	
     
 end
