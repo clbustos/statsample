@@ -70,7 +70,18 @@ class Vector < DelegateClass(Array)
         # values, labels
         def dup_empty
             Vector.new([],@type,@missing_values.dup,@labels.dup)
-
+        end
+        def vector_standarized
+            raise "Should be a scale" unless @type==:scale
+            mean=@delegate.mean
+            sds=@delegate.sds
+            @data.collect{|x|
+                if is_valid? x
+                (x - mean).to_f / sds
+            else
+                nil
+            end
+            }.to_vector(:scale)
         end
         # Vector equality
         # Two vector will be the same if their data, missing values, type, labels are equals
@@ -602,8 +613,7 @@ class Vector < DelegateClass(Array)
 				def standard_deviation_population(m=false) # :nodoc:
 					m=mean unless m
 					@gsl.sd_with_fixed_mean(m)
-				end				
-				
+				end
 				def skew
 					@gsl.skew
 				end

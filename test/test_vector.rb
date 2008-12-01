@@ -103,6 +103,15 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         a=RubySS::Vector.new([1,2,3,4,"STRING"], :scale)
         assert_equal(10,a.sum)
     end
+    def test_vector_standarized
+        v1=[1,2,3,4,nil].to_vector(:scale)
+        sds=v1.sds
+        expected=[((1-2.5) / sds),((2-2.5) / sds),((3-2.5) / sds),((4-2.5) / sds),nil].to_vector(:scale)
+        vs=v1.vector_standarized
+        assert_equal(expected, vs)
+        assert_equal(0,vs.mean)
+        assert_equal(1,vs.sds)
+    end
     def test_summary
         @c.type=:nominal
         assert_match(/Distribution/, @c.summary())
