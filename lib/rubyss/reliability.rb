@@ -31,6 +31,22 @@ module RubySS
 				@alpha_standarized=RubySS::Reliability.cronbach_alpha_standarized(ds)
                 
 			end
+			def correct_responses_distribution
+				i=0
+				out={}
+				p @total
+				@ds.each{|row|
+					tot=@total[i]
+					@ds.fields.each {|f|
+						out[f]||= {}
+						out[f][tot]||= 0
+						out[f][tot]+= 1.0/@total.size
+					}
+					i+=1
+				}
+				
+				p out
+			end
 			def item_total_correlation
 				@ds.fields.inject({}) do |a,v|
 					vector=@ds[v].dup
