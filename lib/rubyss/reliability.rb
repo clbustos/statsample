@@ -34,19 +34,51 @@ module RubySS
 			def correct_responses_distribution
 				i=0
 				out={}
-				p @total
+                total={}
 				@ds.each{|row|
 					tot=@total[i]
 					@ds.fields.each {|f|
 						out[f]||= {}
+                        total[f]||={}
 						out[f][tot]||= 0
-						out[f][tot]+= 1.0/@total.size
+                        total[f][tot]||=0
+						out[f][tot]+= row[f]
+                        total[f][tot]+=1
 					}
 					i+=1
 				}
-				
-				p out
+                total.each{|f,var|
+                    var.each{|tot,v|
+                        out[f][tot]=out[f][tot].to_f/total[f][tot]
+                    }
+                }
+                out
 			end
+            def svggraph_correct_responses_distribution(directory,base="crd")
+                require 'rubyss/graph/svggraph'
+               crd=correct_responses_distribution
+               @ds.fields.each {|f|
+                   dataset=[]
+                   crd[f].each{|tot,prop|
+                       dataset.push(tot)
+                       dataset.push((prop*100).to_i.to_f/100)
+                   }
+                   
+                   graph = ::SVG::Graph::Plot.new({
+                           :height=>500,
+                           :width=>800,
+                           :key=>true
+                   })
+                   graph.add_data({
+                           :title=>"Vector #{f}",
+                           :data=>dataset
+                   })
+                   File.open(directory+"/"+base+"_#{f}.svg","w") {|fp|
+                       fp.puts(graph.burn())
+                   }
+               }
+               
+           end
 			def item_total_correlation
 				@ds.fields.inject({}) do |a,v|
 					vector=@ds[v].dup

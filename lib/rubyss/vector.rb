@@ -96,6 +96,11 @@ class Vector < DelegateClass(Array)
             h=Marshal.load(data)
             Vector.new(h['data'], h['type'], h['missing_values'], h['labels'])
         end
+        def recode
+            @data.collect{|x|
+                yield x
+            }.to_vector(@type)
+        end
         def recode!
             @data.collect!{|x|
                 yield x

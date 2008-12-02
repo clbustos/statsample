@@ -2,6 +2,7 @@ require 'SVG/Graph/Bar'
 require 'SVG/Graph/BarHorizontal'
 require 'SVG/Graph/Pie'
 require 'SVG/Graph/Line'
+require 'SVG/Graph/Plot'
 require 'rubyss/graph/svghistogram.rb'
 module RubySS
     
@@ -53,6 +54,9 @@ module SVG
 			def get_css; SVG::Graph.get_css_standard; end
 			
 		end
+        class PlotNoOp < Plot
+			def get_css; SVG::Graph.get_css_standard; end            
+        end
 		class PieNoOp < Pie
 			def get_css; SVG::Graph.get_css_standard; end
 			
