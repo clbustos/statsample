@@ -7,8 +7,10 @@ demo/benchmark.rb
 demo/chi-square.rb
 demo/distribution_t.rb
 demo/graph.rb
+demo/item_analysis.rb
 demo/mean.rb
 demo/proportion.rb
+demo/sample_test.csv
 demo/strata_proportion.rb
 demo/stratum.rb
 ext/distributions/asa243.c
@@ -36,6 +38,7 @@ lib/rubyss/graph/svggraph.rb
 lib/rubyss/graph/svghistogram.rb
 lib/rubyss/multiset.rb
 lib/rubyss/regression.rb
+lib/rubyss/reliability.rb
 lib/rubyss/resample.rb
 lib/rubyss/srs.rb
 lib/rubyss/test.rb
