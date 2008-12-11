@@ -44,7 +44,7 @@ end
 # :startdoc:
 #
 module RubySS
-    VERSION = '0.1.7'
+    VERSION = '0.1.8'
     SPLIT_TOKEN = ","
 	autoload(:Database, 'rubyss/converters')
 	autoload(:CSV, 'rubyss/converters')
