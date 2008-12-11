@@ -79,7 +79,7 @@ class Vector < DelegateClass(Array)
             mean=@delegate.mean
             sd=use_population ? @delegate.sdp : @delegate.sds
             @data.collect{|x|
-                if is_valid? x
+            if is_valid? x
 					(x - mean).to_f / sd
             else
                 nil
@@ -532,9 +532,7 @@ class Vector < DelegateClass(Array)
 		class Scale <Ordinal
 			attr_reader :gsl 
             def initialize(data)
-                data.collect!{|x|
-                    x.to_f
-                }
+                
                 # puts "Inicializando Scale..."
                 super(data)
                 set_gsl
@@ -550,6 +548,9 @@ class Vector < DelegateClass(Array)
                 set_gsl
             end
             def set_gsl # :nodoc
+                @data.collect!{|x|
+                    x.to_f
+                }
                 if HAS_GSL
                     @gsl=GSL::Vector.alloc(@data) if @data.size>0
 				end

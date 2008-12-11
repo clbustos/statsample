@@ -15,7 +15,6 @@ void Init_rubyssopt()
     VALUE cDataset = rb_define_class_under(mRubySS,"Dataset",rb_cObject);
     
     rb_define_const(mRubySS,"OPTIMIZED",Qtrue);
-    
     rb_define_module_function(mRubySS,"_frequencies",rubyss_frequencies,1);
     rb_define_method(cNominal,"frequencies",nominal_frequencies,0);
     rb_define_method(cDataset,"case_as_hash",dataset_case_as_hash,1);

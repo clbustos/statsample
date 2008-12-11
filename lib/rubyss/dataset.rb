@@ -142,7 +142,7 @@ module RubySS
 				if(fields.find{|f| !@vectors[f].is_valid? row[f]})
 					a.push(nil)
 				else
-					a.push(fields.inject(0) {|ac,v| ac+row[v]})
+					a.push(fields.inject(0) {|ac,v| ac + row[v].to_f})
 				end
 			}
 			a.to_vector(:scale)

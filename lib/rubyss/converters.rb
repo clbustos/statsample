@@ -46,7 +46,7 @@ module RubySS
         # USE:
         #        
         #  ds={'id'=>[1,2,3,4,5].to_vector,'name'=>%w{Alex Peter Susan Mary John}.to_vector}.to_dataset
-	#  RubySS::Database.create_sql(ds,'names')
+        #  RubySS::Database.create_sql(ds,'names')
         #   ==>"CREATE TABLE names (id INTEGER,\n name VARCHAR (255)) CHARACTER SET=UTF8;"
 	# 
         def create_sql(ds,table,charset="UTF8")
@@ -66,7 +66,7 @@ module RubySS
         #
         # USE:
         #     ds=RubySS::CSV.read("test_csv.csv")
-        def read(filename)
+        def read(filename, empty=[''])
                 first_row=true
                 fields=[]
                 fields_data={}
@@ -83,7 +83,11 @@ module RubySS
                         ds=RubySS::Dataset.new(fields)
                         first_row=false
                     else
-                        ds.add_case(row.to_a,false)
+                        rowa=row.to_a.collect{|c|
+                            empty.include?(c) ? nil: c
+                        }
+                        
+                        ds.add_case(rowa,false)
                     end
                 end
                 ds.update_valid_data

@@ -31,7 +31,7 @@ module RubySS
 				@alpha_standarized=RubySS::Reliability.cronbach_alpha_standarized(ds)
                 
 			end
-			def correct_responses_distribution
+			def item_characteristic_curve
 				i=0
 				out={}
                 total={}
@@ -54,21 +54,44 @@ module RubySS
                 }
                 out
 			end
-            def svggraph_correct_responses_distribution(directory,base="crd")
+            def gnuplot_item_characteristic_curve(directory, base="crd",options={})
+                require 'gnuplot'
+
+                crd=item_characteristic_curve
+                @ds.fields.each {|f|
+                    x=[]
+                    y=[]
+                Gnuplot.open do |gp|
+                Gnuplot::Plot.new( gp ) do |plot|
+                    crd[f].sort.each{|tot,prop|
+                       x.push(tot)
+                       y.push((prop*100).to_i.to_f/100)
+                   }
+                plot.data << Gnuplot::DataSet.new( [x, y] ) do |ds|
+                ds.with = "linespoints"
+                ds.notitle
+                end
+
+                end
+                end
+            }
+            
+            end
+            def svggraph_item_characteristic_curve(directory,base="crd",options={})
                 require 'rubyss/graph/svggraph'
-               crd=correct_responses_distribution
+               crd=item_characteristic_curve
                @ds.fields.each {|f|
                    dataset=[]
                    crd[f].each{|tot,prop|
                        dataset.push(tot)
                        dataset.push((prop*100).to_i.to_f/100)
                    }
-                   
-                   graph = ::SVG::Graph::Plot.new({
+                   options={
                            :height=>500,
                            :width=>800,
                            :key=>true
-                   })
+                   }.update(options)
+                   graph = ::SVG::Graph::Plot.new(options)
                    graph.add_data({
                            :title=>"Vector #{f}",
                            :data=>dataset
@@ -146,6 +169,7 @@ is=item_statistics
 </tr>
 EOF
 }
+html << "</table><hr />"
 html
 			end
 		end		

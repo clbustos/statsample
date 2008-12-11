@@ -7,8 +7,11 @@ class RubySSCSVTestCase < Test::Unit::TestCase
 		super
 	end
     def test_read
-        assert_equal(5,@ds.cases)
+        assert_equal(6,@ds.cases)
         assert_equal(%w{id name age city a1},@ds.fields)
+    end
+    def test_nil
+        assert_equal(nil,@ds['age'][5])
     end
     def test_write
         filename="/tmp/test_write.csv"
