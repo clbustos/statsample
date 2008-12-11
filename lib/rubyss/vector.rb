@@ -71,13 +71,16 @@ class Vector < DelegateClass(Array)
         def dup_empty
             Vector.new([],@type,@missing_values.dup,@labels.dup)
         end
-        def vector_standarized
+		def vector_standarized_pop
+			vector_standarized(true)
+		end
+        def vector_standarized(use_population=false)
             raise "Should be a scale" unless @type==:scale
             mean=@delegate.mean
-            sds=@delegate.sds
+            sd=use_population ? @delegate.sdp : @delegate.sds
             @data.collect{|x|
                 if is_valid? x
-                (x - mean).to_f / sds
+					(x - mean).to_f / sd
             else
                 nil
             end

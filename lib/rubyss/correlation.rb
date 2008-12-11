@@ -1,14 +1,39 @@
 module RubySS
     # module for correlation methods 
+	
     module Correlation
         class << self
+			def covariance(v1,v2)
+				v1a,v2a=RubySS.only_valid(v1,v2)
+				if HAS_GSL
+					GSL::Stats::covariance(v1a.gsl, v2a.gsl)
+				else
+					covariance_slow(v1a,v2a)
+				end
+			end
+			# Covariance. The denominator is n-1
+			def covariance_slow(v1a,v2a)
+				t=0
+				m1=v1a.mean
+				m2=v1a.mean
+				(0...v1a.size).each {|i|
+					t+=((v1a[i]-m1)*(v2a[i]-m2))
+				}
+				t.to_f / (v1a.size-1)
+			end
             # Calculate Pearson correlation coefficient between 2 vectors
             def pearson(v1,v2)
 				v1a,v2a=RubySS.only_valid(v1,v2)
 				if HAS_GSL
 					GSL::Stats::correlation(v1a.gsl, v2a.gsl)
 				else
-					sum_of_codeviated(v1a,v2a) / Math::sqrt(v1a.sum_of_squared_deviation * v2a.sum_of_squared_deviation)
+					v1s,v2s=v1a.vector_standarized_pop,v2a.vector_standarized_pop
+					t=0
+					siz=v1s.size
+					(0...v1s.size).each {|i|
+					t+=(v1s[i]*v2s[i])
+					}
+					t.to_f/v2s.size
 				end
             end
 			# Calculate Spearman correlation coefficient between 2 vectors

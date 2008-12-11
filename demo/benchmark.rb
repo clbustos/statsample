@@ -11,7 +11,7 @@ v=(0..10000).collect{|n|
 v.missing_values=[5,10,20]
 v.type=:scale
 
- n = 1000
+ n = 100
  if (false)
     Benchmark.bm(7) do |x|
 		x.report("mean")   { for i in 1..n; v.mean; end }

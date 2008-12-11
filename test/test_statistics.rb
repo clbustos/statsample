@@ -26,11 +26,19 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
     def test_pearson
         v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
         v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
-        assert_in_delta(0.53,RubySS::Correlation.pearson(v1,v2),0.01)
+        assert_in_delta(0.525,RubySS::Correlation.pearson(v1,v2), 0.001)
         v3=[6,2,  1000,1000,5,4,7,8,4,3,2,nil].to_vector(:scale)
         v4=[2,nil,nil,nil,  3,7,8,6,4,3,2,500].to_vector(:scale)
-        assert_in_delta(0.53,RubySS::Correlation.pearson(v3,v4),0.01)
+        assert_in_delta(0.525,RubySS::Correlation.pearson(v3,v4),0.001)
     end
+	def test_covariance
+		if HAS_GSL
+			v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
+			v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
+			assert_in_delta(RubySS::Correlation.covariance(v1,v2), RubySS::Correlation.covariance_slow(v1,v2), 0.001)
+			
+		end
+	end
 	def test_spearman
 		v1=[86,97,99,100,101,103,106,110,112,113].to_vector(:scale)
 		v2=[0,20,28,27,50,29,7,17,6,12].to_vector(:scale)
