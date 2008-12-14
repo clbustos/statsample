@@ -2,9 +2,9 @@ module RubySS
     # module for regression methods 
     module Regression
 		# Class for calculation of linear regressions
-		# To create a LinearRegression object:
-		# * <tt> LinearRegression.new_from_vectors(vx,vy)</tt>
-		# * <tt> LinearRegression.new_from_gsl(gsl) </tt>
+		# To create a SimpleRegression object:
+		# * <tt> SimpleRegression.new_from_vectors(vx,vy)</tt>
+		# * <tt> SimpleRegression.new_from_gsl(gsl) </tt>
 		#
 		class SimpleRegression
 			attr_accessor :a,:b,:cov00, :cov01, :covx1, :chisq, :status
@@ -20,9 +20,13 @@ module RubySS
 			end
             # Sum of square error
 			def sse
-				(0...@vx.size).inject(0) {|a,i|
-                    a+((@vy[i]-y(@vx[i]))**2)
+				(0...@vx.size).inject(0) {|acum,i|
+                    acum+((@vy[i]-y(@vx[i]))**2)
 				}				
+			end
+			def standard_error
+				p sse
+				Math::sqrt(sse / (@vx.size-2).to_f)
 			end
             # Sum of square regression
             def ssr
