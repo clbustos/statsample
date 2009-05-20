@@ -73,7 +73,7 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         v=([42]*23+[41]*4+[36]*1+[32]*1+[29]*1+[27]*2+[23]*1+[19]*1+[16]*2+[15]*2+[14,11,10,9,7]+ [6]*3+[5]*2+[4,3]).to_vector(:scale)
         assert_equal(50,v.size)
         assert_equal(1471,v.sum())
-        limits=RubySS::SRS.mean_confidence_interval_z(v.mean(),v.sds(),v.size,676,0.80)
+        limits=RubySS::SRS.mean_confidence_interval_z(v.mean(), v.sds(), v.size,676,0.80)
        
     end
     def test_estimation_proportion
@@ -112,18 +112,6 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         reg=RubySS::Regression::MultipleRegression.new_from_vectors([x1,x2,x3],y)
         p reg
     end
-    def test_reliability
-        x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_vector(:scale)
-        x2=[1,1,1,2,2,3,3,3,3,4,4,50].to_vector(:scale)
-        x3=[2,2,1,1,1,2,2,2,3,4,5,40].to_vector(:scale)
-        x4=[1,2,3,4,4,4,4,3,4,4,5,30].to_vector(:scale)
-        ds={'x1'=>x1,'x2'=>x2,'x3'=>x3,'x4'=>x4}.to_dataset
-        ia=RubySS::Reliability::ItemAnalysis.new(ds)
-        assert_in_delta(0.980,ia.alpha,0.001)
-        assert_in_delta(0.999,ia.alpha_standarized,0.001)
-        assert_in_delta(0.999,ia.item_total_correlation()['x1'],0.001)
-        assert_in_delta(1050.455,ia.stats_if_deleted()['x1'][:variance_sample],0.001)
 
-    end	
     
 end

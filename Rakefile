@@ -14,7 +14,6 @@ EXT1 = "ext/distributions/cdf.#{Hoe::DLEXT}"
 EXT2 = "ext/rubyss/rubyssopt.#{Hoe::DLEXT}"  
 
 Hoe.new('rubyss', RubySS::VERSION) do |p|
-  # p.rubyforge_name = 'rubyssx' # if different than lowercase project name
   p.developer('Claudio Bustos', 'clbustos@gmail.com')
   p.spec_extras[:extensions] = ["ext/rubyss/extconf.rb","ext/distributions/extconf.rb"]
   p.extra_deps << ["gnuplot",">= 2.2"] << ["ruby-gdchart"]

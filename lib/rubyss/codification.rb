@@ -12,16 +12,16 @@ module RubySS
 #
 # Usage:
 #   recode_file="recodification.yaml"
-#
-#   if first_pass
+#   phase=:first # flag
+#   if phase==:first
 #       File.open(recode_file,"w") {|fp|
 #   RubySS::Codification.create_yaml(ds,%w{vector1 vector2}, ",",fp)
 #   } # Edit the file recodification.yaml
-#   elsif second_pass 
+#   elsif phase==:second 
 #       File.open(recode_file,"r") {|fp|
 #       RubySS::Codification.verify(fp,['vector1'])
 #       }
-#   elsif third_pass
+#   elsif phase==:third
 #       File.open(recode_file,"r") {|fp|
 #   RubySS::Codification.recode_dataset_split!(ds,fp,"*")
 #   }

@@ -1,6 +1,9 @@
 require 'rubyss/vector'
 require 'gnuplot'
 
+# Row number on each
+$RUBY_SS_ROW=nil
+
 class Hash
 	def to_dataset(*args)
 		RubySS::Dataset.new(self,*args)
@@ -9,6 +12,18 @@ end
 
 
 module RubySS
+    class DatasetException < RuntimeError
+        attr_reader :ds,:exp
+        def initialize(ds,e)
+            @ds=ds
+            @exp=e
+        end
+        def to_s
+            m="Error:"+@exp.message+@exp.backtrace.join("\n")+"\nOn Dataset:"+@ds.to_s
+            m+="\nRow: #{$RUBY_SS_ROW}" if($RUBY_SS_ROW)
+            m
+        end
+    end
     class Dataset
         attr_reader :vectors, :fields, :cases
         attr_accessor :labels
@@ -41,12 +56,22 @@ module RubySS
             ds
         end
         # Returns a duplicate of the Database
-        def dup
-            vectors=@vectors.inject({}) {|a,v|
-                a[v[0]]=v[1].dup
-                a
+        # If fields given, only include those vectors
+        def dup(*fields_to_include)
+            if fields_to_include.size==1 and fields_to_include[0].is_a? Array
+                fields_to_include=fields_to_include[0]
+            end
+            fields_to_include=@fields if fields_to_include.size==0
+            vectors={}
+            fields=[]
+            labels={}
+            fields_to_include.each{|f|
+                raise "Vector #{f} doesn't exists" unless @vectors.has_key? f
+                vectors[f]=@vectors[f].dup
+                labels[f]=@labels[f]
+                fields.push(f)                
             }
-            Dataset.new(vectors,@fields.dup,@labels.dup)
+            Dataset.new(vectors,fields,labels)
         end
         # Creates a copy of the given dataset, without data on vectors
         def dup_empty
@@ -55,6 +80,14 @@ module RubySS
                 a
             }
             Dataset.new(vectors,@fields.dup,@labels.dup)
+        end
+        # Returns a dataset with standarized data
+        def standarize
+            ds=dup()
+            ds.fields.each {|f|
+                ds[f]=ds[f].vector_standarized
+            }
+            ds
         end
         # We have the same datasets if the labels and vectors are the same 
         def ==(d2)
@@ -133,20 +166,48 @@ module RubySS
 			}
 			a.to_vector(type)
 		end
-		# Add a vector with the sum of fields, with a given name
+		# Returns a vector with sumatory of fields
 		# if fields parameter is empty, sum all fields 
 		def vector_sum(fields=nil)
 			a=[]
 			fields||=@fields
-			each {|row|
+			each do |row|
 				if(fields.find{|f| !@vectors[f].is_valid? row[f]})
 					a.push(nil)
 				else
 					a.push(fields.inject(0) {|ac,v| ac + row[v].to_f})
 				end
-			}
+            end
 			a.to_vector(:scale)
 		end
+        # Returns a vector with the mean for a set of fields
+        # if fields parameter is empty, return the mean for all fields
+        # if max invalid parameter > 0, returns the mean for all tuples
+        # with 0 to max_invalid invalid fields
+        def vector_mean(fields=nil,max_invalid=0)
+            a=[]
+            fields||=@fields
+            size=fields.size
+            raise "Fields #{(fields-@fields).join(", ")} doesn't exists on dataset" if (fields-@fields).size>0
+            each do |row|
+                # numero de invalidos
+                sum=0
+                invalids=0
+                fields.each{|f|
+                    if @vectors[f].is_valid? row[f]
+                        sum+=row[f].to_f
+                    else
+                        invalids+=1
+                    end
+                }
+                if(invalids>max_invalid)
+                    a.push(nil)
+                else
+                    a.push(sum/(size-invalids).to_f)
+                end
+            end
+            a.to_vector(:scale)
+        end
         def check_length
             size=nil
             @vectors.each{|k,v|
@@ -179,16 +240,24 @@ module RubySS
             end            
         end
         def each
+            begin
             0.upto(@cases-1) {|i|
+                $RUBY_SS_ROW=i
                 row=case_as_hash(i)
                 yield row
             }
+            $RUBY_SS_ROW=nil
+            rescue =>e
+                raise DatasetException.new(self,e)
+            end
         end
         def each_array
             0.upto(@cases-1) {|i|
+                $RUBY_SS_ROW=i
                 row=case_as_array(i)
                 yield row
             }
+            $RUBY_SS_ROW=nil
         end
         def fields=(f)
             @fields=f
@@ -204,6 +273,13 @@ module RubySS
         def[](i)
         raise Exception,"Vector '#{i}' doesn't exists on dataset" unless @vectors.has_key?(i)
             @vectors[i]
+        end
+        def collect(type=:scale)
+            data=[]
+            each {|row|
+                data.push(yield row)
+            }
+            RubySS::Vector.new(data,type)
         end
         # Recode a vector based on a block
         def recode!(vector_name)
@@ -305,6 +381,33 @@ module RubySS
             ms
 			
 		end
+        # Test each row with one or more tests
+        # each test is a Proc with the form
+        #   Proc.new {|row| row['age']>0}
+        # The function returns an array with all errors
+        def verify(*tests)
+            if(tests[0].is_a? String)
+                id=tests[0]
+                tests.shift
+            else
+                id=@fields[0]
+            end
+            vr=[]
+            i=0
+            each do |row|
+                i+=1
+                tests.each{|test|
+                    if ! test[2].call(row)
+                        values=""
+                        if test[1].size>0
+                            values=" ("+test[1].collect{|k| "#{k}=#{row[k]}"}.join(", ")+")"
+                        end
+                            vr.push("#{i} [#{row[id]}]: #{test[0]}#{values}")
+                    end
+                }
+            end
+            vr
+        end
         def to_s
             "#<"+self.class.to_s+":"+self.object_id.to_s+" @fields=["+@fields.join(",")+"] labels="+@labels.inspect+" cases="+@vectors[@fields[0]].size.to_s
         end

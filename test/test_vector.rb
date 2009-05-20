@@ -73,7 +73,7 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 		assert_equal({ 1 => 1.to_f/15 ,2=>1.to_f/15, 3=>1.to_f/15,4=>1.to_f/15,5=>5.to_f/15,6=>2.to_f/15,7=>1.to_f/15,8=>1.to_f/15, 9=>1.to_f/15,10=>1.to_f/15}, @c.proportions)
         assert_equal(@c.proportion, 1.to_f/15)
         assert_equal(@c.proportion(2), 1.to_f/15)
-		assert_equal(@c.factors.sort,[1,2,3,4,5,6,7,8,9,10])
+		assert_equal([1,2,3,4,5,6,7,8,9,10], @c.factors.sort)
 		assert_equal(@c.mode,5)
 		assert_equal(@c.n_valid,15)
 	end
@@ -102,6 +102,13 @@ class RubySSVectorTestCase < Test::Unit::TestCase
     def test_scale
         a=RubySS::Vector.new([1,2,3,4,"STRING"], :scale)
         assert_equal(10,a.sum)
+        i=0
+        factors=a.factors.sort
+        [0.0,1,2,3,4].each{|v|
+            assert(v==factors[i])
+            assert(v.class==factors[i].class,"#{v} - #{v.class} != #{factors[i]} - #{factors[i].class}")
+            i+=1
+        }
     end
     def test_vector_standarized
         v1=[1,2,3,4,nil].to_vector(:scale)

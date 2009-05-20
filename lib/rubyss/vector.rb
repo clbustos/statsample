@@ -71,16 +71,22 @@ class Vector < DelegateClass(Array)
         def dup_empty
             Vector.new([],@type,@missing_values.dup,@labels.dup)
         end
+        # Return a vector usign the standarized values for data
+        # with sd with denominator N
 		def vector_standarized_pop
 			vector_standarized(true)
 		end
+        
+        # Return a vector usign the standarized values for data
+        # with sd with denominator n-1
+        
         def vector_standarized(use_population=false)
             raise "Should be a scale" unless @type==:scale
             mean=@delegate.mean
             sd=use_population ? @delegate.sdp : @delegate.sds
             @data.collect{|x|
             if is_valid? x
-					(x - mean).to_f / sd
+                (x.to_f - mean).to_f / sd
             else
                 nil
             end
@@ -154,8 +160,10 @@ class Vector < DelegateClass(Array)
         def [](i)
             @data[i]
         end
+        def []=(i,v)
+            @data[i]=v
+        end
         # Return true if a value is valid (not nil and not included on missing values)
-        
         def is_valid?(x)
             !(x.nil? or @missing_values.include? x)
         end
@@ -213,7 +221,6 @@ class Vector < DelegateClass(Array)
             }
             h
         end
-        
         def _vector_ari(method,v) # :nodoc:
             if(v.is_a? Vector or v.is_a? Array)
                 if v.size==@data.size
@@ -359,12 +366,20 @@ class Vector < DelegateClass(Array)
 	class Nominal
 		def initialize(data)
 			@data=data
+            @factors=data.uniq
 		end
+        def delegate_data
+            @data
+        end
+                    # Return an array of the different values of the data
+        def factors
+            @data.uniq.sort
+        end
 		# Returns a hash with the distribution of frecuencies of
 		# the sample                
 		def frequencies_slow
 			@data.inject(Hash.new) {|a,x|
-				a[x]=0 if a[x].nil?
+				a[x]||=0
 				a[x]=a[x]+1
 				a
 			}
@@ -395,10 +410,7 @@ class Vector < DelegateClass(Array)
 		
             end
 
-            # Return an array of the different values of the data
-			def factors
-				@data.uniq
-			end
+
             # Returns the most frequent item
 			def mode
 				frequencies.max{|a,b| a[1]<=>b[1]}[0]
@@ -519,6 +531,10 @@ class Vector < DelegateClass(Array)
                     GSL::Stats::median_from_sorted_data(GSL::Vector.alloc(@data.sort))
                 end
             end
+            # Minimun value
+            def min; @data.min;end
+                # Maximum value
+            def max; @data.max; end
             
             
             def summary(labels,out="")
@@ -532,14 +548,12 @@ class Vector < DelegateClass(Array)
 		class Scale <Ordinal
 			attr_reader :gsl 
             def initialize(data)
-                
                 # puts "Inicializando Scale..."
                 super(data)
+                
                 set_gsl
-		end
-            def delegate_data
-                @data
             end
+            
             def _dump(i)
                 Marshal.dump(@data)
             end
@@ -548,8 +562,14 @@ class Vector < DelegateClass(Array)
                 set_gsl
             end
             def set_gsl # :nodoc
-                @data.collect!{|x|
-                    x.to_f
+                data=@data.collect!{|x|
+                    if x.is_a? Numeric
+                        x
+                    elsif x.is_a? String and x.to_i==x.to_f
+                        x.to_i
+                    else
+                        x.to_f
+                    end
                 }
                 if HAS_GSL
                     @gsl=GSL::Vector.alloc(@data) if @data.size>0
@@ -631,7 +651,7 @@ class Vector < DelegateClass(Array)
 				end
                 # Create a GSL::Histogram
                 # With a fixnum, creates X bins within the range of data
-                # With an Array, every value will be a cut point for every bin
+                # With an Array, each value will be a cut point
                 def histogram(bins=10)
                     if bins.is_a? Array
                         h=GSL::Histogram.alloc(bins)                        
@@ -641,7 +661,7 @@ class Vector < DelegateClass(Array)
                         h=GSL::Histogram.alloc(bins,[@data.min,@data.max+0.0001])
                     end
                     h.increment(@gsl)
-					h
+					 h
                 end
                 def plot_histogram(bins=10,options="")
                     self.histogram(bins).graph(options)

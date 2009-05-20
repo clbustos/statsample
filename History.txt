@@ -1,4 +1,26 @@
-=== 0.1.7 / 2008-10-?
+=== 0.1.9 / 2009-05-20
+* Class Vector: new method vector_standarized_pop, []=, min,max
+* Class Dataset: global variable $RUBY_SS_ROW stores the row number on each() and related methods. dup() with argument returns a copy of the dataset only for given fields. New methods: standarize, vector_mean, collect, verify
+* Module SRS: New methods estimation_n0 and estimation_n
+* Module Reliability: new ItemCharacteristicCurve class
+* New HtmlReport class
+* New experimental SPSS Class. 
+* Converters: Module CSV with new options. Added write() method for GGobi module 
+* New Mx exporter (http://www.vcu.edu/mx/)
+* Class SimpleRegression: new methods standard error
+* Module Correlation: new methods covariance
+* Added tests for regression and reliability, Vector#vector_mean, Dataset#dup (partial)  and Dataset#verify
+
+
+=== 0.1.8 / 2008-12-10
+* Added Regression and Reliability modules
+* Class Vector: added methods vector_standarized, recode, inspect, ranked
+* Class Dataset: added methods vector_by_calculation, vector_sum, filter_field
+* Module Correlation: added methods like spearman, point biserial and tau-b
+* Added tests for Vector#ranked, Vector#vector_standarized,  Vector#sum_of_squared_deviation, Dataset#vector_by_calculation, Dataset#vector_sum, Dataset#filter_field and various test for Correlation module
+* Added demos: item_analysis and sample_test
+
+=== 0.1.7 / 2008-10-1
 * New module for codification
 * ...
 === 0.1.6 / 2008-09-26

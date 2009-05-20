@@ -1,6 +1,8 @@
 module RubySS
 	module Reliability
 		class << self
+            # Calculate Chonbach's alpha for a given dataset.
+            # only uses tuples without missing data
 			def cronbach_alpha(ods)
 				ds=ods.dup_only_valid
 				n_items=ds.fields.size
@@ -10,6 +12,10 @@ module RubySS
 				total=ds.vector_sum
 				(n_items / (n_items-1).to_f) * (1-(sum_var_items/ total.variance_sample))
 			end
+            # Calculate Chonbach's alpha for a given dataset
+            # using standarized values for every vector.
+            # Only uses tuples without missing data
+
             def cronbach_alpha_standarized(ods)
                 ds=ods.fields.inject({}){|a,f|
                     a[f]=ods[f].vector_standarized
@@ -18,7 +24,43 @@ module RubySS
                 cronbach_alpha(ds)
             end
 		end
-		
+        
+		class ItemCharacteristicCurve
+            attr_reader :totals, :counts,:vector_total
+            def initialize (ds, vector_total=nil)
+                vector_total||=ds.vector_sum
+                raise "Total size != Dataset size" if vector_total.size!=ds.cases
+                @vector_total=vector_total
+                @ds=ds
+                @totals={}
+                @counts=@ds.fields.inject({}) {|a,v| a[v]={};a}
+                process
+            end
+            def process
+                i=0
+                @ds.each{|row|
+					tot=@vector_total[i]
+                   @totals[tot]||=0
+                   @totals[tot]+=1
+					@ds.fields.each {|f|
+                        item=row[f].to_s
+                       @counts[f][tot]||={}
+                       @counts[f][tot][item]||=0
+                       @counts[f][tot][item] += 1 
+					}
+					i+=1
+				}
+            end
+            def curve_field(field, item)
+                out={}
+                item=item.to_s
+                @totals.each{|value,n|
+                    count_value= @counts[field][value][item].nil? ? 0 : @counts[field][value][item] 
+                    out[value]=count_value.to_f/n.to_f
+                }
+                out
+            end
+        end
 		class ItemAnalysis
             attr_reader :mean, :sd,:valid_n, :alpha , :alpha_standarized
 			def initialize(ds)
@@ -27,10 +69,14 @@ module RubySS
 				@mean=@total.mean
 				@sd=@total.sdp
 				@valid_n=@total.size
+                begin
 				@alpha=RubySS::Reliability.cronbach_alpha(ds)
 				@alpha_standarized=RubySS::Reliability.cronbach_alpha_standarized(ds)
-                
+                rescue => e
+                    raise DatasetException.new(@ds,e), "Problem on calculate alpha" 
+                end
 			end
+            # Returns a hash with structure
 			def item_characteristic_curve
 				i=0
 				out={}
@@ -42,14 +88,14 @@ module RubySS
                         total[f]||={}
 						out[f][tot]||= 0
                         total[f][tot]||=0
-						out[f][tot]+= row[f]
+						out[f][tot]+= row[f] 
                         total[f][tot]+=1
 					}
 					i+=1
 				}
                 total.each{|f,var|
                     var.each{|tot,v|
-                        out[f][tot]=out[f][tot].to_f/total[f][tot]
+                        out[f][tot]=out[f][tot].to_f / total[f][tot]
                     }
                 }
                 out
@@ -77,25 +123,29 @@ module RubySS
             }
             
             end
-            def svggraph_item_characteristic_curve(directory,base="crd",options={})
+            def svggraph_item_characteristic_curve(directory, base="icc",options={})
                 require 'rubyss/graph/svggraph'
-               crd=item_characteristic_curve
+                crd=ItemCharacteristicCurve.new(@ds)
                @ds.fields.each {|f|
-                   dataset=[]
-                   crd[f].each{|tot,prop|
-                       dataset.push(tot)
-                       dataset.push((prop*100).to_i.to_f/100)
-                   }
+                   factors=@ds[f].factors.sort
                    options={
                            :height=>500,
                            :width=>800,
                            :key=>true
                    }.update(options)
                    graph = ::SVG::Graph::Plot.new(options)
-                   graph.add_data({
-                           :title=>"Vector #{f}",
-                           :data=>dataset
-                   })
+                   factors.each{|factor|
+                       factor=factor.to_s
+                       dataset=[]
+                           crd.curve_field(f, factor).each{|tot,prop|
+                               dataset.push(tot)
+                               dataset.push((prop*100).to_i.to_f/100)
+                            }
+                        graph.add_data({
+                                :title=>"#{factor}",
+                               :data=>dataset
+                        })
+                   }
                    File.open(directory+"/"+base+"_#{f}.svg","w") {|fp|
                        fp.puts(graph.burn())
                    }

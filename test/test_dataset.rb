@@ -10,7 +10,7 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
 	end
     def test_basic
         assert_equal(5,@ds.cases)
-        assert_equal(%w{id name age city a1},@ds.fields)
+        assert_equal(%w{id name age city a1}, @ds.fields)
     end
     def test_matrix
         matrix=Matrix[[1,2],[3,4],[5,6]]
@@ -71,6 +71,28 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
 		assert_equal(expected_b, b)
 		assert_equal(expected_total, total)
 	end
+    def test_vector_mean
+		a1=[1  ,2 ,3 ,4  , 5,nil].to_vector(:scale)
+		a2=[10 ,10,20,20 ,20,30].to_vector(:scale)
+		b1=[nil,1 ,1 ,1  ,1 ,2].to_vector(:scale)
+		b2=[2  ,2 ,2 ,nil,2 ,3].to_vector(:scale)
+        c= [nil,2, 4,2   ,2 ,2].to_vector(:scale)
+		ds={'a1'=>a1,'a2'=>a2,'b1'=>b1,'b2'=>b2,'c'=>c}.to_dataset
+		total=ds.vector_mean
+		a=ds.vector_mean(['a1','a2'],1)
+		b=ds.vector_mean(['b1','b2'],1)
+        c=ds.vector_mean(['b1','b2','c'],1)
+		expected_a=[5.5,6,11.5,12,12.5,30].to_vector(:scale)
+		expected_b=[2,1.5,1.5,1,1.5,2.5].to_vector(:scale)
+		expected_c=[nil, 5.0/3,7.0/3,1.5,5.0/3,7.0/3].to_vector(:scale)
+
+		expected_total=[nil,3.4,6,nil,6.0,nil].to_vector(:scale)
+		assert_equal(expected_a, a)
+		assert_equal(expected_b, b)
+		assert_equal(expected_c, c)
+		assert_equal(expected_total, total)
+	end
+    
     def test_each_array
         expected=[[1,'Alex',20,'New York','a,b'], [2,'Claude',23,'London','b,c'], [3,'Peter',25,'London','a'],[4,'Franz', 27,'Paris',nil],[5,'George',5,'Tome','a,b,c']]
         out=[]
@@ -141,6 +163,17 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         assert_equal(ds1.fields,ds2.fields)
         assert_not_same(ds1.fields,ds2.fields)
         ds1['v1'].type=:scale
+        # dup partial
+        ds3=ds1.dup('v1')
+        ds_exp=RubySS::Dataset.new({'v1'=>v1},%w{v1})
+        assert_equal(ds_exp,ds3)
+        assert_not_same(ds_exp,ds3)
+        assert_equal(ds3['v1'],ds_exp['v1'])
+        assert_not_same(ds3['v1'],ds_exp['v1'])
+        assert_equal(ds3.fields,ds_exp.fields)
+        assert_not_same(ds3.fields,ds_exp.fields)
+        
+        
         # empty
         ds3=ds1.dup_empty
         assert_not_equal(ds1,ds3)
@@ -176,4 +209,25 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         assert_equal(expected,filtered)
 		
 	end
+    def test_verify
+        name=%w{r1 r2 r3 r4}.to_vector(:nominal)
+        v1=[1,2,3,4].to_vector(:scale)
+        v2=[4,3,2,1].to_vector(:scale)
+        v3=[10,20,30,40].to_vector(:scale)
+        v4=%w{a b a b}.to_vector(:nominal)
+        ds={'v1'=>v1,'v2'=>v2,'v3'=>v3,'v4'=>v4,'id'=>name}.to_dataset
+        ds.fields=%w{v1 v2 v3 v4 id}
+        #Correct
+        t1=create_test("If v4=a, v1 odd") {|r| r['v4']=='b' or (r['v4']=='a' and r['v1']%2==1)}
+        t2=create_test("v3=v1*10")  {|r| r['v3']==r['v1']*10}
+        # Fail!
+        t3=create_test("v4='b'") {|r| r['v4']=='b'}
+        exp1=["1 [1]: v4='b'", "3 [3]: v4='b'"]
+        exp2=["1 [r1]: v4='b'", "3 [r3]: v4='b'"]
+        res=ds.verify(t3,t1,t2)
+        assert_equal(exp1,res)
+        res=ds.verify('id',t1,t2,t3)
+        assert_equal(exp2,res)
+
+    end
 end

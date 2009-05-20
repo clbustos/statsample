@@ -12,7 +12,7 @@ module RubySS
         
         def estimation_n0(d,prop,margin=0.95)
             t=GSL::Cdf.ugaussian_Pinv(1-((1-margin) / 2))
-            t**2*prop*(1-prop) / (d**2).to_f
+            t**2*(prop*(1-prop)) / (d**2).to_f
         end
         def estimation_n(d,prop,n_pobl,margin=0.95)
             n0=estimation_n0(d,prop,margin)

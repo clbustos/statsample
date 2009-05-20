@@ -21,6 +21,13 @@ class Numeric
   def square ; self * self ; end
 end
 
+
+def create_test(*args,&proc) 
+    description=args.shift
+    fields=args
+    [description, fields, Proc.new]
+end
+
 # Process files and databases for statistical purposes, with focus on 
 # estimation of parameters for several types of samples (simple random, 
 # stratified and multistage sampling).
@@ -44,10 +51,12 @@ end
 # :startdoc:
 #
 module RubySS
-    VERSION = '0.1.8'
+    VERSION = '0.1.9'
     SPLIT_TOKEN = ","
 	autoload(:Database, 'rubyss/converters')
 	autoload(:CSV, 'rubyss/converters')
+	autoload(:HtmlReport, 'rubyss/htmlreport')
+    autoload(:Mx, 'rubyss/converters')
 	autoload(:Resample, 'rubyss/resample')
 	autoload(:SRS, 'rubyss/srs')
 	autoload(:Codification, 'rubyss/codification')

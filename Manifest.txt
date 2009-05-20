@@ -36,6 +36,7 @@ lib/rubyss/dataset.rb
 lib/rubyss/graph/gdchart.rb
 lib/rubyss/graph/svggraph.rb
 lib/rubyss/graph/svghistogram.rb
+lib/rubyss/htmlreport.rb
 lib/rubyss/multiset.rb
 lib/rubyss/regression.rb
 lib/rubyss/reliability.rb
@@ -43,6 +44,7 @@ lib/rubyss/resample.rb
 lib/rubyss/srs.rb
 lib/rubyss/test.rb
 lib/rubyss/vector.rb
+lib/spss.rb
 test/_test_chart.rb
 test/test_codification.rb
 test/test_crosstab.rb
@@ -51,6 +53,8 @@ test/test_csv.rb
 test/test_dataset.rb
 test/test_ggobi.rb
 test/test_multiset.rb
+test/test_regression.rb
+test/test_reliability.rb
 test/test_resample.rb
 test/test_statistics.rb
 test/test_stratified.rb

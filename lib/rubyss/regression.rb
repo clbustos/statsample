@@ -25,7 +25,6 @@ module RubySS
 				}				
 			end
 			def standard_error
-				p sse
 				Math::sqrt(sse / (@vx.size-2).to_f)
 			end
             # Sum of square regression

@@ -37,10 +37,10 @@ class RubySSCrosstabTestCase < Test::Unit::TestCase
         assert_equal(13,sum)
         fr=@ct.frequencies_by_row
         assert_equal(4,fr.size)
-        assert_equal(%w{black blonde brown red},fr.keys)
+        assert_equal(%w{black blonde brown red},fr.keys.sort)
         fc=@ct.frequencies_by_col
         assert_equal(2,fc.size)
-        assert_equal(%w{man woman},fc.keys)
+        assert_equal(%w{man woman},fc.keys.sort)
         assert_equal(Matrix.rows([[3,4],[3,0],[1,0],[1,1]]),@ct.to_matrix)
 	end
     def test_expected

@@ -91,7 +91,7 @@ class RubySSMultisetTestCase < Test::Unit::TestCase
         assert_equal(36,ss.sample_size)
         assert_equal(75,ss.mean('test'))
         assert_in_delta(1.45,ss.standard_error_wor('test'),0.01)
-        assert_equal(ss.standard_error_wor('test'), ss.standard_error_wor_2('test'))
+        assert_in_delta(ss.standard_error_wor('test'), ss.standard_error_wor_2('test'),0.00001)
         
         
     end
