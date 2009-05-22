@@ -36,9 +36,60 @@ module RubySS
 					t.to_f/v2s.size
 				end
             end
+            # Retrieves the value for t test for a pearson correlation
+            # between two vectors to test the null hipothesis of r=0
+            def t_pearson(v1,v2)
+				v1a,v2a=RubySS.only_valid(v1,v2)
+                r=pearson(v1a,v2a)
+                if(r==1.0) 
+                    0
+                else
+                    t_r(r,v1a.size)
+                end
+            end
+            # Retrieves the value for t test for a pearson correlation
+            # giving r and vector size
+            def t_r(r,size)
+                r*Math::sqrt(((size)-2).to_f / (1 - r**2))
+            end
+            # Retrieves the probability value (a la SPSS)
+            # for a given t, size and number of tails
+            def prop_pearson(t,size, tails=2)
+                t=-t if t>0
+                cdf=GSL::Cdf::tdist_P(t,(size)-2)
+                cdf*tails
+            end
+            # Covariance matrix
+            def covariance_matrix
+                ds.collect_matrix do |row,col|
+                        if (ds[row].type!=:scale or ds[col].type!=:scale)
+                            nil
+                        else
+                            covariance(ds[row],ds[col])
+                        end
+                    end
+            end
             # The classic correlation matrix for all fields of a dataset
-            def matrix(ds)
-                
+            
+            def correlation_matrix(ds)
+                ds.collect_matrix {|row,col|
+                        if row==col
+                            1
+                        elsif (ds[row].type!=:scale or ds[col].type!=:scale)
+                            nil
+                        else
+                            pearson(ds[row],ds[col])
+                        end
+                }
+            end
+            def correlation_probability_matrix(ds)
+                rows=ds.fields.collect{|row|
+                    ds.fields.collect{|col|
+                        v1a,v2a=RubySS.only_valid(ds[row],ds[col])
+                        (row==col or ds[row].type!=:scale or ds[col].type!=:scale) ? nil : prop_pearson(t_pearson(ds[row],ds[col]), v1a.size)
+                    }
+                }
+                Matrix.rows(rows)
             end
 			# Calculate Spearman correlation coefficient between 2 vectors
 			def spearman(v1,v2)
@@ -53,10 +104,10 @@ module RubySS
 				ds={'d'=>dichotomous,'c'=>continous}.to_dataset.dup_only_valid
 				raise(TypeError, "First vector should be dichotomous") if ds['d'].factors.size!=2
 				raise(TypeError, "Second vector should be continous") if ds['c'].type!=:scale
-				f0=ds['d'].factors[0]
+				f0=ds['d'].factors.sort[0]
 				m0=ds.filter_field('c') {|c| c['d']==f0}
 				m1=ds.filter_field('c') {|c| c['d']!=f0}
-				((m0.mean-m1.mean).to_f / ds['c'].sdp) * Math::sqrt(m0.size*m1.size.to_f / ds.cases**2)
+				((m1.mean-m0.mean).to_f / ds['c'].sdp) * Math::sqrt(m0.size*m1.size.to_f / ds.cases**2)
 			end
 			# Kendall Rank Correlation Coefficient.
 			#

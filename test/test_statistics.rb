@@ -31,6 +31,22 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         v4=[2,nil,nil,nil,  3,7,8,6,4,3,2,500].to_vector(:scale)
         assert_in_delta(0.525,RubySS::Correlation.pearson(v3,v4),0.001)
     end
+    def test_matrix_correlation
+        v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
+        v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
+        v3=[6,2,  1000,1000,5,4,7,8].to_vector(:scale)
+        v4=[2,nil,nil,nil,  3,7,8,6].to_vector(:scale)
+        ds={'v1'=>v1,'v2'=>v2,'v3'=>v3,'v4'=>v4}.to_dataset
+        c=Proc.new {|n1,n2|RubySS::Correlation.pearson(n1,n2)} 
+        expected=Matrix[ [c.call(v1,v1),c.call(v1,v2),c.call(v1,v3),c.call(v1,v4)], [c.call(v2,v1),c.call(v2,v2),c.call(v2,v3),c.call(v2,v4)], [c.call(v3,v1),c.call(v3,v2),c.call(v3,v3),c.call(v3,v4)],
+        [c.call(v4,v1),c.call(v4,v2),c.call(v4,v3),c.call(v4,v4)]
+        ]
+        assert_equal(expected,RubySS::Correlation.correlation_matrix(ds))
+    end
+    def test_prop_pearson
+        assert_in_delta(0.42,RubySS::Correlation.prop_pearson(RubySS::Correlation.t_r(0.084,94),94),0.01)        
+        assert_in_delta(0.65,RubySS::Correlation.prop_pearson(RubySS::Correlation.t_r(0.046,95),95),0.01)
+    end
 	def test_covariance
 		if HAS_GSL
 			v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
@@ -50,7 +66,7 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
 		assert_raise TypeError do
 			RubySS::Correlation.point_biserial(c,d)
 		end
-		assert_in_delta(RubySS::Correlation.point_biserial(d,c), RubySS::Correlation.pearson(d,c),0.0001)
+		assert_in_delta(RubySS::Correlation.point_biserial(d,c), RubySS::Correlation.pearson(d,c), 0.0001)
 	end
 	def test_tau
 		v1=[1,2,3,4,5,6,7,8,9,10,11].to_vector(:ordinal)
@@ -112,6 +128,5 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         reg=RubySS::Regression::MultipleRegression.new_from_vectors([x1,x2,x3],y)
         p reg
     end
-
     
 end

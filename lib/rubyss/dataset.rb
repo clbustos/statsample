@@ -89,6 +89,15 @@ module RubySS
             }
             ds
         end
+        # Generate a matrix, based on fields of dataset 
+        def collect_matrix
+            rows=@fields.collect{|row|
+                @fields.collect{|col|
+                        yield row,col
+                    }
+                }
+            Matrix.rows(rows)
+        end
         # We have the same datasets if the labels and vectors are the same 
         def ==(d2)
             @vectors==d2.vectors and @fields==d2.fields

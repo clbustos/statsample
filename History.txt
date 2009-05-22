@@ -1,6 +1,7 @@
-=== 0.1.9 / 2009-05-20
+=== 0.1.9 / 2009-05-22
 * Class Vector: new method vector_standarized_pop, []=, min,max
-* Class Dataset: global variable $RUBY_SS_ROW stores the row number on each() and related methods. dup() with argument returns a copy of the dataset only for given fields. New methods: standarize, vector_mean, collect, verify
+* Class Dataset: global variable $RUBY_SS_ROW stores the row number on each() and related methods. dup() with argument returns a copy of the dataset only for given fields. New methods: standarize, vector_mean, collect, verify,collect_matrix
+* Module Correlation: new methods covariance, t_pearson, t_r, prop_pearson, covariance_matrix, correlation_matrix, correlation_probability_matrix
 * Module SRS: New methods estimation_n0 and estimation_n
 * Module Reliability: new ItemCharacteristicCurve class
 * New HtmlReport class
@@ -8,7 +9,7 @@
 * Converters: Module CSV with new options. Added write() method for GGobi module 
 * New Mx exporter (http://www.vcu.edu/mx/)
 * Class SimpleRegression: new methods standard error
-* Module Correlation: new methods covariance
+
 * Added tests for regression and reliability, Vector#vector_mean, Dataset#dup (partial)  and Dataset#verify
 
 
