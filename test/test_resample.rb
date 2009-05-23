@@ -13,7 +13,7 @@ class RubySSResampleTestCase < Test::Unit::TestCase
     end
     def test_repeat_and_save
         r=RubySS::Resample.repeat_and_save(400) {
-            RubySS::Resample.generate(20,1,10).count(1.0)
+            RubySS::Resample.generate(20,1,10).count(1)
         }
         assert_equal(400,r.size)
         v=RubySS::Vector.new(r,:scale)

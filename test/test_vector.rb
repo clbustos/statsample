@@ -104,7 +104,7 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_equal(10,a.sum)
         i=0
         factors=a.factors.sort
-        [0.0,1,2,3,4].each{|v|
+        [0,1,2,3,4].each{|v|
             assert(v==factors[i])
             assert(v.class==factors[i].class,"#{v} - #{v.class} != #{factors[i]} - #{factors[i].class}")
             i+=1

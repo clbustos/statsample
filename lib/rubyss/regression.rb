@@ -39,10 +39,11 @@ module RubySS
             def sst
                 @vy.sum_of_squared_deviation
             end
-            # 
+            # Value of r
             def r
                 @b * (@vx.sds / @vy.sds)
             end
+            # Value of r^2
             def r2
                 r**2
             end

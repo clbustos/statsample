@@ -126,7 +126,7 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         x3=[100,90,50,30,50,10].to_vector(:scale)
 		y=[6,2,4,10,12,8].to_vector(:scale)
         reg=RubySS::Regression::MultipleRegression.new_from_vectors([x1,x2,x3],y)
-        p reg
+        # p reg
     end
     
 end

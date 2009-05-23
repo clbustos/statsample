@@ -54,6 +54,7 @@ module RubySS
     VERSION = '0.1.9'
     SPLIT_TOKEN = ","
 	autoload(:Database, 'rubyss/converters')
+    autoload(:Anova, 'rubyss/anova')
 	autoload(:CSV, 'rubyss/converters')
 	autoload(:HtmlReport, 'rubyss/htmlreport')
     autoload(:Mx, 'rubyss/converters')

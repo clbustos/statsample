@@ -20,12 +20,13 @@ class RubySSReliabilityTestCase < Test::Unit::TestCase
         assert_in_delta(1050.455,ia.stats_if_deleted()['x1'][:variance_sample],0.001)
     end	
     def test_icc
-        p @x1.factors
+        #p @x1.factors
         icc=RubySS::Reliability::ItemCharacteristicCurve.new(@ds)
-        p icc.curve_field('x1',1).sort
-        p icc.curve_field('x1',2).sort
-        p icc.curve_field('x1',3).sort
-        p icc.curve_field('x1',30).sort
+        # Need to create the test!!!!
+        #p icc.curve_field('x1',1).sort
+        #p icc.curve_field('x1',2).sort
+        #p icc.curve_field('x1',3).sort
+        #p icc.curve_field('x1',30).sort
         
     end
 end

@@ -17,7 +17,9 @@ module RubySS
                 }
                 sum
             end
-            
+            def t_significance
+                
+            end
         end
     end
 end

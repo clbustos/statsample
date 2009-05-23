@@ -1,3 +1,7 @@
+=== 0.2.0 / 2009-XX-XX
+
+* One Way Anova on RubySS::Anova::OneWay
+
 === 0.1.9 / 2009-05-22
 * Class Vector: new method vector_standarized_pop, []=, min,max
 * Class Dataset: global variable $RUBY_SS_ROW stores the row number on each() and related methods. dup() with argument returns a copy of the dataset only for given fields. New methods: standarize, vector_mean, collect, verify,collect_matrix

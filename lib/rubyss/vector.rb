@@ -584,33 +584,38 @@ class Vector < DelegateClass(Array)
 			def mean
 					sum.to_f/ n_valid
 			end
+            def sum_of_squares(m=nil)
+                m||=mean
+                @data.inject(0){|a,x| a+(x-m).square}
+            end
 			# Sum of squared deviation
 			def sum_of_squared_deviation
 				@data.inject(0) {|a,x| x.square+a} - (sum.square.to_f / n_valid)
-				
 			end
+            
             # Population variance (divided by n)
-            def variance_population
+            def variance_population(m=nil)
+                m||=mean
 				squares=@data.inject(0){|a,x| x.square+a}
-                squares.to_f / n_valid - mean.square
+                squares.to_f / n_valid - m.square
             end
 			
 		
             # Population Standard deviation (divided by n)
-            def standard_deviation_population
-                Math::sqrt( variance_population )
+            def standard_deviation_population(m=nil)
+                Math::sqrt( variance_population(m) )
             end
             # Sample Variance (divided by n-1)
             
-			def variance_sample(m=false)
-				m=mean unless m
-				@data.inject(0){|a,x|a+(x-m).square} / (n_valid - 1)
+			def variance_sample(m=nil)
+				m||=mean
+				sum_of_squares(m) / (n_valid - 1)
 			end
 
             # Sample Standard deviation (divided by n-1)
             
-			def standard_deviation_sample(m=false)
-				m=mean unless m
+			def standard_deviation_sample(m=nil)
+				m||=m
 				Math::sqrt(variance_sample(m))
 			end
 			
@@ -626,21 +631,21 @@ class Vector < DelegateClass(Array)
 				def mean # :nodoc:
 					@gsl.mean
 				end				
-				def variance_sample(m=false) # :nodoc:
-					m=mean unless m
+				def variance_sample(m=nil) # :nodoc:
+					m||=mean
 					@gsl.variance_m
 				end
-				def standard_deviation_sample(m=false) # :nodoc:
-					m=mean unless m
+				def standard_deviation_sample(m=nil) # :nodoc:
+					m||=mean
 					@gsl.sd(m)
 				end
 				
-				def variance_population(m=false) # :nodoc:
-					m=mean unless m
+				def variance_population(m=nil) # :nodoc:
+					m||=mean
 					@gsl.variance_with_fixed_mean(m)
 				end
-				def standard_deviation_population(m=false) # :nodoc:
-					m=mean unless m
+				def standard_deviation_population(m=nil) # :nodoc:
+					m||=mean
 					@gsl.sd_with_fixed_mean(m)
 				end
 				def skew
