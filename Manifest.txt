@@ -5,6 +5,7 @@ Rakefile
 bin/rubyss
 demo/benchmark.rb
 demo/chi-square.rb
+demo/dice.rb
 demo/distribution_t.rb
 demo/graph.rb
 demo/item_analysis.rb
@@ -27,6 +28,7 @@ ext/distributions/test.rb
 ext/rubyss/extconf.rb
 ext/rubyss/rubyssopt.c
 lib/rubyss.rb
+lib/rubyss/anova.rb
 lib/rubyss/chidistribution.rb
 lib/rubyss/codification.rb
 lib/rubyss/converters.rb
@@ -35,7 +37,9 @@ lib/rubyss/crosstab.rb
 lib/rubyss/dataset.rb
 lib/rubyss/graph/gdchart.rb
 lib/rubyss/graph/svggraph.rb
+lib/rubyss/graph/svgboxplot.rb
 lib/rubyss/graph/svghistogram.rb
+lib/rubyss/graph/svgscatterplot.rb
 lib/rubyss/htmlreport.rb
 lib/rubyss/multiset.rb
 lib/rubyss/regression.rb
@@ -46,6 +50,7 @@ lib/rubyss/test.rb
 lib/rubyss/vector.rb
 lib/spss.rb
 test/_test_chart.rb
+test/test_anova.rb
 test/test_codification.rb
 test/test_crosstab.rb
 test/test_csv.csv

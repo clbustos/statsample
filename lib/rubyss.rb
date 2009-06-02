@@ -75,6 +75,17 @@ module RubySS
         def qf(sam,pop)
             1-(sam.to_f/pop)
         end
+        # Reference: http://www.itl.nist.gov/div898/handbook/eda/section3/normprpl.htm
+        def normal_order_statistic_medians(i,n)
+            if i==1
+                u= 1.0 - normal_order_statistic_medians(n,n)
+            elsif i==n
+                u=0.5**(1 / n.to_f)
+            else
+                u= (i - 0.3175) / (n + 0.365)
+            end
+            u
+        end
 	end
 end
 

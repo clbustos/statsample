@@ -92,6 +92,22 @@ class Vector < DelegateClass(Array)
             end
             }.to_vector(:scale)
         end
+        
+        def box_cox_transformation(lambda)
+            raise "Should be a scale" unless @type==:scale
+            @data.collect{|x|
+            if is_valid? x
+                if(lambda==0)
+                    Math.log(x)
+                else
+                    (x**lambda-1).to_f / lambda
+                end
+            else
+                nil
+            end
+            }.to_vector(:scale)
+        end
+        
         # Vector equality
         # Two vector will be the same if their data, missing values, type, labels are equals
         def ==(v2)

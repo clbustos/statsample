@@ -1,7 +1,7 @@
 module RubySS
     module Graph
 class SvgHistogram < SVG::Graph::BarBase
-    attr_accessor :inner_margin
+    attr_accessor :inner_margin, :mean, :sigma, :show_normal
         def initialize(config)
             config[:fields]=[:dummy]
             super
@@ -18,7 +18,8 @@ class SvgHistogram < SVG::Graph::BarBase
 		 self.top_align = self.top_font = 0
          init_with({
             :inner_margin=>16,
-            :key=>false
+            :key=>false,
+            :show_normal=>false
             })
          
 		end
@@ -29,7 +30,6 @@ class SvgHistogram < SVG::Graph::BarBase
                 @histogram[i]
             }}]
         end
-		
 		def get_x_labels
             [""]
 		end
@@ -82,39 +82,64 @@ class SvgHistogram < SVG::Graph::BarBase
             end
         end
 		def draw_data
-		minvalue = min_value
-		fieldwidth = field_width
-
-		unit_size =  (@graph_height.to_f - font_size*2*top_font) / 
-					  (get_y_labels.max - get_y_labels.min)		
-		bottom = @graph_height
-		field_count = 0
-		hist_min=@histogram.min
-		(0...@histogram.bins).each { |i|
-			dataset_count = 0
-			value = @histogram[i]
-			range = @histogram.get_range(i)
-			left = (range[0] - hist_min)*unit_width
-			bar_width = (range[1] - hist_min)*unit_width - left
-			length = (value.abs - (minvalue > 0 ? minvalue : 0)) * unit_size
-			# top is 0 if value is negative
-			top = bottom - (((value < 0 ? 0 : value) - minvalue) * unit_size)
-			@graph.add_element( "rect", {
-				"x" => (@inner_margin+left).to_s,
-				"y" => top.to_s,
-				"width" => bar_width.to_s,
-				"height" => length.to_s,
-				"class" => "fill#{dataset_count+1}"
-			})
-			make_datapoint_text(left + @inner_margin+ (bar_width/2), top - 6, value.to_s)
-			field_count += 1
-		}
+            minvalue = min_value
+            fieldwidth = field_width
+    
+            unit_size =  (@graph_height.to_f - font_size*2*top_font) / 
+                          (get_y_labels.max - get_y_labels.min)		
+            bottom = @graph_height
+            field_count = 0
+            hist_min=@histogram.min
+            hist_max=@histogram.max
+            range_hist=hist_max-hist_min
+            total=0
+            (0...@histogram.bins).each { |i|
+                dataset_count = 0
+                value = @histogram[i]
+                total=total+value
+                range = @histogram.get_range(i)
+                left = (range[0] - hist_min)*unit_width
+                bar_width = (range[1] - hist_min)*unit_width - left
+                length = (value.abs - (minvalue > 0 ? minvalue : 0)) * unit_size
+                # top is 0 if value is negative
+                top = bottom - (((value < 0 ? 0 : value) - minvalue) * unit_size)
+                @graph.add_element( "rect", {
+                    "x" => (@inner_margin+left).to_s,
+                    "y" => top.to_s,
+                    "width" => bar_width.to_s,
+                    "height" => length.to_s,
+                    "class" => "fill#{dataset_count+1}"
+                })
+                make_datapoint_text(left + @inner_margin+ (bar_width/2), top - 6, value.to_s)
+                field_count += 1
+            }
+            if(show_normal)
+                divs=30
+                path=""
+                0.upto(divs) {|i|
+                    x_abs=hist_min+(range_hist/divs)*i
+                    y=GSL::Ran::gaussian_pdf((x_abs-mean) / sigma)*total
+                    xg=@inner_margin+((x_abs-hist_min)*unit_width)
+                    yg=bottom-y*unit_size
+                    if i==0
+                        path="M#{xg} #{yg} "
+                    else
+                        path+="L#{xg} #{yg} "
+                    end
+                }
+                @graph.add_element("path", {
+                        "d"=>path,
+                        "style"=>"stroke:black;fill:none"
+                }
+                )
+            end
 	end
     
     
      def get_css
         return <<EOL
 /* default fill styles for multiple datasets (probably only use a single dataset on this graph though) */
+
 .key1,.fill1{
 	fill: #ff0000;
 	stroke: black;

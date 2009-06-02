@@ -184,6 +184,12 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         assert_equal(ds1.fields,ds2.fields)
         assert_not_same(ds1.fields,ds2.fields)
     end
+    def test_from_to
+        assert_equal(%w{name age city}, @ds.from_to("name","city"))
+        assert_raise ArgumentError do
+            @ds.from_to("name","a2")
+        end
+    end
     def test_dup_only_valid
         v1=[1,nil,3,4].to_vector(:scale)
         v2=[5,6,nil,8].to_vector(:scale)

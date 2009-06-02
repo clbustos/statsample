@@ -10,6 +10,18 @@ class Hash
 	end
 end
 
+class Array
+    def prefix(s)
+        self.collect{|c|
+            s+c.to_s
+        }
+    end
+    def suffix(s)
+        self.collect{|c|
+            c.to_s+s
+        }
+    end
+end
 
 module RubySS
     class DatasetException < RuntimeError
@@ -33,7 +45,7 @@ module RubySS
         # * Dataset.new({'v1'=>%w{1 2 3}.to_vector, 'v2'=>%w{4 5 6}.to_vector})
         # * Dataset.new({'v2'=>v2,'v1'=>v1},['v1','v2'])
         #
-        def initialize(vectors={},fields=[],labels={})
+        def initialize(vectors={}, fields=[], labels={})
             if vectors.instance_of? Array
                 @fields=vectors.dup
                 @vectors=vectors.inject({}){|a,x| a[x]=RubySS::Vector.new(); a}
@@ -45,6 +57,10 @@ module RubySS
             end
             @labels=labels
         end
+        def vector_label(v_id)
+            raise "Vector #{v} doesn't exists" unless @fields.include? v_id
+            @labels[v_id].nil? ? v_id : @labels[v_id]
+        end
         # Creates a copy of the given dataset, deleting all the cases with
         # missing data on one of the vectors
         def dup_only_valid
@@ -54,6 +70,12 @@ module RubySS
             }
             ds.update_valid_data
             ds
+        end
+        # Returns an array with the fields from first argumen to last argument
+        def from_to(from,to)
+            raise ArgumentError, "Field #{from} should be included on dataset" if !@fields.include? from
+            raise ArgumentError, "Field #{to} should be included on dataset" if !@fields.include? to
+            @fields.slice(@fields.index(from)..@fields.index(to))
         end
         # Returns a duplicate of the Database
         # If fields given, only include those vectors
@@ -131,7 +153,7 @@ module RubySS
                 if (v[0].is_a? Array)
                     v.each{|subv| add_case(subv,false)}
                 else
-                    raise ArgumentError, "Array size should be equal to fields number" if @fields.size!=v.size
+                    raise ArgumentError, "Input array size (#{v.size}) should be equal to fields number (#{@fields.size})" if @fields.size!=v.size
                     (0...v.size).each{|i| @vectors[@fields[i]].add(v[i],false)}
                 end
             when Hash

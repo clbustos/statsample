@@ -60,7 +60,7 @@ module RubySS
                 cdf*tails
             end
             # Covariance matrix
-            def covariance_matrix
+            def covariance_matrix(ds)
                 ds.collect_matrix do |row,col|
                         if (ds[row].type!=:scale or ds[col].type!=:scale)
                             nil

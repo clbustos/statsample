@@ -1,15 +1,29 @@
 module RubySS
     class HtmlReport
+        require 'rubyss/graph/svggraph'
     def initialize(ds,name,dir=nil)
         require 'fileutils'
+        @uniq=1
+        @uniq_file=0
         @ds=ds
         @name=name
         @partials=[]
+        @anchors=[]
         dir||=@name+"/"
         @dir=dir
         FileUtils.mkdir(@dir) if !File.exists? @dir
     end
+    def add_anchor(name,level=1)
+        @anchors.push([name,level,@uniq])
+        @partials.push("<a name='#{@uniq}'> </a>")
+        @uniq+=1
+    end
+    def uniq_file(prepend="file")
+        @uniq_file+=1
+        "#{prepend}_#{@uniq_file}"
+    end
     def add_correlation_matrix()
+        add_anchor("Correlation Matrix")
         html="<h2>Correlation Matrix</h2> <table><thead><th>-</th><th>"+@ds.fields.join("</th><th>")+"</th> </thead> <tbody>"
         matrix=RubySS::Correlation.correlation_matrix(@ds)
         pmatrix=RubySS::Correlation.correlation_probability_matrix(@ds)
@@ -50,17 +64,91 @@ module RubySS
     # Add a scale
     # First arg is the name of the scale                          
     # Other are fields
-    def add_scale(name, fields)
+    def add_scale(name, fields,icc=false)
         raise "Fields are empty" if fields.size==0
+        add_anchor("Scale:#{name}")
+        
         ds_partial=@ds.dup(fields)
         ia=RubySS::Reliability::ItemAnalysis.new(ds_partial)
         html="<h2>Scale: #{name}</h2>"
         html << ia.html_summary
-        hist_file=@dir+"/#{name}.svg"
-        ds_partial.vector_sum.svggraph_histogram(5,hist_file,500,400)
-        html << "<h3>Histogram</h3> <p><embed src='#{hist_file}'  width='500' height='400' type='image/svg+xml' /></p>\n"
-        html << "<h3>ICC</h3>"
+        @partials.push(html)
+        add_histogram(name, ds_partial.vector_sum)        
+        add_icc(name,fields) if icc
         
+    end
+    
+    def add_boxplot(name,vector)
+        add_graph("Box Plot #{name}", name, vector.svggraph_boxplot)
+    end    
+    def add_graph(name,id,graph)
+        add_anchor(name)
+        rs_file=@dir+"/#{uniq_file()}.svg"
+        html = "<h3>#{name}</h3> <p><embed src='#{rs_file}'  width='#{graph.width}' height='#{graph.height}' type='image/svg+xml' /></p>\n"
+        File.open(rs_file, "w") {|f|
+            f.puts(graph.burn)
+        }
+        @partials.push(html)
+    end
+    def add_runsequence_plot(name, vector)
+        add_graph("Run-Sequence Plot #{name}", name, vector.svggraph_runsequence_plot)
+    end
+    def add_lag_plot(name,vector)
+        add_graph("Lag Plot #{name}", name,vector.svggraph_lag_plot)
+    end
+        
+    def add_normalprobability_plot(name,vector)
+        add_graph("Normal Probability Plot #{name}", name, vector.svggraph_normalprobability_plot)
+    end
+
+    def add_scatterplot(name, ds=nil,x_field=nil, y_fields=nil,config={})
+        ds||=@ds
+        add_anchor("Scatterplot: #{name}")
+        x_field||=ds.fields[0]
+        y_fields||=ds.fields-[x_field]
+        ds_partial=ds.dup([x_field]+y_fields)
+        sc=RubySS::Graph::SvgScatterplot.new(ds_partial, config)
+        sc.parse
+        sc_file=@dir+"/#{uniq_file("sc")}.svg"
+        html = "<h3>Scatterplot #{name}</h3> <p><embed src='#{sc_file}'  width='#{sc.width}' height='#{sc.height}' type='image/svg+xml' /></p>\n"
+        File.open(sc_file, "w") {|f|
+              f.puts(sc.burn)
+        }
+        @partials.push(html)
+    end
+    
+    
+    def add_boxplots(name, ds=nil,options={})
+        ds||=@ds
+        add_anchor("Boxplots: #{name}")
+        options={:graph_title=>"Boxplots:#{name}", :show_graph_title=>true, :height=>500}.merge! options
+        graph = RubySS::Graph::SvgBoxplot.new(options)
+        ds.fields.each{|f|
+            graph.add_data(:title=>f, 
+                :data=>ds[f].valid_data,
+                :vector=>ds[f]
+                )
+        }
+        add_graph(name,name,graph)
+        graph
+    end
+    def add_histogram(name,vector,bins=nil)
+        add_anchor("Histogram: #{name}")
+        hist_file=@dir+"/#{name}.svg"
+        bins||=vector.size / 15
+        vector.svggraph_histogram(bins,hist_file,500,400)
+        html = "<h3>Histogram #{name}</h3> <p><embed src='#{hist_file}'  width='500' height='400' type='image/svg+xml' /></p>\n"
+        html << "<ul><li>Skewness=#{sprintf("%0.3f",vector.skew)}</li>
+        <li>Kurtosis=#{sprintf("%0.3f",vector.skew)}</li></ul>"
+        @partials.push(html)
+    end
+    def add_icc(name, fields)
+        require 'rubyss/graph/svggraph'
+        raise "Fields are empty" if fields.size==0
+        add_anchor("ICC:#{name}")        
+        ds_partial=@ds.dup(fields)
+        ia=RubySS::Reliability::ItemAnalysis.new(ds_partial)
+        html="<h3>ICC for scale: #{name}</h3>"
         ia.svggraph_item_characteristic_curve(@dir ,name, {:width=>400,:height=>300})
         ds_partial.fields.sort.each{|f|
             html << "<div><p><strong>#{f}</strong></p><embed src='#{@dir}/#{name}_#{f}.svg'  width='400' height='300' type='image/svg+xml' /></div>\n"
@@ -77,8 +165,32 @@ border: 1px solid black;
 }
 HERE
     end
+    
+    def create_uls(level)
+        if @c_level!=level            
+            if level>@c_level
+                "<ul>\n" * (level-@c_level)
+            else
+                "</ul>\n" * (@c_level-level)
+            end
+        else
+            ""
+        end
+    end
+    
     def parse
         html="<html><head><title>#{@name}</title><style>#{css()}</style></head><body><h1>Report: #{@name}</h1>"
+        if @anchors.size>0
+            html << "<div class='index'>Index</div><ul>"
+            @c_level=1
+            @anchors.each{|name,level,uniq|
+                create_uls(level)
+                @c_level=level
+                html << "<li><a href='#"+uniq.to_s+"'>#{name}</a></li>"
+            }
+            create_uls(1)
+            html << "</ul></div>"
+        end
         html+="<div class='section'>"+@partials.join("</div><div class='section'>")+"</div>"
         html+="</body></html>"
         html

@@ -67,6 +67,9 @@ module RubySS
 				@ds=ds.dup_only_valid
 				@total=@ds.vector_sum
 				@mean=@total.mean
+                @median=@total.median
+                @skew=@total.skew
+                @kurtosis=@total.kurtosis
 				@sd=@total.sdp
 				@valid_n=@total.size
                 begin
@@ -188,6 +191,10 @@ module RubySS
 <ul>
 <li>Mean=#{@mean}</li>
 <li>Std.Dv.=#{@sd}</li>
+<li>Median=#{@median}</li>
+<li>Skewness=#{sprintf("%0.3f",@skew)}</li>
+<li>Kurtosis=#{sprintf("%0.3f",@kurtosis)}</li>
+
 <li>Valid n:#{@valid_n}</li>
 <li>Cronbach alpha: #{@alpha}</li>
 </ul>
