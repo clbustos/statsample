@@ -14,11 +14,15 @@ class RubySSVectorTestCase < Test::Unit::TestCase
     end
 	def test_missing_values
 		@c.missing_values=[10]
-		assert_equal(@c.valid_data.sort,[-99,-99,1,2,3,4,5,5,5,5,5,6,6,7,8,9])
+		assert_equal([-99,-99,1,2,3,4,5,5,5,5,5,6,6,7,8,9], @c.valid_data.sort)
+        assert_equal([5,5,5,5,5,6,6,7,8,9,nil,1,2,3,4,nil,-99,-99], @c.data_with_nils)
 		@c.missing_values=[-99]
 		assert_equal(@c.valid_data.sort,[1,2,3,4,5,5,5,5,5,6,6,7,8,9,10])
+        assert_equal(@c.data_with_nils,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,nil,nil])
 		@c.missing_values=[]
 		assert_equal(@c.valid_data.sort,[-99,-99,1,2,3,4,5,5,5,5,5,6,6,7,8,9,10])
+        assert_equal(@c.data_with_nils,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99])
+        
 	end
     def test_labeled
         @c.labels={5=>'FIVE'}

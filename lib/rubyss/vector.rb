@@ -42,7 +42,7 @@ module RubySS
 class Vector < DelegateClass(Array)
 	
     include Enumerable
-        attr_reader :type, :data, :valid_data, :missing_values, :missing_data
+        attr_reader :type, :data, :valid_data, :missing_values, :missing_data, :data_with_nils
         attr_accessor :labels
         # Creates a new 
         # data = Array of data
@@ -58,6 +58,7 @@ class Vector < DelegateClass(Array)
 
             @type=t
 			@valid_data=[]
+            @data_with_nils=[]
 			@missing_data=[]
 			_set_valid_data
 			self.type=t
@@ -84,8 +85,8 @@ class Vector < DelegateClass(Array)
             raise "Should be a scale" unless @type==:scale
             mean=@delegate.mean
             sd=use_population ? @delegate.sdp : @delegate.sds
-            @data.collect{|x|
-            if is_valid? x
+            @data_with_nils.collect{|x|
+            if !x.nil?
                 (x.to_f - mean).to_f / sd
             else
                 nil
@@ -95,8 +96,8 @@ class Vector < DelegateClass(Array)
         
         def box_cox_transformation(lambda)
             raise "Should be a scale" unless @type==:scale
-            @data.collect{|x|
-            if is_valid? x
+            @data_with_nils.collect{|x|
+            if !x.nil?
                 if(lambda==0)
                     Math.log(x)
                 else
@@ -141,9 +142,10 @@ class Vector < DelegateClass(Array)
             @data.push(v)
             set_valid_data if update_valid
         end
-	def set_valid_data
+        def set_valid_data
 			@valid_data.clear
 			@missing_data.clear
+            @data_with_nils.clear
             _set_valid_data
             @delegate.set_gsl if(@type==:scale)
 		end
@@ -151,7 +153,9 @@ class Vector < DelegateClass(Array)
             @data.each do |n|
 				if is_valid? n
 					@valid_data.push(n)
+                    @data_with_nils.push(n)
 				else
+                    @data_with_nils.push(nil)
                     @missing_data.push(n)
 				end
 			end
@@ -256,7 +260,7 @@ class Vector < DelegateClass(Array)
             elsif(v.respond_to? method )
                 RubySS::Vector.new(
                     @data.collect  {|x|
-                        if(is_valid?(x))
+                        if(!x.nil?)
                         x.send(method,v)
                         else
                             nil

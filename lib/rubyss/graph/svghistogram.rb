@@ -4,7 +4,7 @@ class SvgHistogram < SVG::Graph::BarBase
     attr_accessor :inner_margin, :mean, :sigma, :show_normal
         def initialize(config)
             config[:fields]=[:dummy]
-            super
+            super(config)
             
             @histogram=nil
         end
@@ -120,7 +120,7 @@ class SvgHistogram < SVG::Graph::BarBase
                     x_abs=hist_min+(range_hist/divs)*i
                     y=GSL::Ran::gaussian_pdf((x_abs-mean) / sigma)*total
                     xg=@inner_margin+((x_abs-hist_min)*unit_width)
-                    yg=bottom-y*unit_size
+                    yg=bottom-(y-minvalue)*unit_size
                     if i==0
                         path="M#{xg} #{yg} "
                     else

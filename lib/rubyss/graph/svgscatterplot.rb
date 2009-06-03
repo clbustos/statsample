@@ -31,7 +31,26 @@ module RubySS
                     })
                 }
             end
-            
+            def get_x_labels
+                values=super
+                values.collect{|x|
+                    if x.is_a? Integer
+                        x 
+                    else
+                        sprintf("%0.2f",x).to_f
+                    end
+                }
+            end
+            def get_y_labels
+                values=super
+                values.collect{|x|
+                    if x.is_a? Integer
+                        x 
+                    else
+                        sprintf("%0.2f",x).to_f
+                    end
+                }
+            end
             def draw_data
         line = 1
 

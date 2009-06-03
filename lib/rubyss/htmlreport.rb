@@ -1,6 +1,8 @@
+require 'rubyss/graph/svggraph'
+
 module RubySS
     class HtmlReport
-        require 'rubyss/graph/svggraph'
+        attr_accessor :ds
     def initialize(ds,name,dir=nil)
         require 'fileutils'
         @uniq=1
@@ -11,10 +13,11 @@ module RubySS
         @anchors=[]
         dir||=@name+"/"
         @dir=dir
+        @level=1
         FileUtils.mkdir(@dir) if !File.exists? @dir
     end
-    def add_anchor(name,level=1)
-        @anchors.push([name,level,@uniq])
+    def add_anchor(name)
+        @anchors.push([name,@level,@uniq])
         @partials.push("<a name='#{@uniq}'> </a>")
         @uniq+=1
     end
@@ -22,15 +25,16 @@ module RubySS
         @uniq_file+=1
         "#{prepend}_#{@uniq_file}"
     end
-    def add_correlation_matrix()
+    def add_correlation_matrix(ds=nil)
+        ds||=@ds
         add_anchor("Correlation Matrix")
-        html="<h2>Correlation Matrix</h2> <table><thead><th>-</th><th>"+@ds.fields.join("</th><th>")+"</th> </thead> <tbody>"
-        matrix=RubySS::Correlation.correlation_matrix(@ds)
-        pmatrix=RubySS::Correlation.correlation_probability_matrix(@ds)
+        html="<h2>Correlation Matrix</h2> <table><thead><th>-</th><th>"+ds.fields.join("</th><th>")+"</th> </thead> <tbody>"
+        matrix=RubySS::Correlation.correlation_matrix(ds)
+        pmatrix=RubySS::Correlation.correlation_probability_matrix(ds)
 
       
         (0...(matrix.row_size)).each {|row|
-            html+="<tr><td>"+@ds.fields[row]+"</td>"
+            html+="<tr><td>"+ds.fields[row]+"</td>"
             (0...(matrix.column_size)).each {|col|
                 if matrix[row,col].nil?
                     html+="<td>--</td>"
@@ -73,13 +77,17 @@ module RubySS
         html="<h2>Scale: #{name}</h2>"
         html << ia.html_summary
         @partials.push(html)
-        add_histogram(name, ds_partial.vector_sum)        
-        add_icc(name,fields) if icc
-        
+        @level+=1
+        v=ds_partial.vector_mean
+            add_histogram(name, v)        
+            add_runsequence_plot(name, v)        
+            add_normalprobability_plot(name,v)
+            add_icc(name,fields) if icc
+        @level-=1
     end
     
-    def add_boxplot(name,vector)
-        add_graph("Box Plot #{name}", name, vector.svggraph_boxplot)
+    def add_boxplot(name,vector,options={})
+        add_graph("Box Plot #{name}", name, vector.svggraph_boxplot(options))
     end    
     def add_graph(name,id,graph)
         add_anchor(name)
@@ -90,15 +98,15 @@ module RubySS
         }
         @partials.push(html)
     end
-    def add_runsequence_plot(name, vector)
-        add_graph("Run-Sequence Plot #{name}", name, vector.svggraph_runsequence_plot)
+    def add_runsequence_plot(name, vector,options={})
+        add_graph("Run-Sequence Plot #{name}", name, vector.svggraph_runsequence_plot(options))
     end
-    def add_lag_plot(name,vector)
-        add_graph("Lag Plot #{name}", name,vector.svggraph_lag_plot)
+    def add_lag_plot(name,vector, options={})
+        add_graph("Lag Plot #{name}", name,vector.svggraph_lag_plot(options))
     end
         
-    def add_normalprobability_plot(name,vector)
-        add_graph("Normal Probability Plot #{name}", name, vector.svggraph_normalprobability_plot)
+    def add_normalprobability_plot(name,vector,options={})
+        add_graph("Normal Probability Plot #{name}", name, vector.svggraph_normalprobability_plot(options))
     end
 
     def add_scatterplot(name, ds=nil,x_field=nil, y_fields=nil,config={})
@@ -132,14 +140,13 @@ module RubySS
         add_graph(name,name,graph)
         graph
     end
-    def add_histogram(name,vector,bins=nil)
-        add_anchor("Histogram: #{name}")
+    def add_histogram(name,vector,bins=nil,options={})
         hist_file=@dir+"/#{name}.svg"
         bins||=vector.size / 15
-        vector.svggraph_histogram(bins,hist_file,500,400)
-        html = "<h3>Histogram #{name}</h3> <p><embed src='#{hist_file}'  width='500' height='400' type='image/svg+xml' /></p>\n"
-        html << "<ul><li>Skewness=#{sprintf("%0.3f",vector.skew)}</li>
-        <li>Kurtosis=#{sprintf("%0.3f",vector.skew)}</li></ul>"
+        graph=vector.svggraph_histogram(bins,options)
+        add_graph("Histogram:#{name}",name,graph)
+        html = "<ul><li>Skewness=#{sprintf("%0.3f",vector.skew)}</li>
+        <li>Kurtosis=#{sprintf("%0.3f",vector.kurtosis)}</li></ul>"
         @partials.push(html)
     end
     def add_icc(name, fields)
@@ -167,7 +174,7 @@ HERE
     end
     
     def create_uls(level)
-        if @c_level!=level            
+        if @c_level!=level
             if level>@c_level
                 "<ul>\n" * (level-@c_level)
             else
@@ -184,11 +191,11 @@ HERE
             html << "<div class='index'>Index</div><ul>"
             @c_level=1
             @anchors.each{|name,level,uniq|
-                create_uls(level)
+                html << create_uls(level)
                 @c_level=level
                 html << "<li><a href='#"+uniq.to_s+"'>#{name}</a></li>"
             }
-            create_uls(1)
+            html << create_uls(1)
             html << "</ul></div>"
         end
         html+="<div class='section'>"+@partials.join("</div><div class='section'>")+"</div>"

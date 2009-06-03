@@ -1,9 +1,6 @@
 require 'rubyss/vector'
 require 'gnuplot'
 
-# Row number on each
-$RUBY_SS_ROW=nil
-
 class Hash
 	def to_dataset(*args)
 		RubySS::Dataset.new(self,*args)
@@ -25,14 +22,15 @@ end
 
 module RubySS
     class DatasetException < RuntimeError
-        attr_reader :ds,:exp
+        attr_reader :ds,:exp, :i
         def initialize(ds,e)
             @ds=ds
             @exp=e
+            @i=nil
         end
         def to_s
             m="Error:"+@exp.message+@exp.backtrace.join("\n")+"\nOn Dataset:"+@ds.to_s
-            m+="\nRow: #{$RUBY_SS_ROW}" if($RUBY_SS_ROW)
+            m+="\nRow: #{@i}" unless @i.nil?
             m
         end
     end
@@ -65,8 +63,8 @@ module RubySS
         # missing data on one of the vectors
         def dup_only_valid
             ds=dup_empty
-            each {|c|
-                ds.add_case(c,false) unless @fields.find{|f| !@vectors[f].is_valid? c[f]}
+            each { |c|
+                ds.add_case(c,false) unless @fields.find{|f| @vectors[f].data_with_nils[@i].nil? }
             }
             ds.update_valid_data
             ds
@@ -203,7 +201,7 @@ module RubySS
 			a=[]
 			fields||=@fields
 			each do |row|
-				if(fields.find{|f| !@vectors[f].is_valid? row[f]})
+				if(fields.find{|f| !@vectors[f].data_with_nils[@i]})
 					a.push(nil)
 				else
 					a.push(fields.inject(0) {|ac,v| ac + row[v].to_f})
@@ -225,7 +223,7 @@ module RubySS
                 sum=0
                 invalids=0
                 fields.each{|f|
-                    if @vectors[f].is_valid? row[f]
+                    if !@vectors[f].data_with_nils[@i].nil?
                         sum+=row[f].to_f
                     else
                         invalids+=1
@@ -272,23 +270,23 @@ module RubySS
         end
         def each
             begin
-            0.upto(@cases-1) {|i|
-                $RUBY_SS_ROW=i
+            @cases.times {|i|
+                @i=i
                 row=case_as_hash(i)
                 yield row
             }
-            $RUBY_SS_ROW=nil
+            @i=nil
             rescue =>e
                 raise DatasetException.new(self,e)
             end
         end
         def each_array
-            0.upto(@cases-1) {|i|
-                $RUBY_SS_ROW=i
+            @cases.times {|i|
+                @i=i
                 row=case_as_array(i)
                 yield row
             }
-            $RUBY_SS_ROW=nil
+            @i=nil
         end
         def fields=(f)
             @fields=f

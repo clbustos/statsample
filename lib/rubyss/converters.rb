@@ -78,6 +78,25 @@ module RubySS
         end
         end
     end
+    module Excel
+        class << self
+            def write(dataset,filename)
+                require 'spreadsheet'
+                book = Spreadsheet::Workbook.new
+                sheet = book.create_worksheet
+                format = Spreadsheet::Format.new :color => :blue,
+                                   :weight => :bold
+                sheet.row(0).concat(dataset.fields)
+                sheet.row(0).default_format = format
+                i=1
+                dataset.each_array{|row|
+                    sheet.row(i).concat(row)
+                    i+=1
+                }
+                book.write(filename)
+            end
+        end
+    end
     module CSV
         require 'csv'
 		class << self

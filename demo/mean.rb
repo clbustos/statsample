@@ -4,13 +4,15 @@ require 'rubyss/srs'
 require 'rubyss/multiset'
 require 'gnuplot'
 require 'rubyss/graph/svggraph.rb'
+require 'gsl'
 tests=1000
 sample_size=100
 
 a=[]
-(-200..+200).to_a.each {|i|
-    z=i/100.0
-    a+=[GSL::Ran.gaussian_pdf(z)]
+r = GSL::Rng.alloc(GSL::Rng::TAUS, 1)
+
+1.upto(tests).each {|i|
+    a.push(r.ugaussian())
 }
 
 

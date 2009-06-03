@@ -28,18 +28,16 @@ module RubySS
 		end
 	end
 	class Scale < Ordinal
-		def svggraph_histogram(bins,file, width=600, height=300, options={})
-            options={:height=>height,:width=>width, :graph_title=>"Histogram", :show_graph_title=>true,:show_normal=>true, :mean=>self.mean, :sigma=>sdp }.merge! options
+		def svggraph_histogram(bins, options={})
+            options={:graph_title=>"Histogram", :show_graph_title=>true,:show_normal=>true, :mean=>self.mean, :sigma=>sdp }.merge! options
             graph = RubySS::Graph::SvgHistogram.new(options)
             graph.histogram=histogram(bins)
-            File.open(file,"w") {|f|
-              f.puts(graph.burn)
-            }
+            graph
 		end
         # Returns a Run-Sequence Plot
         # Reference: http://www.itl.nist.gov/div898/handbook/eda/section3/runseqpl.htm
         def svggraph_runsequence_plot(options={})
-            options={:graph_title=>"Run-Sequence Plot",:show_graph_title=>true,:scale_x_integers => true}.merge! options
+            options={:graph_title=>"Run-Sequence Plot", :show_graph_title=>true, :scale_x_integers => true, :add_popups=>true }.merge! options
             vx=(1..@data.size).to_a.to_vector(:scale)
             vy=@data.to_vector(:scale)
             ds={'index'=>vx,'value'=>vy}.to_dataset            

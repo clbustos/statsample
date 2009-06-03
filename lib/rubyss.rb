@@ -56,6 +56,7 @@ module RubySS
 	autoload(:Database, 'rubyss/converters')
     autoload(:Anova, 'rubyss/anova')
 	autoload(:CSV, 'rubyss/converters')
+	autoload(:Excel, 'rubyss/converters')
 	autoload(:HtmlReport, 'rubyss/htmlreport')
     autoload(:Mx, 'rubyss/converters')
 	autoload(:Resample, 'rubyss/resample')

@@ -24,6 +24,7 @@ module RubySS
             # Calculate Pearson correlation coefficient between 2 vectors
             def pearson(v1,v2)
 				v1a,v2a=RubySS.only_valid(v1,v2)
+                return nil if v1a.size ==0
 				if HAS_GSL
 					GSL::Stats::correlation(v1a.gsl, v2a.gsl)
 				else
