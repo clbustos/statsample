@@ -1,10 +1,11 @@
 module RubySS
-    # module for correlation methods 
-	
+    # Diverse correlation methods 
     module Correlation
         class << self
+            # Covariance between two vectors
 			def covariance(v1,v2)
 				v1a,v2a=RubySS.only_valid(v1,v2)
+                return nil if v1a.size==0
 				if HAS_GSL
 					GSL::Stats::covariance(v1a.gsl, v2a.gsl)
 				else
@@ -28,14 +29,16 @@ module RubySS
 				if HAS_GSL
 					GSL::Stats::correlation(v1a.gsl, v2a.gsl)
 				else
-					v1s,v2s=v1a.vector_standarized_pop,v2a.vector_standarized_pop
-					t=0
-					siz=v1s.size
-					(0...v1s.size).each {|i|
-					t+=(v1s[i]*v2s[i])
-					}
-					t.to_f/v2s.size
+					
 				end
+            end
+            #:nodoc:
+            def pearson_slow(v1a,v2a)
+                v1s,v2s=v1a.vector_standarized_pop,v2a.vector_standarized_pop
+                t=0
+                siz=v1s.size
+                (0...v1s.size).each {|i| t+=(v1s[i]*v2s[i]) }
+                t.to_f/v2s.size
             end
             # Retrieves the value for t test for a pearson correlation
             # between two vectors to test the null hipothesis of r=0
@@ -70,6 +73,7 @@ module RubySS
                         end
                     end
             end
+            
             # The classic correlation matrix for all fields of a dataset
             
             def correlation_matrix(ds)

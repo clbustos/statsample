@@ -11,7 +11,21 @@ v=(0..10000).collect{|n|
 v.missing_values=[5,10,20]
 v.type=:scale
 
- n = 100
+ n = 300
+ if (false)
+     Benchmark.bm(7) do |bench|
+         bench.report("missing or")   { for i in 1..n; v.each {|x|             !(x.nil? or v.missing_values.include? x) }; end }
+         bench.report("missing and")   { for i in 1..n;v.each {|x|             !x.nil? and !v.missing_values.include? x } ; end }
+    end
+ end
+ if (false)
+     Benchmark.bm(7) do |bench|
+         bench.report("true")   { RubySS::OPTIMIZED=true; for i in 1..n; v.set_valid_data ; end }
+         bench.report("false")   { RubySS::OPTIMIZED=false; for i in 1..n; v.set_valid_data ; end }
+    end
+ end
+
+
  if (false)
     Benchmark.bm(7) do |x|
 		x.report("mean")   { for i in 1..n; v.mean; end }

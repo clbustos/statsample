@@ -10,10 +10,11 @@ if File.exists? './local_rakefile.rb'
 end
 	
 	
-EXT1 = "ext/distributions/cdf.#{Hoe::DLEXT}"  
-EXT2 = "ext/rubyss/rubyssopt.#{Hoe::DLEXT}"  
+EXT1 = "ext/distributions/cdf.#{Config::CONFIG['DLEXT']}"  
+EXT2 = "ext/rubyss/rubyssopt.#{Config::CONFIG['DLEXT']}"  
 
-Hoe.new('rubyss', RubySS::VERSION) do |p|
+Hoe.spec('rubyss') do |p|
+    p.version=RubySS::VERSION
   p.developer('Claudio Bustos', 'clbustos@gmail.com')
   p.spec_extras[:extensions] = ["ext/rubyss/extconf.rb","ext/distributions/extconf.rb"]
   p.extra_deps << ["gnuplot",">= 2.2"] << ["ruby-gdchart"]

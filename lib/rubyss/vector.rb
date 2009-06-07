@@ -42,7 +42,7 @@ module RubySS
 class Vector < DelegateClass(Array)
 	
     include Enumerable
-        attr_reader :type, :data, :valid_data, :missing_values, :missing_data, :data_with_nils
+    attr_reader :type, :data, :valid_data, :missing_values, :missing_data, :data_with_nils
         attr_accessor :labels
         # Creates a new 
         # data = Array of data
@@ -55,11 +55,11 @@ class Vector < DelegateClass(Array)
 			@data=data
 			@missing_values=missing_values
 			@labels=labels
-
             @type=t
-			@valid_data=[]
+            @valid_data=[]
             @data_with_nils=[]
-			@missing_data=[]
+            @missing_data=[]
+            @has_missing_data=nil
 			_set_valid_data
 			self.type=t
 			super(@delegate)
@@ -86,11 +86,11 @@ class Vector < DelegateClass(Array)
             mean=@delegate.mean
             sd=use_population ? @delegate.sdp : @delegate.sds
             @data_with_nils.collect{|x|
-            if !x.nil?
-                (x.to_f - mean).to_f / sd
-            else
-                nil
-            end
+                if !x.nil?
+                    (x.to_f - mean).to_f / sd
+                else
+                    nil
+                end
             }.to_vector(:scale)
         end
         
@@ -138,6 +138,9 @@ class Vector < DelegateClass(Array)
                 yield x
             }
         end
+        # Add a value at the end of the vector
+        # If second argument set to false, you should update valid data usign
+        # Vector#set_valid_data at the end of your insertion cycle
         def add(v,update_valid=true)
             @data.push(v)
             set_valid_data if update_valid
@@ -150,15 +153,24 @@ class Vector < DelegateClass(Array)
             @delegate.set_gsl if(@type==:scale)
 		end
         def _set_valid_data
+            if RubySS::OPTIMIZED
+                RubySS::_set_valid_data(self)
+            else
             @data.each do |n|
 				if is_valid? n
-					@valid_data.push(n)
+                    @valid_data.push(n)
                     @data_with_nils.push(n)
 				else
                     @data_with_nils.push(nil)
                     @missing_data.push(n)
 				end
 			end
+            @has_missing_data=@missing_data.size>0
+            end
+        end
+        # Retrieves true if data has one o more missing values
+        def has_missing_data?
+            @has_missing_data
         end
         def labeling(x)
             @labels.has_key?(x) ? @labels[x].to_s : x.to_s
@@ -385,8 +397,8 @@ class Vector < DelegateClass(Array)
 	
 	class Nominal
 		def initialize(data)
-			@data=data
-            @factors=data.uniq
+            @data=data
+           # @factors=data.uniq
 		end
         def delegate_data
             @data
@@ -582,7 +594,7 @@ class Vector < DelegateClass(Array)
                 set_gsl
             end
             def set_gsl # :nodoc
-                data=@data.collect!{|x|
+                data = @data.collect!{|x|
                     if x.is_a? Numeric
                         x
                     elsif x.is_a? String and x.to_i==x.to_f

@@ -16,7 +16,7 @@ module RubySS
             fields=[]
             sth.column_info.each {|c|
                 vectors[c['name']]=RubySS::Vector.new([])
-                vectors[c['name']].type= (c['type_name']=='INTEGER') ? :scale : :nominal
+                vectors[c['name']].type= (c['type_name']=='INTEGER' or c['type_name']=='DOUBLE') ? :scale : :nominal
                 fields.push(c['name'])
             }
             ds=RubySS::Dataset.new(vectors,fields)
@@ -104,13 +104,13 @@ module RubySS
         #
         # USE:
         #     ds=RubySS::CSV.read("test_csv.csv")
-        def read(filename, empty=[''],ignore_lines=0)
+        def read(filename, empty=[''],ignore_lines=0,fs=nil,rs=nil)
                 first_row=true
                 fields=[]
                 fields_data={}
                 ds=nil
                 line_number=0
-                ::CSV.open(filename,'r') do |row|
+                ::CSV.open(filename,'r',fs,rs) do |row|
                     line_number+=1
                     if(line_number<=ignore_lines)
                         #puts "Skip line"

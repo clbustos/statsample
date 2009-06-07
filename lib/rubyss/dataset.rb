@@ -22,20 +22,19 @@ end
 
 module RubySS
     class DatasetException < RuntimeError
-        attr_reader :ds,:exp, :i
+        attr_reader :ds,:exp
         def initialize(ds,e)
             @ds=ds
             @exp=e
-            @i=nil
         end
         def to_s
-            m="Error:"+@exp.message+@exp.backtrace.join("\n")+"\nOn Dataset:"+@ds.to_s
+            m="Error:"+@exp.message+@exp.backtrace.join("\n")+"\nOn Dataset:"+@ds.inspect
             m+="\nRow: #{@i}" unless @i.nil?
             m
         end
     end
     class Dataset
-        attr_reader :vectors, :fields, :cases
+        attr_reader :vectors, :fields, :cases, :i
         attr_accessor :labels
         # To create a dataset
         # * Dataset.new()
@@ -53,6 +52,7 @@ module RubySS
                 check_order
                 check_length
             end
+            @i=nil
             @labels=labels
         end
         def vector_label(v_id)
@@ -62,17 +62,21 @@ module RubySS
         # Creates a copy of the given dataset, deleting all the cases with
         # missing data on one of the vectors
         def dup_only_valid
-            ds=dup_empty
-            each { |c|
-                ds.add_case(c,false) unless @fields.find{|f| @vectors[f].data_with_nils[@i].nil? }
-            }
-            ds.update_valid_data
+            if @vectors.find{|field,vector| vector.has_missing_data?} 
+                ds=dup_empty
+                each_with_index { |i,c|
+                    ds.add_case(c,false) unless @fields.find{|f| @vectors[f].data_with_nils[i].nil? }
+                }
+                ds.update_valid_data
+            else
+                ds=dup()
+            end
             ds
         end
         # Returns an array with the fields from first argumen to last argument
         def from_to(from,to)
-            raise ArgumentError, "Field #{from} should be included on dataset" if !@fields.include? from
-            raise ArgumentError, "Field #{to} should be included on dataset" if !@fields.include? to
+            raise ArgumentError, "Field #{from} should be on dataset" if !@fields.include? from
+            raise ArgumentError, "Field #{to} should be on dataset" if !@fields.include? to
             @fields.slice(@fields.index(from)..@fields.index(to))
         end
         # Returns a duplicate of the Database
@@ -152,7 +156,7 @@ module RubySS
                     v.each{|subv| add_case(subv,false)}
                 else
                     raise ArgumentError, "Input array size (#{v.size}) should be equal to fields number (#{@fields.size})" if @fields.size!=v.size
-                    (0...v.size).each{|i| @vectors[@fields[i]].add(v[i],false)}
+                    v.size.times {|i| @vectors[@fields[i]].add(v[i],false)}
                 end
             when Hash
                 raise ArgumentError, "Hash keys should be equal to fields" if @fields.sort!=v.keys.sort
@@ -200,15 +204,36 @@ module RubySS
 		def vector_sum(fields=nil)
 			a=[]
 			fields||=@fields
-			each do |row|
-				if(fields.find{|f| !@vectors[f].data_with_nils[@i]})
-					a.push(nil)
+			collect_with_index do |i,row|
+				if(fields.find{|f| !@vectors[f].data_with_nils[i]})
+					nil
 				else
-					a.push(fields.inject(0) {|ac,v| ac + row[v].to_f})
+					fields.inject(0) {|ac,v| ac + row[v].to_f}
 				end
             end
-			a.to_vector(:scale)
 		end
+        # Returns a vector with the numbers of missing values for a case
+        
+        def vector_missing_values(fields=nil)
+            fields||=@fields
+            raise "Fields #{(fields-@fields).join(", ")} doesn't exists on dataset" if (fields-@fields).size>0
+            
+            collect_with_index do |i,row|
+                fields.inject(0){|a,v|
+                    a+ ((@vectors[v].data_with_nils[i].nil?) ? 1: 0)
+                }
+            end
+        end
+        def vector_count_characters(fields=nil)
+            fields||=@fields
+            raise "Fields #{(fields-@fields).join(", ")} doesn't exists on dataset" if (fields-@fields).size>0
+            collect_with_index do |i,row|
+                fields.inject(0){|a,v|
+                    
+                    a+((@vectors[v].data_with_nils[i].nil?) ? 0: row[v].to_s.size)
+                }
+            end
+        end
         # Returns a vector with the mean for a set of fields
         # if fields parameter is empty, return the mean for all fields
         # if max invalid parameter > 0, returns the mean for all tuples
@@ -218,12 +243,12 @@ module RubySS
             fields||=@fields
             size=fields.size
             raise "Fields #{(fields-@fields).join(", ")} doesn't exists on dataset" if (fields-@fields).size>0
-            each do |row|
+            each_with_index do |i, row|
                 # numero de invalidos
                 sum=0
                 invalids=0
                 fields.each{|f|
-                    if !@vectors[f].data_with_nils[@i].nil?
+                    if !@vectors[f].data_with_nils[i].nil?
                         sum+=row[f].to_f
                     else
                         invalids+=1
@@ -270,12 +295,26 @@ module RubySS
         end
         def each
             begin
+                @i=0
             @cases.times {|i|
                 @i=i
                 row=case_as_hash(i)
                 yield row
             }
             @i=nil
+            rescue =>e
+                raise DatasetException.new(self,e)
+            end
+        end
+        def each_with_index
+            begin
+                @i=0
+                @cases.times{|i|
+                    @i=i
+                    row=case_as_hash(i)
+                    yield i,row
+                }
+                @i=nil
             rescue =>e
                 raise DatasetException.new(self,e)
             end
@@ -300,13 +339,28 @@ module RubySS
         end
         # Returns the vector named i
         def[](i)
-        raise Exception,"Vector '#{i}' doesn't exists on dataset" unless @vectors.has_key?(i)
+        if i.is_a? String
+            raise Exception,"Vector '#{i}' doesn't exists on dataset" unless @vectors.has_key?(i)
             @vectors[i]
+        elsif i.is_a? Range
+            fields=from_to(i.begin,i.end)
+            vectors=fields.inject({}) {|a,v| a[v]=@vectors[v];a}
+            ds=Dataset.new(vectors,fields)
+        else
+            raise ArgumentError, "You need a String or a Range"
+        end
         end
         def collect(type=:scale)
             data=[]
             each {|row|
                 data.push(yield row)
+            }
+            RubySS::Vector.new(data,type)
+        end
+        def collect_with_index(type=:scale)
+            data=[]
+            each_with_index {|i,row|
+                data.push(yield i,row)
             }
             RubySS::Vector.new(data,type)
         end

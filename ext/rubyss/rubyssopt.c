@@ -5,6 +5,7 @@
 void Init_rubyssopt();
 VALUE nominal_frequencies(VALUE self);
 VALUE rubyss_frequencies(VALUE self, VALUE data);
+VALUE rubyss_set_valid_data(VALUE self, VALUE vector);
 VALUE dataset_case_as_hash(VALUE self, VALUE index);
 VALUE dataset_case_as_array(VALUE self, VALUE index);
 void Init_rubyssopt()
@@ -16,13 +17,49 @@ void Init_rubyssopt()
     
     rb_define_const(mRubySS,"OPTIMIZED",Qtrue);
     rb_define_module_function(mRubySS,"_frequencies",rubyss_frequencies,1);
+    rb_define_module_function(mRubySS,"_set_valid_data",rubyss_set_valid_data,1);
     rb_define_method(cNominal,"frequencies",nominal_frequencies,0);
     rb_define_method(cDataset,"case_as_hash",dataset_case_as_hash,1);
     rb_define_method(cDataset,"case_as_array",dataset_case_as_array,1);
 
 }
 
+VALUE rubyss_set_valid_data(VALUE self, VALUE vector) {
+/** Emulate
 
+@data.each do |n|
+				if is_valid? n
+                    @valid_data.push(n)
+                    @data_with_nils.push(n)
+				else
+                    @data_with_nils.push(nil)
+                    @missing_data.push(n)
+				end
+			end
+            @has_missing_data=@missing_data.size>0
+            */
+    VALUE data=rb_iv_get(vector,"@data");
+    VALUE valid_data=rb_iv_get(vector,"@valid_data");
+    VALUE data_with_nils=rb_iv_get(vector,"@data_with_nils");
+    VALUE missing_data=rb_iv_get(vector,"@missing_data");
+    VALUE missing_values=rb_iv_get(vector,"@missing_values");
+    VALUE has_missing_data=rb_iv_get(vector,"@has_missing_data");
+    long len=RARRAY_LEN(data);
+    long i;
+    VALUE val;
+    for(i=0;i<len;i++) {
+        val=rb_ary_entry(data,i);
+        if(val==Qnil || rb_ary_includes(missing_values,val)) {
+            rb_ary_push(missing_data,val);
+            rb_ary_push(data_with_nils,Qnil);
+        } else {
+            rb_ary_push(valid_data,val);
+            rb_ary_push(data_with_nils,val);
+        }
+    }
+    rb_iv_set(vector,"@has_missing_data",(RARRAY_LEN(missing_data)>0) ? Qtrue : Qfalse);
+    return Qnil;
+}
 VALUE rubyss_frequencies(VALUE self, VALUE data) {
     VALUE h=rb_hash_new();
     Check_Type(data,T_ARRAY);

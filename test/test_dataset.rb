@@ -71,6 +71,27 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
 		assert_equal(expected_b, b)
 		assert_equal(expected_total, total)
 	end
+    def test_vector_missing_values
+        a1=[1  ,nil ,3 ,4  , 5,nil].to_vector(:scale)
+		a2=[10 ,nil ,20,20 ,20,30].to_vector(:scale)
+		b1=[nil,nil ,1 ,1  ,1 ,2].to_vector(:scale)
+		b2=[2  ,2   ,2 ,nil,2 ,3].to_vector(:scale)
+        c= [nil,2   , 4,2   ,2 ,2].to_vector(:scale)
+		ds={'a1'=>a1,'a2'=>a2,'b1'=>b1,'b2'=>b2,'c'=>c}.to_dataset
+        mva=[2,3,0,1,0,1].to_vector(:scale)
+        assert_equal(mva,ds.vector_missing_values)
+    end
+    def test_vector_count_characters
+        a1=[1  ,"abcde"  ,3  ,4  , 5,nil].to_vector(:scale)
+		a2=[10 ,20.3     ,20 ,20 ,20,30].to_vector(:scale)
+		b1=[nil,"343434" ,1  ,1  ,1 ,2].to_vector(:scale)
+		b2=[2  ,2        ,2  ,nil,2 ,3].to_vector(:scale)
+        c= [nil,2        ,"This is a nice example",2   ,2 ,2].to_vector(:scale)
+		ds={'a1'=>a1,'a2'=>a2,'b1'=>b1,'b2'=>b2,'c'=>c}.to_dataset
+        exp=[4,17,27,5,6,5].to_vector(:scale)
+        assert_equal(exp,ds.vector_count_characters)
+        
+    end
     def test_vector_mean
 		a1=[1  ,2 ,3 ,4  , 5,nil].to_vector(:scale)
 		a2=[10 ,10,20,20 ,20,30].to_vector(:scale)
@@ -150,6 +171,19 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
     def test_marshaling
         ds_marshal=Marshal.load(Marshal.dump(@ds))
         assert_equal(ds_marshal,@ds)
+    end
+    def test_range
+        v1=[1,2,3,4].to_vector
+        v2=[5,6,7,8].to_vector
+        v3=[9,10,11,12].to_vector
+        ds1=RubySS::Dataset.new({'v1'=>v1,'v2'=>v2,'v3'=>v3}, %w{v3 v2 v1})
+        assert_same(v1,ds1['v1'])
+        ds2=ds1["v2".."v1"]
+        assert_equal(%w{v2 v1},ds2.fields)
+        assert_same(ds1['v1'],ds2['v1'])
+        assert_same(ds1['v2'],ds2['v2'])
+        
+
     end
     def test_dup
         v1=[1,2,3,4].to_vector
