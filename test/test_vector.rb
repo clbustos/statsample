@@ -24,6 +24,14 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_equal(@c.data_with_nils,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99])
         
 	end
+    def test_has_missing_data
+        a=[1,2,3,nil].to_vector
+        assert(a.has_missing_data?)
+        a=[1,2,3,4,10].to_vector
+        assert(!a.has_missing_data?)
+        a.missing_values=[10]
+        assert(a.has_missing_data?)
+    end
     def test_labeled
         @c.labels={5=>'FIVE'}
         assert_equal(["FIVE","FIVE","FIVE","FIVE","FIVE",6,6,7,8,9,10,1,2,3,4,nil,-99, -99],@c.vector_labeled.to_a)
