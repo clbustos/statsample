@@ -106,7 +106,6 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
 		expected_a=[5.5,6,11.5,12,12.5,30].to_vector(:scale)
 		expected_b=[2,1.5,1.5,1,1.5,2.5].to_vector(:scale)
 		expected_c=[nil, 5.0/3,7.0/3,1.5,5.0/3,7.0/3].to_vector(:scale)
-
 		expected_total=[nil,3.4,6,nil,6.0,nil].to_vector(:scale)
 		assert_equal(expected_a, a)
 		assert_equal(expected_b, b)

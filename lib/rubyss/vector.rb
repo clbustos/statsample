@@ -87,7 +87,7 @@ class Vector < DelegateClass(Array)
             sd=use_population ? @delegate.sdp : @delegate.sds
             @data_with_nils.collect{|x|
                 if !x.nil?
-                    (x.to_f - mean).to_f / sd
+                    (x.to_f - mean).quo(sd)
                 else
                     nil
                 end
@@ -101,7 +101,7 @@ class Vector < DelegateClass(Array)
                 if(lambda==0)
                     Math.log(x)
                 else
-                    (x**lambda-1).to_f / lambda
+                    (x**lambda-1).quo(lambda)
                 end
             else
                 nil
@@ -455,13 +455,13 @@ class Vector < DelegateClass(Array)
             # the sample
             def proportions
                 frequencies.inject({}){|a,v|
-                    a[v[0]] = v[1].to_f / @data.size
+                    a[v[0]] = v[1].quo(@data.size)
                     a
                 }
             end
             # Proportion of a given value.
             def proportion(v=1)
-                frequencies[v].to_f / @data.size
+                frequencies[v].quo(@data.size)
             end
             def summary(labels,out="")
                 out << sprintf("n valid:%d\n",n_valid)
@@ -470,7 +470,7 @@ class Vector < DelegateClass(Array)
                 out <<  "Distribution:\n"
                 frequencies.sort.each{|k,v|
                     key=labels.has_key?(k) ? labels[k]:k
-                    out <<  sprintf("%s : %s (%0.2f%%)\n",key,v, (v.to_f / n_valid)*100)
+                    out <<  sprintf("%s : %s (%0.2f%%)\n",key,v, (v.quo(n_valid))*100)
                 }
                 out
             end
@@ -526,18 +526,18 @@ class Vector < DelegateClass(Array)
         # Return the value of the percentil q
             def percentil(q)
                 sorted=@data.sort
-                v= (n_valid.to_f * q / 100)
+                v= (n_valid * q).quo(100)
                 if(v.to_i!=v)
                     sorted[v.to_i]
                 else
-                    (sorted[(v-0.5).to_i].to_f + sorted[(v+0.5).to_i]) / 2
+                    (sorted[(v-0.5).to_i].to_f + sorted[(v+0.5).to_i]).quo(2)
                 end
             end
 			# Returns a ranked vector
 			def ranked(type=:ordinal)
 				i=0
 				r=frequencies.sort.inject({}){|a,v|
-					a[v[0]]=((i+1 + i+v[1]) / 2.0)
+					a[v[0]]=(i+1 + i+v[1]).quo(2)
 					i+=v[1]
 					a
 				}
@@ -614,7 +614,7 @@ class Vector < DelegateClass(Array)
                 @data.inject(0){|a,x|x+a} ; end
             # The arithmetical mean of data
 			def mean
-					sum.to_f/ n_valid
+					sum.to_f.quo(n_valid)
 			end
             def sum_of_squares(m=nil)
                 m||=mean
@@ -622,14 +622,14 @@ class Vector < DelegateClass(Array)
             end
 			# Sum of squared deviation
 			def sum_of_squared_deviation
-				@data.inject(0) {|a,x| x.square+a} - (sum.square.to_f / n_valid)
+				@data.inject(0) {|a,x| x.square+a} - (sum.square.quo(n_valid))
 			end
             
             # Population variance (divided by n)
             def variance_population(m=nil)
                 m||=mean
 				squares=@data.inject(0){|a,x| x.square+a}
-                squares.to_f / n_valid - m.square
+                squares.quo(n_valid) - m.square
             end
 			
 		
@@ -641,7 +641,7 @@ class Vector < DelegateClass(Array)
             
 			def variance_sample(m=nil)
 				m||=mean
-				sum_of_squares(m) / (n_valid - 1)
+				sum_of_squares(m).quo(n_valid - 1)
 			end
 
             # Sample Standard deviation (divided by n-1)
@@ -716,7 +716,7 @@ class Vector < DelegateClass(Array)
             # Coefficient of variation
             # Calculed with the sample standard deviation
 			def coefficient_of_variation
-				standard_deviation_sample / mean
+				standard_deviation_sample.quo(mean)
 			end
             def summary(labels,out="")
                 out << sprintf("n valid:%d\n",n_valid)

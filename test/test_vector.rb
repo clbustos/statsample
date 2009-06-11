@@ -82,9 +82,9 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 	def test_nominal
 		assert_equal(@c[1],5)
 		assert_equal({ 1=>1,2=>1,3=>1,4=>1,5=>5,6=>2,7=>1,8=>1, 9=>1,10=>1},@c.frequencies)
-		assert_equal({ 1 => 1.to_f/15 ,2=>1.to_f/15, 3=>1.to_f/15,4=>1.to_f/15,5=>5.to_f/15,6=>2.to_f/15,7=>1.to_f/15,8=>1.to_f/15, 9=>1.to_f/15,10=>1.to_f/15}, @c.proportions)
-        assert_equal(@c.proportion, 1.to_f/15)
-        assert_equal(@c.proportion(2), 1.to_f/15)
+		assert_equal({ 1 => 1.quo(15) ,2=>1.quo(15), 3=>1.quo(15),4=>1.quo(15),5=>5.quo(15),6=>2.quo(15),7=>1.quo(15), 8=>1.quo(15), 9=>1.quo(15),10=>1.quo(15)}, @c.proportions)
+        assert_equal(@c.proportion, 1.quo(15))
+        assert_equal(@c.proportion(2), 1.quo(15))
 		assert_equal([1,2,3,4,5,6,7,8,9,10], @c.factors.sort)
 		assert_equal(@c.mode,5)
 		assert_equal(@c.n_valid,15)
@@ -125,7 +125,7 @@ class RubySSVectorTestCase < Test::Unit::TestCase
     def test_vector_standarized
         v1=[1,2,3,4,nil].to_vector(:scale)
         sds=v1.sds
-        expected=[((1-2.5) / sds),((2-2.5) / sds),((3-2.5) / sds),((4-2.5) / sds),nil].to_vector(:scale)
+        expected=[((1-2.5).quo(sds)),((2-2.5).quo(sds)),((3-2.5).quo(sds)),((4-2.5).quo(sds)), nil].to_vector(:scale)
         vs=v1.vector_standarized
         assert_equal(expected, vs)
         assert_equal(0,vs.mean)
@@ -145,7 +145,7 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_equal([3,4,5,6,7], (a+2).to_a)
         assert_equal([12,14,16,18,20], (a+b).to_a)
         assert_raise  ArgumentError do
-			a+@c
+			a + @c
 		end
         assert_raise  TypeError do
 			a+"string"

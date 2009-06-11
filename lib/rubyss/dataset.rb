@@ -1,5 +1,4 @@
 require 'rubyss/vector'
-require 'gnuplot'
 
 class Hash
 	def to_dataset(*args)
@@ -257,7 +256,7 @@ module RubySS
                 if(invalids>max_invalid)
                     a.push(nil)
                 else
-                    a.push(sum/(size-invalids).to_f)
+                    a.push(sum.quo(size-invalids))
                 end
             end
             a.to_vector(:scale)
