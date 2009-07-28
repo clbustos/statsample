@@ -178,14 +178,14 @@ class RubySSVectorTestCase < Test::Unit::TestCase
     def test_samples
         srand(1)
         assert_equal(100,@c.sample_with_replacement(100).size)
-        assert_equal(@c.valid_data.to_a.sort,@c.sample_without_replacement(15).sort)
+        assert_equal(@c.valid_data.to_a.sort, @c.sample_without_replacement(15).sort)
         assert_raise  ArgumentError do
 			@c.sample_without_replacement(20)
 		end
         @c.type=:scale
         srand(1)
-        assert_equal(100,@c.sample_with_replacement(100).size)
-        assert_equal(@c.valid_data.to_a.sort,@c.sample_without_replacement(15).sort)
+        assert_equal(100, @c.sample_with_replacement(100).size)
+        assert_equal(@c.valid_data.to_a.sort, @c.sample_without_replacement(15).sort)
         
     end
     
@@ -197,7 +197,6 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 			assert_equal(a.standard_deviation_sample_slow,a.sds)
 			assert_equal(a.variance_population_slow,a.variance_population)
 			assert_equal(a.standard_deviation_population_slow,a.standard_deviation_population)
-
             assert_nothing_raised do
                 a=[].to_vector(:scale)
             end
@@ -206,8 +205,9 @@ class RubySSVectorTestCase < Test::Unit::TestCase
             a.set_valid_data
             assert_equal(3,a.sum)
             b=[1,2,nil,3,4,5,nil,6].to_vector(:scale)
-            assert_equal(21,b.sum)
-            assert_equal(3.5,b.mean)
+            assert_equal(21, b.sum)
+            
+            assert_equal(3.5, b.mean)
             assert_equal(6,b.gsl.size)
             # histogram
             a=[11,12,13,15,21,22,23,32,33].to_vector(:scale)
