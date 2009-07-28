@@ -4,7 +4,7 @@ require 'rubyss/resample'
 require 'rubyss/test'
 require 'matrix'
 ideal=Matrix[[30,30,40]]
-tests=3000
+tests=10000
 monte=RubySS::Resample.repeat_and_save(tests) {
 	observed=[0,0,0]
 	(1..100).each{|i|
@@ -17,7 +17,7 @@ monte=RubySS::Resample.repeat_and_save(tests) {
 			observed[2]+=1
 		end
 	}
-	(RubySS::Test::chi_square(Matrix[observed],ideal)*100).round/100.to_f
+	RubySS::Test::chi_square(Matrix[observed],ideal)
 }
 
 
@@ -36,12 +36,9 @@ v.frequencies.sort.each{|k,v1|
 	y.push(prev+v1)
 	prev=prev+v1
 	cdf_chi=GSL::Cdf.chisq_P(k,2)
-	y2.push(cdf_chi*tests)
-	y3.push(v1.to_f/(tests/4))
-	#y3.push(0)
-	y4.push(GSL::Ran.chisq_pdf(k,2))
+	y2.push(cdf_chi)
+	y4.push(prev.quo(tests))
 }
 
 
-GSL::graph(GSL::Vector.alloc(x),  GSL::Vector.alloc(y3), GSL::Vector.alloc(y4))
-#GSL::graph(GSL::Vector.alloc(x), GSL::Vector.alloc(y2), GSL::Vector.alloc(y4))
+GSL::graph(GSL::Vector.alloc(x), GSL::Vector.alloc(y2), GSL::Vector.alloc(y4))

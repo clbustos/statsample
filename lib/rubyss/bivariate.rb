@@ -1,6 +1,6 @@
 module RubySS
     # Diverse correlation methods 
-    module Correlation
+    module Bivariate
         class << self
             # Covariance between two vectors
 			def covariance(v1,v2)
@@ -63,15 +63,40 @@ module RubySS
                 cdf=GSL::Cdf::tdist_P(t,(size)-2)
                 cdf*tails
             end
+            # Returns residual score after delete variance
+            # from another variable
+            # 
+            def residuals(from,del)
+                r=RubySS::Bivariate.pearson(from,del)
+                froms, dels = from.vector_standarized, del.vector_standarized
+                nv=[]
+                froms.data_with_nils.each_index{|i|
+                    if froms[i].nil? or dels[i].nil?
+                        nv.push(nil)
+                    else
+                        nv.push(froms[i]-r*dels[i])
+                    end
+                }
+                nv.to_vector(:scale)
+            end
+            def partial_correlation(v1,v2,control)
+                v1a,v2a,cona=RubySS.only_valid(v1,v2,control)
+                rv1v2=pearson(v1a,v2a)
+                rv1con=pearson(v1a,cona)
+                rv2con=pearson(v2a,cona)
+                
+                (rv1v2-(rv1con*rv2con)).quo(Math::sqrt(1-rv1con**2) * Math::sqrt(1-rv2con**2))
+                
+            end
             # Covariance matrix
             def covariance_matrix(ds)
                 ds.collect_matrix do |row,col|
-                        if (ds[row].type!=:scale or ds[col].type!=:scale)
-                            nil
-                        else
-                            covariance(ds[row],ds[col])
-                        end
+                    if (ds[row].type!=:scale or ds[col].type!=:scale)
+                        nil
+                    else
+                        covariance(ds[row],ds[col])
                     end
+                end
             end
             
             # The classic correlation matrix for all fields of a dataset

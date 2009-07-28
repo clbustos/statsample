@@ -1,0 +1,61 @@
+\part{Equations}
+\section{Convention}
+\begin{align*}
+n &= \text{sample size}\\
+N &= \text{population size}\\
+p &= \text{proportion inside a sample}\\
+P &= \text{proportion inside a population}
+\end{align*}
+\section{Ruby::SRS}
+Finite Poblation correction is used on standard error calculation on poblation below 10.000. Function 
+\begin{verbatim}
+fpc_var(sam,pop)
+\end{verbatim}
+calculate FPC for variance with
+\begin{equation}
+fpc_{var} = \frac{N-n} {N-1}
+\end{equation}
+
+with n  as sam and N as pop
+
+Function 
+\begin{verbatim}
+fpc = fpc(sam,pop)
+\end{verbatim}
+
+calculate FPC for standard deviation with 
+\begin{equation}
+fpc_{sd} = \sqrt{\frac{N-n} {N-1}}
+\label{fpc}
+\end{equation}
+with n  as sam and N as pop.
+
+\subsection{Sample Size estimation for proportions}
+
+On infinite poblations, you should use method
+\begin{verbatim}
+estimation_n0(d,prop,margin=0.95)
+\end{verbatim}
+which uses
+\begin{equation}
+n = \frac{t^2(pq)}{d^2}
+\label{n_i}
+\end{equation}
+where
+\begin{align*}
+t &= \text{t value for given level of confidence ( 1.96 for 95\% )}\\
+d &= \text{margin of error}
+\end{align*}
+
+On finite poblations, you should use
+\begin{verbatim}
+estimation_n(d,prop,n_pobl, margin=0.95)
+\end{verbatim}
+which uses
+\begin{equation}
+n = \frac{n_i}{1+(\frac{n_i-1}{N})}
+\end{equation}
+
+Where $n_i$ is n on \ref{n_i} and N is population size
+
+

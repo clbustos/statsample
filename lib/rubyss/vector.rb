@@ -52,6 +52,7 @@ class Vector < DelegateClass(Array)
         # [:scale]   : Scale level of meausurement
         #
 		def initialize(data=[],t=:nominal,missing_values=[],labels={})
+            raise "Data should be an array" unless data.is_a? Array
 			@data=data
 			@missing_values=missing_values
 			@labels=labels
@@ -93,7 +94,7 @@ class Vector < DelegateClass(Array)
                 end
             }.to_vector(:scale)
         end
-        
+        alias_method :standarized, :vector_standarized
         def box_cox_transformation(lambda)
             raise "Should be a scale" unless @type==:scale
             @data_with_nils.collect{|x|
@@ -705,11 +706,11 @@ class Vector < DelegateClass(Array)
                 end
                 def sample_with_replacement(k)
                     r = GSL::Rng.alloc(GSL::Rng::MT19937,rand(10000))
-                    r.sample(@gsl, k)
+                    r.sample(@gsl, k).to_a
                 end
                 def sample_without_replacement(k)
                     r = GSL::Rng.alloc(GSL::Rng::MT19937,rand(10000))
-                    r.choose(@gsl, k)
+                    r.choose(@gsl, k).to_a
                 end
 			end
 			
@@ -732,7 +733,9 @@ class Vector < DelegateClass(Array)
             end
             
 			alias_method :sdp, :standard_deviation_population
-			alias_method :sds, :standard_deviation_sample	
+			alias_method :sds, :standard_deviation_sample
 			alias_method :cov, :coefficient_of_variation
+            alias_method :variance, :variance_sample
+            alias_method :sd, :standard_deviation_sample
 		end
 end

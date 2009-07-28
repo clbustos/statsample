@@ -78,41 +78,127 @@ module RubySS
 			end
 		end
         # Multiple Regression
-        # Based on GSL algorithm
-        
-        # I don't know if is correct
-        class MultipleRegression
-            attr_reader :c,:cov,:chisq,:status
-            private_class_method :new
-			def initialize(init_method, *argv)
-				self.send(init_method, *argv)
-			end
-            class << self
-				def new_from_vectors(vxs,vy)
-                    new(:init_vectors,vxs,vy)
-				end
-			end
-            def init_vectors(vxs,vy)
-                
-                @vxs=vxs
-                @vy=vy
-                dim=vxs.size
-                n=vy.size
-                matrix = GSL::Matrix.alloc(n, dim)
-                for x in 0...n
-                    for y in 0...dim
-                        matrix.set(x, y, vxs[y][x])
+        # Based on Alglib library
+        if HAS_ALGIB
+            class MultipleRegression
+                private_class_method :new
+                def initialize(init_method, *argv)
+                    self.send(init_method, *argv)
+                end
+                class << self
+                    def new_from_dataset(ds,y_var)
+                        new(:init_dataset,ds,y_var)
                     end
                 end
-                @c, @cov, @chisq, @status = GSL::MultiFit.linear(matrix, vy.gsl)
+                def init_dataset(ds,y_var)
+                    @ds=ds.dup_only_valid
+                    @y_var=y_var
+                    @dy=@ds[@y_var]
+                    # Create a custom matrix
+                    columns=[]
+                    @ds.fields.each{|f|
+                        columns.push(@ds[f].to_a) unless f==@y_var
+                    }
+                    @dep_columns=columns.dup
+                    columns.push(@ds[@y_var])
+                    matrix=Matrix.columns(columns)
+                    @lr=Alglib::LinearRegression.build_from_matrix(matrix)
+                end
+                def coeffs
+                    @lr.coeffs
+                end
+                def constant
+                    @lr.constant
+                end
+                def standarized_coeffs
+                    lr_s.coeffs
+                end
+                def lr_s
+                    if @lr_s.nil?
+                        build_standarized
+                    end
+                    @lr_s
+                end
+                def build_standarized
+                    @ds_s=@ds.standarize
+                    columns=[]
+                    @ds_s.fields.each{|f|
+                        columns.push(@ds_s[f].to_a) unless f==@y_var
+                    }
+                    @dep_columns_s=columns.dup
+                    columns.push(@ds_s[@y_var])
+                    matrix=Matrix.columns(columns)
+                    @lr_s=Alglib::LinearRegression.build_from_matrix(matrix)
+                end
+                def process(v)
+                    @lr.process(v)
+                end
+                def process_s(v)
+                    lr_s.process(v)
+                end
+                # Sum of square total
+                def sst
+                    @dy.sum_of_squared_deviation
+                end
+                def ssr
+                    mean=@dy.mean
+                    (0...@ds.cases).inject(0) {|a,i|
+                        v=@dep_columns.collect{|v|v[i]}
+                        a+((process(v)-mean)**2)
+                    }
+                end
+                def sse
+                    sst-ssr
+                end
+                def r2
+                    ssr.quo(sst)
+                end
+                def r
+                    Math::sqrt(r2)
+                end
+                def predicted
+                    0.upto(@ds.cases-1).collect{|i|
+                        vect=@dep_columns.collect{|v| v[i]}
+                        process(vect)
+                    }.to_vector(:scale)
+                end
+                def standarized_predicted
+                    predicted.standarized
+                end
+                def residuals
+                    0.upto(@ds.cases-1).collect{|i|
+                        vect=@dep_columns.collect{|v| v[i]}
+                         @ds[@y_var][i] - process(vect) 
+                    }.to_vector(:scale)
+                end
+                # ???? Not equal to SPSS output
+                def standarized_residuals
+                    res=residuals
+                    red_sd=residuals.sds
+                    res.collect {|v|
+                        v.quo(red_sd)
+                    }.to_vector(:scale)
+                end
+                def df_r
+                    @dep_columns.size
+                end
+                def df_e
+                    @ds.cases-@dep_columns.size-1
+                end
+                def f
+                    (ssr.quo(df_r)).quo(sse.quo(df_e))
+                end
+                # Significance of Fisher
+                def significance
+                if HAS_GSL
+                    GSL::Cdf.fdist_Q(f,df_r,df_e)
+                else
+                    raise "Need Ruby/GSL"
+                end
+                end
+                
+                
             end
-        end
-        class << self
-			
-			def r2_adjusted(r2,n,k)
-				1-((1-r2)*((n.to_f-1) / (n-k-1).to_f))
-				
-			end
         end
     end
 end

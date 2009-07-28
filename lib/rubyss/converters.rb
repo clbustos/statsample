@@ -95,16 +95,62 @@ module RubySS
                 }
                 book.write(filename)
             end
+            # Returns a dataset based on a xls file
+            # USE:
+            #     ds = RubySS::Excel.read("test.xls")
+            #
+            def read(filename, worksheet_id=0, ignore_lines=0, empty=[''])
+            require 'spreadsheet'
+                
+                first_row=true
+                fields=[]
+                fields_data={}
+                ds=nil
+                line_number=0
+                book = Spreadsheet.open filename
+                sheet= book.worksheet worksheet_id
+                sheet.each do |row|
+                    line_number+=1
+                    if(line_number<=ignore_lines)
+                        #puts "Skip line"
+                        next
+                    end
+                    row.collect!{|c|
+                        c.to_s
+                    }
+                    if first_row
+                        fields=row.to_a.collect{|c| c.downcase}
+                        if fields.size!=fields.uniq.size
+                            repeated=fields.inject({}) {|a,v|
+                                (a[v].nil? ? a[v]=1 : a[v]+=1); a }.find_all{|k,v| v>1}.collect{|k,v|k}.join(",")
+                                raise "There are some repeated fields on the header:#{repeated}. Please, fix" 
+                        end
+                        ds=RubySS::Dataset.new(fields)
+                        first_row=false
+                    else
+                        rowa=row.to_a.collect{|c|
+                            empty.include?(c) ? nil: c
+                        }
+                        (fields.size - rowa.size).times {|i|
+                            rowa << nil
+                        }
+                        ds.add_case(rowa,false)
+                    end
+                end
+                ds.update_valid_data
+                ds
+            end
         end
     end
     module CSV
-        require 'csv'
 		class << self
         # Returns a Dataset  based on a csv file
         #
         # USE:
         #     ds=RubySS::CSV.read("test_csv.csv")
         def read(filename, empty=[''],ignore_lines=0,fs=nil,rs=nil)
+        require 'csv'
+            
                 first_row=true
                 fields=[]
                 fields_data={}
@@ -182,7 +228,7 @@ module RubySS
                     fp.puts "End Rectangular"
                 when :covariance
                     fp.puts " CMatrix Full"
-                    cm=RubySS::Correlation.covariance_matrix(dataset)
+                    cm=RubySS::Bivariate.covariance_matrix(dataset)
                     d=(0...(cm.row_size)).collect {|row|
                         (0...(cm.column_size)).collect{|col|
                             cm[row,col].nil? ? "." : sprintf("%0.3f", cm[row,col])

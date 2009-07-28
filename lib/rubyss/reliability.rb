@@ -161,7 +161,7 @@ module RubySS
 					ds2=@ds.dup
 					ds2.delete_vector(v)
 					total=ds2.vector_sum
-					a[v]=RubySS::Correlation.pearson(vector,total)
+					a[v]=RubySS::Bivariate.pearson(vector,total)
 					a
 				end
 			end

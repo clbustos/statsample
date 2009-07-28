@@ -54,6 +54,13 @@ module RubySS
             @i=nil
             @labels=labels
         end
+        def to_gsl_matrix
+            matrix=GSL::Matrix.alloc(cases,@vectors.size)
+            each_array do |row|
+                row.each_index{|y| matrix.set(@i,y,row[y]) }
+            end
+            matrix
+        end
         def vector_label(v_id)
             raise "Vector #{v} doesn't exists" unless @fields.include? v_id
             @labels[v_id].nil? ? v_id : @labels[v_id]

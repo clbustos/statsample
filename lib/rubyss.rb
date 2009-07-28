@@ -38,6 +38,13 @@ end
 	rescue LoadError
 		HAS_GSL=false
 	end
+    begin 
+        require 'alglib'
+        HAS_ALGIB=true
+    rescue LoadError
+        HAS_ALGIB=false
+    end
+        
     
     begin 
        require 'rubyss/rubyssopt'
@@ -57,25 +64,20 @@ module RubySS
     autoload(:Anova, 'rubyss/anova')
 	autoload(:CSV, 'rubyss/converters')
 	autoload(:Excel, 'rubyss/converters')
+	autoload(:GGobi, 'rubyss/converters')
+
 	autoload(:HtmlReport, 'rubyss/htmlreport')
     autoload(:Mx, 'rubyss/converters')
 	autoload(:Resample, 'rubyss/resample')
 	autoload(:SRS, 'rubyss/srs')
 	autoload(:Codification, 'rubyss/codification')
 	autoload(:Reliability, 'rubyss/reliability')
-	autoload(:Correlation, 'rubyss/correlation')
+	autoload(:Bivariate, 'rubyss/bivariate')
+	autoload(:Multivariate, 'rubyss/multivariate')
+
 	autoload(:Regression, 'rubyss/regression')
 	autoload(:Test, 'rubyss/test')
 	module Util
-		# Finite population correction
-        # Source: Cochran(1972)
-        def fpc(sam,pop)
-            ((pop - sam).to_f / ( pop - 1))
-        end
-        # 1 - sample fraction
-        def qf(sam,pop)
-            1-(sam.to_f/pop)
-        end
         # Reference: http://www.itl.nist.gov/div898/handbook/eda/section3/normprpl.htm
         def normal_order_statistic_medians(i,n)
             if i==1

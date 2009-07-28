@@ -29,8 +29,8 @@ module RubySS
         ds||=@ds
         add_anchor("Correlation Matrix")
         html="<h2>Correlation Matrix</h2> <table><thead><th>-</th><th>"+ds.fields.join("</th><th>")+"</th> </thead> <tbody>"
-        matrix=RubySS::Correlation.correlation_matrix(ds)
-        pmatrix=RubySS::Correlation.correlation_probability_matrix(ds)
+        matrix=RubySS::Bivariate.correlation_matrix(ds)
+        pmatrix=RubySS::Bivariate.correlation_probability_matrix(ds)
 
       
         (0...(matrix.row_size)).each {|row|
