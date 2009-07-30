@@ -104,11 +104,22 @@ module RubySS
             def correlation_matrix(ds)
                 ds.collect_matrix {|row,col|
                         if row==col
-                            1
+                            1.0
                         elsif (ds[row].type!=:scale or ds[col].type!=:scale)
                             nil
                         else
                             pearson(ds[row],ds[col])
+                        end
+                }
+            end
+            # Retrieves the n valid pairwise
+            def n_valid_matrix(ds)
+                ds.collect_matrix {|row,col|
+                        if row==col
+                            ds[row].valid_data.size
+                        else
+                            rowa,rowb=RubySS.only_valid(ds[row],ds[col])
+                            rowa.size
                         end
                 }
             end

@@ -621,6 +621,7 @@ class Vector < DelegateClass(Array)
                 m||=mean
                 @data.inject(0){|a,x| a+(x-m).square}
             end
+            
 			# Sum of squared deviation
 			def sum_of_squared_deviation
 				@data.inject(0) {|a,x| x.square+a} - (sum.square.quo(n_valid))
@@ -737,5 +738,6 @@ class Vector < DelegateClass(Array)
 			alias_method :cov, :coefficient_of_variation
             alias_method :variance, :variance_sample
             alias_method :sd, :standard_deviation_sample
+            alias_method :ss, :sum_of_squares
 		end
 end

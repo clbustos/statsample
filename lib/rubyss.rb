@@ -65,7 +65,7 @@ module RubySS
 	autoload(:CSV, 'rubyss/converters')
 	autoload(:Excel, 'rubyss/converters')
 	autoload(:GGobi, 'rubyss/converters')
-
+    autoload(:DominanceAnalysis, 'rubyss/doman')
 	autoload(:HtmlReport, 'rubyss/htmlreport')
     autoload(:Mx, 'rubyss/converters')
 	autoload(:Resample, 'rubyss/resample')

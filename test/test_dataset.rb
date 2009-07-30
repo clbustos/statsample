@@ -16,13 +16,30 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         matrix=Matrix[[1,2],[3,4],[5,6]]
         ds=RubySS::Dataset.new('v1'=>[1,3,5].to_vector,'v2'=>[2,4,6].to_vector)
         assert_equal(matrix,ds.to_matrix)
-    end        
+    end
+    
     def test_fields
         @ds.fields=%w{name a1 id age city}
         assert_equal(%w{name a1 id age city}, @ds.fields)
         @ds.fields=%w{id name age}
-        assert_equal(%w{id name age a1 city}, @ds.fields)
-        
+        assert_equal(%w{id name age a1 city}, @ds.fields) 
+    end
+    def test_each_vector
+        a=[1,2,3].to_vector
+        b=[3,4,5].to_vector
+        fields=["a","b"]
+        ds=RubySS::Dataset.new({'a'=>a,'b'=>b},fields)
+        res=[]
+        ds.each_vector{|k,v|
+            res.push([k,v])
+        }
+        assert_equal([["a",a],["b",b]],res)
+        ds.fields=["b","a"]
+        res=[]
+        ds.each_vector{|k,v|
+            res.push([k,v])
+        }
+        assert_equal([["b",b],["a",a]],res)
     end
     def test_equality
         v1=[1,2,3,4].to_vector

@@ -115,8 +115,14 @@ module RubySS
                         #puts "Skip line"
                         next
                     end
+                    # This should be fixed.
+                    # If we have a Formula, should be resolver first
                     row.collect!{|c|
-                        c.to_s
+                        if c.is_a? Spreadsheet::Formula
+                            nil
+                        else
+                            c.to_s
+                        end
                     }
                     if first_row
                         fields=row.to_a.collect{|c| c.downcase}
@@ -129,6 +135,7 @@ module RubySS
                         first_row=false
                     else
                         rowa=row.to_a.collect{|c|
+                            
                             empty.include?(c) ? nil: c
                         }
                         (fields.size - rowa.size).times {|i|

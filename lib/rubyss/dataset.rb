@@ -284,8 +284,8 @@ module RubySS
             @cases=size
             end
             def each_vector
-                @vectors.each{|k,v|
-                    yield k,v
+                @fields.each{|k|
+                    yield k,@vectors[k]
                 }
             end
         if !RubySS::OPTIMIZED
