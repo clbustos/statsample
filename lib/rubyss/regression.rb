@@ -199,9 +199,11 @@ module RubySS
                 def constant_se
                     estimated_variance_covariance_matrix[0,0]
                 end
-                def summary
+                def summary(report_type=ConsoleSummary)
                     c=coeffs
-                    out=<<HEREDOC
+                    out=""
+                    out.extend report_type
+                    out.add <<HEREDOC
 Summary for regression of #{@fields.join(',')} over #{@y_var}"
 *************************************************************
 Cases(listwise)=#{@ds.cases}(#{@ds_valid.cases})
@@ -214,7 +216,7 @@ F#{sprintf("(%d,%d)=%0.3f, p=%0.3f",df_r,df_e,f,significance)}
 Equation=#{sprintf("%0.3f",constant)}+#{@fields.collect {|k| sprintf("%0.3f%s",c[k],k)}.join(' + ')}
 
 HEREDOC
-
+                
                 end
                 
                 
@@ -411,6 +413,15 @@ HEREDOC
                     matrix=Matrix.columns(columns)
                     @lr=Alglib::LinearRegression.build_from_matrix(matrix)
                 end
+                
+                def _dump(i)
+                    Marshal.dump({'ds'=>@ds,'y_var'=>@y_var})
+                end
+                def self._load(data)
+                    h=Marshal.load(data)
+                    MultipleRegression.new(h['ds'], h['y_var'])
+                end
+                
                 def coeffs
                     assign_names(@lr.coeffs)
                 end

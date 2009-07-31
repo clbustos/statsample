@@ -2,12 +2,10 @@ require 'rubyss/graph/svggraph'
 
 module RubySS
     class HtmlReport
-        attr_accessor :ds
-    def initialize(ds,name,dir=nil)
+    def initialize(name,dir=nil)
         require 'fileutils'
         @uniq=1
         @uniq_file=0
-        @ds=ds
         @name=name
         @partials=[]
         @anchors=[]
@@ -16,6 +14,10 @@ module RubySS
         @level=1
         FileUtils.mkdir(@dir) if !File.exists? @dir
     end
+    def add_summary(name,summary)
+        add_anchor(name)
+        @partials.push(summary)
+    end
     def add_anchor(name)
         @anchors.push([name,@level,@uniq])
         @partials.push("<a name='#{@uniq}'> </a>")
@@ -23,10 +25,9 @@ module RubySS
     end
     def uniq_file(prepend="file")
         @uniq_file+=1
-        "#{prepend}_#{@uniq_file}"
+        "#{prepend}_#{@uniq_file}_#{Time.now.to_i}"
     end
-    def add_correlation_matrix(ds=nil)
-        ds||=@ds
+    def add_correlation_matrix(ds)
         add_anchor("Correlation Matrix")
         html="<h2>Correlation Matrix</h2> <table><thead><th>-</th><th>"+ds.fields.join("</th><th>")+"</th> </thead> <tbody>"
         matrix=RubySS::Bivariate.correlation_matrix(ds)
@@ -68,11 +69,11 @@ module RubySS
     # Add a scale
     # First arg is the name of the scale                          
     # Other are fields
-    def add_scale(name, fields,icc=false)
+    def add_scale(ds,name, fields,icc=false)
         raise "Fields are empty" if fields.size==0
         add_anchor("Scale:#{name}")
         
-        ds_partial=@ds.dup(fields)
+        ds_partial=ds.dup(fields)
         ia=RubySS::Reliability::ItemAnalysis.new(ds_partial)
         html="<h2>Scale: #{name}</h2>"
         html << ia.html_summary
@@ -109,8 +110,7 @@ module RubySS
         add_graph("Normal Probability Plot #{name}", name, vector.svggraph_normalprobability_plot(options))
     end
 
-    def add_scatterplot(name, ds=nil,x_field=nil, y_fields=nil,config={})
-        ds||=@ds
+    def add_scatterplot(name, ds,x_field=nil, y_fields=nil,config={})
         add_anchor("Scatterplot: #{name}")
         x_field||=ds.fields[0]
         y_fields||=ds.fields-[x_field]
@@ -126,8 +126,7 @@ module RubySS
     end
     
     
-    def add_boxplots(name, ds=nil,options={})
-        ds||=@ds
+    def add_boxplots(name, ds,options={})
         add_anchor("Boxplots: #{name}")
         options={:graph_title=>"Boxplots:#{name}", :show_graph_title=>true, :height=>500}.merge! options
         graph = RubySS::Graph::SvgBoxplot.new(options)
@@ -141,19 +140,19 @@ module RubySS
         graph
     end
     def add_histogram(name,vector,bins=nil,options={})
-        hist_file=@dir+"/#{name}.svg"
         bins||=vector.size / 15
+        bins=15 if bins>15 
         graph=vector.svggraph_histogram(bins,options)
         add_graph("Histogram:#{name}",name,graph)
         html = "<ul><li>Skewness=#{sprintf("%0.3f",vector.skew)}</li>
         <li>Kurtosis=#{sprintf("%0.3f",vector.kurtosis)}</li></ul>"
         @partials.push(html)
     end
-    def add_icc(name, fields)
+    def add_icc(name,ds, fields)
         require 'rubyss/graph/svggraph'
         raise "Fields are empty" if fields.size==0
         add_anchor("ICC:#{name}")        
-        ds_partial=@ds.dup(fields)
+        ds_partial=ds.dup(fields)
         ia=RubySS::Reliability::ItemAnalysis.new(ds_partial)
         html="<h3>ICC for scale: #{name}</h3>"
         ia.svggraph_item_characteristic_curve(@dir ,name, {:width=>400,:height=>300})
@@ -165,11 +164,33 @@ module RubySS
     def css
 <<HERE
 table {
-border-collapse:collapse;
+  border-collapse: collapse;
+}
+th {
+  text-align: left;
+  padding-right: 1em;
+  border-bottom: 3px solid #ccc;
+}
+th.active img {
+  display: inline;
+}
+tr.even, tr.odd {
+  background-color: #eee;
+  border-bottom: 1px solid #ccc;
+}
+tr.even, tr.odd {
+  padding: 0.1em 0.6em;
+}
+td.active {
+  background-color: #ddd;
 }
 table td {
-border: 1px solid black;
+border:1px solid #aaa;
 }
+table tr.line td{
+border-top: 2px solid black;
+}
+
 HERE
     end
     

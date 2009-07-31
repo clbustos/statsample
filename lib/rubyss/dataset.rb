@@ -33,6 +33,7 @@ module RubySS
         end
     end
     class Dataset
+        include Writable
         attr_reader :vectors, :fields, :cases, :i
         attr_accessor :labels
         # To create a dataset
@@ -70,8 +71,8 @@ module RubySS
         def dup_only_valid
             if @vectors.find{|field,vector| vector.has_missing_data?} 
                 ds=dup_empty
-                each_with_index { |i,c|
-                    ds.add_case(c,false) unless @fields.find{|f| @vectors[f].data_with_nils[i].nil? }
+                each_array { |c|
+                    ds.add_case_array(c) unless @fields.find{|f| @vectors[f].data_with_nils[@i].nil? }
                 }
                 ds.update_valid_data
             else
@@ -132,17 +133,6 @@ module RubySS
         def ==(d2)
             @vectors==d2.vectors and @fields==d2.fields
         end
-        def self.load(filename)
-            fp=File.open(filename,"r")
-            o=Marshal.load(fp)
-            fp.close
-            o
-        end
-        def save(filename)
-            fp=File.open(filename,"w")
-            Marshal.dump(self,fp)
-            fp.close
-        end
         def col(c)
             @vectors[c]
         end
@@ -155,6 +145,23 @@ module RubySS
         def has_vector? (v)
             return @vectors.has_key?(v)
         end
+        # Creates a dataset with the random data, of a n size
+        # If n not given, uses original number of cases
+        def bootstrap(n=nil)
+            n||=@cases
+            ds_boot=dup_empty
+            for i in 1..n
+                ds_boot.add_case_array(case_as_array(rand(n)))
+            end
+            ds_boot.update_valid_data
+            ds_boot
+        end
+        # Fast version of add case
+        # Can only add one case and no error check if performed 
+        # You SHOULD use update_valid_data at the the of insertion cycle
+        def add_case_array(v)
+            v.each_index {|i| d=@vectors[@fields[i]].data; d.push(v[i])}
+        end
         def add_case(v,uvd=true)
             case v
             when Array
@@ -162,7 +169,7 @@ module RubySS
                     v.each{|subv| add_case(subv,false)}
                 else
                     raise ArgumentError, "Input array size (#{v.size}) should be equal to fields number (#{@fields.size})" if @fields.size!=v.size
-                    v.size.times {|i| @vectors[@fields[i]].add(v[i],false)}
+                    v.each_index {|i| @vectors[@fields[i]].add(v[i],false)}
                 end
             when Hash
                 raise ArgumentError, "Hash keys should be equal to fields" if @fields.sort!=v.keys.sort

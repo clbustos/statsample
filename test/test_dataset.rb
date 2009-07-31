@@ -183,6 +183,10 @@ class RubySSDatasetTestCase < Test::Unit::TestCase
         assert_equal([4,5,6],ds.case_as_array(1))
         assert_equal([7,8,9],ds.case_as_array(2))
         assert_equal(['a','b','c'],ds.case_as_array(3))
+        ds.add_case_array([6,7,1])
+        ds.update_valid_data
+        assert_equal([6,7,1],ds.case_as_array(4))
+        
     end
     def test_marshaling
         ds_marshal=Marshal.load(Marshal.dump(@ds))
