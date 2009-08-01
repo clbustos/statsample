@@ -1,4 +1,3 @@
-
 module RubySS
     # module for regression methods 
     module Regression

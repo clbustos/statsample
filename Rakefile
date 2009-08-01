@@ -30,9 +30,10 @@ end
 
 Hoe.spec('rubyss') do |p|
 	p.version=RubySS::VERSION
+	p.rubyforge_name = "ruby-statsample"
 	p.developer('Claudio Bustos', 'clbustos@gmail.com')
 	p.spec_extras[:extensions] = ["ext/rubyss/extconf.rb"]
-	p.extra_deps << ["spreadsheet"]
+	p.extra_deps << "spreadsheet" << "svg-graph"
 	p.clean_globs << EXT2 
 	%w{rubyss}.each do |ext|
 	p.clean_globs << "ext/#{ext}/*.o" << "ext/#{ext}/*.so" << "ext/#{ext}/Makefile"
