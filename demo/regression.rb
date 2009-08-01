@@ -2,17 +2,20 @@ require File.dirname(__FILE__)+'/../lib/rubyss'
 tests=300
 include RubySS
 r = GSL::Rng.alloc(GSL::Rng::TAUS,Time.now.to_i)
-    ds=Dataset.new(%w{a b c y})
+ds=Dataset.new(%w{a b c d y})
     ds['a'].type=:scale
     ds['b'].type=:scale
     ds['c'].type=:scale
+    ds['d'].type=:scale
     ds['y'].type=:scale
+    
     tests.times {
     a=r.ugaussian
     b=r.ugaussian
     c=r.ugaussian
-    y=a*90+b*5+r.ugaussian*5
-    ds.add_case_array([a,b,c,y])
+    d=r.ugaussian
+    y=a*70+b*30+c*5+r.ugaussian*5
+    ds.add_case_array([a,b,c,d,y])
 }
 ds.update_valid_data
 

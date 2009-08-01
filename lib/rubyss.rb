@@ -214,5 +214,3 @@ require 'rubyss/vector'
 require 'rubyss/dataset'
 require 'rubyss/crosstab'
 
-
-

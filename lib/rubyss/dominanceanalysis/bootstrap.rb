@@ -28,17 +28,17 @@ class DominanceAnalysis
                     @n_samples+=1
                     puts "Bootstrap #{t+1} of #{number_samples}"
                     ds_boot=@ds.bootstrap(n)
-                    da=DominanceAnalysis.new(ds_boot,@y_var,@lr_class)
-                    da.total_dominance.each{|k,v|
+                    da_1=DominanceAnalysis.new(ds_boot,@y_var,@lr_class)
+                    da_1.total_dominance.each{|k,v|
                         @samples_td[k].push(v)
                     }
-                    da.conditional_dominance.each{|k,v|
+                    da_1.conditional_dominance.each{|k,v|
                         @samples_cd[k].push(v)
                     }
-                    da.general_dominance.each{|k,v|
+                    da_1.general_dominance.each{|k,v|
                         @samples_gd[k].push(v)
                     }
-                    da.general_averages.each{|k,v|
+                    da_1.general_averages.each{|k,v|
                         @samples_ga[k].push(v)
                     }
                 }
@@ -99,10 +99,10 @@ class DominanceAnalysis
             out.parse_table(table)
             out.add("General averages")
             table=RubySS::ReportTable.new
-            table.header=["var","mean","se","l.l","u.l","t"]
+            table.header=["var","mean","se","p.5","p.95"]
             @fields.each{|f|
                 v=@samples_ga[f].to_vector(:scale)
-                row=[f, sprintf("%0.3f",v.mean), sprintf("%0.3f",v.sd), sprintf("%0.3f",v.mean-(v.sd*t)), sprintf("%0.3f",v.mean+(v.sd*t))]
+                row=[f, sprintf("%0.3f",v.mean), sprintf("%0.3f",v.sd), sprintf("%0.3f",v.percentil(5)),sprintf("%0.3f",v.percentil(95))]
                 table.add_row(row)
 
             }

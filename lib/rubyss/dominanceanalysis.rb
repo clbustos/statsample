@@ -200,7 +200,7 @@ module RubySS
                     t.add_row(row)
             out.parse_table(t)
                     
-            out << "\n"
+            out.nl
             out << "Pairwise\n"
             td=total_dominance
             cd=conditional_dominance
