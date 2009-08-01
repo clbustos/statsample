@@ -25,7 +25,8 @@ file EXT2 => ["ext/rubyss/Makefile", "ext/rubyss/rubyssopt.c"] do
 	puts "Compiling"
   Dir.chdir "ext/rubyss" do
     system %(make)
-  end
+    end
+puts "End compiling"
 end
 
 Hoe.spec('rubyss') do |p|

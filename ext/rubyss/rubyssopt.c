@@ -43,7 +43,7 @@ VALUE rubyss_set_valid_data(VALUE self, VALUE vector) {
     VALUE data_with_nils=rb_iv_get(vector,"@data_with_nils");
     VALUE missing_data=rb_iv_get(vector,"@missing_data");
     VALUE missing_values=rb_iv_get(vector,"@missing_values");
-    VALUE has_missing_data=rb_iv_get(vector,"@has_missing_data");
+//    VALUE has_missing_data=rb_iv_get(vector,"@has_missing_data");
     long len=RARRAY_LEN(data);
     long i;
     VALUE val;
@@ -61,11 +61,15 @@ VALUE rubyss_set_valid_data(VALUE self, VALUE vector) {
     return Qnil;
 }
 VALUE rubyss_frequencies(VALUE self, VALUE data) {
-    VALUE h=rb_hash_new();
-    Check_Type(data,T_ARRAY);
+    VALUE h;
     VALUE val;
-    long len=RARRAY_LEN(data);
+     long len;
     long i;
+
+	Check_Type(data,T_ARRAY);
+     h=rb_hash_new();
+
+	len=RARRAY_LEN(data);
     for(i=0;i<len;i++) {
         val=rb_ary_entry(data,i);
         if(rb_hash_aref(h,val)==Qnil) {
