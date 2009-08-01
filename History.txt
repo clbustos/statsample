@@ -1,8 +1,19 @@
-=== 0.2.0 / 2009-XX-XX
+=== 0.2.0 / 2009-08-01
 
 * One Way Anova on RubySS::Anova::OneWay
+* Dominance Analysis!!!! The one and only reason to develop a Multiple Regression on pure ruby.
+* Multiple Regression on Multiple Regression module. Pairwise (pure ruby) or MultipleRegressionPairwise and Listwise (optimized) on MultipleRegressionAlglib and 
+* New Dataset#to_gsl_matrix, #from_to,#[..],#bootstrap,#vector_missing_values, #vector_count_characters, #each_with_index, #collect_with_index
+* New Vector#box_cox_transformation
+* Module Correlation renamed to Bivariate
+* Some fancy methods and classes to create Summaries
+* Some documentation about Algorithm used on doc_latex
+* Deleted 'distributions' extension. Ruby/GSL has all the pdf and cdf you ever need.
+* Tests work without any dependency. Only nags about missing deps. 
+* Test for MultipleRegression, Anova, Excel, Bivariate.correlation_matrix and many others 
 
 === 0.1.9 / 2009-05-22
+
 * Class Vector: new method vector_standarized_pop, []=, min,max
 * Class Dataset: global variable $RUBY_SS_ROW stores the row number on each() and related methods. dup() with argument returns a copy of the dataset only for given fields. New methods: standarize, vector_mean, collect, verify,collect_matrix
 * Module Correlation: new methods covariance, t_pearson, t_r, prop_pearson, covariance_matrix, correlation_matrix, correlation_probability_matrix
