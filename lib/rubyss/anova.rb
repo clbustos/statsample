@@ -12,13 +12,17 @@ module RubySS
         def initialize(vectors)
             @vectors=vectors
         end
-        # Total mean
-        def mean
-            sum/n
+        # Total sum
+        def sum
+            @vectors.inject(0){|a,v| a+v.sum}
+        end
+	# Total mean
+	def mean
+            sum.quo(n)
         end
         # Total sum of squares
         def sst
-            m=mean
+            m=mean.to_f
             @vectors.inject(0) {|total,vector|
                 total+vector.sum_of_squares(m)
             }
@@ -47,10 +51,6 @@ module RubySS
         # Total Degrees of freedom
         def df_total
             n-1
-        end
-        # Total sum
-        def sum
-            @vectors.inject(0){|a,v| a+v.sum}
         end
         # Total number of cases
         def n

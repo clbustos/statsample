@@ -1,9 +1,8 @@
 require File.dirname(__FILE__)+'/../lib/rubyss'
 require 'tempfile'
 require 'test/unit'
-require 'rubyss/graph/svggraph'
-
-# Not included on default test, because GDChart send a lot of warnings!
+begin
+	require 'rubyss/graph/svggraph'
 class RubySSSvgGraphTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
@@ -51,4 +50,7 @@ class RubySSSvgGraphTestCase < Test::Unit::TestCase
         assert(File.exists?(file))
 
 	end
+end
+rescue LoadError
+	puts "You should install SVG::Graph"
 end

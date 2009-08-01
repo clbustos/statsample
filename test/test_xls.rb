@@ -1,6 +1,11 @@
 require File.dirname(__FILE__)+'/../lib/rubyss'
 require 'test/unit'
-
+require 'tmpdir'
+begin
+	require 'spreadsheet'
+rescue LoadError
+	puts "You should install spreadsheet (gem install spreadsheet)"
+end
 class RubySSExcelTestCase < Test::Unit::TestCase
 	def initialize(*args)
         @ds=RubySS::Excel.read(File.dirname(__FILE__)+"/test_xls.xls")
@@ -15,7 +20,7 @@ class RubySSExcelTestCase < Test::Unit::TestCase
         assert_equal(nil,@ds['age'][5])
     end
     def test_write
-        filename="/tmp/test_write.xls"
+        filename=Dir::tmpdir+"/test_write.xls"
         RubySS::Excel.write(@ds,filename)
         ds2=RubySS::Excel.read(filename)
         i=0

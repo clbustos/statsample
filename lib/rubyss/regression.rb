@@ -81,6 +81,12 @@ module RubySS
         
         
         class MultipleRegressionBase
+		def initialize(ds,y_var)
+			@ds=ds
+			@y_var=y_var
+			@r2=nil
+			
+		end
              def assign_names(c)
                     a={}
                     @fields.each_index {|i|
@@ -89,9 +95,9 @@ module RubySS
                     a
             end
             def predicted
-                0.upto(@ds.cases-1).collect{|i|
+                (0...@ds.cases).collect { |i|
                     invalid=false
-                    vect=@dep_columns.collect{|v| invalid=true if v[i].nil?; v[i]}
+                    vect=@dep_columns.collect {|v| invalid=true if v[i].nil?; v[i]}
                     if invalid
                         nil
                     else
@@ -103,7 +109,7 @@ module RubySS
                 predicted.standarized
             end
             def residuals
-                0.upto(@ds.cases-1).collect{|i|
+                (0...@ds.cases).collect{|i|
                     invalid=false
                     vect=@dep_columns.collect{|v| invalid=true if v[i].nil?; v[i]}
                     if invalid or @ds[@y_var][i].nil?
@@ -163,7 +169,14 @@ module RubySS
                     ds.each{|k,v|
                         ds[k]=v.to_vector(:scale)
                     }
-                    lr=MultipleRegression.new(ds.to_dataset,var)
+		    if HAS_ALGIB
+			    lr_class=MultipleRegressionAlgib
+			    ds=ds.to_dataset
+			else
+			    lr_class=MultipleRegressionPairwise
+			    ds=ds.to_dataset.dup_only_valid
+                    end
+		    lr=lr_class.new(ds,var)
                     1-lr.r2
                 end
                 def coeffs_tolerances
@@ -181,7 +194,7 @@ module RubySS
                     out
                 end
                 def estimated_variance_covariance_matrix
-                    mse_p=mse
+		    mse_p=mse
                     columns=[]
                     @ds_valid.each_vector{|k,v|
                         columns.push(v.data) unless k==@y_var
@@ -190,7 +203,8 @@ module RubySS
                     x=Matrix.columns(columns)
                     matrix=((x.t*x)).inverse * mse
                     matrix.collect {|i|
-                        Math::sqrt(i)
+			
+                        Math::sqrt(i) if i>0
                     }
                 end
                 def constant_t
@@ -261,16 +275,16 @@ HEREDOC
         end
         class MultipleRegressionPairwise < MultipleRegressionBase 
             def initialize(ds,y_var)
-                @y_var=y_var
+		    super
                 @dy=ds[@y_var]
-                @ds=ds
                 @ds_valid=ds.dup_only_valid
                 @ds_indep=ds.dup(ds.fields-[y_var])
                 @fields=@ds_indep.fields
                 set_dep_columns
                 obtain_y_vector
-                @matrix_x=Bivariate.correlation_matrix(@ds_indep)
-                @coeffs_stan=(@matrix_x.inverse*@matrix_y).column(0).to_a
+                @matrix_x = Bivariate.correlation_matrix(@ds_indep)
+                @coeffs_stan=(@matrix_x.inverse * @matrix_y).column(0).to_a
+		@min_n_valid=nil
             end
             def min_n_valid
                 if @min_n_valid.nil?
@@ -392,7 +406,7 @@ HEREDOC
         #   ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
         #   lr=RubySS::Regression::MultipleRegression.new(ds,'y')
 		#            
-            class MultipleRegression < MultipleRegressionBase
+            class MultipleRegressionAlglib < MultipleRegressionBase
                 def initialize(ds,y_var)
                     @ds=ds.dup_only_valid
                     @ds_valid=@ds

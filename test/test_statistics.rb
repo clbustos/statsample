@@ -41,11 +41,23 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         expected=Matrix[ [c.call(v1,v1),c.call(v1,v2),c.call(v1,v3),c.call(v1,v4)], [c.call(v2,v1),c.call(v2,v2),c.call(v2,v3),c.call(v2,v4)], [c.call(v3,v1),c.call(v3,v2),c.call(v3,v3),c.call(v3,v4)],
         [c.call(v4,v1),c.call(v4,v2),c.call(v4,v3),c.call(v4,v4)]
         ]
-        assert_equal(expected,RubySS::Bivariate.correlation_matrix(ds))
+	obt=RubySS::Bivariate.correlation_matrix(ds)
+	for i in 0...expected.row_size
+	for j in 0...expected.column_size
+		#puts expected[i,j].inspect
+		#puts obt[i,j].inspect
+		assert_in_delta(expected[i,j], obt[i,j],0.0001,"#{expected[i,j].class}!=#{obt[i,j].class}  ")
+	end
+	end
+#assert_equal(expected,obt)
     end
     def test_prop_pearson
+	if HAS_GSL    
         assert_in_delta(0.42,RubySS::Bivariate.prop_pearson(RubySS::Bivariate.t_r(0.084,94),94),0.01)        
         assert_in_delta(0.65,RubySS::Bivariate.prop_pearson(RubySS::Bivariate.t_r(0.046,95),95),0.01)
+	else
+		puts "Bivariate.prop_pearson not tested (no ruby-gsl)"
+	end
     end
 	def test_covariance
 		if HAS_GSL
@@ -89,8 +101,11 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         v=([42]*23+[41]*4+[36]*1+[32]*1+[29]*1+[27]*2+[23]*1+[19]*1+[16]*2+[15]*2+[14,11,10,9,7]+ [6]*3+[5]*2+[4,3]).to_vector(:scale)
         assert_equal(50,v.size)
         assert_equal(1471,v.sum())
+	if HAS_GSL
         limits=RubySS::SRS.mean_confidence_interval_z(v.mean(), v.sds(), v.size,676,0.80)
-       
+       else
+	       puts "SRS.mean_confidence_interval_z not tested (no ruby-gsl)"
+	       end
     end
     def test_estimation_proportion
         # total
@@ -104,9 +119,14 @@ class RubySSStatisicsTestCase < Test::Unit::TestCase
         sam=100
         prop=0.37
         a=0.95
+	if HAS_GSL
         l= RubySS::SRS.proportion_confidence_interval_z(prop, sam, pop, a)
         assert_in_delta(0.28,l[0],0.01)
         assert_in_delta(0.46,l[1],0.01)
+	else
+	       puts "SRS.proportion_confidence_interval_z not tested (no ruby-gsl)"
+		
+		end
     end
     def test_simple_linear_regression
 		a=[1,2,3,4,5,6].to_vector(:scale)

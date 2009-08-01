@@ -113,7 +113,7 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 	end
     def test_scale
         a=RubySS::Vector.new([1,2,3,4,"STRING"], :scale)
-        assert_equal(10,a.sum)
+        assert_equal(10, a.sum)
         i=0
         factors=a.factors.sort
         [0,1,2,3,4].each{|v|

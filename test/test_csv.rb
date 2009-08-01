@@ -1,4 +1,5 @@
 require File.dirname(__FILE__)+'/../lib/rubyss'
+	require 'tmpdir'
 require 'test/unit'
 
 class RubySSCSVTestCase < Test::Unit::TestCase
@@ -14,7 +15,7 @@ class RubySSCSVTestCase < Test::Unit::TestCase
         assert_equal(nil,@ds['age'][5])
     end
     def test_write
-        filename="/tmp/test_write.csv"
+        filename=Dir::tmpdir+"/test_write.csv"
         RubySS::CSV.write(@ds,filename)
         ds2=RubySS::CSV.read(filename)
         i=0

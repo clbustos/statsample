@@ -29,7 +29,7 @@ module RubySS
 				if HAS_GSL
 					GSL::Stats::correlation(v1a.gsl, v2a.gsl)
 				else
-					
+					pearson_slow(v1a,v2a)
 				end
             end
             #:nodoc:
@@ -59,9 +59,13 @@ module RubySS
             # Retrieves the probability value (a la SPSS)
             # for a given t, size and number of tails
             def prop_pearson(t,size, tails=2)
+		if HAS_GSL
                 t=-t if t>0
                 cdf=GSL::Cdf::tdist_P(t,(size)-2)
                 cdf*tails
+		else
+			raise "Needs ruby-gsl"
+		end
             end
             # Returns residual score after delete variance
             # from another variable

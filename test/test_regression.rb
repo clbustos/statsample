@@ -1,6 +1,5 @@
 require File.dirname(__FILE__)+'/../lib/rubyss'
 require 'test/unit'
-require 'rubyss/regression'
 class RubySSRegressionTestCase < Test::Unit::TestCase
 	def initialize(*args)
 		@x=[13,20,10,33,15].to_vector(:scale)
@@ -28,13 +27,14 @@ class RubySSRegressionTestCase < Test::Unit::TestCase
         assert_in_delta(3.035,lr.f,0.001)
         
     end
-    def test_multiple_regression
+    def test_multiple_regression_alglib
+	    if HAS_ALGIB
         @a=[1,3,2,4,3,5,4,6,5,7].to_vector(:scale)
         @b=[3,3,4,4,5,5,6,6,4,4].to_vector(:scale)
         @c=[11,22,30,40,50,65,78,79,99,100].to_vector(:scale)
         @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
         ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
-        lr=RubySS::Regression::MultipleRegression.new(ds,'y')
+        lr=RubySS::Regression::MultipleRegressionAlglib.new(ds,'y')
         model_test(lr)
         predicted=[1.7857, 6.0989, 3.2433, 7.2908, 4.9667, 10.3428, 8.8158, 10.4717, 23.6639, 25.3198]
         c_predicted=lr.predicted
@@ -46,6 +46,9 @@ class RubySSRegressionTestCase < Test::Unit::TestCase
         residuals.each_index{|i|
             assert_in_delta(residuals[i],c_residuals[i],0.001)
         }
+	else
+		puts "Regression::MultipleRegressionAlglib not tested (no Alglib)"
+	end
     end
     def model_test(lr)
         assert_in_delta(0.695,lr.coeffs['a'],0.001)
@@ -64,7 +67,11 @@ class RubySSRegressionTestCase < Test::Unit::TestCase
         assert_in_delta(0.955,lr.r,0.001)
         assert_in_delta(0.913,lr.r2,0.001)
         assert_in_delta(20.908, lr.f,0.001)
+	if HAS_GSL
         assert_in_delta(0.001, lr.significance, 0.001)
+	else
+		puts "#{lr.class}#significance not tested (not GSL)"
+	end
         assert_in_delta(0.226,lr.tolerance("a"),0.001)
         coeffs_se={"a"=>1.171,"b"=>1.129,"c"=>0.072}
         ccoeffs_se=lr.coeffs_se
@@ -88,7 +95,7 @@ class RubySSRegressionTestCase < Test::Unit::TestCase
         lr=RubySS::Regression::MultipleRegressionPairwise.new(ds,'y')
         model_test(lr)
         predicted=[nil,1.7857, 6.0989, 3.2433, 7.2908, 4.9667, 10.3428, 8.8158, 10.4717, 23.6639, 25.3198]
-        c_predicted=lr.predicted
+        c_predicted = lr.predicted
         predicted.each_index{|i|
             assert_in_delta(predicted[i],c_predicted[i],0.001)
         }

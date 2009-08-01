@@ -366,14 +366,14 @@ module RubySS
         def collect(type=:scale)
             data=[]
             each {|row|
-                data.push(yield row)
+                data.push(yield(row))
             }
             RubySS::Vector.new(data,type)
         end
         def collect_with_index(type=:scale)
             data=[]
             each_with_index {|i,row|
-                data.push(yield i,row)
+                data.push(yield(i,row))
             }
             RubySS::Vector.new(data,type)
         end

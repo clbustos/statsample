@@ -32,12 +32,12 @@ end
 # estimation of parameters for several types of samples (simple random, 
 # stratified and multistage sampling).
 
-	begin
-		require 'rbgsl'
-		HAS_GSL=true
-	rescue LoadError
-		HAS_GSL=false
-	end
+begin
+	require 'rbgsl'
+	HAS_GSL=true
+rescue LoadError
+	HAS_GSL=false
+end
     begin 
         require 'alglib'
         HAS_ALGIB=true

@@ -136,7 +136,7 @@ class Vector < DelegateClass(Array)
         end
         def each
             @data.each{|x|
-                yield x
+                yield(x)
             }
         end
         # Add a value at the end of the vector
@@ -223,7 +223,13 @@ class Vector < DelegateClass(Array)
         def n; @data.size ; end
         def to_a
             @data.dup
-        end
+    end
+	# Redundant, but necessary
+	# Spreadsheet creates Array#sum, so calling sum 
+	# doesn't call the delegates method
+	def sum
+	    @delegate.sum
+	end
         alias_method :to_ary, :to_a 
         # Vector sum. 
         # - If v is a scalar, add this value to all elements
@@ -652,10 +658,20 @@ class Vector < DelegateClass(Array)
 				m||=m
 				Math::sqrt(variance_sample(m))
 			end
-			
+			def skew
+				m=mean
+				thirds=@data.inject(0){|a,x| a+((x-mean)**3)}
+				thirds.quo((@data.size-1)*sd**3)
+			end
+			def kurtosis
+				m=mean
+				thirds=@data.inject(0){|a,x| a+((x-mean)**4)}
+				thirds.quo((@data.size-1)*sd**4)
+				
+			end
 			
 			if HAS_GSL
-                %w{variance_sample standard_deviation_sample variance_population standard_deviation_population mean sum}.each{|m|
+                %w{skew variance_sample standard_deviation_sample variance_population standard_deviation_population mean sum}.each{|m|
                     m_nuevo=(m+"_slow").intern
                     alias_method m_nuevo, m.intern
                 }
