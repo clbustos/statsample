@@ -671,7 +671,7 @@ class Vector < DelegateClass(Array)
 			end
 			
 			if HAS_GSL
-                %w{skew variance_sample standard_deviation_sample variance_population standard_deviation_population mean sum}.each{|m|
+                %w{skew kurtosis variance_sample standard_deviation_sample variance_population standard_deviation_population mean sum}.each{|m|
                     m_nuevo=(m+"_slow").intern
                     alias_method m_nuevo, m.intern
                 }
