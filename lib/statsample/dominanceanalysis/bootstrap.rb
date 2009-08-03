@@ -11,7 +11,7 @@ class DominanceAnalysis
             @fields=ds.fields-[y_var]
             @samples_ga=@fields.inject({}){|a,v| a[v]=[];a}
             @n_samples=0
-            @lr_class=Regression::MultipleRegressionPairwise
+            @lr_class=Regression::Multiple::RubyEngine
             create_samples_pairs            
         end
         def lr_class=(lr)
@@ -68,6 +68,7 @@ class DominanceAnalysis
             out.add "Summary for Bootstrap Dominance Analysis of "+@fields.join(", ")+" over "+@y_var+"\n"
             out.add "Size of sample: #{@n_samples}\n"
             out.add "t:#{t}\n"
+            out.add "Linear Regression Engine: #{@lr_class.name}"
             out.nl
             table=ReportTable.new
             header=["pairs","sD","Dij","SE(Dij)","Pij","Pji","Pno","Reprod"]

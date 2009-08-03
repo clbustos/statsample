@@ -1,0 +1,117 @@
+if HAS_ALGIB
+module Statsample
+module Regression
+module Multiple
+# Class for Multiple Regression Analysis
+# Requires Alglib gem and uses a listwise aproach.
+# If you need pairwise, use RubyEngine
+# Example:
+#
+#   @a=[1,3,2,4,3,5,4,6,5,7].to_vector(:scale)
+#   @b=[3,3,4,4,5,5,6,6,4,4].to_vector(:scale)
+#   @c=[11,22,30,40,50,65,78,79,99,100].to_vector(:scale)
+#   @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
+#   ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
+#   lr=Statsample::Regression::Multiple::AlglibEngine.new(ds,'y')
+#            
+class AlglibEngine < BaseEngine
+    def initialize(ds,y_var)
+        @ds=ds.dup_only_valid
+        @ds_valid=@ds
+        @y_var=y_var
+        @dy=@ds[@y_var]
+        @ds_indep=ds.dup(ds.fields-[y_var])
+        # Create a custom matrix
+        columns=[]
+        @fields=[]
+        @ds.fields.each{|f|
+            if f!=@y_var
+                columns.push(@ds[f].to_a)
+                @fields.push(f)
+            end
+        }
+        @dep_columns=columns.dup
+        columns.push(@ds[@y_var])
+        matrix=Matrix.columns(columns)
+        @lr_s=nil
+        @lr=::Alglib::LinearRegression.build_from_matrix(matrix)
+    end
+    
+    def _dump(i)
+        Marshal.dump({'ds'=>@ds,'y_var'=>@y_var})
+    end
+    def self._load(data)
+        h=Marshal.load(data)
+        self.new(h['ds'], h['y_var'])
+    end
+    
+    def coeffs
+        assign_names(@lr.coeffs)
+    end
+    # Coefficients using a constant
+    # Based on http://www.xycoon.com/ols1.htm
+    def matrix_resolution
+        mse_p=mse
+        columns=@dep_columns.dup.map {|xi| xi.map{|i| i.to_f}}
+        columns.unshift([1.0]*@ds.cases)
+        y=Matrix.columns([@dy.data.map  {|i| i.to_f}])
+        x=Matrix.columns(columns)
+        xt=x.t
+        matrix=((xt*x)).inverse*xt
+        matrix*y
+    end
+    def r2
+        r**2
+    end
+    def r
+        Bivariate::pearson(@dy,predicted)
+    end  
+    def sst
+        @dy.ss
+    end
+    def constant
+        @lr.constant
+    end
+    def standarized_coeffs
+        l=lr_s
+        assign_names(l.coeffs)
+    end
+    def lr_s
+        if @lr_s.nil?
+            build_standarized
+        end
+        @lr_s
+    end
+    def build_standarized
+        @ds_s=@ds.standarize
+        columns=[]
+        @ds_s.fields.each{|f|
+            columns.push(@ds_s[f].to_a) unless f==@y_var
+        }
+        @dep_columns_s=columns.dup
+        columns.push(@ds_s[@y_var])
+        matrix=Matrix.columns(columns)
+        @lr_s=Alglib::LinearRegression.build_from_matrix(matrix)
+    end
+    def process(v)
+        @lr.process(v)
+    end
+    def process_s(v)
+        lr_s.process(v)
+    end
+    # ???? Not equal to SPSS output
+    def standarized_residuals
+        res=residuals
+        red_sd=residuals.sds
+        res.collect {|v|
+            v.quo(red_sd)
+        }.to_vector(:scale)
+    end
+end
+end
+end
+end # for Statsample
+end # for if
+
+        
+

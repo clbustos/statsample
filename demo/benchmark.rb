@@ -29,7 +29,7 @@ v.type=:scale
  if (true)
     Benchmark.bm(7) do |x|
 		x.report("mean")   { for i in 1..n; v.mean; end }
-		x.report("slow_mean")   { for i in 1..n; v.slow_mean; end }
+		x.report("slow_mean")   { for i in 1..n; v.mean_slow; end }
 
     end
 

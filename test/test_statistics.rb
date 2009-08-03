@@ -1,6 +1,5 @@
 require File.dirname(__FILE__)+'/../lib/statsample'
 require 'test/unit'
-
 class StatsampleStatisicsTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
@@ -131,7 +130,7 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
     def test_simple_linear_regression
 		a=[1,2,3,4,5,6].to_vector(:scale)
 		b=[6,2,4,10,12,8].to_vector(:scale)
-		reg = Statsample::Regression::SimpleRegression.new_from_vectors(a,b)
+		reg = Statsample::Regression::Simple.new_from_vectors(a,b)
         assert_in_delta((reg.ssr+reg.sse).to_f,reg.sst,0.001)
         assert_in_delta(Statsample::Bivariate.pearson(a,b),reg.r,0.001)
 		assert_in_delta(2.4,reg.a,0.01)
@@ -139,14 +138,5 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
 		assert_in_delta(0.657,reg.r,0.001)
 		assert_in_delta(0.432,reg.r2,0.001)
         
-	end
-    def a_test_multiple_regression
-        x1=[1,2,3,4,5,6].to_vector(:scale)
-        x2=[3,5,8,9,10,20].to_vector(:scale)
-        x3=[100,90,50,30,50,10].to_vector(:scale)
-		y=[6,2,4,10,12,8].to_vector(:scale)
-        reg=Statsample::Regression::MultipleRegression.new_from_vectors([x1,x2,x3],y)
-        # p reg
-    end
-    
+	end    
 end

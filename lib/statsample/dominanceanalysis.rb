@@ -1,7 +1,7 @@
 require 'statsample/dominanceanalysis/bootstrap'
 module Statsample
     class DominanceAnalysis
-        def initialize(ds,y_var, r_class = Regression::MultipleRegressionPairwise)
+        def initialize(ds,y_var, r_class = Regression::Multiple::RubyEngine)
             @y_var=y_var
             @dy=ds[@y_var]
             @ds=ds
@@ -220,7 +220,7 @@ module Statsample
                 @name=name
                 @fields=fields
                 @contributions=@fields.inject({}){|a,v| a[v]=nil;a}
-                r_class=Regression::MultipleRegressionPairwise if r_class.nil?
+                r_class=Regression::Multiple::RubyEngine if r_class.nil?
                 @lr=r_class.new(ds,y_var)
             end
             def add_contribution(f,v)

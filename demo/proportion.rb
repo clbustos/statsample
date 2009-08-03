@@ -7,7 +7,7 @@ tests=3000
 sample_size=100
 # rand a 50%
 poblacion=([1]*500+[0]*500).to_vector(:scale)
-prop=poblacion.proportion(1.0)
+prop=poblacion.proportion(1)
 puts "Estadísticos"
 puts "DE con reemplazo:"+Statsample::SRS.proportion_sd_kp_wr(prop, sample_size).to_s
 puts "DE sin reemplazo:"+Statsample::SRS.proportion_sd_kp_wor(prop, sample_size,poblacion.size).to_s

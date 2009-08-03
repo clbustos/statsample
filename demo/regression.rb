@@ -25,13 +25,13 @@ else
     da=Statsample.load("regression.dab")
 end
     
-da.lr_class=Regression::MultipleRegression
-da.bootstrap(100)
+da.lr_class=Regression::Multiple::AlglibEngine
+da.bootstrap(20)
 
 puts da.summary
 da.save("regression.dab")
 
-lr=Regression::MultipleRegression.new(ds,"y")
+lr=Regression::Multiple.listwise(ds,"y")
 
 hr=HtmlReport.new("Regression")
 hr.add_summary("Regression",lr.summary(HtmlSummary))

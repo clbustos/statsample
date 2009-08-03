@@ -58,7 +58,7 @@ end
 # :startdoc:
 #
 module Statsample
-    VERSION = '0.3.0'
+    VERSION = '0.3.1'
     SPLIT_TOKEN = ","
 	autoload(:Database, 'statsample/converters')
     autoload(:Anova, 'statsample/anova')
@@ -74,7 +74,6 @@ module Statsample
 	autoload(:Reliability, 'statsample/reliability')
 	autoload(:Bivariate, 'statsample/bivariate')
 	autoload(:Multivariate, 'statsample/multivariate')
-
 	autoload(:Regression, 'statsample/regression')
 	autoload(:Test, 'statsample/test')
     def self.load(filename)
