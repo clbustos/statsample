@@ -1,5 +1,5 @@
-= rubyss
-
+= Statsample
+* http://rubyforge.org/projects/ruby-statsample/
 * http://code.google.com/p/ruby-statsample/
 
 == DESCRIPTION:
@@ -8,6 +8,8 @@ This package allows to process files and databases for statistical purposes, wit
 
 == FEATURES:
 
+* Multiple Regression. Listwise analysis optimized with use of Alglib library. Pairwise analysis is executed on pure ruby and reports same values as SPSS
+* Dominance Analysis. Based on Bodescu and Azen papers, DominanceAnalysis? class can report dominance analysis for a sample and DominanceAnalysis?. Bootstrap can execute bootstrap analysis to determine dominance stability, as recomended by Azen & Bodescu (2003). 
 * Classes for Vector, Datasets (set of Vectors) and Multisets (multiple datasets with same fields and type of vectors), and multiple methods to manipulate them
 * Module Codification, to help to codify open questions
 * Converters to and from database and csv files, and to output Mx and GGobi files
@@ -58,11 +60,16 @@ This package allows to process files and databases for statistical purposes, wit
 Optional: 
 
 * Plotting: gnuplot and rbgnuplot, SVG::Graph
-* Advanced Statistical: gsl and rb-gsl
+* Advanced Statistical: gsl and rb-gsl (http://rb-gsl.rubyforge.org/)
 
 == INSTALL:
 
-sudo gem install rubyss-VERSION.gem
+gem install ruby-statsample
+
+For optimization on *nix env
+
+gem install ruby-statsample-optimization
+
 
 == LICENSE:
 
