@@ -10,10 +10,10 @@ class StatsampleAnovaTestCase < Test::Unit::TestCase
 		super
 	end
     def test_basic
-	assert_in_delta(72.933, @anova.sst,0.001)
+        assert_in_delta(72.933, @anova.sst,0.001)
         assert_in_delta(14.8,@anova.sswg,0.001)
         assert_in_delta(58.133,@anova.ssbg,0.001)
-	assert_in_delta(@anova.sst,@anova.sswg+@anova.ssbg,0.00001)
+        assert_in_delta(@anova.sst,@anova.sswg+@anova.ssbg,0.00001)
         assert_equal(14,@anova.df_total)
         assert_equal(12,@anova.df_wg)
         assert_equal(2,@anova.df_bg)

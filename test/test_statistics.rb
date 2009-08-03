@@ -127,6 +127,15 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
 		
 		end
     end
+    def test_ml
+        if(true)
+		real=[1,1,1,1].to_vector(:scale)
+		
+		pred=[0.0001,0.0001,0.0001,0.0001].to_vector(:scale)
+        puts  Statsample::Bivariate.maximum_likehood_dichotomic(pred,real)
+
+        end
+    end
     def test_simple_linear_regression
 		a=[1,2,3,4,5,6].to_vector(:scale)
 		b=[6,2,4,10,12,8].to_vector(:scale)

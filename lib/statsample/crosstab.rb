@@ -62,7 +62,7 @@ module Statsample
         # Chi square, based on expected and real matrix
         def chi_square
             require 'statsample/test'
-            Statsample::Test.chi_square(self.to_matrix,matrix_expected)
+            Statsample::Test.chi_square(self.to_matrix, matrix_expected)
         end
         # Useful to obtain chi square
         def matrix_expected
@@ -77,6 +77,39 @@ module Statsample
                 }
             }
             Matrix.rows(m)
+        end
+        def summary(report_type=ConsoleSummary)
+            out=""
+            out.extend report_type
+            fq=frequencies
+            rn=rows_names
+            cn=cols_names
+            total=0
+            total_cols=cn.inject({}) {|a,x| a[x]=0;a}
+            out.add "Chi Square: #{chi_square}"
+            t=Statsample::ReportTable.new([""]+cols_names+["Total"])
+            rn.each{|row|
+                total_row=0
+                t_row=[@v_rows.labeling(row)]
+                cn.each{|col|
+                    data=fq[[row,col]]
+                    total_row+=fq[[row,col]]
+                    total+=fq[[row,col]]                    
+                    total_cols[col]+=fq[[row,col]]                    
+                    t_row.push(data)
+                }
+                t_row.push(total_row)
+                t.add_row(t_row)
+            }
+            t.add_horizontal_line
+            t_row=["Total"]
+            cn.each{|v|
+                t_row.push(total_cols[v])
+            }
+            t_row.push(total)
+            t.add_row(t_row)
+            out.parse_table(t)
+            out
         end
         def to_s
             fq=frequencies

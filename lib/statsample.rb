@@ -133,10 +133,10 @@ module Statsample
     end
     class ReportTable
         attr_reader :header
-        def initialize(header=[])
-            @header=header
+        def initialize(h=[])
             @rows=[]
             @max_cols=[]
+            self.header=(h)
         end
         def add_row(row)
             row.each_index{|i|

@@ -117,14 +117,7 @@ class RubyEngine < BaseEngine
         c=coeffs
         @dy.mean-@fields.inject(0){|a,k| a+(c[k] * @ds_indep[k].mean)}
     end
-    def process(v)
-        c=coeffs
-        total=constant
-        @fields.each_index{|i|
-        total+=c[@fields[i]]*v[i]
-        }
-        total
-    end
+   
     def coeffs
         sc=standarized_coeffs
         assign_names(@fields.collect{|f|

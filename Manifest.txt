@@ -1,10 +1,10 @@
 History.txt
 Manifest.txt
 README.txt
-Rakefile
 bin/statsample
 demo/benchmark.rb
 demo/chi-square.rb
+demo/crosstab.rb
 demo/dice.rb
 demo/distribution_t.rb
 demo/graph.rb

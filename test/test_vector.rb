@@ -12,6 +12,10 @@ class StatsampleVectorTestCase < Test::Unit::TestCase
         val=@c.collect {|v| v}
         assert_equal(val,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99])
     end
+    def test_product
+        a=[1,2,3,4,5].to_vector(:scale)
+        assert_equal(120,a.product)
+    end
 	def test_missing_values
 		@c.missing_values=[10]
 		assert_equal([-99,-99,1,2,3,4,5,5,5,5,5,6,6,7,8,9], @c.valid_data.sort)

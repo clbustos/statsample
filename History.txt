@@ -1,6 +1,7 @@
 === 0.3.1 / 2009-08-03
 
 * Name and logic of Regression classes changed. Now, you have Regression::Simple class and Regression::Multiple module with two engines: RubyEngine and AlglibEngne
+* New Crosstab#summary
 
 === 0.3.0 / 2009-08-02
 

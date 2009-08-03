@@ -139,6 +139,11 @@ class Vector < DelegateClass(Array)
                 yield(x)
             }
         end
+        def each_index
+            (0...@data.size).each {|i|
+                yield(i)
+            }
+        end
         # Add a value at the end of the vector
         # If second argument set to false, you should update valid data usign
         # Vector#set_valid_data at the end of your insertion cycle
@@ -669,7 +674,9 @@ class Vector < DelegateClass(Array)
 				thirds.quo((@data.size-1)*sd**4)
 				
 			end
-			
+			def product
+                @data.inject(1){|a,x| a*x }
+            end
 			if HAS_GSL
                 %w{skew kurtosis variance_sample standard_deviation_sample variance_population standard_deviation_population mean sum}.each{|m|
                     m_nuevo=(m+"_slow").intern

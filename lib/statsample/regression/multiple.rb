@@ -21,6 +21,8 @@ module Multiple
     def self.listwise(ds,y_var)
         if HAS_ALGIB
             AlglibEngine.new(ds,y_var)
+        elsif HAS_GSL
+            GslEngine.new(ds,y_var)
         else
             ds2=ds.dup_only_valid
             RubyEngine.new(ds2,y_var)
@@ -252,6 +254,14 @@ end
     end
     def sse_direct
         sst-ssr
+    end
+     def process(v)
+        c=coeffs
+        total=constant
+        @fields.each_index{|i|
+        total+=c[@fields[i]]*v[i]
+        }
+        total
     end
 end
 end

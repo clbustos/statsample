@@ -11,7 +11,15 @@ module Statsample
 				else
 					covariance_slow(v1a,v2a)
 				end
-			end
+            end
+            def maximum_likehood_dichotomic(pred,real)
+				preda,reala=Statsample.only_valid(pred,real)                
+                sum=0
+               pred.each_index{|i|
+                   sum+=(real[i]*Math::log(pred[i])) + ((1-real[i])*Math::log(1-pred[i]))
+               }
+               sum
+            end
 			# Covariance. The denominator is n-1
 			def covariance_slow(v1a,v2a)
 				t=0
