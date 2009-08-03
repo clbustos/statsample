@@ -3,7 +3,7 @@
 
 require 'rubygems'
 require 'hoe'
-require './lib/statsample.rb'
+require './lib/statsample'
 
 if File.exists? './local_rakefile.rb'
 	require './local_rakefile'

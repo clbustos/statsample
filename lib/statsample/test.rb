@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
     # module for several statistical tests 
     module Test
         # Calculate chi square for two Matrix

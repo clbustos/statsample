@@ -1,11 +1,11 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
+require File.dirname(__FILE__)+'/../lib/statsample'
 require 'test/unit'
 
-class RubySSVectorTestCase < Test::Unit::TestCase
+class StatsampleVectorTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
 		super
-		@c = RubySS::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :nominal)
+		@c = Statsample::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :nominal)
 		@c.missing_values=[-99]
 	end
     def test_enumerable
@@ -37,7 +37,7 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_equal(["FIVE","FIVE","FIVE","FIVE","FIVE",6,6,7,8,9,10,1,2,3,4,nil,-99, -99],@c.vector_labeled.to_a)
     end
     def test_split
-        a = RubySS::Vector.new(["a","a,b","c,d","a,d","d",10,nil],:nominal)
+        a = Statsample::Vector.new(["a","a,b","c,d","a,d","d",10,nil],:nominal)
         assert_equal([%w{a},%w{a b},%w{c d},%w{a d},%w{d},[10],nil], a.splitted)
     end
     def test_verify
@@ -46,14 +46,14 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_equal(e,h)
     end
     def test_split_by_separator
-        a = RubySS::Vector.new(["a","a,b","c,d","a,d",10,nil],:nominal)
+        a = Statsample::Vector.new(["a","a,b","c,d","a,d",10,nil],:nominal)
         b=a.split_by_separator(",")
         assert_kind_of(Hash, b)
-        assert_instance_of(RubySS::Vector,b['a'])
-        assert_instance_of(RubySS::Vector,b['b'])
-        assert_instance_of(RubySS::Vector,b['c'])
-        assert_instance_of(RubySS::Vector,b['d'])
-        assert_instance_of(RubySS::Vector,b[10])
+        assert_instance_of(Statsample::Vector,b['a'])
+        assert_instance_of(Statsample::Vector,b['b'])
+        assert_instance_of(Statsample::Vector,b['c'])
+        assert_instance_of(Statsample::Vector,b['d'])
+        assert_instance_of(Statsample::Vector,b[10])
         assert_equal([1,1,0,1,0,nil],b['a'].to_a)
         assert_equal([0,1,0,0,0,nil],b['b'].to_a)
         assert_equal([0,0,1,0,0,nil],b['c'].to_a)
@@ -61,7 +61,7 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_equal([0,0,0,0,1,nil],b[10].to_a)
         assert_equal({'a'=>3,'b'=>1,'c'=>1,'d'=>2,10=>1}, a.split_by_separator_freq())
 
-        a = RubySS::Vector.new(["a","a*b","c*d","a*d",10,nil],:nominal)
+        a = Statsample::Vector.new(["a","a*b","c*d","a*d",10,nil],:nominal)
         b=a.split_by_separator("*")
         assert_equal([1,1,0,1,0,nil],b['a'].to_a)
         assert_equal([0,1,0,0,0,nil],b['b'].to_a)
@@ -112,7 +112,7 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 		assert_equal(expected,v1.ranked)
 	end
     def test_scale
-        a=RubySS::Vector.new([1,2,3,4,"STRING"], :scale)
+        a=Statsample::Vector.new([1,2,3,4,"STRING"], :scale)
         assert_equal(10, a.sum)
         i=0
         factors=a.factors.sort
@@ -140,8 +140,8 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_match(/mean/, @c.summary())
     end
     def test_add
-        a=RubySS::Vector.new([1,2,3,4,5], :scale)
-        b=RubySS::Vector.new([11,12,13,14,15], :scale)
+        a=Statsample::Vector.new([1,2,3,4,5], :scale)
+        b=Statsample::Vector.new([11,12,13,14,15], :scale)
         assert_equal([3,4,5,6,7], (a+2).to_a)
         assert_equal([12,14,16,18,20], (a+b).to_a)
         assert_raise  ArgumentError do
@@ -150,14 +150,14 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_raise  TypeError do
 			a+"string"
 		end
-        a=RubySS::Vector.new([nil,1, 2  ,3 ,4 ,5], :scale)
-        b=RubySS::Vector.new([11, 12,nil,13,14,15], :scale)
+        a=Statsample::Vector.new([nil,1, 2  ,3 ,4 ,5], :scale)
+        b=Statsample::Vector.new([11, 12,nil,13,14,15], :scale)
         assert_equal([nil,13,nil,16,18,20], (a+b).to_a)
         assert_equal([nil,13,nil,16,18,20], (a+b.to_a).to_a)
     end
     def test_minus
-        a=RubySS::Vector.new([1,2,3,4,5], :scale)
-        b=RubySS::Vector.new([11,12,13,14,15], :scale)
+        a=Statsample::Vector.new([1,2,3,4,5], :scale)
+        b=Statsample::Vector.new([11,12,13,14,15], :scale)
         assert_equal([-1,0,1,2,3], (a-2).to_a)
         assert_equal([10,10,10,10,10], (b-a).to_a)
         assert_raise  ArgumentError do
@@ -166,8 +166,8 @@ class RubySSVectorTestCase < Test::Unit::TestCase
         assert_raise  TypeError do
 			a-"string"
 		end
-        a=RubySS::Vector.new([nil,1, 2  ,3 ,4 ,5], :scale)
-        b=RubySS::Vector.new([11, 12,nil,13,14,15], :scale)
+        a=Statsample::Vector.new([nil,1, 2  ,3 ,4 ,5], :scale)
+        b=Statsample::Vector.new([11, 12,nil,13,14,15], :scale)
         assert_equal([nil,11,nil,10,10,10], (b-a).to_a)
         assert_equal([nil,11,nil,10,10,10], (b-a.to_a).to_a)
     end
@@ -191,7 +191,7 @@ class RubySSVectorTestCase < Test::Unit::TestCase
     
     def test_gsl
 		if HAS_GSL
-			a=RubySS::Vector.new([1,2,3,4,"STRING"], :scale)
+			a=Statsample::Vector.new([1,2,3,4,"STRING"], :scale)
 			assert_equal(2,a.mean)
 			assert_equal(a.variance_sample_slow,a.variance_sample)
 			assert_equal(a.standard_deviation_sample_slow,a.sds)
@@ -227,7 +227,7 @@ class RubySSVectorTestCase < Test::Unit::TestCase
 		v2=%w{1 3 4 5 6 4 3 2}.to_vector
 		v3=%w{1 0 0 0 1 1 1 0}.to_vector
 		ex=Matrix.rows([["a", "1", "1"], ["a", "3", "0"], ["a", "4", "0"], ["b", "5", "0"], ["b", "6", "1"], ["b", "4", "1"], ["c", "3", "1"], ["c", "2", "0"]])
-		assert_equal(ex,RubySS.vector_cols_matrix(v1,v2,v3))
+		assert_equal(ex,Statsample.vector_cols_matrix(v1,v2,v3))
 	end
     def test_marshalling
         v1=(0..100).to_a.collect{|n| rand(100)}.to_vector(:scale)

@@ -1,6 +1,11 @@
+=== 0.3.0 / 2009-08-02
+
+* Statsample renamed to Statsample
+* Optimization extension goes to another gem: ruby-statsample-optimization
+
 === 0.2.0 / 2009-08-01
 
-* One Way Anova on RubySS::Anova::OneWay
+* One Way Anova on Statsample::Anova::OneWay
 * Dominance Analysis!!!! The one and only reason to develop a Multiple Regression on pure ruby.
 * Multiple Regression on Multiple Regression module. Pairwise (pure ruby) or MultipleRegressionPairwise and Listwise (optimized) on MultipleRegressionAlglib and 
 * New Dataset#to_gsl_matrix, #from_to,#[..],#bootstrap,#vector_missing_values, #vector_count_characters, #each_with_index, #collect_with_index
@@ -41,12 +46,12 @@
 * ...
 === 0.1.6 / 2008-09-26
 * New modules for SRS and stratified sampling
-* RubySS::Database for read and write onto databases.
+* Statsample::Database for read and write onto databases.
   You could use Database and CSV on-tandem for mass-editing and reimport
   of databases
 
 === 0.1.5 / 2008-08-29
-* New extension rubyssopt for optimizing some functions on RubySS submodules
+* New extension statsampleopt for optimizing some functions on Statsample submodules
 * New submodules Correlation and Test
 
 === 0.1.4 / 2008-08-27

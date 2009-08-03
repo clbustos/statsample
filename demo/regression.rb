@@ -1,6 +1,6 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
+require File.dirname(__FILE__)+'/../lib/statsample'
 tests=300
-include RubySS
+include Statsample
 r = GSL::Rng.alloc(GSL::Rng::TAUS,Time.now.to_i)
 ds=Dataset.new(%w{a b c d y})
     ds['a'].type=:scale
@@ -22,7 +22,7 @@ ds.update_valid_data
 if !File.exists? "regression.dab"
     da=DominanceAnalysis::Bootstrap.new(ds,"y")
 else
-    da=RubySS.load("regression.dab")
+    da=Statsample.load("regression.dab")
 end
     
 da.lr_class=Regression::MultipleRegression

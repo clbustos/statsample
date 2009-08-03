@@ -1,8 +1,8 @@
-require 'rubyss/vector'
+require 'statsample/vector'
 
 class Hash
 	def to_dataset(*args)
-		RubySS::Dataset.new(self,*args)
+		Statsample::Dataset.new(self,*args)
 	end
 end
 
@@ -19,7 +19,7 @@ class Array
     end
 end
 
-module RubySS
+module Statsample
     class DatasetException < RuntimeError
         attr_reader :ds,:exp
         def initialize(ds,e)
@@ -45,7 +45,7 @@ module RubySS
         def initialize(vectors={}, fields=[], labels={})
             if vectors.instance_of? Array
                 @fields=vectors.dup
-                @vectors=vectors.inject({}){|a,x| a[x]=RubySS::Vector.new(); a}
+                @vectors=vectors.inject({}){|a,x| a[x]=Statsample::Vector.new(); a}
             else
                 @vectors=vectors
                 @fields=fields
@@ -189,7 +189,7 @@ module RubySS
             @fields.delete(name)
             @vectors.delete(name)
         end
-        def add_vectors_by_split_recode(name,join='-',sep=RubySS::SPLIT_TOKEN)
+        def add_vectors_by_split_recode(name,join='-',sep=Statsample::SPLIT_TOKEN)
             split=@vectors[name].split_by_separator(sep)
             i=1
             split.each{|k,v|
@@ -199,7 +199,7 @@ module RubySS
                 i+=1
             }
         end
-        def add_vectors_by_split(name,join='-',sep=RubySS::SPLIT_TOKEN)
+        def add_vectors_by_split(name,join='-',sep=Statsample::SPLIT_TOKEN)
             split=@vectors[name].split_by_separator(sep)
             split.each{|k,v|
                 add_vector(name+join+k,v)
@@ -278,7 +278,7 @@ module RubySS
         def check_length
             size=nil
             @vectors.each{|k,v|
-                raise Exception, "Data #{v.class} is not a vector on key #{k}" if !v.is_a? RubySS::Vector
+                raise Exception, "Data #{v.class} is not a vector on key #{k}" if !v.is_a? Statsample::Vector
                 if size.nil?
                     size=v.size
                 else
@@ -295,7 +295,7 @@ module RubySS
                     yield k,@vectors[k]
                 }
             end
-        if !RubySS::OPTIMIZED
+        if !Statsample::OPTIMIZED
             def case_as_hash(c)
                 @fields.inject({}) {|a,x|
                         a[x]=@vectors[x][c]
@@ -368,14 +368,14 @@ module RubySS
             each {|row|
                 data.push(yield(row))
             }
-            RubySS::Vector.new(data,type)
+            Statsample::Vector.new(data,type)
         end
         def collect_with_index(type=:scale)
             data=[]
             each_with_index {|i,row|
                 data.push(yield(i,row))
             }
-            RubySS::Vector.new(data,type)
+            Statsample::Vector.new(data,type)
         end
         # Recode a vector based on a block
         def recode!(vector_name)
@@ -385,14 +385,14 @@ module RubySS
             @vectors[vector_name].set_valid_data
         end
         def crosstab(v1,v2)
-            RubySS::Crosstab.new(@vectors[v1],@vectors[v2])
+            Statsample::Crosstab.new(@vectors[v1],@vectors[v2])
         end
         def[]=(i,v)
-            if v.instance_of? RubySS::Vector
+            if v.instance_of? Statsample::Vector
                 @vectors[i]=v
                 check_order
             else
-                raise ArgumentError,"Should pass a RubySS::Vector"
+                raise ArgumentError,"Should pass a Statsample::Vector"
             end
         end
         def to_matrix
@@ -403,7 +403,7 @@ module RubySS
             Matrix.rows(rows)
         end
 		def to_multiset_by_split(*fields)
-			require 'rubyss/multiset'
+			require 'statsample/multiset'
 			if fields.size==1
 				to_multiset_by_split_one_field(fields[0])
 			else

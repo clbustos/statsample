@@ -1,8 +1,8 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
-require 'rubyss/multiset'
+require File.dirname(__FILE__)+'/../lib/statsample'
+require 'statsample/multiset'
 require 'test/unit'
 
-class RubySSStratifiedTestCase < Test::Unit::TestCase
+class StatsampleStratifiedTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
 		super
@@ -14,6 +14,6 @@ class RubySSStratifiedTestCase < Test::Unit::TestCase
 		av=a.to_vector(:scale)
 		bv=b.to_vector(:scale)
 		popv=pop.to_vector(:scale)
-		assert_equal(popv.mean,RubySS::StratifiedSample.mean(av,bv))
+		assert_equal(popv.mean,Statsample::StratifiedSample.mean(av,bv))
 	end
 end

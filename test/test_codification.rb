@@ -1,8 +1,8 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
+require File.dirname(__FILE__)+'/../lib/statsample'
 require 'tempfile'
 require 'test/unit'
 
-class RubySSCodificationTestCase < Test::Unit::TestCase
+class StatsampleCodificationTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
         v1=%w{run walk,run walking running sleep sleeping,dreaming sleep,dream}.to_vector
@@ -12,15 +12,15 @@ class RubySSCodificationTestCase < Test::Unit::TestCase
 	end
     def test_create_yaml
         assert_raise  ArgumentError do
-            RubySS::Codification.create_yaml(@ds,[])
+            Statsample::Codification.create_yaml(@ds,[])
         end
         expected_keys_v1=%w{run walk walking running sleep sleeping dream dreaming}.sort
-        yaml_hash=RubySS::Codification.create_yaml(@ds,['v1'])
+        yaml_hash=Statsample::Codification.create_yaml(@ds,['v1'])
         h=YAML::load(yaml_hash)
         assert_equal(['v1'],h.keys)
         assert_equal(expected_keys_v1,h['v1'].keys.sort)
         tf = Tempfile.new("test_codification")
-        yaml_hash=RubySS::Codification.create_yaml(@ds,['v1'],RubySS::SPLIT_TOKEN,tf)
+        yaml_hash=Statsample::Codification.create_yaml(@ds,['v1'],Statsample::SPLIT_TOKEN,tf)
         tf.close
         tf.open
         h=YAML::load(tf)
@@ -30,21 +30,21 @@ class RubySSCodificationTestCase < Test::Unit::TestCase
     end
     def test_recodification
         expected=[['r'],['w','r'],['w'],['r'],['s'],['s','d'], ['s','d']]
-        assert_equal(expected,RubySS::Codification.recode_vector(@ds['v1'],@dict))
+        assert_equal(expected,Statsample::Codification.recode_vector(@ds['v1'],@dict))
         v2=['run','walk,dreaming',nil,'walk,dream,dreaming,walking'].to_vector
         expected=[['r'],['w','d'],nil,['w','d']]
-        assert_equal(expected,RubySS::Codification.recode_vector(v2,@dict))
+        assert_equal(expected,Statsample::Codification.recode_vector(v2,@dict))
     end
     def test_recode_dataset_simple
         yaml=YAML::dump({'v1'=>@dict})
-        RubySS::Codification.recode_dataset_simple!(@ds,yaml)
+        Statsample::Codification.recode_dataset_simple!(@ds,yaml)
         expected_vector=['r','w,r','w','r','s','s,d', 's,d'].to_vector
         assert_not_equal(expected_vector,@ds['v1'])
         assert_equal(expected_vector,@ds['v1_recoded'])
     end
     def test_recode_dataset_split
         yaml=YAML::dump({'v1'=>@dict})
-        RubySS::Codification.recode_dataset_split!(@ds,yaml)
+        Statsample::Codification.recode_dataset_split!(@ds,yaml)
         e={}
         e['r']=[1,1,0,1,0,0,0].to_vector
         e['w']=[0,1,1,0,0,0,0].to_vector

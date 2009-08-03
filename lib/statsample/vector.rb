@@ -1,20 +1,20 @@
 class Array
 	def to_vector(*args)
-		RubySS::Vector.new(self,*args)
+		Statsample::Vector.new(self,*args)
 	end
 end
 
-module RubySS
+module Statsample
     class << self
 	# Create a matrix using vectors as columns
     # Use:
     #
-    # matrix=RubySS.vector_cols_matrix(v1,v2)
+    # matrix=Statsample.vector_cols_matrix(v1,v2)
 	def vector_cols_matrix(*vs)
 		# test
 		size=vs[0].size
 		vs.each{|v|
-			raise ArgumentError,"Arguments should be Vector" unless v.instance_of? RubySS::Vector
+			raise ArgumentError,"Arguments should be Vector" unless v.instance_of? Statsample::Vector
 			raise ArgumentError,"Vectors size should be the same" if v.size!=size
 		}
 		Matrix.rows((0...size).to_a.collect() {|i|
@@ -28,15 +28,15 @@ module RubySS
 	#  a=[1,2,3,6,7,nil,3,5].to_vector(:scale)
 	#  b=[nil,nil,5,6,4,5,10,2].to_vector(:scale)
 	#  c=[2,4,6,7,4,5,6,7].to_vector(:scale)
-	#  a2,b2,c2=RubySS.only_valid(a,b,c)
-	#  => [#<RubySS::Scale:0xb748c8c8 @data=[3, 6, 7, 3, 5]>, 
-	#        #<RubySS::Scale:0xb748c814 @data=[5, 6, 4, 10, 2]>, 
-	#        #<RubySS::Scale:0xb748c760 @data=[6, 7, 4, 6, 7]>]
+	#  a2,b2,c2=Statsample.only_valid(a,b,c)
+	#  => [#<Statsample::Scale:0xb748c8c8 @data=[3, 6, 7, 3, 5]>, 
+	#        #<Statsample::Scale:0xb748c814 @data=[5, 6, 4, 10, 2]>, 
+	#        #<Statsample::Scale:0xb748c760 @data=[6, 7, 4, 6, 7]>]
 	#
 	def self.only_valid(*vs)
 		i=1
 		h=vs.inject({}) {|a,v| a["v#{i}"]=v;i+=1;a}
-		ds=RubySS::Dataset.new(h).dup_only_valid
+		ds=Statsample::Dataset.new(h).dup_only_valid
 		ds.vectors.values
 	end
 class Vector < DelegateClass(Array)
@@ -113,7 +113,7 @@ class Vector < DelegateClass(Array)
         # Vector equality
         # Two vector will be the same if their data, missing values, type, labels are equals
         def ==(v2)
-            raise TypeError,"Argument should be a Vector" unless v2.instance_of? RubySS::Vector
+            raise TypeError,"Argument should be a Vector" unless v2.instance_of? Statsample::Vector
             @data==v2.data and @missing_values==v2.missing_values and @type==v2.type and @labels=v2.labels
         end
         def _dump(i)
@@ -154,8 +154,8 @@ class Vector < DelegateClass(Array)
             @delegate.set_gsl if(@type==:scale)
 		end
         def _set_valid_data
-            if RubySS::OPTIMIZED
-                RubySS::_set_valid_data(self)
+            if Statsample::OPTIMIZED
+                Statsample::_set_valid_data(self)
             else
             @data.each do |n|
 				if is_valid? n
@@ -272,12 +272,12 @@ class Vector < DelegateClass(Array)
                             sum.push(nil)
                         end
                     }
-                    RubySS::Vector.new(sum)
+                    Statsample::Vector.new(sum)
                 else
                     raise ArgumentError, "The array/vector parameter should be of the same size of the original vector"
                 end
             elsif(v.respond_to? method )
-                RubySS::Vector.new(
+                Statsample::Vector.new(
                     @data.collect  {|x|
                         if(!x.nil?)
                         x.send(method,v)
@@ -295,7 +295,7 @@ class Vector < DelegateClass(Array)
         # a=Vector.new(["a,b","c,d","a,b","d"])
         # a.splitted
         # [["a","b"],["c","d"],["a","b"],["d"]]
-        def splitted(sep=RubySS::SPLIT_TOKEN)
+        def splitted(sep=Statsample::SPLIT_TOKEN)
             @data.collect{|x|
                 if x.nil?
                     nil
@@ -312,11 +312,11 @@ class Vector < DelegateClass(Array)
         #
         # a=Vector.new(["a,b","c,d","a,b"])
         #  a.split_by_separator
-        #    {"a"=>#<RubySS::Type::Nominal:0x7f2dbcc09d88 @data=[1, 0, 1]>,
-        #     "b"=>#<RubySS::Type::Nominal:0x7f2dbcc09c48 @data=[1, 1, 0]>,
-        #     "c"=>#<RubySS::Type::Nominal:0x7f2dbcc09b08 @data=[0, 1, 1]>}
+        #    {"a"=>#<Statsample::Type::Nominal:0x7f2dbcc09d88 @data=[1, 0, 1]>,
+        #     "b"=>#<Statsample::Type::Nominal:0x7f2dbcc09c48 @data=[1, 1, 0]>,
+        #     "c"=>#<Statsample::Type::Nominal:0x7f2dbcc09b08 @data=[0, 1, 1]>}
         #
-        def split_by_separator(sep=RubySS::SPLIT_TOKEN)
+        def split_by_separator(sep=Statsample::SPLIT_TOKEN)
             split_data=splitted(sep)
             factors=split_data.flatten.uniq.compact
             out=factors.inject({}) {|a,x|
@@ -339,7 +339,7 @@ class Vector < DelegateClass(Array)
                 s
             }
         end
-        def split_by_separator_freq(sep=RubySS::SPLIT_TOKEN)
+        def split_by_separator_freq(sep=Statsample::SPLIT_TOKEN)
             split_by_separator(sep).inject({}) {|a,v|
                 a[v[0]]=v[1].inject {|s,x| s+x.to_i}
                 a
@@ -510,16 +510,16 @@ class Vector < DelegateClass(Array)
             
             # Variance of p, according to poblation size
             def variance_proportion(n_poblation, v=1)
-                RubySS::proportion_variance_sample(self.proportion(v), @data.size, n_poblation)
+                Statsample::proportion_variance_sample(self.proportion(v), @data.size, n_poblation)
             end
             def variance_total(n_poblation, v=1)
-                RubySS::total_variance_sample(self.proportion(v), @data.size, n_poblation)
+                Statsample::total_variance_sample(self.proportion(v), @data.size, n_poblation)
             end
             def proportion_confidence_interval_t(n_poblation,margin=0.95,v=1)
-                RubySS::proportion_confidence_interval_t(proportion(v), @data.size, n_poblation, margin)
+                Statsample::proportion_confidence_interval_t(proportion(v), @data.size, n_poblation, margin)
             end
             def proportion_confidence_interval_z(n_poblation,margin=0.95,v=1)
-                RubySS::proportion_confidence_interval_z(proportion(v), @data.size, n_poblation, margin)
+                Statsample::proportion_confidence_interval_z(proportion(v), @data.size, n_poblation, margin)
             end            
 		self.instance_methods.find_all{|met| met=~/_slow$/}.each{|met|
 			met_or=met.gsub("_slow","")

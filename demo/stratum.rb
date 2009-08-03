@@ -1,7 +1,7 @@
-require File.dirname(__FILE__)+"/../lib/rubyss"
-require 'rubyss/multiset'
-require 'rubyss/srs'
-require 'rubyss/resample'
+require File.dirname(__FILE__)+"/../lib/statsample"
+require 'statsample/multiset'
+require 'statsample/srs'
+require 'statsample/resample'
 require 'gnuplot'
 
 tests=3000
@@ -17,18 +17,18 @@ bv=b.to_vector(:scale)
 ads={'data'=>a.to_vector(:scale)}.to_dataset
 bds={'data'=>b.to_vector(:scale)}.to_dataset
 
-m=RubySS::Multiset.new(['data'])
+m=Statsample::Multiset.new(['data'])
 m.add_dataset('a',ads)
 m.add_dataset('b',bds)
-ss=RubySS::StratifiedSample.new(m,{'a'=>a.size,'b'=>b.size})
+ss=Statsample::StratifiedSample.new(m,{'a'=>a.size,'b'=>b.size})
 
 es=[{'N'=>a_size,'n'=>sample_size/2,'s'=>av.standard_deviation_population}, {'N'=>b_size,'n'=>sample_size/2,'s'=>bv.standard_deviation_population}]
 
 
 
-sd_estimated_wr=RubySS::StratifiedSample.standard_error_ksd_wr(es)
+sd_estimated_wr=Statsample::StratifiedSample.standard_error_ksd_wr(es)
 
-sd_estimated_wor = RubySS::StratifiedSample.standard_error_ksd_wor(es)
+sd_estimated_wor = Statsample::StratifiedSample.standard_error_ksd_wor(es)
 
 
 
@@ -43,8 +43,8 @@ puts "-------------"
 puts "Estadísticos:"
 puts "Mean:"+pop.mean.to_s
 puts "SD:"+s.to_s
-puts "EE con reemplazo:"+RubySS::SRS.standard_error_ksd_wr(s, sample_size, pop.size).to_s
-puts "EE sin reemplazo:"+RubySS::SRS.standard_error_ksd_wor(s, sample_size,pop.size).to_s
+puts "EE con reemplazo:"+Statsample::SRS.standard_error_ksd_wr(s, sample_size, pop.size).to_s
+puts "EE sin reemplazo:"+Statsample::SRS.standard_error_ksd_wor(s, sample_size,pop.size).to_s
 
 puts "EE estratified con reemplazo:"+sd_estimated_wr.to_s
 puts "EE estratified sin reemplazo:"+sd_estimated_wor.to_s
@@ -52,39 +52,39 @@ sd_with=[]
 sd_without=[]
 sd_strat_wr=[]
 sd_strat_wor=[]
-monte_with=RubySS::Resample.repeat_and_save(tests) {
+monte_with=Statsample::Resample.repeat_and_save(tests) {
     sample= pop.sample_with_replacement(sample_size)
-    sd_with.push(RubySS::SRS.standard_error_esd_wr(sample.sds,sample_size,pop.size))
+    sd_with.push(Statsample::SRS.standard_error_esd_wr(sample.sds,sample_size,pop.size))
     sample.mean
 }
 
 
-monte_without=RubySS::Resample.repeat_and_save(tests) {
+monte_without=Statsample::Resample.repeat_and_save(tests) {
     sample= pop.sample_without_replacement(sample_size)
-    sd_without.push(RubySS::SRS.standard_error_esd_wor(sample.sds,sample_size,pop.size))
+    sd_without.push(Statsample::SRS.standard_error_esd_wor(sample.sds,sample_size,pop.size))
     sample.mean
 }
 
 
 
-stratum_wor=RubySS::Resample.repeat_and_save(tests) {
+stratum_wor=Statsample::Resample.repeat_and_save(tests) {
     a_sample= {'data'=>av.sample_without_replacement(sample_size/2)}.to_dataset
     b_sample= {'data'=>bv.sample_without_replacement(sample_size/2)}.to_dataset
-    m=RubySS::Multiset.new(['data'])
+    m=Statsample::Multiset.new(['data'])
     m.add_dataset('a',a_sample)
     m.add_dataset('b',b_sample)
-    ss=RubySS::StratifiedSample.new(m,{'a'=>a_size,'b'=>b_size})
+    ss=Statsample::StratifiedSample.new(m,{'a'=>a_size,'b'=>b_size})
     sd_strat_wor.push(ss.standard_error_wor('data'))
     ss.mean('data')    
 }.to_vector(:scale)
 
-stratum_wr=RubySS::Resample.repeat_and_save(tests) {
+stratum_wr=Statsample::Resample.repeat_and_save(tests) {
     a_sample= {'data'=>av.sample_with_replacement(sample_size/2)}.to_dataset
     b_sample= {'data'=>bv.sample_with_replacement(sample_size/2)}.to_dataset
-    m=RubySS::Multiset.new(['data'])
+    m=Statsample::Multiset.new(['data'])
     m.add_dataset('a',a_sample)
     m.add_dataset('b',b_sample)
-    ss=RubySS::StratifiedSample.new(m,{'a'=>a_size,'b'=>b_size})
+    ss=Statsample::StratifiedSample.new(m,{'a'=>a_size,'b'=>b_size})
     sd_strat_wr.push(ss.standard_error_wr('data'))
     ss.mean('data')    
 }.to_vector(:scale)

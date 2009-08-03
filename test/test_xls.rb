@@ -1,4 +1,4 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
+require File.dirname(__FILE__)+'/../lib/statsample'
 require 'test/unit'
 require 'tmpdir'
 begin
@@ -6,9 +6,9 @@ begin
 rescue LoadError
 	puts "You should install spreadsheet (gem install spreadsheet)"
 end
-class RubySSExcelTestCase < Test::Unit::TestCase
+class StatsampleExcelTestCase < Test::Unit::TestCase
 	def initialize(*args)
-        @ds=RubySS::Excel.read(File.dirname(__FILE__)+"/test_xls.xls")
+        @ds=Statsample::Excel.read(File.dirname(__FILE__)+"/test_xls.xls")
 		super
 	end
     
@@ -21,8 +21,8 @@ class RubySSExcelTestCase < Test::Unit::TestCase
     end
     def test_write
         filename=Dir::tmpdir+"/test_write.xls"
-        RubySS::Excel.write(@ds,filename)
-        ds2=RubySS::Excel.read(filename)
+        Statsample::Excel.write(@ds,filename)
+        ds2=Statsample::Excel.read(filename)
         i=0
         ds2.each_array{|row|
             assert_equal(@ds.case_as_array(i),row)

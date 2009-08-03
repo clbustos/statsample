@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
-require File.dirname(__FILE__)+"/../lib/rubyss"
-require 'rubyss/resample'
+require File.dirname(__FILE__)+"/../lib/statsample"
+require 'statsample/resample'
 require 'gnuplot'
 r = GSL::Rng.alloc(GSL::Rng::TAUS, 1)
 v=[]
@@ -32,12 +32,12 @@ Gnuplot.open do |gp|
 	sample_size=ss
     sds_prom=[]
     sds_prom_wo=[]
-	monte_wr=RubySS::Resample.repeat_and_save(tests) {
+	monte_wr=Statsample::Resample.repeat_and_save(tests) {
 		sample=v.sample_with_replacement(sample_size)
         sds_prom.push(sample.sds)
 		sample.mean
 	}
-    monte_wor=RubySS::Resample.repeat_and_save(tests) {
+    monte_wor=Statsample::Resample.repeat_and_save(tests) {
 		sample=v.sample_without_replacement(sample_size)
         sds_prom_wo.push(sample.sds)
 		sample.mean

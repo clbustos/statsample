@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
     module Resample
         class << self
             def repeat_and_save(times,&action)

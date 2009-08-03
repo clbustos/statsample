@@ -1,11 +1,11 @@
 require 'yaml'
 
-module RubySS
+module Statsample
 # Codification
 #
 # This tool aids to code open questions
-# * Load one or more vectors on the workflow, to create a file on yaml of values. If data have RubySS::SEPARATOR_TOKEN, the value will be splitted on two or more values 
-# * Edit the yaml and replace the values with your codes. If you need to create two or mores codes for an answer, use the separator (default RubySS::SEPARATOR_TOKEN)
+# * Load one or more vectors on the workflow, to create a file on yaml of values. If data have Statsample::SEPARATOR_TOKEN, the value will be splitted on two or more values 
+# * Edit the yaml and replace the values with your codes. If you need to create two or mores codes for an answer, use the separator (default Statsample::SEPARATOR_TOKEN)
 # * Recode the vectors, loading the yaml file:
 #   * The new vectors have the same name of the original plus "_recoded"
 #   * Instead of load new recoded vectors, create many vectors as values, as add_vectors_by_split
@@ -15,15 +15,15 @@ module RubySS
 #   phase=:first # flag
 #   if phase==:first
 #       File.open(recode_file,"w") {|fp|
-#   RubySS::Codification.create_yaml(ds,%w{vector1 vector2}, ",",fp)
+#   Statsample::Codification.create_yaml(ds,%w{vector1 vector2}, ",",fp)
 #   } # Edit the file recodification.yaml
 #   elsif phase==:second 
 #       File.open(recode_file,"r") {|fp|
-#       RubySS::Codification.verify(fp,['vector1'])
+#       Statsample::Codification.verify(fp,['vector1'])
 #       }
 #   elsif phase==:third
 #       File.open(recode_file,"r") {|fp|
-#   RubySS::Codification.recode_dataset_split!(ds,fp,"*")
+#   Statsample::Codification.recode_dataset_split!(ds,fp,"*")
 #   }
 #   end
 #     
@@ -35,9 +35,9 @@ module RubySS
             # 
             #   v1=%w{a,b b,c d}.to_vector
             #   ds={"v1"=>v1}.to_dataset
-            #   RubySS::Codification.create_yaml(ds,['v1'])
+            #   Statsample::Codification.create_yaml(ds,['v1'])
             #   => "--- \nv1: \n  a: a\n  b: b\n  c: c\n  d: d\n"
-            def create_yaml(dataset,vectors,sep=RubySS::SPLIT_TOKEN,io=nil)
+            def create_yaml(dataset,vectors,sep=Statsample::SPLIT_TOKEN,io=nil)
                 raise ArgumentError,"Array should't be empty" if vectors.size==0
                 pro_hash=vectors.inject({}){|h,v_name|
                     raise Exception, "Vector #{v_name} doesn't exists on Dataset" if !dataset.fields.include? v_name
@@ -49,7 +49,7 @@ module RubySS
                 }
                 YAML.dump(pro_hash,io)
             end
-            def inverse_hash(h,sep=RubySS::SPLIT_TOKEN)
+            def inverse_hash(h,sep=Statsample::SPLIT_TOKEN)
                 h.inject({}) {|a,v|
                     v[1].split(sep).each {|val|
                         a[val]||=[]
@@ -58,13 +58,13 @@ module RubySS
                     a
                 }
             end
-            def dictionary(h,sep=RubySS::SPLIT_TOKEN)
+            def dictionary(h,sep=Statsample::SPLIT_TOKEN)
                 h.inject({}) {|a,v|
                     a[v[0]]=v[1].split(sep)
                     a
                 }
             end
-            def recode_vector(v,h,sep=RubySS::SPLIT_TOKEN)
+            def recode_vector(v,h,sep=Statsample::SPLIT_TOKEN)
                 dict=dictionary(h,sep)
                 new_data=v.splitted(sep)
                 recoded=new_data.collect{|c|
@@ -77,14 +77,14 @@ module RubySS
                 end
                 }
             end
-            def recode_dataset_simple!(dataset,yaml,sep=RubySS::SPLIT_TOKEN)
+            def recode_dataset_simple!(dataset,yaml,sep=Statsample::SPLIT_TOKEN)
                 _recode_dataset(dataset,yaml,sep,false)
             end
-            def recode_dataset_split!(dataset,yaml,sep=RubySS::SPLIT_TOKEN)
+            def recode_dataset_split!(dataset,yaml,sep=Statsample::SPLIT_TOKEN)
                 _recode_dataset(dataset,yaml,sep,true)
             end
             
-            def _recode_dataset(dataset,yaml,sep=RubySS::SPLIT_TOKEN,split=false)
+            def _recode_dataset(dataset,yaml,sep=Statsample::SPLIT_TOKEN,split=false)
                 h=YAML::load(yaml)
                 v_names||=h.keys
                 v_names.each do |v_name|
@@ -105,7 +105,7 @@ module RubySS
                     end
                 end
             end
-            def verify(yaml,v_names=nil,sep=RubySS::SPLIT_TOKEN,io=$>)
+            def verify(yaml,v_names=nil,sep=Statsample::SPLIT_TOKEN,io=$>)
                 require 'pp'
                 h=YAML::load(yaml)
                 v_names||=h.keys

@@ -1,8 +1,8 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
-require 'rubyss/multiset'
+require File.dirname(__FILE__)+'/../lib/statsample'
+require 'statsample/multiset'
 require 'test/unit'
 
-class RubySSGGobiTestCase < Test::Unit::TestCase
+class StatsampleGGobiTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
 		super
@@ -14,13 +14,13 @@ class RubySSGGobiTestCase < Test::Unit::TestCase
 	end
 	def test_values_definition
 		a=[1.0,2,"a"]
-		assert_equal("<real>1.0</real> <int>2</int> <string>a</string>",RubySS::GGobi.values_definition(a))
+		assert_equal("<real>1.0</real> <int>2</int> <string>a</string>",Statsample::GGobi.values_definition(a))
 	end
 	def test_variable_definition
 		carrier=OpenStruct.new
 		carrier.categorials=[]
 		carrier.conversions={}
-		real_var_definition=RubySS::GGobi.variable_definition(carrier,@v2,'variable 2',"v2")
+		real_var_definition=Statsample::GGobi.variable_definition(carrier,@v2,'variable 2',"v2")
 		expected=<<EOS
 <categoricalvariable name="variable 2" nickname="v2">
 <levels count="4">
@@ -35,8 +35,8 @@ assert_equal({'variable 2'=>{'a'=>1,'b'=>2,'c'=>3,'d'=>4}},carrier.conversions)
 	assert_equal(['variable 2'],carrier.categorials)
 	end
 	def test_out
-		filename="/tmp/test_rubyss_ggobi.xml"
-		go=RubySS::GGobi.out(@ds)
+		filename="/tmp/test_statsample_ggobi.xml"
+		go=Statsample::GGobi.out(@ds)
 		
 	end
 end

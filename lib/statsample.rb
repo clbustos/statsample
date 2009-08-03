@@ -1,12 +1,12 @@
-# = rubyss.rb - 
+# = statsample.rb - 
 
 # Process files and databases for statistical purposes, with focus on 
 # estimation of parameters for several types of samples (simple random, 
 # stratified and multistage sampling).
 #
-# Copyright (C) 2008 Claudio Bustos
+# Copyright (C) 2008-2009 Claudio Bustos
 #
-# Claudio Bustos mailto:clbustos@gmail.com
+# Claudio Bustos mailto:clbustos_AT_gmail.com
 
 # :stopdoc:
 
@@ -47,9 +47,9 @@ end
         
     
     begin 
-       require 'rubyss/rubyssopt'
+        require 'statsample/optimization'
     rescue LoadError
-        module RubySS
+        module Statsample
             OPTIMIZED=false
         end
     end
@@ -57,26 +57,26 @@ end
 #
 # :startdoc:
 #
-module RubySS
-    VERSION = '0.2.0'
+module Statsample
+    VERSION = '0.3.0'
     SPLIT_TOKEN = ","
-	autoload(:Database, 'rubyss/converters')
-    autoload(:Anova, 'rubyss/anova')
-	autoload(:CSV, 'rubyss/converters')
-	autoload(:Excel, 'rubyss/converters')
-	autoload(:GGobi, 'rubyss/converters')
-    autoload(:DominanceAnalysis, 'rubyss/dominanceanalysis')
-	autoload(:HtmlReport, 'rubyss/htmlreport')
-    autoload(:Mx, 'rubyss/converters')
-	autoload(:Resample, 'rubyss/resample')
-	autoload(:SRS, 'rubyss/srs')
-	autoload(:Codification, 'rubyss/codification')
-	autoload(:Reliability, 'rubyss/reliability')
-	autoload(:Bivariate, 'rubyss/bivariate')
-	autoload(:Multivariate, 'rubyss/multivariate')
+	autoload(:Database, 'statsample/converters')
+    autoload(:Anova, 'statsample/anova')
+	autoload(:CSV, 'statsample/converters')
+	autoload(:Excel, 'statsample/converters')
+	autoload(:GGobi, 'statsample/converters')
+    autoload(:DominanceAnalysis, 'statsample/dominanceanalysis')
+	autoload(:HtmlReport, 'statsample/htmlreport')
+    autoload(:Mx, 'statsample/converters')
+	autoload(:Resample, 'statsample/resample')
+	autoload(:SRS, 'statsample/srs')
+	autoload(:Codification, 'statsample/codification')
+	autoload(:Reliability, 'statsample/reliability')
+	autoload(:Bivariate, 'statsample/bivariate')
+	autoload(:Multivariate, 'statsample/multivariate')
 
-	autoload(:Regression, 'rubyss/regression')
-	autoload(:Test, 'rubyss/test')
+	autoload(:Regression, 'statsample/regression')
+	autoload(:Test, 'statsample/test')
     def self.load(filename)
         fp=File.open(filename,"r")
         o=Marshal.load(fp)
@@ -210,7 +210,7 @@ module RubySS
     end
 end
 
-require 'rubyss/vector'
-require 'rubyss/dataset'
-require 'rubyss/crosstab'
+require 'statsample/vector'
+require 'statsample/dataset'
+require 'statsample/crosstab'
 

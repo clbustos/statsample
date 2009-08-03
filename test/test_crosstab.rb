@@ -1,27 +1,27 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
-require 'rubyss/crosstab'
+require File.dirname(__FILE__)+'/../lib/statsample'
+require 'statsample/crosstab'
 require 'test/unit'
 
-class RubySSCrosstabTestCase < Test::Unit::TestCase
+class StatsampleCrosstabTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
 		@v1=%w{black blonde black black red black brown black blonde black red black blonde}.to_vector
 		@v2=%w{woman man man woman man man man woman man woman woman man man}.to_vector
-		@ct=RubySS::Crosstab.new(@v1,@v2)
+		@ct=Statsample::Crosstab.new(@v1,@v2)
 		super
 	end
 	def test_crosstab_errors
 		e1=%w{black blonde black black red black brown black blonde black}
 		assert_raise ArgumentError do
-			RubySS::Crosstab.new(e1,@v2)
+			Statsample::Crosstab.new(e1,@v2)
 		end
 		e2=%w{black blonde black black red black brown black blonde black black}.to_vector
 		
 		assert_raise ArgumentError do
-			RubySS::Crosstab.new(e2,@v2)
+			Statsample::Crosstab.new(e2,@v2)
 		end
 		assert_nothing_raised do
-			RubySS::Crosstab.new(@v1,@v2)
+			Statsample::Crosstab.new(@v1,@v2)
 		end
 	end
 	def test_crosstab_basic
@@ -46,7 +46,7 @@ class RubySSCrosstabTestCase < Test::Unit::TestCase
     def test_expected
         v1=%w{1 1 1 1 1 0 0 0 0 0}.to_vector
         v2=%w{0 0 0 0 0 1 1 1 1 1}.to_vector
-        ct=RubySS::Crosstab.new(v1,v2)
+        ct=Statsample::Crosstab.new(v1,v2)
         assert_equal(Matrix[[2.5,2.5],[2.5,2.5]],ct.matrix_expected)
     end
     def test_to_s

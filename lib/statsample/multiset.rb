@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
     # Multiset joins multiple dataset with the same fields and vectors
     # but with different number of cases. 
     # This is the base class for stratified and cluster sampling estimation
@@ -171,7 +171,7 @@ module RubySS
             
 		end
         def initialize(ms,strata_sizes)
-            raise TypeError,"ms should be a Multiset" unless ms.is_a? RubySS::Multiset
+            raise TypeError,"ms should be a Multiset" unless ms.is_a? Statsample::Multiset
             @ms=ms
             raise ArgumentError,"You should put a strata size for each dataset" if strata_sizes.keys.sort!=ms.datasets_names
             @strata_sizes=strata_sizes

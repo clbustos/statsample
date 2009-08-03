@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
 class DominanceAnalysis
     class Bootstrap
         include Writable
@@ -98,7 +98,7 @@ class DominanceAnalysis
             }
             out.parse_table(table)
             out.add("General averages")
-            table=RubySS::ReportTable.new
+            table=Statsample::ReportTable.new
             table.header=["var","mean","se","p.5","p.95"]
             @fields.each{|f|
                 v=@samples_ga[f].to_vector(:scale)

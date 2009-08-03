@@ -1,9 +1,9 @@
 basedir=File.dirname(__FILE__)
-require basedir+"/../lib/rubyss"
-require 'rubyss/srs'
-require 'rubyss/multiset'
+require basedir+"/../lib/statsample"
+require 'statsample/srs'
+require 'statsample/multiset'
 require 'gnuplot'
-require 'rubyss/graph/svggraph.rb'
+require 'statsample/graph/svggraph.rb'
 require 'gsl'
 tests=1000
 sample_size=100
@@ -32,23 +32,23 @@ puts "Skew:"+pop.skew.to_s
 puts "Kurtosis:"+pop.kurtosis.to_s
 
 puts "SD:"+s.to_s
-puts "SE with replacement:"+RubySS::SRS.standard_error_ksd_wr(s, sample_size, pop.size).to_s
-puts "SE without replacement:"+RubySS::SRS.standard_error_ksd_wor(s, sample_size,pop.size).to_s
+puts "SE with replacement:"+Statsample::SRS.standard_error_ksd_wr(s, sample_size, pop.size).to_s
+puts "SE without replacement:"+Statsample::SRS.standard_error_ksd_wor(s, sample_size,pop.size).to_s
 
 sd_with=[]
 sd_without=[]
-monte_with=RubySS::Resample.repeat_and_save(tests) {
+monte_with=Statsample::Resample.repeat_and_save(tests) {
     sample= pop.sample_with_replacement(sample_size)
-    sd_with.push(RubySS::SRS.standard_error_esd_wr(sample.sds,sample_size,pop.size))
+    sd_with.push(Statsample::SRS.standard_error_esd_wr(sample.sds,sample_size,pop.size))
     sample.mean
 }
 
 
 
 
-monte_without=RubySS::Resample.repeat_and_save(tests) {
+monte_without=Statsample::Resample.repeat_and_save(tests) {
     sample= pop.sample_without_replacement(sample_size)
-    sd_without.push(RubySS::SRS.standard_error_esd_wor(sample.sds,sample_size,pop.size))
+    sd_without.push(Statsample::SRS.standard_error_esd_wor(sample.sds,sample_size,pop.size))
     sample.mean
 }
 

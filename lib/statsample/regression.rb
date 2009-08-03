@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
     # module for regression methods 
     module Regression
 		# Class for calculation of linear regressions
@@ -56,7 +56,7 @@ module RubySS
 				end
 			end
             def init_vectors(vx,vy)
-                @vx,@vy=RubySS.only_valid(vx,vy)
+                @vx,@vy=Statsample.only_valid(vx,vy)
                 x_m=@vx.mean
                 y_m=@vy.mean
                 num=den=0
@@ -169,7 +169,7 @@ module RubySS
                         ds[k]=v.to_vector(:scale)
                     }
 		    if HAS_ALGIB
-			    lr_class=::RubySS::Regression::MultipleRegressionAlglib
+			    lr_class=::Statsample::Regression::MultipleRegressionAlglib
 			    ds=ds.to_dataset
 			else
 			    lr_class=MultipleRegressionPairwise
@@ -286,7 +286,7 @@ HEREDOC
         #   @c=[11,22,30,40,50,65,78,79,99,100].to_vector(:scale)
         #   @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
         #   ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
-        #   lr=RubySS::Regression::MultipleRegression.new(ds,'y')
+        #   lr=Statsample::Regression::MultipleRegression.new(ds,'y')
 		#            
             class MultipleRegressionAlglib < MultipleRegressionBase
                 def initialize(ds,y_var)
@@ -307,6 +307,7 @@ HEREDOC
                     @dep_columns=columns.dup
                     columns.push(@ds[@y_var])
                     matrix=Matrix.columns(columns)
+                    @lr_s=nil
                     @lr=::Alglib::LinearRegression.build_from_matrix(matrix)
                 end
                 

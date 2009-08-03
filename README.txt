@@ -1,4 +1,5 @@
 = Statsample
+
 * http://rubyforge.org/projects/ruby-statsample/
 * http://code.google.com/p/ruby-statsample/
 
@@ -25,7 +26,7 @@ This package allows to process files and databases for statistical purposes, wit
 == Example of use:
 
     # Read a CSV file, using '' and 'error' as missing values and ommiting 1 lines
-    ds=RubySS::CSV.read('resultados_c1.csv',['','error'],1)
+    ds=Statsample::CSV.read('resultados_c1.csv',['','error'],1)
     
     # Create a new vector (column), calculating the mean of 13 vectors. Accept 1 missing values on one of the vectors
     
@@ -47,13 +48,13 @@ This package allows to process files and databases for statistical purposes, wit
     ds_software=ds.dup(%w{pe1n1 pe1n2 pe1n3 pe1n4 pe1n5 })
     
     # Creates an html report, add a correlation matrix with all the scale vectors and save the report into a file 
-    hr=RubySS::HtmlReport.new(ds_software,"correlations")
+    hr=Statsample::HtmlReport.new(ds_software,"correlations")
     hr.add_correlation_matrix()
     hr.save("correlation_matrix.html")
     
     
     # Saves the new dataset
-    RubySS::CSV.write(ds_software,"ds_software.csv",true)
+    Statsample::CSV.write(ds_software,"ds_software.csv",true)
 
 == REQUIREMENTS:
 

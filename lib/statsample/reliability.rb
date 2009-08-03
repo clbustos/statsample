@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
 	module Reliability
 		class << self
             # Calculate Chonbach's alpha for a given dataset.
@@ -73,8 +73,8 @@ module RubySS
 				@sd=@total.sdp
 				@valid_n=@total.size
                 begin
-				@alpha=RubySS::Reliability.cronbach_alpha(ds)
-				@alpha_standarized=RubySS::Reliability.cronbach_alpha_standarized(ds)
+				@alpha=Statsample::Reliability.cronbach_alpha(ds)
+				@alpha_standarized=Statsample::Reliability.cronbach_alpha_standarized(ds)
                 rescue => e
                     raise DatasetException.new(@ds,e), "Problem on calculate alpha" 
                 end
@@ -127,7 +127,7 @@ module RubySS
             
             end
             def svggraph_item_characteristic_curve(directory, base="icc",options={})
-                require 'rubyss/graph/svggraph'
+                require 'statsample/graph/svggraph'
                 crd=ItemCharacteristicCurve.new(@ds)
                @ds.fields.each {|f|
                    factors=@ds[f].factors.sort
@@ -161,7 +161,7 @@ module RubySS
 					ds2=@ds.dup
 					ds2.delete_vector(v)
 					total=ds2.vector_sum
-					a[v]=RubySS::Bivariate.pearson(vector,total)
+					a[v]=Statsample::Bivariate.pearson(vector,total)
 					a
 				end
 			end
@@ -181,7 +181,7 @@ module RubySS
 					a[v][:mean]=total.mean
 					a[v][:sds]=total.sds
 					a[v][:variance_sample]=total.variance_sample
-					a[v][:alpha]=RubySS::Reliability.cronbach_alpha(ds2)
+					a[v][:alpha]=Statsample::Reliability.cronbach_alpha(ds2)
 					a
 				}
 			end

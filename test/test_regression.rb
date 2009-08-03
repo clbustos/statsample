@@ -1,10 +1,10 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
+require File.dirname(__FILE__)+'/../lib/statsample'
 require 'test/unit'
-class RubySSRegressionTestCase < Test::Unit::TestCase
+class StatsampleRegressionTestCase < Test::Unit::TestCase
 	def initialize(*args)
 		@x=[13,20,10,33,15].to_vector(:scale)
 		@y=[23,18,35,10,27	].to_vector(:scale)
-		@reg=RubySS::Regression::SimpleRegression.new_from_vectors(@x,@y)
+		@reg=Statsample::Regression::SimpleRegression.new_from_vectors(@x,@y)
 		super
 	end
 	def test_parameters
@@ -18,7 +18,7 @@ class RubySSRegressionTestCase < Test::Unit::TestCase
         @c=[11,22,30,40,50,65,78,79,99,100,nil,3,7,nil,7].to_vector(:scale)
         @y=[3,4,5,6,7,8,9,10,20,30,30,40,nil,50,nil].to_vector(:scale)
         ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
-        lr=RubySS::Regression::MultipleRegressionPairwise.new(ds,'y')
+        lr=Statsample::Regression::MultipleRegressionPairwise.new(ds,'y')
         assert_in_delta(2407.436,lr.sst,0.001)
         assert_in_delta(0.752,lr.r,0.001)
         assert_in_delta(0.565,lr.r2,0.001)
@@ -34,7 +34,7 @@ class RubySSRegressionTestCase < Test::Unit::TestCase
         @c=[11,22,30,40,50,65,78,79,99,100].to_vector(:scale)
         @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
         ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
-        lr=RubySS::Regression::MultipleRegressionAlglib.new(ds,'y')
+        lr=Statsample::Regression::MultipleRegressionAlglib.new(ds,'y')
         model_test(lr)
         predicted=[1.7857, 6.0989, 3.2433, 7.2908, 4.9667, 10.3428, 8.8158, 10.4717, 23.6639, 25.3198]
         c_predicted=lr.predicted
@@ -92,7 +92,7 @@ class RubySSRegressionTestCase < Test::Unit::TestCase
         @c=[nil,11,22,30,40,50,65,78,79,99,100].to_vector(:scale)
         @y=[nil,3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
         ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
-        lr=RubySS::Regression::MultipleRegressionPairwise.new(ds,'y')
+        lr=Statsample::Regression::MultipleRegressionPairwise.new(ds,'y')
         model_test(lr)
         predicted=[nil,1.7857, 6.0989, 3.2433, 7.2908, 4.9667, 10.3428, 8.8158, 10.4717, 23.6639, 25.3198]
         c_predicted = lr.predicted

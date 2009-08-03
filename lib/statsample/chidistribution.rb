@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
     # Based on Babatunde, Iyiola & Eni () : 
     # "A Numerical Procedure for Computing Chi-Square Percentage Points"
     # 

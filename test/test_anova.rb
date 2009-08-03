@@ -1,12 +1,12 @@
-require File.dirname(__FILE__)+'/../lib/rubyss.rb'
+require File.dirname(__FILE__)+'/../lib/statsample.rb'
 require 'test/unit'
 
-class RubySSAnovaTestCase < Test::Unit::TestCase
+class StatsampleAnovaTestCase < Test::Unit::TestCase
 	def initialize(*args)
         @v1=[3,3,2,3,6].to_vector(:scale)
         @v2=[7,6,5,6,7].to_vector(:scale)
         @v3=[9,8,9,7,8].to_vector(:scale)
-        @anova=RubySS::Anova::OneWay.new([@v1,@v2,@v3])
+        @anova=Statsample::Anova::OneWay.new([@v1,@v2,@v3])
 		super
 	end
     def test_basic
@@ -18,7 +18,7 @@ class RubySSAnovaTestCase < Test::Unit::TestCase
         assert_equal(12,@anova.df_wg)
         assert_equal(2,@anova.df_bg)
         assert_in_delta(23.568,@anova.f,0.001)
-        anova2=RubySS::Anova::OneWay.new([@v1,@v1,@v1,@v1,@v2])
+        anova2=Statsample::Anova::OneWay.new([@v1,@v1,@v1,@v1,@v2])
         assert_in_delta(3.960, anova2.f,0.001)
 
 	if HAS_GSL

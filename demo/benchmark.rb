@@ -1,4 +1,4 @@
-require File.dirname(__FILE__)+'/../lib/rubyss.rb'
+require File.dirname(__FILE__)+'/../lib/statsample.rb'
 require 'benchmark'
 v=(0..10000).collect{|n|
 	r=rand(100)
@@ -20,8 +20,8 @@ v.type=:scale
  end
  if (false)
      Benchmark.bm(7) do |bench|
-         bench.report("true")   { RubySS::OPTIMIZED=true; for i in 1..n; v.set_valid_data ; end }
-         bench.report("false")   { RubySS::OPTIMIZED=false; for i in 1..n; v.set_valid_data ; end }
+         bench.report("true")   { Statsample::OPTIMIZED=true; for i in 1..n; v.set_valid_data ; end }
+         bench.report("false")   { Statsample::OPTIMIZED=false; for i in 1..n; v.set_valid_data ; end }
     end
  end
 
@@ -45,7 +45,7 @@ v.type=:scale
 		x.report("Nominal.frequencies")   { for i in 1..n; v.frequencies; end }
 		x.report("Nominal.frequencies_slow")   { for i in 1..n; v.frequencies_slow; end }
 
-		x.report("_frequencies")   { for i in 1..n; RubySS._frequencies(v.valid_data); end }
+		x.report("_frequencies")   { for i in 1..n; Statsample._frequencies(v.valid_data); end }
 
     end
 

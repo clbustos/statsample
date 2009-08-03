@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
     module Graph
 class SvgHistogram < SVG::Graph::BarBase
     attr_accessor :inner_margin, :mean, :sigma, :show_normal

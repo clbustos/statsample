@@ -1,9 +1,9 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
+require File.dirname(__FILE__)+'/../lib/statsample'
 require 'tempfile'
 require 'test/unit'
 begin
-	require 'rubyss/graph/svggraph'
-class RubySSSvgGraphTestCase < Test::Unit::TestCase
+	require 'statsample/graph/svggraph'
+class StatsampleSvgGraphTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
 		@image_path=File.dirname(__FILE__)+"/images"
@@ -16,13 +16,13 @@ class RubySSSvgGraphTestCase < Test::Unit::TestCase
 		}.to_vector(:scale)
         h=ar.histogram([0,2,5,11])
         file=@image_path+"/svg_histogram_only.svg"
-        graph = RubySS::Graph::SvgHistogram.new({})
+        graph = Statsample::Graph::SvgHistogram.new({})
         graph.histogram=h
         File.open(file,"w") {|f|
               f.puts(graph.burn)
         }
 	else
-		puts "RubySS::Graph::SvgHistogram.new not tested (no ruby-gsl)"
+		puts "Statsample::Graph::SvgHistogram.new not tested (no ruby-gsl)"
 	end
     end
     def test_vector
@@ -53,7 +53,7 @@ class RubySSSvgGraphTestCase < Test::Unit::TestCase
 		}
 		assert(File.exists?(file))
 		else
-		puts "RubySS::Vector#svggraph_histogram.new not tested (no ruby-gsl)"
+		puts "Statsample::Vector#svggraph_histogram.new not tested (no ruby-gsl)"
 
 		end
 	end

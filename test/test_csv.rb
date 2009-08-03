@@ -1,10 +1,10 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
+require File.dirname(__FILE__)+'/../lib/statsample'
 	require 'tmpdir'
 require 'test/unit'
 
-class RubySSCSVTestCase < Test::Unit::TestCase
+class StatsampleCSVTestCase < Test::Unit::TestCase
 	def initialize(*args)
-        @ds=RubySS::CSV.read(File.dirname(__FILE__)+"/test_csv.csv")
+        @ds=Statsample::CSV.read(File.dirname(__FILE__)+"/test_csv.csv")
 		super
 	end
     def test_read
@@ -16,8 +16,8 @@ class RubySSCSVTestCase < Test::Unit::TestCase
     end
     def test_write
         filename=Dir::tmpdir+"/test_write.csv"
-        RubySS::CSV.write(@ds,filename)
-        ds2=RubySS::CSV.read(filename)
+        Statsample::CSV.write(@ds,filename)
+        ds2=Statsample::CSV.read(filename)
         i=0
         ds2.each_array{|row|
             assert_equal(@ds.case_as_array(i),row)

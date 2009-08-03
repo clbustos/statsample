@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
 	# Several methods to estimate parameters for simple random sampling
 	module SRS
 		class << self

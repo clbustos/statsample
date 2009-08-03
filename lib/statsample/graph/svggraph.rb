@@ -3,9 +3,9 @@ require 'SVG/Graph/BarHorizontal'
 require 'SVG/Graph/Pie'
 require 'SVG/Graph/Line'
 require 'SVG/Graph/Plot'
-require 'rubyss/graph/svghistogram'
+require 'statsample/graph/svghistogram'
 
-module RubySS
+module Statsample
 	class Nominal
 		# Creates a barchart using ruby-gdchart
 		def svggraph_frequencies(file, width=600, height=300, chart_type=SVG::Graph::BarNoOp, options={})
@@ -30,7 +30,7 @@ module RubySS
 	class Scale < Ordinal
 		def svggraph_histogram(bins, options={})
             options={:graph_title=>"Histogram", :show_graph_title=>true,:show_normal=>true, :mean=>self.mean, :sigma=>sdp }.merge! options
-            graph = RubySS::Graph::SvgHistogram.new(options)
+            graph = Statsample::Graph::SvgHistogram.new(options)
             graph.histogram=histogram(bins)
             graph
 		end
@@ -41,7 +41,7 @@ module RubySS
             vx=(1..@data.size).to_a.to_vector(:scale)
             vy=@data.to_vector(:scale)
             ds={'index'=>vx,'value'=>vy}.to_dataset            
-            graph = RubySS::Graph::SvgScatterplot.new(ds,options)
+            graph = Statsample::Graph::SvgScatterplot.new(ds,options)
             graph.set_x('index')
             graph.parse
             graph
@@ -49,7 +49,7 @@ module RubySS
         def svggraph_boxplot(options={})
             options={:graph_title=>"Boxplot", :fields=>['vector'], :show_graph_title=>true}.merge! options
             vx=@data.to_a.to_vector(:scale)
-            graph = RubySS::Graph::SvgBoxplot.new(options)
+            graph = Statsample::Graph::SvgBoxplot.new(options)
             graph.add_data(:title=>"vector", :data=>@data.to_a)
             graph
         end
@@ -59,7 +59,7 @@ module RubySS
             vx=@data[0...(@data.size-1)].to_vector(:scale)
             vy=@data[1...@data.size].to_vector(:scale)
             ds={'x_minus_1'=>vx,'x'=>vy}.to_dataset            
-            graph = RubySS::Graph::SvgScatterplot.new(ds,options)
+            graph = Statsample::Graph::SvgScatterplot.new(ds,options)
             graph.set_x('x_minus_1')
             graph.parse
             graph
@@ -68,7 +68,7 @@ module RubySS
         # Returns a Normal Probability Plot
         # Reference: http://www.itl.nist.gov/div898/handbook/eda/section3/normprpl.htm
         def svggraph_normalprobability_plot(options={})
-                    extend RubySS::Util
+                    extend Statsample::Util
 
                     options={:graph_title=>"Normal Probability Plot", :show_graph_title=>true}.merge! options
             n=@data.size
@@ -77,7 +77,7 @@ module RubySS
             }.to_vector(:scale)
             vy=@data.sort.to_vector(:scale)
             ds={'normal_order_statistics_medians'=>vx, 'ordered_response'=>vy}.to_dataset            
-            graph = RubySS::Graph::SvgScatterplot.new(ds,options)
+            graph = Statsample::Graph::SvgScatterplot.new(ds,options)
             graph.set_x('normal_order_statistics_medians')
             graph.parse
             graph
@@ -177,5 +177,5 @@ EOL
 	end
 end
 
-require 'rubyss/graph/svgscatterplot'
-require 'rubyss/graph/svgboxplot'
+require 'statsample/graph/svgscatterplot'
+require 'statsample/graph/svgboxplot'

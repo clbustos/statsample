@@ -1,10 +1,10 @@
-module RubySS
+module Statsample
     # Diverse correlation methods 
     module Bivariate
         class << self
             # Covariance between two vectors
 			def covariance(v1,v2)
-				v1a,v2a=RubySS.only_valid(v1,v2)
+				v1a,v2a=Statsample.only_valid(v1,v2)
                 return nil if v1a.size==0
 				if HAS_GSL
 					GSL::Stats::covariance(v1a.gsl, v2a.gsl)
@@ -24,7 +24,7 @@ module RubySS
 			end
             # Calculate Pearson correlation coefficient between 2 vectors
             def pearson(v1,v2)
-				v1a,v2a=RubySS.only_valid(v1,v2)
+				v1a,v2a=Statsample.only_valid(v1,v2)
                 return nil if v1a.size ==0
 				if HAS_GSL
 					GSL::Stats::correlation(v1a.gsl, v2a.gsl)
@@ -43,7 +43,7 @@ module RubySS
             # Retrieves the value for t test for a pearson correlation
             # between two vectors to test the null hipothesis of r=0
             def t_pearson(v1,v2)
-				v1a,v2a=RubySS.only_valid(v1,v2)
+				v1a,v2a=Statsample.only_valid(v1,v2)
                 r=pearson(v1a,v2a)
                 if(r==1.0) 
                     0
@@ -71,7 +71,7 @@ module RubySS
             # from another variable
             # 
             def residuals(from,del)
-                r=RubySS::Bivariate.pearson(from,del)
+                r=Statsample::Bivariate.pearson(from,del)
                 froms, dels = from.vector_standarized, del.vector_standarized
                 nv=[]
                 froms.data_with_nils.each_index{|i|
@@ -84,7 +84,7 @@ module RubySS
                 nv.to_vector(:scale)
             end
             def partial_correlation(v1,v2,control)
-                v1a,v2a,cona=RubySS.only_valid(v1,v2,control)
+                v1a,v2a,cona=Statsample.only_valid(v1,v2,control)
                 rv1v2=pearson(v1a,v2a)
                 rv1con=pearson(v1a,cona)
                 rv2con=pearson(v2a,cona)
@@ -122,7 +122,7 @@ module RubySS
                         if row==col
                             ds[row].valid_data.size
                         else
-                            rowa,rowb=RubySS.only_valid(ds[row],ds[col])
+                            rowa,rowb=Statsample.only_valid(ds[row],ds[col])
                             rowa.size
                         end
                 }
@@ -130,7 +130,7 @@ module RubySS
             def correlation_probability_matrix(ds)
                 rows=ds.fields.collect{|row|
                     ds.fields.collect{|col|
-                        v1a,v2a=RubySS.only_valid(ds[row],ds[col])
+                        v1a,v2a=Statsample.only_valid(ds[row],ds[col])
                         (row==col or ds[row].type!=:scale or ds[col].type!=:scale) ? nil : prop_pearson(t_pearson(ds[row],ds[col]), v1a.size)
                     }
                 }
@@ -138,7 +138,7 @@ module RubySS
             end
 			# Calculate Spearman correlation coefficient between 2 vectors
 			def spearman(v1,v2)
-				v1a,v2a=RubySS.only_valid(v1,v2)
+				v1a,v2a=Statsample.only_valid(v1,v2)
 				v1r,v2r=v1a.ranked(:scale),v2a.ranked(:scale)
                 pearson(v1r,v2r)
 			end
@@ -158,7 +158,7 @@ module RubySS
 			#
 			# Based on Hervé Adbi article
 			def tau_a(v1,v2)
-				v1a,v2a=RubySS.only_valid(v1,v2)
+				v1a,v2a=Statsample.only_valid(v1,v2)
 				n=v1.size
 				v1r,v2r=v1a.ranked(:scale),v2a.ranked(:scale)
 				o1=ordered_pairs(v1r)
@@ -242,7 +242,7 @@ module RubySS
 			a
 			end
 			def sum_of_codeviated(v1,v2)
-				v1a,v2a=RubySS.only_valid(v1,v2)
+				v1a,v2a=Statsample.only_valid(v1,v2)
 				sum=0
 				(0...v1a.size).each{|i|
 					sum+=v1a[i]*v2a[i]

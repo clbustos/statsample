@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
     module Graph
         class SvgBoxplot < SVG::Graph::Bar
             def initialize(config={})

@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
     module Graph
         class SvgScatterplot < SVG::Graph::Plot
             attr_accessor :draw_path

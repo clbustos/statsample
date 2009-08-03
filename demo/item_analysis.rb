@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
-require File.dirname(__FILE__)+'/../lib/rubyss'
+require File.dirname(__FILE__)+'/../lib/statsample'
 require 'fileutils.rb'
-ds=RubySS::CSV.read(File.dirname(__FILE__)+"/sample_test.csv")
+ds=Statsample::CSV.read(File.dirname(__FILE__)+"/sample_test.csv")
 FileUtils::mkdir_p(File.dirname(__FILE__)+"/item_analysis")
 fp=File.new(File.dirname(__FILE__)+"/item_analysis/Analisis.html","w")
 
@@ -17,7 +17,7 @@ ds2={}
     ds2["p"+v.to_s].type=:scale
 }
 
-a= RubySS::Reliability::ItemAnalysis.new(ds2.to_dataset)
+a= Statsample::Reliability::ItemAnalysis.new(ds2.to_dataset)
 
 fp.puts(a.html_summary)
 a.svggraph_item_characteristic_curve(File.dirname(__FILE__) + "/item_analysis",dim,{:width=>500,:height=>400})

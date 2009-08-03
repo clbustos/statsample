@@ -1,5 +1,5 @@
-require 'rubyss/dominanceanalysis/bootstrap'
-module RubySS
+require 'statsample/dominanceanalysis/bootstrap'
+module Statsample
     class DominanceAnalysis
         def initialize(ds,y_var, r_class = Regression::MultipleRegressionPairwise)
             @y_var=y_var
@@ -165,7 +165,7 @@ module RubySS
             out=""
             out.extend report_type
             out << "Summary for Dominance Analysis of "+@fields.join(", ")+" over "+@y_var+"\n"
-                t=RubySS::ReportTable.new
+                t=Statsample::ReportTable.new
                 t.header=["","r2","sign"]+@fields
                 row=["Model 0","",""]+@fields.collect{|f|
                     sprintf("%0.3f",md(f).r2)
@@ -205,7 +205,7 @@ module RubySS
             td=total_dominance
             cd=conditional_dominance
             gd=general_dominance
-            t=RubySS::ReportTable.new(["Pairs","T","C","G"])
+            t=Statsample::ReportTable.new(["Pairs","T","C","G"])
             pairs.each{|p|
                 name=p.join(" - ")
                 row=[name, sprintf("%0.1f",td[p]), sprintf("%0.1f",cd[p]), sprintf("%0.1f",gd[p])]

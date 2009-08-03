@@ -1,11 +1,11 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
+require File.dirname(__FILE__)+'/../lib/statsample'
 require 'rbgsl'
-require 'rubyss/resample'
-require 'rubyss/test'
+require 'statsample/resample'
+require 'statsample/test'
 require 'matrix'
 ideal=Matrix[[30,30,40]]
 tests=10000
-monte=RubySS::Resample.repeat_and_save(tests) {
+monte=Statsample::Resample.repeat_and_save(tests) {
 	observed=[0,0,0]
 	(1..100).each{|i|
 		r=rand(100)
@@ -17,7 +17,7 @@ monte=RubySS::Resample.repeat_and_save(tests) {
 			observed[2]+=1
 		end
 	}
-	RubySS::Test::chi_square(Matrix[observed],ideal)
+	Statsample::Test::chi_square(Matrix[observed],ideal)
 }
 
 

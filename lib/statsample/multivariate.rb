@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
     # Diverse multivariate methods 
     module Multivariate
         

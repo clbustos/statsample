@@ -1,4 +1,4 @@
-module RubySS
+module Statsample
 	# Class to create crosstab of data
 	# With this, you can create reports and do chi square test
 	# The first vector will be at rows and the second will the the columns
@@ -29,7 +29,7 @@ module RubySS
 				s[par]=0
 				s
 			}
-			base.update(RubySS::vector_cols_matrix(@v_rows,@v_cols).to_a.to_vector.frequencies)
+			base.update(Statsample::vector_cols_matrix(@v_rows,@v_cols).to_a.to_vector.frequencies)
 		end
         def to_matrix
             f=frequencies
@@ -61,8 +61,8 @@ module RubySS
         end
         # Chi square, based on expected and real matrix
         def chi_square
-            require 'rubyss/test'
-            RubySS::Test.chi_square(self.to_matrix,matrix_expected)
+            require 'statsample/test'
+            Statsample::Test.chi_square(self.to_matrix,matrix_expected)
         end
         # Useful to obtain chi square
         def matrix_expected

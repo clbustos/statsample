@@ -1,6 +1,6 @@
-require 'rubyss/graph/svggraph'
+require 'statsample/graph/svggraph'
 
-module RubySS
+module Statsample
     class HtmlReport
     def initialize(name,dir=nil)
         require 'fileutils'
@@ -30,8 +30,8 @@ module RubySS
     def add_correlation_matrix(ds)
         add_anchor("Correlation Matrix")
         html="<h2>Correlation Matrix</h2> <table><thead><th>-</th><th>"+ds.fields.join("</th><th>")+"</th> </thead> <tbody>"
-        matrix=RubySS::Bivariate.correlation_matrix(ds)
-        pmatrix=RubySS::Bivariate.correlation_probability_matrix(ds)
+        matrix=Statsample::Bivariate.correlation_matrix(ds)
+        pmatrix=Statsample::Bivariate.correlation_probability_matrix(ds)
 
       
         (0...(matrix.row_size)).each {|row|
@@ -74,7 +74,7 @@ module RubySS
         add_anchor("Scale:#{name}")
         
         ds_partial=ds.dup(fields)
-        ia=RubySS::Reliability::ItemAnalysis.new(ds_partial)
+        ia=Statsample::Reliability::ItemAnalysis.new(ds_partial)
         html="<h2>Scale: #{name}</h2>"
         html << ia.html_summary
         @partials.push(html)
@@ -115,7 +115,7 @@ module RubySS
         x_field||=ds.fields[0]
         y_fields||=ds.fields-[x_field]
         ds_partial=ds.dup([x_field]+y_fields)
-        sc=RubySS::Graph::SvgScatterplot.new(ds_partial, config)
+        sc=Statsample::Graph::SvgScatterplot.new(ds_partial, config)
         sc.parse
         sc_file=@dir+"/#{uniq_file("sc")}.svg"
         html = "<h3>Scatterplot #{name}</h3> <p><embed src='#{sc_file}'  width='#{sc.width}' height='#{sc.height}' type='image/svg+xml' /></p>\n"
@@ -129,7 +129,7 @@ module RubySS
     def add_boxplots(name, ds,options={})
         add_anchor("Boxplots: #{name}")
         options={:graph_title=>"Boxplots:#{name}", :show_graph_title=>true, :height=>500}.merge! options
-        graph = RubySS::Graph::SvgBoxplot.new(options)
+        graph = Statsample::Graph::SvgBoxplot.new(options)
         ds.fields.each{|f|
             graph.add_data(:title=>f, 
                 :data=>ds[f].valid_data,
@@ -149,11 +149,11 @@ module RubySS
         @partials.push(html)
     end
     def add_icc(name,ds, fields)
-        require 'rubyss/graph/svggraph'
+        require 'statsample/graph/svggraph'
         raise "Fields are empty" if fields.size==0
         add_anchor("ICC:#{name}")        
         ds_partial=ds.dup(fields)
-        ia=RubySS::Reliability::ItemAnalysis.new(ds_partial)
+        ia=Statsample::Reliability::ItemAnalysis.new(ds_partial)
         html="<h3>ICC for scale: #{name}</h3>"
         ia.svggraph_item_characteristic_curve(@dir ,name, {:width=>400,:height=>300})
         ds_partial.fields.sort.each{|f|

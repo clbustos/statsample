@@ -1,11 +1,11 @@
-module RubySS
+module Statsample
     module Anova
         # One Way Anova
         # Example:
         #   v1=[2,3,4,5,6].to_vector(:scale)
         #   v2=[3,3,4,5,6].to_vector(:scale)
         #   v3=[5,3,1,5,6].to_vector(:scale)
-        #   anova=RubySS::Anova::OneWay.new([v1,v2,v3])
+        #   anova=Statsample::Anova::OneWay.new([v1,v2,v3])
         #   puts anova.f
         #   puts anova.significance
         class OneWay

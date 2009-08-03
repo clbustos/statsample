@@ -1,5 +1,5 @@
 require 'GDChart'
-module RubySS
+module Statsample
 	module Util
 	class << self
 		def chart_gdchart(file,width,height,chart_type, labels, options,num_datasets,data)
@@ -26,7 +26,7 @@ module RubySS
 				data.push(v) 
 			}
 			options['ext_color']=[0xFF3399,0xFF9933,0xFFEE33,0x33FF33, 0x9966FF]
-			RubySS::Util.chart_gdchart(file,width,height,chart_type, labels,options,1,data)
+			Statsample::Util.chart_gdchart(file,width,height,chart_type, labels,options,1,data)
 		end
 	end
 	class Scale < Ordinal
@@ -39,7 +39,7 @@ module RubySS
                 range=h.get_range(bin)
                 labels.push(((range[0]+range[1]) / 2.to_f).to_s)
             }
-            RubySS::Util.chart_gdchart(file, width, height, chart_type, labels,options, 1,data)
+            Statsample::Util.chart_gdchart(file, width, height, chart_type, labels,options, 1,data)
 		end
 	end
 end

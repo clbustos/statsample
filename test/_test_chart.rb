@@ -1,9 +1,9 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
+require File.dirname(__FILE__)+'/../lib/statsample'
 require 'tempfile'
 require 'test/unit'
-require 'rubyss/chart/gdchart'
+require 'statsample/chart/gdchart'
 # Not included on default test, because GDChart send a lot of warnings!
-class RubySSChartTestCase < Test::Unit::TestCase
+class StatsampleChartTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
 		@image_path=File.dirname(__FILE__)+"/images"
@@ -20,7 +20,7 @@ class RubySSChartTestCase < Test::Unit::TestCase
 		n_data=1
 		data=[10,40,30,20,40]
 		
-		RubySS::Util.chart_gdchart(file,width,height,chart_type, labels, options,n_data,data)
+		Statsample::Util.chart_gdchart(file,width,height,chart_type, labels, options,n_data,data)
 		assert(File.exists?(file))
 		%w{STACK_DEPTH STACK_SUM STACK_BESIDE STACK_LAYER}.each{|stack|
 			file=@image_path+"/gdchart_base_bar_2_#{stack}.jpg"
@@ -30,7 +30,7 @@ class RubySSChartTestCase < Test::Unit::TestCase
 			chart_type=GDChart::BAR
 			
 			data=[10,15,10,20,30,30,20,5,15,20]
-			RubySS::Util.chart_gdchart(file,width,height,chart_type, labels, options,n_data,data)
+			Statsample::Util.chart_gdchart(file,width,height,chart_type, labels, options,n_data,data)
 			assert(File.exists?(file))
 		}
 	end

@@ -1,7 +1,7 @@
-require File.dirname(__FILE__)+'/../lib/rubyss'
+require File.dirname(__FILE__)+'/../lib/statsample'
 require 'test/unit'
 
-class RubySSReliabilityTestCase < Test::Unit::TestCase
+class StatsampleReliabilityTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
 		super
@@ -13,7 +13,7 @@ class RubySSReliabilityTestCase < Test::Unit::TestCase
 	end
    
     def test_general
-        ia=RubySS::Reliability::ItemAnalysis.new(@ds)
+        ia=Statsample::Reliability::ItemAnalysis.new(@ds)
         assert_in_delta(0.980,ia.alpha,0.001)
         assert_in_delta(0.999,ia.alpha_standarized,0.001)
         assert_in_delta(0.999,ia.item_total_correlation()['x1'],0.001)
@@ -21,7 +21,7 @@ class RubySSReliabilityTestCase < Test::Unit::TestCase
     end	
     def test_icc
         #p @x1.factors
-        icc=RubySS::Reliability::ItemCharacteristicCurve.new(@ds)
+        icc=Statsample::Reliability::ItemCharacteristicCurve.new(@ds)
         # Need to create the test!!!!
         #p icc.curve_field('x1',1).sort
         #p icc.curve_field('x1',2).sort

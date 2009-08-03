@@ -1,8 +1,8 @@
-require File.dirname(__FILE__)+'/../lib/rubyss.rb'
-require 'rubyss/multiset'
+require File.dirname(__FILE__)+'/../lib/statsample.rb'
+require 'statsample/multiset'
 require 'test/unit'
 
-class RubySSMultisetTestCase < Test::Unit::TestCase
+class StatsampleMultisetTestCase < Test::Unit::TestCase
 	def initialize(*args)
 		super
 	end
@@ -15,7 +15,7 @@ class RubySSMultisetTestCase < Test::Unit::TestCase
         v2b=[11,21,31,41,51].to_vector
         v3b=[21,23,34,45,56].to_vector
         ds2={'v1'=>v1b,'v2'=>v2b,'v3'=>v3b}.to_dataset
-        ms=RubySS::Multiset.new(['v1','v2','v3'])
+        ms=Statsample::Multiset.new(['v1','v2','v3'])
         ms.add_dataset('ds1',ds1)
         ms.add_dataset('ds2',ds2)
         assert_equal(ds1,ms['ds1'])
@@ -28,10 +28,10 @@ class RubySSMultisetTestCase < Test::Unit::TestCase
 		end
     end
     def test_creation_empty
-        ms=RubySS::Multiset.new_empty_vectors(%w{id age name},%w{male female})
+        ms=Statsample::Multiset.new_empty_vectors(%w{id age name},%w{male female})
         ds_male={'id'=>[].to_vector,'age'=>[].to_vector, 'name'=>[].to_vector}.to_dataset(%w{id age name})
         ds_female={'id'=>[].to_vector,'age'=>[].to_vector, 'name'=>[].to_vector}.to_dataset(%w{id age name})
-        ms2=RubySS::Multiset.new(%w{id age name})
+        ms2=Statsample::Multiset.new(%w{id age name})
         ms2.add_dataset('male',ds_male)
         ms2.add_dataset('female',ds_female)
         assert_equal(ms2.fields,ms.fields)
@@ -69,10 +69,10 @@ class RubySSMultisetTestCase < Test::Unit::TestCase
         ds2={'q1'=>[1,1,1,1,1,1,1,0,0].to_vector}.to_dataset
         assert_equal(5.0/12, ds1['q1'].proportion )
         assert_equal(7.0/9, ds2['q1'].proportion )
-        ms=RubySS::Multiset.new(['q1'])
+        ms=Statsample::Multiset.new(['q1'])
         ms.add_dataset('d1',ds1)
         ms.add_dataset('d2',ds2)
-        ss=RubySS::StratifiedSample.new(ms,{'d1'=>50,'d2'=>100})
+        ss=Statsample::StratifiedSample.new(ms,{'d1'=>50,'d2'=>100})
         assert_in_delta(0.655, ss.proportion('q1'),0.01)
         assert_in_delta(0.345, ss.proportion('q1',0),0.01)        
         
@@ -80,10 +80,10 @@ class RubySSMultisetTestCase < Test::Unit::TestCase
     def test_stratum_scale
         boys={'test'=>[50, 55, 60, 62, 62, 65, 67, 67, 70, 70, 73, 73, 75, 78, 78, 80, 85, 90].to_vector(:scale)}.to_dataset
         girls={'test'=>[70, 70, 72, 72, 75, 75, 78, 78, 80, 80, 82, 82, 85, 85, 88, 88, 90, 90].to_vector(:scale)}.to_dataset
-        ms=RubySS::Multiset.new(['test'])
+        ms=Statsample::Multiset.new(['test'])
         ms.add_dataset('boys',boys)
         ms.add_dataset('girls',girls)
-        ss=RubySS::StratifiedSample.new(ms,{'boys'=>10000,'girls'=>10000})
+        ss=Statsample::StratifiedSample.new(ms,{'boys'=>10000,'girls'=>10000})
         assert_equal(2,ss.strata_number)
         assert_equal(20000,ss.population_size)
         assert_equal(10000,ss.stratum_size('boys'))
