@@ -19,10 +19,10 @@ module Multiple
     # select the best engine
     #   lr=Statsample::Regression::Multiple.listwise(ds,'y')
     def self.listwise(ds,y_var)
-        if HAS_ALGIB
-            AlglibEngine.new(ds,y_var)
-        elsif HAS_GSL
+        if HAS_GSL
             GslEngine.new(ds,y_var)
+        elsif HAS_ALGIB
+            AlglibEngine.new(ds,y_var)
         else
             ds2=ds.dup_only_valid
             RubyEngine.new(ds2,y_var)

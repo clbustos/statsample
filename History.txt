@@ -1,3 +1,7 @@
+=== 0.3.2 / 2009-08-?
+
+* Added Regression::Multiple::GslEngine
+
 === 0.3.1 / 2009-08-03
 
 * Name and logic of Regression classes changed. Now, you have Regression::Simple class and Regression::Multiple module with two engines: RubyEngine and AlglibEngne

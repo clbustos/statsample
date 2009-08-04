@@ -10,6 +10,16 @@ v=(0..10000).collect{|n|
 }.to_vector
 v.missing_values=[5,10,20]
 v.type=:scale
+a=[]
+b=[]
+c=[]
+(0..1000).each{|i|
+    a.push(rand())
+    b.push(rand())
+    c.push(rand())
+}
+ds=Statsample::Dataset.new({'a'=>a.to_vector(:scale),'b'=>b.to_vector(:scale), 'c'=>c.to_vector(:scale)})
+    
 
  n = 300
  if (false)
@@ -25,8 +35,20 @@ v.type=:scale
     end
  end
 
-
  if (true)
+     Benchmark.bm(7) do |x|
+         x.report("Alglib coeffs")   { for i in 1..n; lr=Statsample::Regression::Multiple::AlglibEngine.new(ds,"c"); lr.coeffs; end }
+         x.report("GslEngine coeffs")   { for i in 1..n; lr=Statsample::Regression::Multiple::GslEngine.new(ds,"c"); lr.coeffs; end }
+     end
+ end
+ if(true)
+     Benchmark.bm(7) do |x|
+         x.report("Alglib process")   { for i in 1..n; lr=Statsample::Regression::Multiple::AlglibEngine.new(ds,"c"); lr.process([1,2]); end }
+         x.report("GslEngine process")   { for i in 1..n; lr=Statsample::Regression::Multiple::GslEngine.new(ds,"c"); lr.process([1,2]); end }
+
+    end
+ end
+ if (false)
     Benchmark.bm(7) do |x|
 		x.report("mean")   { for i in 1..n; v.mean; end }
 		x.report("slow_mean")   { for i in 1..n; v.mean_slow; end }
