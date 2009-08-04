@@ -1,6 +1,8 @@
 require 'statsample/dominanceanalysis/bootstrap'
 module Statsample
     class DominanceAnalysis
+        include GetText
+        bindtextdomain("statsample")
         def initialize(ds,y_var, r_class = Regression::Multiple::RubyEngine)
             @y_var=y_var
             @dy=ds[@y_var]
@@ -164,10 +166,10 @@ module Statsample
         def summary(report_type=ConsoleSummary)
             out=""
             out.extend report_type
-            out << "Summary for Dominance Analysis of "+@fields.join(", ")+" over "+@y_var+"\n"
+            out << _("Summary for Dominance Analysis of %s on %s\n") % [@fields.join(", "),@y_var]
                 t=Statsample::ReportTable.new
                 t.header=["","r2","sign"]+@fields
-                row=["Model 0","",""]+@fields.collect{|f|
+                row=[_("Model 0"),"",""]+@fields.collect{|f|
                     sprintf("%0.3f",md(f).r2)
                 }
                 t.add_row(row)
@@ -181,7 +183,7 @@ module Statsample
                 a=average_k(i)
                 if !a.nil?
                     t.add_horizontal_line
-                    row=["k=#{i} Average","",""] + @fields.collect{|f|
+                    row=[_("k=%d Average") % i,"",""] + @fields.collect{|f|
                         sprintf("%0.3f",a[f])
                     }
                     t.add_row(row)
@@ -194,18 +196,18 @@ module Statsample
             g=general_averages
                     t.add_horizontal_line
             
-            row=["Overall averages","",""]+@fields.collect{|f|
+            row=[_("Overall averages"),"",""]+@fields.collect{|f|
                         sprintf("%0.3f",g[f])
             }
             t.add_row(row)
             out.parse_table(t)
                     
             out.nl
-            out << "Pairwise\n"
+            out << _("Pairwise")+"\n"
             td=total_dominance
             cd=conditional_dominance
             gd=general_dominance
-            t=Statsample::ReportTable.new(["Pairs","T","C","G"])
+            t=Statsample::ReportTable.new([_("Pairs"),"T","C","G"])
             pairs.each{|p|
                 name=p.join(" - ")
                 row=[name, sprintf("%0.1f",td[p]), sprintf("%0.1f",cd[p]), sprintf("%0.1f",gd[p])]

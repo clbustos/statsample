@@ -15,14 +15,14 @@ module Regression
         
         
 module Multiple
-    # Creates an object for listwise regression. According to resources
-    # select the best engine
+    # Creates an object for listwise regression. 
+    # Alglib is faster, so is prefered over GSL
     #   lr=Statsample::Regression::Multiple.listwise(ds,'y')
     def self.listwise(ds,y_var)
-        if HAS_GSL
-            GslEngine.new(ds,y_var)
-        elsif HAS_ALGIB
+        if HAS_ALGIB
             AlglibEngine.new(ds,y_var)
+        elsif HAS_GSL
+            GslEngine.new(ds,y_var)
         else
             ds2=ds.dup_only_valid
             RubyEngine.new(ds2,y_var)
@@ -132,14 +132,7 @@ module Multiple
             ds.each{|k,v|
                 ds[k]=v.to_vector(:scale)
             }
-    if HAS_ALGIB
-        lr_class=AlglibEngine
-        ds=ds.to_dataset
-    else
-        lr_class=RubyEngine
-        ds=ds.to_dataset.dup_only_valid
-    end
-    lr=lr_class.new(ds,var)
+            lr=Multiple.listwise(ds.to_dataset,var)
             1-lr.r2
         end
         # Tolerances for each coefficient

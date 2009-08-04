@@ -35,13 +35,28 @@ def create_test(*args,&proc)
     fields=args
     [description, fields, Proc.new]
 end
-
+# Test extensions
 begin
-	require 'rbgsl'
-	HAS_GSL=true
-rescue LoadError
-	HAS_GSL=false
+    require 'gettext'
+    rescue LoadError
+    def bindtextdomain(d)
+        d
+    end
+
+        # Bored module
+        module GetText
+            def _(t)
+                t
+            end
+        end
 end
+    
+    begin
+        require 'rbgsl'
+        HAS_GSL=true
+    rescue LoadError
+        HAS_GSL=false
+    end
     begin 
         require 'alglib'
         HAS_ALGIB=true

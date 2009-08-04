@@ -4,6 +4,8 @@ module Regression
 module Multiple
 # Class for Multiple Regression Analysis
 # Requires rbgsl and uses a listwise aproach.
+# Slower on prediction of values than Alglib, because predict is ruby based.
+# Better memory management on multiple (+1000) series of regression. 
 # If you need pairwise, use RubyEngine
 # Example:
 #
@@ -42,9 +44,11 @@ class GslEngine < BaseEngine
         }
         @dep_columns=columns.dup
         @lr_s=nil
-        @c, @cov, @chisq, @status = GSL::MultiFit.linear(max_deps, @dy.gsl)
-        @constant=@c[constant_col]
-        @coeffs=@c.to_a.slice(0...constant_col)
+        c, @cov, @chisq, @status = GSL::MultiFit.linear(max_deps, @dy.gsl)
+        @constant=c[constant_col]
+        @coeffs_a=c.to_a.slice(0...constant_col)
+        @coeffs=assign_names(@coeffs_a)
+        c=nil
     end
     
     def _dump(i)
@@ -56,7 +60,7 @@ class GslEngine < BaseEngine
     end
     
     def coeffs
-        assign_names(@coeffs)
+        @coeffs
     end
     # Coefficients using a constant
     # Based on http://www.xycoon.com/ols1.htm

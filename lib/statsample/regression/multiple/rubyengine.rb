@@ -2,7 +2,8 @@ module Statsample
 module Regression
 module Multiple
 # Pure Ruby Class for Multiple Regression Analysis.
-# Slower than AlglibEngine, but is pure ruby and uses a pairwise aproach for missing values. 
+# Slower than AlglibEngine, but is pure ruby and can use a pairwise aproach for missing values. 
+# Coeffient calculation uses correlation matrix between the vectors
 # If you need listwise aproach for missing values, use AlglibEngine, because is faster.
 # 
 # Example:

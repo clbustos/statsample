@@ -4,6 +4,8 @@ module Regression
 module Multiple
 # Class for Multiple Regression Analysis
 # Requires Alglib gem and uses a listwise aproach.
+# Faster than GslEngine on massive prediction use, because process is c-based.
+# Prefer GslEngine if you need good memory use.
 # If you need pairwise, use RubyEngine
 # Example:
 #

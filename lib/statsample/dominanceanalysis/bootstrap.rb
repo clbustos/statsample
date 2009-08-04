@@ -1,7 +1,9 @@
 module Statsample
 class DominanceAnalysis
     class Bootstrap
+        include GetText
         include Writable
+        bindtextdomain("statsample")
         attr_reader :samples_td,:samples_cd,:samples_gd,:samples_ga, :fields
         attr_writer :lr_class
         attr_accessor :ds
@@ -24,10 +26,10 @@ class DominanceAnalysis
             end
             @da
         end
-        def bootstrap(number_samples,n=nil)
+        def bootstrap(number_samples,n=nil,report=false)
                 number_samples.times{ |t|
                     @n_samples+=1
-                    puts "Bootstrap #{t+1} of #{number_samples}"
+                    puts _("Bootstrap %d of %d") % [t+1, number_samples] if report
                     ds_boot=@ds.bootstrap(n)
                     da_1=DominanceAnalysis.new(ds_boot,@y_var,@lr_class)
                     da_1.total_dominance.each{|k,v|
@@ -66,13 +68,13 @@ class DominanceAnalysis
             alfa=0.95
             t=GSL::Cdf.tdist_Pinv(1-((1-alfa) / 2),@n_samples - 1)
             out.extend report_type
-            out.add "Summary for Bootstrap Dominance Analysis of "+@fields.join(", ")+" over "+@y_var+"\n"
-            out.add "Size of sample: #{@n_samples}\n"
+            out.add _("Summary for Bootstrap Dominance Analysis of %s on %s\n") % [@fields.join(", "), @y_var]
+            out.add _("Sample size: %d\n") % @n_samples
             out.add "t:#{t}\n"
             out.add "Linear Regression Engine: #{@lr_class.name}"
             out.nl
             table=ReportTable.new
-            header=["pairs","sD","Dij","SE(Dij)","Pij","Pji","Pno","Reprod"]
+            header=[_("pairs"),"sD","Dij",_("SE(Dij)"),"Pij","Pji","Pno",_("Reproducibility")]
             table.header=header
             table.add_row(["Complete dominance"])
             table.add_horizontal_line
@@ -82,7 +84,7 @@ class DominanceAnalysis
                 table.add_row(summary_pairs(pair,std,ttd))
             }
             table.add_horizontal_line
-            table.add_row(["Conditional dominance"])
+            table.add_row([_("Conditional dominance")])
             table.add_horizontal_line
             @pairs.each{|pair|
                 std=@samples_cd[pair].to_vector(:scale)
@@ -91,7 +93,7 @@ class DominanceAnalysis
 
             }
             table.add_horizontal_line
-            table.add_row(["General Dominance"])
+            table.add_row([_("General Dominance")])
             table.add_horizontal_line
             @pairs.each{|pair|
                 std=@samples_gd[pair].to_vector(:scale)
@@ -99,9 +101,9 @@ class DominanceAnalysis
                 table.add_row(summary_pairs(pair,std,ttd))
             }
             out.parse_table(table)
-            out.add("General averages")
+            out.add(_("General averages"))
             table=Statsample::ReportTable.new
-            table.header=["var","mean","se","p.5","p.95"]
+            table.header=[_("var"),_("mean"),_("se"),_("p.5"),_("p.95")]
             @fields.each{|f|
                 v=@samples_ga[f].to_vector(:scale)
                 row=[@ds.vector_label(f), sprintf("%0.3f",v.mean), sprintf("%0.3f",v.sd), sprintf("%0.3f",v.percentil(5)),sprintf("%0.3f",v.percentil(95))]

@@ -1,4 +1,5 @@
 require File.dirname(__FILE__)+'/../lib/statsample'
+require 'benchmark'
 tests=300
 include Statsample
 r = GSL::Rng.alloc(GSL::Rng::TAUS,Time.now.to_i)
@@ -24,9 +25,17 @@ if !File.exists? "regression.dab"
 else
     da=Statsample.load("regression.dab")
 end
-    
-da.lr_class=Regression::Multiple::AlglibEngine
-da.bootstrap(20)
+times=1
+Benchmark.bm(7) do |x|
+    x.report("GslEngine:") {
+        da.lr_class=Regression::Multiple::GslEngine
+        da.bootstrap(times)
+    }
+    x.report("AlglibEngine:") {
+        da.lr_class=Regression::Multiple::AlglibEngine
+        da.bootstrap(times)
+    }
+end
 
 puts da.summary
 da.save("regression.dab")

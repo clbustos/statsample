@@ -3,6 +3,7 @@ LICENSE.txt
 Manifest.txt
 README.txt
 bin/statsample
+data/locale/es/LC_MESSAGES/statsample.po
 demo/benchmark.rb
 demo/chi-square.rb
 demo/crosstab.rb
@@ -47,6 +48,8 @@ lib/statsample/resample.rb
 lib/statsample/srs.rb
 lib/statsample/test.rb
 lib/statsample/vector.rb
+po/statsample.pot
+po/es/statsample.po
 setup.rb
 test/_test_chart.rb
 test/test_anova.rb

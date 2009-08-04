@@ -1,11 +1,12 @@
 = Statsample
 
-* http://rubyforge.org/projects/ruby-statsample/
-* http://code.google.com/p/ruby-statsample/
+* Main page: http://ruby-statsample.rubyforge.org/
+* Gems and bugs report: http://rubyforge.org/projects/ruby-statsample/
+* SVN and Wiki: http://code.google.com/p/ruby-statsample/
 
 == DESCRIPTION:
 
-This package allows to process files and databases for statistical purposes, with focus on validation, recodification and estimation of parameters for several types of samples (simple random, stratified and multistage sampling).
+A suite for your basic and advanced statistics needs. Descriptive statistics, multiple regression, dominance analysis, scale's reliability analysis, bivariate statistics and others procedures.
 
 == FEATURES:
 
