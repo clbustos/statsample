@@ -1,14 +1,22 @@
 # = statsample.rb - 
-
-# Process files and databases for statistical purposes, with focus on 
-# estimation of parameters for several types of samples (simple random, 
-# stratified and multistage sampling).
+# Statsample - Statistic package for Ruby
+# Copyright (C) 2008-2009  Claudio Bustos
 #
-# Copyright (C) 2008-2009 Claudio Bustos
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
-# Claudio Bustos mailto:clbustos_AT_gmail.com
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
 
-# :stopdoc:
 
 $:.unshift(File.dirname(__FILE__))
 $:.unshift(File.expand_path(File.dirname(__FILE__)+"/../ext"))
@@ -27,10 +35,6 @@ def create_test(*args,&proc)
     fields=args
     [description, fields, Proc.new]
 end
-
-# Process files and databases for statistical purposes, with focus on 
-# estimation of parameters for several types of samples (simple random, 
-# stratified and multistage sampling).
 
 begin
 	require 'rbgsl'
@@ -54,11 +58,15 @@ end
         end
     end
 
-#
-# :startdoc:
+# 
+# Modules for statistical analysis
+# See first: 
+# * Converter : several modules to import and export data
+# * Vector: The base class of all analysis
+# * Dataset: An union of vectors.
 #
 module Statsample
-    VERSION = '0.3.1'
+    VERSION = '0.3.2'
     SPLIT_TOKEN = ","
 	autoload(:Database, 'statsample/converters')
     autoload(:Anova, 'statsample/anova')

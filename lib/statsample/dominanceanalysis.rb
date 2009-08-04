@@ -197,7 +197,7 @@ module Statsample
             row=["Overall averages","",""]+@fields.collect{|f|
                         sprintf("%0.3f",g[f])
             }
-                    t.add_row(row)
+            t.add_row(row)
             out.parse_table(t)
                     
             out.nl

@@ -14,7 +14,7 @@ Hoe.spec('statsample') do |p|
 	p.rubyforge_name = "ruby-statsample"
 	p.developer('Claudio Bustos', 'clbustos@gmail.com')
 	p.extra_deps << ["spreadsheet","=0.6.4"] << "svg-graph"
-	p.clean_globs << "test/images/*" 
+	p.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"
 	#  p.rdoc_pattern = /^(lib|bin|ext\/distributions)|txt$/
 end
 

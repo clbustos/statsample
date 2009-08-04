@@ -1,6 +1,9 @@
-=== 0.3.2 / 2009-08-?
+=== 0.3.2 / 2009-08-04
 
 * Added Regression::Multiple::GslEngine
+* Added setup.rb
+* Crosstab#row_label and #column_name
+* DominanceAnalysis and DominanceAnalysisBootstrap uses Dataset#labels for Vector names.
 
 === 0.3.1 / 2009-08-03
 

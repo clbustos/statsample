@@ -1,4 +1,5 @@
 History.txt
+LICENSE.txt
 Manifest.txt
 README.txt
 bin/statsample
@@ -38,6 +39,7 @@ lib/statsample/multiset.rb
 lib/statsample/regression.rb
 lib/statsample/regression/multiple.rb
 lib/statsample/regression/multiple/alglibengine.rb
+lib/statsample/regression/multiple/gslengine.rb
 lib/statsample/regression/multiple/rubyengine.rb
 lib/statsample/regression/simple.rb
 lib/statsample/reliability.rb
@@ -45,6 +47,7 @@ lib/statsample/resample.rb
 lib/statsample/srs.rb
 lib/statsample/test.rb
 lib/statsample/vector.rb
+setup.rb
 test/_test_chart.rb
 test/test_anova.rb
 test/test_codification.rb

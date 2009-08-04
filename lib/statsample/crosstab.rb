@@ -5,6 +5,7 @@ module Statsample
 	#
     class Crosstab
 		attr_reader :v_rows, :v_cols
+        attr_accessor :row_label, :column_label
 		def initialize(v1,v2)
 			raise ArgumentError, "Both arguments should be Vectors" unless v1.instance_of? Vector and v2.instance_of? Vector
 			raise ArgumentError, "Vectors should be the same size" unless v1.size==v2.size
@@ -86,7 +87,10 @@ module Statsample
             cn=cols_names
             total=0
             total_cols=cn.inject({}) {|a,x| a[x]=0;a}
-            out.add "Chi Square: #{chi_square}"
+            out.add "Chi Square: #{chi_square}\n"
+            out.add "Rows: #{@row_label}\n" unless @row_label.nil?
+            out.add "Columns: #{@column_label}\n" unless @column_label.nil?
+            
             t=Statsample::ReportTable.new([""]+cols_names+["Total"])
             rn.each{|row|
                 total_row=0

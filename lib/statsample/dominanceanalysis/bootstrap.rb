@@ -4,6 +4,7 @@ class DominanceAnalysis
         include Writable
         attr_reader :samples_td,:samples_cd,:samples_gd,:samples_ga, :fields
         attr_writer :lr_class
+        attr_accessor :ds
         def initialize(ds,y_var)
             @ds=ds
             @y_var=y_var
@@ -103,7 +104,7 @@ class DominanceAnalysis
             table.header=["var","mean","se","p.5","p.95"]
             @fields.each{|f|
                 v=@samples_ga[f].to_vector(:scale)
-                row=[f, sprintf("%0.3f",v.mean), sprintf("%0.3f",v.sd), sprintf("%0.3f",v.percentil(5)),sprintf("%0.3f",v.percentil(95))]
+                row=[@ds.vector_label(f), sprintf("%0.3f",v.mean), sprintf("%0.3f",v.sd), sprintf("%0.3f",v.percentil(5)),sprintf("%0.3f",v.percentil(95))]
                 table.add_row(row)
 
             }
@@ -115,7 +116,7 @@ class DominanceAnalysis
             [0,0.5,1].each{|n|
                 freqs[n]=0 if freqs[n].nil?
             }
-            name=pair[0]+" - "+pair[1]
+            name=@ds.vector_label(pair[0])+" - "+@ds.vector_label(pair[1])
             [name,f(ttd,1),f(std.mean,4),f(std.sd),f(freqs[1]), f(freqs[0]), f(freqs[0.5]), f(freqs[ttd])]
         end
         def f(v,n=3)

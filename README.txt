@@ -10,7 +10,7 @@ This package allows to process files and databases for statistical purposes, wit
 == FEATURES:
 
 * Multiple Regression. Listwise analysis optimized with use of Alglib library. Pairwise analysis is executed on pure ruby and reports same values as SPSS
-* Dominance Analysis. Based on Bodescu and Azen papers, DominanceAnalysis? class can report dominance analysis for a sample and DominanceAnalysis?. Bootstrap can execute bootstrap analysis to determine dominance stability, as recomended by Azen & Bodescu (2003). 
+* Dominance Analysis. Based on Bodescu and Azen papers, DominanceAnalysis class can report dominance analysis for a sample and DominanceAnalysisBootstrap can execute bootstrap analysis to determine dominance stability, as recomended by Azen & Bodescu (2003). 
 * Classes for Vector, Datasets (set of Vectors) and Multisets (multiple datasets with same fields and type of vectors), and multiple methods to manipulate them
 * Module Codification, to help to codify open questions
 * Converters to and from database and csv files, and to output Mx and GGobi files
@@ -65,13 +65,16 @@ Optional:
 
 == INSTALL:
 
-gem install ruby-statsample
+  sudo gem install ruby-statsample
 
 For optimization on *nix env
 
-gem install ruby-statsample-optimization
+  sudo gem install ruby-statsample-optimization
 
+Available setup.rb file
+
+  sudo gem ruby setup.rb
 
 == LICENSE:
 
-GPL-2
+GPL-2 (See LICENSE.txt)
