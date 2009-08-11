@@ -1,4 +1,5 @@
-require File.dirname(__FILE__)+'/../lib/statsample'
+$:.unshift(File.dirname(__FILE__)+'/../lib/')
+require 'statsample'
 require 'test/unit'
 
 class StatsampleSrsTestCase < Test::Unit::TestCase

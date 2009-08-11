@@ -393,6 +393,14 @@ class Vector < DelegateClass(Array)
                 return "INTEGER"
             end
         end
+        # Return true if all data is Numeric or nil
+        def can_be_scale?
+            if @data.find {|v| !v.nil? and !v.is_a? Numeric}
+                false
+            else
+                true
+            end
+        end
         def summary(out="")
             @delegate.summary(@labels,out)
         end

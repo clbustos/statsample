@@ -1,14 +1,15 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Statsample español\n"
-"POT-Creation-Date: 2009-08-04 15:36-0400\n"
-"PO-Revision-Date: 2009-08-04 15:43-0300\n"
+"Project-Id-Version: statsample 0.3.3\n"
+"POT-Creation-Date: 2009-08-10 11:59-0400\n"
+"PO-Revision-Date: 2009-08-04 15:57-0300\n"
 "Last-Translator: Claudio Bustos <clbustos@gmail.com>\n"
 "Language-Team: Desarrollador\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Spanish\n"
+"X-Poedit-SourceCharset: utf-8\n"
 
 #: lib/statsample/dominanceanalysis/bootstrap.rb:32
 msgid "Bootstrap %d of %d"
@@ -16,7 +17,7 @@ msgstr "Bootstrap: %d de %d"
 
 #: lib/statsample/dominanceanalysis/bootstrap.rb:71
 msgid "Summary for Bootstrap Dominance Analysis of %s on %s\n"
-msgstr "Resultados para el Análisis de Dominancia de %s en %s\n"
+msgstr "Resultados del Análisis de Dominancia Bootstrap de %s en %s\n"
 
 #: lib/statsample/dominanceanalysis/bootstrap.rb:72
 msgid "Sample size: %d\n"
@@ -33,6 +34,10 @@ msgstr "EE(Dij)"
 #: lib/statsample/dominanceanalysis/bootstrap.rb:77
 msgid "Reproducibility"
 msgstr "Reproducibilidad"
+
+#: lib/statsample/dominanceanalysis/bootstrap.rb:79
+msgid "Complete dominance"
+msgstr "Dominancia Completa"
 
 #: lib/statsample/dominanceanalysis/bootstrap.rb:87
 msgid "Conditional dominance"
@@ -66,8 +71,20 @@ msgstr "p.5"
 msgid "p.95"
 msgstr "p.95"
 
+#: lib/statsample/crosstab.rb:93
+msgid "Rows: %s\n"
+msgstr ""
+
+#: lib/statsample/crosstab.rb:94
+msgid "Columns: %s\n"
+msgstr ""
+
+#: lib/statsample/crosstab.rb:96 lib/statsample/crosstab.rb:111
+msgid "Total"
+msgstr ""
+
 #: lib/statsample/dominanceanalysis.rb:169
-msgid "Summary for Dominance Analysis of %s over %s\n"
+msgid "Summary for Dominance Analysis of %s on %s\n"
 msgstr "Resultado del Análisis de Dominancia de %s en %s\n"
 
 #: lib/statsample/dominanceanalysis.rb:172
@@ -89,4 +106,3 @@ msgstr "De a pares"
 #: lib/statsample/dominanceanalysis.rb:210
 msgid "Pairs"
 msgstr "Pares"
-

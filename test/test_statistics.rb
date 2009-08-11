@@ -1,10 +1,23 @@
-require File.dirname(__FILE__)+'/../lib/statsample'
+$:.unshift(File.dirname(__FILE__)+'/../lib/')
+require 'statsample'
 require 'test/unit'
 class StatsampleStatisicsTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
 		super
 	end
+    def test_is_number
+        assert("10".is_number?)
+        assert("-10".is_number?)
+        assert("0.1".is_number?)
+        assert("-0.1".is_number?)
+        assert("10e3".is_number?)
+        assert("10e-3".is_number?)
+        assert(!"1212-1212-1".is_number?)
+        assert(!"a10".is_number?)
+        assert(!"".is_number?)
+
+    end
     def test_chi_square
         assert_raise TypeError do
             Statsample::Test.chi_square(1,1)

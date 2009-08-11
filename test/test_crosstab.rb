@@ -1,5 +1,5 @@
-require File.dirname(__FILE__)+'/../lib/statsample'
-require 'statsample/crosstab'
+$:.unshift(File.dirname(__FILE__)+'/../lib/')
+require 'statsample'
 require 'test/unit'
 
 class StatsampleCrosstabTestCase < Test::Unit::TestCase

@@ -1,8 +1,7 @@
 = Statsample
 
-* Main page: http://ruby-statsample.rubyforge.org/
-* Gems and bugs report: http://rubyforge.org/projects/ruby-statsample/
-* SVN and Wiki: http://code.google.com/p/ruby-statsample/
+http://ruby-statsample.rubyforge.org/
+
 
 == DESCRIPTION:
 
@@ -63,6 +62,10 @@ Optional:
 
 * Plotting: gnuplot and rbgnuplot, SVG::Graph
 * Advanced Statistical: gsl and rb-gsl (http://rb-gsl.rubyforge.org/)
+
+== DOWNLOAD
+* Gems and bugs report: http://rubyforge.org/projects/ruby-statsample/
+* SVN and Wiki: http://code.google.com/p/ruby-statsample/
 
 == INSTALL:
 

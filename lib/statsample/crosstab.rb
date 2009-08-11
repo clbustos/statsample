@@ -4,6 +4,8 @@ module Statsample
 	# The first vector will be at rows and the second will the the columns
 	#
     class Crosstab
+        include GetText
+        bindtextdomain("statsample")
 		attr_reader :v_rows, :v_cols
         attr_accessor :row_label, :column_label
 		def initialize(v1,v2)
@@ -88,10 +90,10 @@ module Statsample
             total=0
             total_cols=cn.inject({}) {|a,x| a[x]=0;a}
             out.add "Chi Square: #{chi_square}\n"
-            out.add "Rows: #{@row_label}\n" unless @row_label.nil?
-            out.add "Columns: #{@column_label}\n" unless @column_label.nil?
+            out.add(_("Rows: %s\n") % @row_label) unless @row_label.nil?
+            out.add(_("Columns: %s\n") % @column_label) unless @column_label.nil?
             
-            t=Statsample::ReportTable.new([""]+cols_names+["Total"])
+            t=Statsample::ReportTable.new([""]+cols_names+[_("Total")])
             rn.each{|row|
                 total_row=0
                 t_row=[@v_rows.labeling(row)]
@@ -106,7 +108,7 @@ module Statsample
                 t.add_row(t_row)
             }
             t.add_horizontal_line
-            t_row=["Total"]
+            t_row=[_("Total")]
             cn.each{|v|
                 t_row.push(total_cols[v])
             }

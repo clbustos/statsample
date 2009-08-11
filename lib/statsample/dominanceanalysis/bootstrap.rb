@@ -76,7 +76,7 @@ class DominanceAnalysis
             table=ReportTable.new
             header=[_("pairs"),"sD","Dij",_("SE(Dij)"),"Pij","Pji","Pno",_("Reproducibility")]
             table.header=header
-            table.add_row(["Complete dominance"])
+            table.add_row([_("Complete dominance")])
             table.add_horizontal_line
             @pairs.each{|pair|
                 std=@samples_td[pair].to_vector(:scale)

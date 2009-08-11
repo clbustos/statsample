@@ -29,6 +29,15 @@ class Numeric
   def square ; self * self ; end
 end
 
+class String
+    def is_number?
+        if self =~ /^-?\d+[,.]?\d*(e-?\d+)?$/
+            true
+        else
+            false
+        end
+    end
+end
 
 def create_test(*args,&proc) 
     description=args.shift
@@ -81,7 +90,7 @@ end
 # * Dataset: An union of vectors.
 #
 module Statsample
-    VERSION = '0.3.2'
+    VERSION = '0.3.3'
     SPLIT_TOKEN = ","
 	autoload(:Database, 'statsample/converters')
     autoload(:Anova, 'statsample/anova')
@@ -97,6 +106,10 @@ module Statsample
 	autoload(:Reliability, 'statsample/reliability')
 	autoload(:Bivariate, 'statsample/bivariate')
 	autoload(:Multivariate, 'statsample/multivariate')
+	autoload(:Multiset, 'statsample/multiset')
+	autoload(:StratifiedSample, 'statsample/multiset')
+    
+    
 	autoload(:Regression, 'statsample/regression')
 	autoload(:Test, 'statsample/test')
     def self.load(filename)

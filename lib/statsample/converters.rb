@@ -78,7 +78,46 @@ module Statsample
         end
         end
     end
-    module Excel
+    class SpreadsheetBase
+        class << self
+            def extract_fields(row)
+                fields=row.to_a.collect{|c| c.downcase}
+                if fields.size!=fields.uniq.size
+                    repeated=fields.inject({}) {|a,v|
+                    (a[v].nil? ? a[v]=1 : a[v]+=1); a }.find_all{|k,v| v>1}.collect{|k,v|k}.join(",")
+                    raise "There are some repeated fields on the header:#{repeated}. Please, fix" 
+                end
+                fields
+            end
+            
+            def process_row(row,empty)
+                row.to_a.collect do |c|
+                    if empty.include?(c)
+                        nil
+                    else
+                        if c.is_a? String and c.is_number?
+                            if c=~/^\d+$/
+                                c.to_i
+                            else
+                                c.gsub(",",".").to_f
+                            end
+                        else
+                            c
+                        end
+                    end
+                end
+            end
+            def convert_to_scale(ds,fields)
+                fields.each do |f|
+                    if ds[f].can_be_scale?
+                        ds[f].type=:scale
+                    end
+                end
+            end
+                
+        end
+    end
+    class Excel < SpreadsheetBase 
         class << self
             def write(dataset,filename)
                 require 'spreadsheet'
@@ -101,7 +140,6 @@ module Statsample
             #
             def read(filename, worksheet_id=0, ignore_lines=0, empty=[''])
             require 'spreadsheet'
-                
                 first_row=true
                 fields=[]
                 fields_data={}
@@ -121,35 +159,28 @@ module Statsample
                         if c.is_a? Spreadsheet::Formula
                             nil
                         else
-                            c.to_s
+                            c
                         end
                     }
                     if first_row
-                        fields=row.to_a.collect{|c| c.downcase}
-                        if fields.size!=fields.uniq.size
-                            repeated=fields.inject({}) {|a,v|
-                                (a[v].nil? ? a[v]=1 : a[v]+=1); a }.find_all{|k,v| v>1}.collect{|k,v|k}.join(",")
-                                raise "There are some repeated fields on the header:#{repeated}. Please, fix" 
-                        end
+                        fields=extract_fields(row)
                         ds=Statsample::Dataset.new(fields)
                         first_row=false
                     else
-                        rowa=row.to_a.collect{|c|
-                            
-                            empty.include?(c) ? nil: c
-                        }
+                        rowa=process_row(row,empty)
                         (fields.size - rowa.size).times {|i|
                             rowa << nil
                         }
                         ds.add_case(rowa,false)
                     end
                 end
+                convert_to_scale(ds,fields)
                 ds.update_valid_data
                 ds
             end
         end
     end
-    module CSV
+    class CSV < SpreadsheetBase
 		class << self
         # Returns a Dataset  based on a csv file
         #
@@ -157,7 +188,6 @@ module Statsample
         #     ds=Statsample::CSV.read("test_csv.csv")
         def read(filename, empty=[''],ignore_lines=0,fs=nil,rs=nil)
         require 'csv'
-            
                 first_row=true
                 fields=[]
                 fields_data={}
@@ -173,23 +203,15 @@ module Statsample
                         c.to_s
                     }
                     if first_row
-                        fields=row.to_a.collect{|c| c.downcase}
-                        if fields.size!=fields.uniq.size
-                            repeated=fields.inject({}) {|a,v|
-                                (a[v].nil? ? a[v]=1 : a[v]+=1); a }.find_all{|k,v| v>1}.collect{|k,v|k}.join(",")
-                           
-                                raise "There are some repeated fields on the header:#{repeated}. Please, fix" 
-                        end
+                        fields=extract_fields(row)
                         ds=Statsample::Dataset.new(fields)
                         first_row=false
                     else
-                        rowa=row.to_a.collect{|c|
-                            empty.include?(c) ? nil: c
-                        }
-                        
+                        rowa=process_row(row,empty)
                         ds.add_case(rowa,false)
                     end
                 end
+                convert_to_scale(ds,fields)
                 ds.update_valid_data
                 ds
             end

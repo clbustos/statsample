@@ -1,3 +1,8 @@
+=== 0.3.3 / 2009-08-11
+* Added i18n support. For now, only spanish translation available
+* Bug fix: Test now load libraries on ../lib path
+* Excel and CSV importers automatically modify type of vector to Scale when all data are numbers or nils values
+
 === 0.3.2 / 2009-08-04
 
 * Added Regression::Multiple::GslEngine

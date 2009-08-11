@@ -1,5 +1,5 @@
-require File.dirname(__FILE__)+'/../lib/statsample'
-require 'statsample/multiset'
+$:.unshift(File.dirname(__FILE__)+'/../lib/')
+require 'statsample'
 require 'test/unit'
 
 class StatsampleGGobiTestCase < Test::Unit::TestCase
