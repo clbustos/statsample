@@ -39,11 +39,11 @@ module Statsample
 		ds=Statsample::Dataset.new(h).dup_only_valid
 		ds.vectors.values
 	end
-class Vector < DelegateClass(Array)
-	
+    
+class Vector
     include Enumerable
-    attr_reader :type, :data, :valid_data, :missing_values, :missing_data, :data_with_nils
-        attr_accessor :labels
+    attr_reader :type, :data, :valid_data, :missing_values, :missing_data, :data_with_nils, :gsl
+    attr_accessor :labels
         # Creates a new 
         # data = Array of data
         # t = level of meausurement. Could be: 
@@ -61,9 +61,9 @@ class Vector < DelegateClass(Array)
             @data_with_nils=[]
             @missing_data=[]
             @has_missing_data=nil
+            @scale_data=nil
 			_set_valid_data
 			self.type=t
-			super(@delegate)
 		end
         def dup
             Vector.new(@data.dup,@type,@missing_values.dup,@labels.dup)
@@ -78,23 +78,27 @@ class Vector < DelegateClass(Array)
 		def vector_standarized_pop
 			vector_standarized(true)
 		end
-        
+        def check_type(t)
+            raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal)
+        end
         # Return a vector usign the standarized values for data
         # with sd with denominator n-1
         
         def vector_standarized(use_population=false)
             raise "Should be a scale" unless @type==:scale
-            mean=@delegate.mean
-            sd=use_population ? @delegate.sdp : @delegate.sds
+            m=mean
+            sd=use_population ? sdp : sds
             @data_with_nils.collect{|x|
                 if !x.nil?
-                    (x.to_f - mean).quo(sd)
+                    (x.to_f - m).quo(sd)
                 else
                     nil
                 end
             }.to_vector(:scale)
         end
+        
         alias_method :standarized, :vector_standarized
+        
         def box_cox_transformation(lambda)
             raise "Should be a scale" unless @type==:scale
             @data_with_nils.collect{|x|
@@ -116,6 +120,7 @@ class Vector < DelegateClass(Array)
             raise TypeError,"Argument should be a Vector" unless v2.instance_of? Statsample::Vector
             @data==v2.data and @missing_values==v2.missing_values and @type==v2.type and @labels=v2.labels
         end
+        
         def _dump(i)
             Marshal.dump({'data'=>@data,'missing_values'=>@missing_values, 'labels'=>@labels, 'type'=>@type})
         end
@@ -155,23 +160,24 @@ class Vector < DelegateClass(Array)
 			@valid_data.clear
 			@missing_data.clear
             @data_with_nils.clear
+            @gsl=nil
             _set_valid_data
-            @delegate.set_gsl if(@type==:scale)
+            set_scale_data if(@type==:scale)
 		end
         def _set_valid_data
             if Statsample::OPTIMIZED
                 Statsample::_set_valid_data(self)
             else
-            @data.each do |n|
-				if is_valid? n
-                    @valid_data.push(n)
-                    @data_with_nils.push(n)
-				else
-                    @data_with_nils.push(nil)
-                    @missing_data.push(n)
-				end
-			end
-            @has_missing_data=@missing_data.size>0
+                @data.each do |n|
+                    if is_valid? n
+                        @valid_data.push(n)
+                        @data_with_nils.push(n)
+                    else
+                        @data_with_nils.push(nil)
+                        @missing_data.push(n)
+                    end
+                end
+                @has_missing_data=@missing_data.size>0
             end
         end
         # Retrieves true if data has one o more missing values
@@ -212,29 +218,13 @@ class Vector < DelegateClass(Array)
 		end
         # Set level of measurement. 
 		def type=(t)
-			case t
-			when :nominal
-				@delegate=Nominal.new(@valid_data)
-			when :ordinal
-				@delegate=Ordinal.new(@valid_data)
-			when :scale
-				@delegate=Scale.new(@valid_data)
-			else
-				raise "Type doesn't exists"
-			end
-			__setobj__(@delegate)
-			@type=t			
+			@type=t	
+            set_scale_data if(t==:scale)
 		end
         def n; @data.size ; end
         def to_a
             @data.dup
-    end
-	# Redundant, but necessary
-	# Spreadsheet creates Array#sum, so calling sum 
-	# doesn't call the delegates method
-	def sum
-	    @delegate.sum
-	end
+        end
         alias_method :to_ary, :to_a 
         # Vector sum. 
         # - If v is a scalar, add this value to all elements
@@ -357,7 +347,13 @@ class Vector < DelegateClass(Array)
         # In all the trails, every item have the same probability
         # of been selected
 		def sample_with_replacement(sample=1)
-            Vector.new(@delegate.sample_with_replacement(sample) ,@type)
+            if(@type!=:scale)
+                vds=@valid_data.size
+                (0...sample).collect{ @valid_data[rand(vds)] }
+            else
+                r = GSL::Rng.alloc(GSL::Rng::MT19937,rand(10000))
+                r.sample(@gsl, sample).to_a
+            end
         end
         # Returns an random sample of size n, without replacement,
         # only with valid data.
@@ -366,9 +362,20 @@ class Vector < DelegateClass(Array)
         # A sample of the same size of the vector is the vector itself
             
         def sample_without_replacement(sample=1)
-            Vector.new(@delegate.sample_without_replacement(sample),@type)
+            if(@type!=:scale)
+                raise ArgumentError, "Sample size couldn't be greater than n" if sample>@valid_data.size
+                out=[]
+                size=@valid_data.size
+                while out.size<sample
+                value=rand(size)
+                out.push(value) if !out.include?value
+                end
+                out.collect{|i|@data[i]}
+            else
+                r = GSL::Rng.alloc(GSL::Rng::MT19937,rand(10000))
+                r.choose(@gsl, sample).to_a
+            end
          end
-         
         def count(x=false)
             if block_given?
                 r=@data.inject(0) {|s, i|
@@ -401,40 +408,31 @@ class Vector < DelegateClass(Array)
                 true
             end
         end
-        def summary(out="")
-            @delegate.summary(@labels,out)
-        end
         def to_s
             sprintf("Vector(type:%s, n:%d)[%s]",@type.to_s,@data.size, @data.collect{|d| d.nil? ? "nil":d}.join(","))
         end
 		def inspect
 			self.to_s
 		end
-        
-    end
-        
-	
-	
-	class Nominal
-		def initialize(data)
-            @data=data
-           # @factors=data.uniq
-		end
-        def delegate_data
-            @data
-        end
-                    # Return an array of the different values of the data
         def factors
-            @data.uniq.sort
+            if @type==:scale
+                @scale_data.uniq.sort
+            else
+                    @valid_data.uniq.sort
+            end
         end
 		# Returns a hash with the distribution of frecuencies of
 		# the sample                
-		def frequencies_slow
-			@data.inject(Hash.new) {|a,x|
+		def frequencies
+            if Statsample::OPTIMIZED
+                Statsample::_frequencies(@valid_data)
+            else
+			@valid_data.inject(Hash.new) {|a,x|
 				a[x]||=0
 				a[x]=a[x]+1
 				a
 			}
+            end
 		end
 		# Plot frequencies on a chart, using gnuplot
         def plot_frequencies
@@ -469,21 +467,21 @@ class Vector < DelegateClass(Array)
 			end
             # The numbers of item with valid data
             def n_valid
-                @data.size
+                @valid_data.size
             end
             # Returns a hash with the distribution of proportions of
             # the sample
             def proportions
                 frequencies.inject({}){|a,v|
-                    a[v[0]] = v[1].quo(@data.size)
+                    a[v[0]] = v[1].quo(n_valid)
                     a
                 }
             end
             # Proportion of a given value.
             def proportion(v=1)
-                frequencies[v].quo(@data.size)
+                frequencies[v].quo(@valid_data.size)
             end
-            def summary(labels,out="")
+            def summary(out="")
                 out << sprintf("n valid:%d\n",n_valid)
                 out <<  sprintf("factors:%s\n",factors.join(","))
                 out <<  "mode:"+mode.to_s+"\n"
@@ -492,47 +490,32 @@ class Vector < DelegateClass(Array)
                     key=labels.has_key?(k) ? labels[k]:k
                     out <<  sprintf("%s : %s (%0.2f%%)\n",key,v, (v.quo(n_valid))*100)
                 }
+                if(@type==:ordinal)
+                out << "median:"+median.to_s+"\n"
+                end
+                if(@type==:scale)
+                out << "mean:"+mean.to_s+"\n"
+                out << "sd:"+sd.to_s+"\n"
+                
+                end
                 out
             end
             
-            # Returns an random sample of size n, with replacement,
-            # only with valid data.
-            #
-            # In all the trails, every item have the same probability
-            # of been selected
-            def sample_with_replacement(sample)
-                (0...sample).collect{ @data[rand(@data.size)] }
-            end
-            # Returns an random sample of size n, without replacement,
-            # only with valid data.
-            #
-            # Every element could only be selected once
-            # A sample of the same size of the vector is the vector itself
-                
-            def sample_without_replacement(sample)
-                    raise ArgumentError, "Sample size couldn't be greater than n" if sample>@data.size
-                    out=[]
-                    size=@data.size
-                    while out.size<sample
-                        value=rand(size)
-                        out.push(value) if !out.include?value
-                    end
-                    out.collect{|i|@data[i]}
-             end
+
             
             
             # Variance of p, according to poblation size
             def variance_proportion(n_poblation, v=1)
-                Statsample::proportion_variance_sample(self.proportion(v), @data.size, n_poblation)
+                Statsample::proportion_variance_sample(self.proportion(v), @valid_data.size, n_poblation)
             end
             def variance_total(n_poblation, v=1)
-                Statsample::total_variance_sample(self.proportion(v), @data.size, n_poblation)
+                Statsample::total_variance_sample(self.proportion(v), @valid_data.size, n_poblation)
             end
             def proportion_confidence_interval_t(n_poblation,margin=0.95,v=1)
-                Statsample::proportion_confidence_interval_t(proportion(v), @data.size, n_poblation, margin)
+                Statsample::proportion_confidence_interval_t(proportion(v), @valid_data.size, n_poblation, margin)
             end
             def proportion_confidence_interval_z(n_poblation,margin=0.95,v=1)
-                Statsample::proportion_confidence_interval_z(proportion(v), @data.size, n_poblation, margin)
+                Statsample::proportion_confidence_interval_z(proportion(v), @valid_data.size, n_poblation, margin)
             end            
 		self.instance_methods.find_all{|met| met=~/_slow$/}.each{|met|
 			met_or=met.gsub("_slow","")
@@ -540,12 +523,11 @@ class Vector < DelegateClass(Array)
 				alias_method met_or, met
 			end
 		}
-	end
-        
-	class Ordinal <Nominal
+        # Ordinal Methods
         # Return the value of the percentil q
             def percentil(q)
-                sorted=@data.sort
+                check_type :ordinal
+                sorted=@valid_data.sort
                 v= (n_valid * q).quo(100)
                 if(v.to_i!=v)
                     sorted[v.to_i]
@@ -555,6 +537,7 @@ class Vector < DelegateClass(Array)
             end
 			# Returns a ranked vector
 			def ranked(type=:ordinal)
+                check_type :ordinal
 				i=0
 				r=frequencies.sort.inject({}){|a,v|
 					a[v[0]]=(i+1 + i+v[1]).quo(2)
@@ -567,100 +550,89 @@ class Vector < DelegateClass(Array)
 			end
             # Return the median (percentil 50)
             def median
+                check_type :ordinal
+
+                if Statsample::OPTIMIZED and @type==:scale
+                    GSL::Stats::median_from_sorted_data(@gsl)
+                else
                 percentil(50)
-            end
-            if HAS_GSL
-                %w{median}.each{|m|
-                    m_nuevo=(m+"_slow").intern
-                    alias_method m_nuevo, m.intern
-                }
-                
-                #def percentil(p)
-                #    v=GSL::Vector.alloc(@data.sort)
-                #    v.stats_quantile_from_sorted_data(p)
-                #end
-                def median # :nodoc:
-                    GSL::Stats::median_from_sorted_data(GSL::Vector.alloc(@data.sort))
                 end
             end
             # Minimun value
-            def min; @data.min;end
+            def min; 
+                check_type :ordinal
+                @valid_data.min;
+            end
                 # Maximum value
-            def max; @data.max; end
-            
-            
-            def summary(labels,out="")
-                out << sprintf("n valid:%d\n",n_valid)
-                out <<  "median:"+median.to_s+"\n"
-                out <<  "percentil 25:"+percentil(25).to_s+"\n"
-                out <<  "percentil 75:"+percentil(75).to_s+"\n"
-                out
+            def max; 
+                check_type :ordinal
+                @valid_data.max;
             end
-		end
-		class Scale <Ordinal
-			attr_reader :gsl 
-            def initialize(data)
-                # puts "Inicializando Scale..."
-                super(data)
-                
-                set_gsl
-            end
-            
-            def _dump(i)
-                Marshal.dump(@data)
-            end
-            def _load(data)
-                @data=Marshal.restore(data)
-                set_gsl
-            end
-            def set_gsl # :nodoc
-                data = @data.collect!{|x|
-                    if x.is_a? Numeric
+
+        def set_scale_data # :nodoc
+            @scale_data=@valid_data.collect{|x|
+                if x.is_a? Numeric
                         x
                     elsif x.is_a? String and x.to_i==x.to_f
                         x.to_i
                     else
                         x.to_f
                     end
-                }
-                if HAS_GSL
-                    @gsl=GSL::Vector.alloc(@data) if @data.size>0
-				end
+            }
+            if HAS_GSL
+                @gsl=GSL::Vector.alloc(@scale_data) if @scale_data.size>0
             end
+          end
             # The range of the data (max - min)
-			def range; @data.max - @data.min; end
+			def range; 
+                check_type :scale
+                @scale_data.max - @scale_data.min
+            end
             # The sum of values for the data
             def sum
-                @data.inject(0){|a,x|x+a} ; end
+                check_type :scale
+                @scale_data.inject(0){|a,x|x+a} ; end
             # The arithmetical mean of data
 			def mean
+                check_type :scale
+
 					sum.to_f.quo(n_valid)
 			end
             def sum_of_squares(m=nil)
+                check_type :scale
+                
                 m||=mean
-                @data.inject(0){|a,x| a+(x-m).square}
+                @scale_data.inject(0){|a,x| a+(x-m).square}
             end
             
 			# Sum of squared deviation
 			def sum_of_squared_deviation
-				@data.inject(0) {|a,x| x.square+a} - (sum.square.quo(n_valid))
+                check_type :scale
+                
+				@scale_data.inject(0) {|a,x| x.square+a} - (sum.square.quo(n_valid))
 			end
             
             # Population variance (divided by n)
             def variance_population(m=nil)
+                check_type :scale
+                
                 m||=mean
-				squares=@data.inject(0){|a,x| x.square+a}
+				squares=@scale_data.inject(0){|a,x| x.square+a}
                 squares.quo(n_valid) - m.square
             end
 			
 		
             # Population Standard deviation (divided by n)
             def standard_deviation_population(m=nil)
+                check_type :scale
+                
                 Math::sqrt( variance_population(m) )
             end
             # Sample Variance (divided by n-1)
             
 			def variance_sample(m=nil)
+                check_type :scale
+                
 				m||=mean
 				sum_of_squares(m).quo(n_valid - 1)
 			end
@@ -668,22 +640,30 @@ class Vector < DelegateClass(Array)
             # Sample Standard deviation (divided by n-1)
             
 			def standard_deviation_sample(m=nil)
+                check_type :scale
+                
 				m||=m
 				Math::sqrt(variance_sample(m))
 			end
 			def skew
+                check_type :scale
+                
 				m=mean
-				thirds=@data.inject(0){|a,x| a+((x-mean)**3)}
-				thirds.quo((@data.size-1)*sd**3)
+				thirds=@scale_data.inject(0){|a,x| a+((x-mean)**3)}
+				thirds.quo((@scale_data.size-1)*sd**3)
 			end
 			def kurtosis
+                check_type :scale
+                
 				m=mean
-				thirds=@data.inject(0){|a,x| a+((x-mean)**4)}
-				thirds.quo((@data.size-1)*sd**4)
+				thirds=@scale_data.inject(0){|a,x| a+((x-mean)**4)}
+				thirds.quo((@scale_data.size-1)*sd**4)
 				
 			end
 			def product
-                @data.inject(1){|a,x| a*x }
+                check_type :scale
+                
+                @scale_data.inject(1){|a,x| a*x }
             end
 			if HAS_GSL
                 %w{skew kurtosis variance_sample standard_deviation_sample variance_population standard_deviation_population mean sum}.each{|m|
@@ -691,38 +671,50 @@ class Vector < DelegateClass(Array)
                     alias_method m_nuevo, m.intern
                 }
 				def sum # :nodoc:
+                check_type :scale
+                    
 					@gsl.sum
 				end
 				def mean # :nodoc:
+                check_type :scale
+                    
 					@gsl.mean
 				end				
 				def variance_sample(m=nil) # :nodoc:
+                check_type :scale
+                    
 					m||=mean
 					@gsl.variance_m
 				end
 				def standard_deviation_sample(m=nil) # :nodoc:
+                    check_type :scale
 					m||=mean
 					@gsl.sd(m)
 				end
 				
 				def variance_population(m=nil) # :nodoc:
+                check_type :scale    
 					m||=mean
 					@gsl.variance_with_fixed_mean(m)
 				end
 				def standard_deviation_population(m=nil) # :nodoc:
+                    check_type :scale
 					m||=mean
 					@gsl.sd_with_fixed_mean(m)
 				end
 				def skew
+                    check_type :scale
 					@gsl.skew
 				end
 				def kurtosis
+                    check_type :scale
 					@gsl.kurtosis
 				end
                 # Create a GSL::Histogram
                 # With a fixnum, creates X bins within the range of data
                 # With an Array, each value will be a cut point
                 def histogram(bins=10)
+                    check_type :scale
                     if bins.is_a? Array
                         h=GSL::Histogram.alloc(bins)                        
                     else
@@ -734,35 +726,18 @@ class Vector < DelegateClass(Array)
 					 h
                 end
                 def plot_histogram(bins=10,options="")
+                    check_type :scale
                     self.histogram(bins).graph(options)
                 end
-                def sample_with_replacement(k)
-                    r = GSL::Rng.alloc(GSL::Rng::MT19937,rand(10000))
-                    r.sample(@gsl, k).to_a
-                end
-                def sample_without_replacement(k)
-                    r = GSL::Rng.alloc(GSL::Rng::MT19937,rand(10000))
-                    r.choose(@gsl, k).to_a
-                end
+
 			end
 			
             # Coefficient of variation
             # Calculed with the sample standard deviation
 			def coefficient_of_variation
+                check_type :scale
 				standard_deviation_sample.quo(mean)
 			end
-            def summary(labels,out="")
-                out << sprintf("n valid:%d\n",n_valid)
-                out <<  "mean:"+mean.to_s+"\n"
-                out <<  "sum:"+sum.to_s+"\n"
-                out <<  "range:"+range.to_s+"\n"
-                out <<  "variance (pop):"+variance_population.to_s+"\n"
-                out <<  "sd (pop):"+sdp.to_s+"\n"
-                out <<  "variance (sample):"+variance_sample.to_s+"\n"
-                out <<  "sd (sample):"+sds.to_s+"\n"
-                
-                out
-            end
             
 			alias_method :sdp, :standard_deviation_population
 			alias_method :sds, :standard_deviation_sample

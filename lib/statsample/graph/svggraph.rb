@@ -6,7 +6,7 @@ require 'SVG/Graph/Plot'
 require 'statsample/graph/svghistogram'
 
 module Statsample
-	class Nominal
+	class Vector
 		# Creates a barchart using ruby-gdchart
 		def svggraph_frequencies(file, width=600, height=300, chart_type=SVG::Graph::BarNoOp, options={})
 			labels,data=[],[]
@@ -26,8 +26,6 @@ module Statsample
               f.puts(graph.burn)
 			}
 		end
-	end
-	class Scale < Ordinal
 		def svggraph_histogram(bins, options={})
             options={:graph_title=>"Histogram", :show_graph_title=>true,:show_normal=>true, :mean=>self.mean, :sigma=>sdp }.merge! options
             graph = Statsample::Graph::SvgHistogram.new(options)
