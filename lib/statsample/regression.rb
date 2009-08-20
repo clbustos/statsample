@@ -1,4 +1,5 @@
 require 'statsample/regression/simple'
+require 'statsample/regression/logit'
 require 'statsample/regression/multiple'
 require 'statsample/regression/multiple/alglibengine'
 require 'statsample/regression/multiple/rubyengine'

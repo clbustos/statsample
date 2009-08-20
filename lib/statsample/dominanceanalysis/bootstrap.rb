@@ -51,26 +51,28 @@ class DominanceAnalysis
             @samples_cd={}
             @samples_gd={}
             @pairs=[]
-            c = GSL::Combination.calloc(@fields.size, 2);
-            begin
-                convert=c.data.to_a.collect {|i|
+            c=Statsample::Combination.new(2,@fields.size)
+            c.each{|data|
+                convert=data.collect {|i|
                     @fields[i]
                 }
                 @pairs.push(convert)
                 [@samples_td,@samples_cd,@samples_gd].each{|s|
                     s[convert]=[]
                 }
-            end while c.next == GSL::SUCCESS
-        end
+            }
+            end
         def summary(report_type=ConsoleSummary)
             out =""
             raise "You should bootstrap first" if @n_samples==0
             alfa=0.95
-            t=GSL::Cdf.tdist_Pinv(1-((1-alfa) / 2),@n_samples - 1)
             out.extend report_type
             out.add _("Summary for Bootstrap Dominance Analysis of %s on %s\n") % [@fields.join(", "), @y_var]
             out.add _("Sample size: %d\n") % @n_samples
-            out.add "t:#{t}\n"
+            if HAS_GSL
+                t=GSL::Cdf.tdist_Pinv(1-((1-alfa) / 2),@n_samples - 1)
+                out.add "t:#{t}\n"
+            end
             out.add "Linear Regression Engine: #{@lr_class.name}"
             out.nl
             table=ReportTable.new

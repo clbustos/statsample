@@ -148,6 +148,13 @@ module Statsample
                 book = Spreadsheet.open filename
                 sheet= book.worksheet worksheet_id
                 sheet.each do |row|
+                    begin
+                        dates=[]
+                        row.formats.each_index{|i|
+                            if !row.formats[i].nil? and row.formats[i].number_format=="DD/MM/YYYY"
+                                dates.push(i)
+                            end
+                        }
                     line_number+=1
                     if(line_number<=ignore_lines)
                         #puts "Skip line"
@@ -155,9 +162,13 @@ module Statsample
                     end
                     # This should be fixed.
                     # If we have a Formula, should be resolver first
+                    i=-1
                     row.collect!{|c|
+                        i+=1
                         if c.is_a? Spreadsheet::Formula
-                            nil
+                            c.value
+                        elsif dates.include? i and !c.nil? and c.is_a? Numeric
+                            row.date(i)
                         else
                             c
                         end
@@ -172,6 +183,10 @@ module Statsample
                             rowa << nil
                         }
                         ds.add_case(rowa,false)
+                    end
+                    rescue => e
+                        error="#{e.to_s}\nError on Line # #{line_number}:#{row.join(",")}"
+                        raise
                     end
                 end
                 convert_to_scale(ds,fields)

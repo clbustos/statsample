@@ -194,13 +194,32 @@ out.add_line
 out.add "ANOVA TABLE"
 
 t=Statsample::ReportTable.new(%w{source ss df ms f s})
-t.add_row(["Regression", sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f",significance)])
-
+begin
+    t.add_row(["Regression", sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
+rescue RuntimeError
+    t.add_row(["Regression", sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), "???", "???"])
+end
 t.add_row(["Error", sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse)])
 
 t.add_row(["Total", sprintf("%0.3f",sst), df_r+df_e])
 
 out.parse_table(t)
+
+begin
+    out.add "Beta coefficientes"
+    sc=standarized_coeffs
+    cse=coeffs_se
+    t=Statsample::ReportTable.new(%w{coeff beta se t})
+    t.add_row(["Constant", "-",constant_se, constant_t])
+    @fields.each{|f|
+        t.add_row([f, sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
+    }
+    out.parse_table(t)
+    
+rescue
+    
+end
+
 out
 end
     def assign_names(c)

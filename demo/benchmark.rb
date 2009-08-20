@@ -1,4 +1,5 @@
-require File.dirname(__FILE__)+'/../lib/statsample.rb'
+$:.unshift(File.dirname(__FILE__)+'/../lib/')
+require 'statsample'
 require 'benchmark'
 v=(0..10000).collect{|n|
 	r=rand(100)
@@ -37,14 +38,15 @@ ds=Statsample::Dataset.new({'a'=>a.to_vector(:scale),'b'=>b.to_vector(:scale), '
 
  if (true)
      Benchmark.bm(7) do |x|
-         x.report("Alglib coeffs")   { for i in 1..n; lr=Statsample::Regression::Multiple::AlglibEngine.new(ds,"c"); lr.coeffs; end }
-         x.report("GslEngine coeffs")   { for i in 1..n; lr=Statsample::Regression::Multiple::GslEngine.new(ds,"c"); lr.coeffs; end }
+         x.report("Alglib coeffs")   { for i in 1..n; lr=Statsample::Regression::Multiple::AlglibEngine.new(ds,"c"); lr.coeffs;          lr=nil;end }
+
+         x.report("GslEngine coeffs")   { for i in 1..n; lr=Statsample::Regression::Multiple::GslEngine.new(ds,"c"); lr.coeffs;lr=nil; end }
      end
  end
  if(true)
      Benchmark.bm(7) do |x|
-         x.report("Alglib process")   { for i in 1..n; lr=Statsample::Regression::Multiple::AlglibEngine.new(ds,"c"); lr.process([1,2]); end }
-         x.report("GslEngine process")   { for i in 1..n; lr=Statsample::Regression::Multiple::GslEngine.new(ds,"c"); lr.process([1,2]); end }
+         x.report("Alglib process")   { for i in 1..n; lr=Statsample::Regression::Multiple::AlglibEngine.new(ds,"c"); lr.process([rand(10),rand(10)]); end }
+         x.report("GslEngine process")   { for i in 1..n; lr=Statsample::Regression::Multiple::GslEngine.new(ds,"c"); lr.process([rand(10),rand(10)]); end }
 
     end
  end

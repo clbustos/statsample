@@ -79,10 +79,12 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
 			
 		end
 	end
+
 	def test_spearman
 		v1=[86,97,99,100,101,103,106,110,112,113].to_vector(:scale)
 		v2=[0,20,28,27,50,29,7,17,6,12].to_vector(:scale)
         assert_in_delta(-0.175758,Statsample::Bivariate.spearman(v1,v2),0.0001)
+        
 	end
 	def test_point_biserial
 		c=[1,3,5,6,7,100,200,300,400,300].to_vector(:scale)

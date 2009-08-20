@@ -75,7 +75,7 @@ end
         
     
     begin 
-        require 'statsample/optimization'
+        require 'statsamplert'
     rescue LoadError
         module Statsample
             OPTIMIZED=false
@@ -90,10 +90,11 @@ end
 # * Dataset: An union of vectors.
 #
 module Statsample
-    VERSION = '0.3.3'
+    VERSION = '0.3.4'
     SPLIT_TOKEN = ","
 	autoload(:Database, 'statsample/converters')
     autoload(:Anova, 'statsample/anova')
+	autoload(:Combination, 'statsample/combination')
 	autoload(:CSV, 'statsample/converters')
 	autoload(:Excel, 'statsample/converters')
 	autoload(:GGobi, 'statsample/converters')
@@ -113,10 +114,15 @@ module Statsample
 	autoload(:Regression, 'statsample/regression')
 	autoload(:Test, 'statsample/test')
     def self.load(filename)
-        fp=File.open(filename,"r")
-        o=Marshal.load(fp)
-        fp.close
+        if File.exists? filename
+            o=false
+            File.open(filename,"r") {|fp|
+                o=Marshal.load(fp)
+            }
         o
+        else
+            false
+        end
     end
     
 	module Util

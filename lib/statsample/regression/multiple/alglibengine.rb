@@ -37,6 +37,8 @@ class AlglibEngine < BaseEngine
         matrix=Matrix.columns(columns)
         @lr_s=nil
         @lr=::Alglib::LinearRegression.build_from_matrix(matrix)
+        @coeffs=assign_names(@lr.coeffs)
+        
     end
     
     def _dump(i)
@@ -48,7 +50,7 @@ class AlglibEngine < BaseEngine
     end
     
     def coeffs
-        assign_names(@lr.coeffs)
+        @coeffs
     end
     # Coefficients using a constant
     # Based on http://www.xycoon.com/ols1.htm

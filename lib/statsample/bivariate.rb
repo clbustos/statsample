@@ -66,14 +66,20 @@ module Statsample
             end
             # Retrieves the probability value (a la SPSS)
             # for a given t, size and number of tails
-            def prop_pearson(t,size, tails=2)
-		if HAS_GSL
-                t=-t if t>0
-                cdf=GSL::Cdf::tdist_P(t,(size)-2)
-                cdf*tails
-		else
-			raise "Needs ruby-gsl"
-		end
+            def prop_pearson(t,size, tails=:both)
+                n_tails=case tails
+                when :both
+                    2
+                else
+                    1
+                end
+                if HAS_GSL
+                        t=-t if t>0 and (tails==:both or tails==:right)
+                        cdf=GSL::Cdf::tdist_P(t,size-2)
+                        cdf*n_tails
+                else
+                raise "Needs ruby-gsl"
+                end
             end
             # Returns residual score after delete variance
             # from another variable

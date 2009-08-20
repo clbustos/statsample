@@ -150,17 +150,16 @@ module Statsample
             @models=[]
             @models_data={}
             for i in 1..@fields.size
-                c = GSL::Combination.calloc(@fields.size, i);
-            begin
-                convert=c.data.to_a.collect {|i|
-                    @fields[i]
+                c=Statsample::Combination.new(i,@fields.size)
+                c.each{|data|
+                    convert=data.collect {|i|
+                        @fields[i]
+                    }
+                    @models.push(convert)
+                    ds_prev=@ds.dup(convert+[@y_var])
+                    modeldata=ModelData.new(convert,ds_prev, @y_var, @fields, @r_class)
+                    @models_data[convert.sort]=modeldata
                 }
-                @models.push(convert)
-                ds_prev=@ds.dup(convert+[@y_var])
-                modeldata=ModelData.new(convert,ds_prev, @y_var, @fields, @r_class)
-                
-                @models_data[convert.sort]=modeldata
-            end while c.next == GSL::SUCCESS
             end
         end
         def summary(report_type=ConsoleSummary)
@@ -232,7 +231,12 @@ module Statsample
                 @lr.r2
             end
             def add_table_row
-                [@name.join("*"), sprintf("%0.3f",r2), sprintf("%0.3f",@lr.significance)]+@fields.collect{|k|
+                begin
+                sign=sprintf("%0.3f", @lr.significance)
+                rescue RuntimeError
+                    sign="???"
+                end
+                [@name.join("*"), sprintf("%0.3f",r2), sign] + @fields.collect{|k|
                     v=@contributions[k]
                     if v.nil?
                         "--"

@@ -27,7 +27,7 @@ module Statsample
             @exp=e
         end
         def to_s
-            m="Error:"+@exp.message+@exp.backtrace.join("\n")+"\nOn Dataset:"+@ds.inspect
+            m="Error: "+@exp.message+"\n"+@exp.backtrace.join("\n")+"\nOn Dataset:"+@ds.inspect
             m+="\nRow: #{@i}" unless @i.nil?
             m
         end
@@ -158,7 +158,7 @@ module Statsample
         end
         # Fast version of add case
         # Can only add one case and no error check if performed 
-        # You SHOULD use update_valid_data at the the of insertion cycle
+        # You SHOULD use update_valid_data at the end of insertion cycle
         def add_case_array(v)
             v.each_index {|i| d=@vectors[@fields[i]].data; d.push(v[i])}
         end

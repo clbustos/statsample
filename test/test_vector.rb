@@ -266,5 +266,9 @@ class StatsampleVectorTestCase < Test::Unit::TestCase
         assert_equal(v1.labels,v3.labels)
         assert_not_same(v1.labels,v3.labels)
     end
-     
+    def test_paired_ties
+        a=[0,0,0,1,1,2,3,3,4,4,4].to_vector(:ordinal)
+        expected=[2,2,2,4.5,4.5,6,7.5,7.5,10,10,10].to_vector(:ordinal)
+        assert_equal(expected,a.ranked)
+    end
 end
