@@ -69,10 +69,8 @@ class DominanceAnalysis
             out.extend report_type
             out.add _("Summary for Bootstrap Dominance Analysis of %s on %s\n") % [@fields.join(", "), @y_var]
             out.add _("Sample size: %d\n") % @n_samples
-            if HAS_GSL
-                t=GSL::Cdf.tdist_Pinv(1-((1-alfa) / 2),@n_samples - 1)
+            t=Distribution::T.p_value(1-((1-alfa) / 2),@n_samples - 1)
                 out.add "t:#{t}\n"
-            end
             out.add "Linear Regression Engine: #{@lr_class.name}"
             out.nl
             table=ReportTable.new

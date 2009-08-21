@@ -21,12 +21,7 @@ class StatsampleAnovaTestCase < Test::Unit::TestCase
         assert_in_delta(23.568,@anova.f,0.001)
         anova2=Statsample::Anova::OneWay.new([@v1,@v1,@v1,@v1,@v2])
         assert_in_delta(3.960, anova2.f,0.001)
-
-	if HAS_GSL
 		assert(@anova.significance<0.01)
 		assert_in_delta(0.016, anova2.significance,0.001)
-	else
-		puts "Skipped OneWay#significance (no GSL)"
-	end
     end
 end

@@ -119,11 +119,7 @@ module Multiple
     end
     # Significance of Fisher
     def significance
-        if HAS_GSL
-            GSL::Cdf.fdist_Q(f,df_r,df_e)
-        else
-            raise "Need Ruby/GSL"
-        end
+        1.0-Distribution::F.cdf(f,df_r,df_e)
     end
         # Tolerance for a given variable
         # http://talkstats.com/showthread.php?t=5056

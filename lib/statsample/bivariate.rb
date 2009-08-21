@@ -62,7 +62,7 @@ module Statsample
             # Retrieves the value for t test for a pearson correlation
             # giving r and vector size
             def t_r(r,size)
-                r*Math::sqrt(((size)-2).to_f / (1 - r**2))
+                r * Math::sqrt(((size)-2).to_f / (1 - r**2))
             end
             # Retrieves the probability value (a la SPSS)
             # for a given t, size and number of tails.
@@ -71,7 +71,7 @@ module Statsample
             # * :right, :positive or 1  : for r > 0
             # * :left, :negative        : for r < 0
             
-            def prop_pearson(t,size, tails=:both)
+            def prop_pearson(t, size, tails=:both)
                 tails=:both if tails==2
                 tails=:right if tails==1 or tails==:positive
                 tails=:left if tails==:negative
@@ -82,16 +82,12 @@ module Statsample
                 else
                     1
                 end
-                if HAS_GSL
-                        t=-t if t>0 and (tails==:both)
-                        cdf=GSL::Cdf::tdist_P(t,size-2)
-                        if(tails==:right)
-                            1.0-(cdf*n_tails)
-                        else
-                            cdf*n_tails
-                        end
+                t=-t if t>0 and (tails==:both)
+                cdf=Distribution::T.cdf(t, size-2)
+                if(tails==:right)
+                    1.0-(cdf*n_tails)
                 else
-                raise "Needs ruby-gsl"
+                    cdf*n_tails
                 end
             end
             # Returns residual score after delete variance

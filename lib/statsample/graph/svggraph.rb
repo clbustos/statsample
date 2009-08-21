@@ -71,7 +71,7 @@ module Statsample
                     options={:graph_title=>"Normal Probability Plot", :show_graph_title=>true}.merge! options
             n=@data.size
             vx=(1..@data.size).to_a.collect{|i|
-                GSL::Cdf.gaussian_Pinv(normal_order_statistic_medians(i,n))
+                Distribution::Normal.p_value(normal_order_statistic_medians(i,n))
             }.to_vector(:scale)
             vy=@data.sort.to_vector(:scale)
             ds={'normal_order_statistics_medians'=>vx, 'ordered_response'=>vy}.to_dataset            

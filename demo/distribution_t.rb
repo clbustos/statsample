@@ -71,8 +71,8 @@ Gnuplot.open do |gp|
         xxt.push(t)
 		prev+=y
 		xy.push(prev.to_f/tests)
-		xt.push(GSL::Cdf.tdist_P(t, ss-1))
-		xz.push(GSL::Cdf.gaussian_P(z))
+		xt.push(Distribution::T.cdf(t, ss-1))
+		xz.push(Distribution::Normal.cdf(z))
 
 	}
 	plot.data << Gnuplot::DataSet.new( [xxt,xy] ) do |ds|

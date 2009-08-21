@@ -22,6 +22,7 @@ demo/t-student.rb
 lib/distribution.rb
 lib/distribution/chisquare.rb
 lib/distribution/f.rb
+lib/distribution/normal.rb
 lib/distribution/t.rb
 lib/spss.rb
 lib/statistics2.rb

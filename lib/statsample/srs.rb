@@ -26,7 +26,7 @@ module Statsample
         end
         # Sample size estimation for proportions, infinite poblation
         def estimation_n0(d,prop,margin=0.95)
-            t=GSL::Cdf.ugaussian_Pinv(1-(1-margin).quo(2))
+            t=Distribution::Normal.p_value(1-(1-margin).quo(2))
             var=prop*(1-prop)
             t**2*var.quo(d**2)
         end
@@ -39,13 +39,13 @@ module Statsample
         # Uses estimated proportion, sample without replacement.
         
         def proportion_confidence_interval_t(prop, n_sample, n_population, margin=0.95)
-            t=GSL::Cdf.tdist_Pinv(1-((1-margin).quo(2)) , n_sample-1)
+            t = Distribution::T.p_value(1-((1-margin).quo(2)) , n_sample-1)
             proportion_confidence_interval(prop,n_sample,n_population, t)
         end
         # Proportion confidence interval with z values
         # Uses estimated proportion, sample without replacement.
         def proportion_confidence_interval_z(p, n_sample, n_population, margin=0.95)
-            z=GSL::Cdf.ugaussian_Pinv(1-((1-margin).quo(2)))
+            z=Distribution::Normal.p_value(1-((1-margin).quo(2)))
             proportion_confidence_interval(p,n_sample,n_population, z)
         end
         # Proportion confidence interval with x value
@@ -137,13 +137,13 @@ module Statsample
         # Confidence Interval using T-Student
         # Use with n < 60
         def mean_confidence_interval_t(mean,s,n_sample,n_population,margin=0.95)
-            t=GSL::Cdf.tdist_Pinv(1-((1-margin) / 2),n_sample-1)
+            t=Distribution::T.p_value(1-((1-margin) / 2),n_sample-1)
             mean_confidence_interval(mean,s,n_sample,n_population,t)
         end
         # Confidente Interval using Z
         # Use with n > 60
         def mean_confidence_interval_z(mean,s,n_sample,n_population,margin=0.95)
-            z=GSL::Cdf.ugaussian_Pinv(1-((1-margin) / 2))
+            z=Distribution::Normal.p_value(1-((1-margin) / 2))
             mean_confidence_interval(mean,s,n_sample,n_population, z)
         end
         # Confidente interval using X.

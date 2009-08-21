@@ -353,7 +353,7 @@ class Vector
         # In all the trails, every item have the same probability
         # of been selected
 		def sample_with_replacement(sample=1)
-            if(@type!=:scale)
+            if(@type!=:scale or !HAS_GSL)
                 vds=@valid_data.size
                 (0...sample).collect{ @valid_data[rand(vds)] }
             else
@@ -368,7 +368,7 @@ class Vector
         # A sample of the same size of the vector is the vector itself
             
         def sample_without_replacement(sample=1)
-            if(@type!=:scale)
+            if(@type!=:scale or !HAS_GSL)
                 raise ArgumentError, "Sample size couldn't be greater than n" if sample>@valid_data.size
                 out=[]
                 size=@valid_data.size
