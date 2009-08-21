@@ -9,10 +9,14 @@ rescue
 end
 class DistributionTestCase < Test::Unit::TestCase
     def test_chi
-        k=2
-        chis=2.0
-        area=Distribution::ChiSquare.cdf(chis,k)
-        assert_equal(chis, Distribution::ChiSquare.p_value(area,k))
+        if !NOT_GSL
+        [2,3,4,5].each{|k|
+            chis=rand()*10
+            area=Distribution::ChiSquare.cdf(chis, k)
+            assert_in_delta(area, GSL::Cdf.chisq_P(chis,k),0.0001)
+            assert_in_delta(chis, Distribution::ChiSquare.p_value(area,k),0.0001,"Error on prob #{area} and k #{k}")
+        }
+        end
     end
     def test_t
         if !NOT_GSL

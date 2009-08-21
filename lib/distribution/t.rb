@@ -1,7 +1,7 @@
 module Distribution
-    # Based on Babatunde, Iyiola & Eni () : 
-    # "A Numerical Procedure for Computing Chi-Square Percentage Points"
-    # 
+
+    # Calculate cdf and inverse cdf for T Distribution.
+    # Uses Statistics2 Module.
     module T
         class << self
             # Return the P-value of the corresponding integral with 

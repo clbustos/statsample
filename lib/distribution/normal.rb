@@ -1,6 +1,6 @@
 module Distribution
-    # Uses statistics2
-    # 
+    # Calculate cdf and inverse cdf for Normal Distribution.
+    # Uses Statistics2 module
     module Normal
         class << self
             # Return the P-value of the corresponding integral
