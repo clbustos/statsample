@@ -95,11 +95,7 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
         assert_in_delta(0.955,lr.r,0.001)
         assert_in_delta(0.913,lr.r2,0.001)
         assert_in_delta(20.908, lr.f,0.001)
-	if HAS_GSL
         assert_in_delta(0.001, lr.significance, 0.001)
-	else
-		puts "#{lr.class}#significance not tested (not GSL)"
-	end
         assert_in_delta(0.226,lr.tolerance("a"),0.001)
         coeffs_se={"a"=>1.171,"b"=>1.129,"c"=>0.072}
         ccoeffs_se=lr.coeffs_se

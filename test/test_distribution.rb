@@ -26,7 +26,16 @@ class DistributionTestCase < Test::Unit::TestCase
             }
         end
     end
-    def test_t
+    def test_normal
+        if !NOT_GSL
+            [-2,0.1,0.5,1,2].each{|x|
+                    area=Distribution::Normal.cdf(x)
+                    assert_in_delta(area, GSL::Cdf.ugaussian_P(x),0.0001)
+                    assert_in_delta(Distribution::Normal.p_value(area), GSL::Cdf.ugaussian_Pinv(area),0.0001)
+            }
+        end
+    end
+    def test_f
         if !NOT_GSL
             [0.1,0.5,1,2,10,20,30].each{|f|
                 [2,5,10].each{|n2|

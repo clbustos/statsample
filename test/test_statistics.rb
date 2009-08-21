@@ -64,7 +64,6 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
 #assert_equal(expected,obt)
     end
     def test_prop_pearson
-	if HAS_GSL    
         assert_in_delta(0.42, Statsample::Bivariate.prop_pearson(Statsample::Bivariate.t_r(0.084,94), 94),0.01)
         assert_in_delta(0.65, Statsample::Bivariate.prop_pearson(Statsample::Bivariate.t_r(0.046,95), 95),0.01)
         r=0.9
@@ -80,11 +79,6 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
         assert(Statsample::Bivariate.prop_pearson(t,n,:both)<0.05)
         assert(Statsample::Bivariate.prop_pearson(t,n,:right)>0.05)
         assert(Statsample::Bivariate.prop_pearson(t,n,:left)<0.05)
-
-        
-	else
-		puts "Bivariate.prop_pearson not tested (no ruby-gsl)"
-	end
     end
 	def test_covariance
 		if HAS_GSL
@@ -130,11 +124,7 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
         v=([42]*23+[41]*4+[36]*1+[32]*1+[29]*1+[27]*2+[23]*1+[19]*1+[16]*2+[15]*2+[14,11,10,9,7]+ [6]*3+[5]*2+[4,3]).to_vector(:scale)
         assert_equal(50,v.size)
         assert_equal(1471,v.sum())
-	if HAS_GSL
         limits=Statsample::SRS.mean_confidence_interval_z(v.mean(), v.sds(), v.size,676,0.80)
-       else
-	       puts "SRS.mean_confidence_interval_z not tested (no ruby-gsl)"
-	       end
     end
     def test_estimation_proportion
         # total
@@ -148,14 +138,9 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
         sam=100
         prop=0.37
         a=0.95
-	if HAS_GSL
         l= Statsample::SRS.proportion_confidence_interval_z(prop, sam, pop, a)
         assert_in_delta(0.28,l[0],0.01)
         assert_in_delta(0.46,l[1],0.01)
-	else
-	       puts "SRS.proportion_confidence_interval_z not tested (no ruby-gsl)"
-		
-		end
     end
     def test_ml
         if(true)
