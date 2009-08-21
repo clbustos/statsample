@@ -62,7 +62,7 @@ class Vector
             @missing_data=[]
             @has_missing_data=nil
             @scale_data=nil
-			_set_valid_data
+			set_valid_data_intern
 			self.type=t
 		end
         def dup
@@ -161,24 +161,30 @@ class Vector
 			@missing_data.clear
             @data_with_nils.clear
             @gsl=nil
-            _set_valid_data
+            set_valid_data_intern
             set_scale_data if(@type==:scale)
 		end
-        def _set_valid_data
-            if Statsample::OPTIMIZED
-                Statsample::_set_valid_data(self)
-            else
-                @data.each do |n|
-                    if is_valid? n
-                        @valid_data.push(n)
-                        @data_with_nils.push(n)
-                    else
-                        @data_with_nils.push(nil)
-                        @missing_data.push(n)
-                    end
-                end
-                @has_missing_data=@missing_data.size>0
+        
+        if Statsample::STATSAMPLE__.respond_to?(:set_valid_data_intern)
+            def set_valid_data_intern
+                Statsample::STATSAMPLE__.set_valid_data_intern(self)
             end
+        else
+            def set_valid_data_intern
+                _set_valid_data_intern
+            end
+        end
+        def _set_valid_data_intern
+            @data.each do |n|
+                if is_valid? n
+                    @valid_data.push(n)
+                    @data_with_nils.push(n)
+                else
+                    @data_with_nils.push(nil)
+                    @missing_data.push(n)
+                end
+            end
+            @has_missing_data=@missing_data.size>0
         end
         # Retrieves true if data has one o more missing values
         def has_missing_data?
@@ -421,19 +427,24 @@ class Vector
                     @valid_data.uniq.sort
             end
         end
-		# Returns a hash with the distribution of frecuencies of
-		# the sample                
-		def frequencies
-            if Statsample::OPTIMIZED
-                Statsample::_frequencies(@valid_data)
-            else
-			@valid_data.inject(Hash.new) {|a,x|
-				a[x]||=0
-				a[x]=a[x]+1
-				a
-			}
+        if Statsample::STATSAMPLE__.respond_to?(:frequencies)
+            # Returns a hash with the distribution of frecuencies of
+            # the sample                
+            def frequencies
+                Statsample::STATSAMPLE__.frequencies(@valid_data)
+            end
+        else
+            def frequencies
+                _frequencies
             end
 		end
+        def _frequencies
+            @valid_data.inject(Hash.new) {|a,x|
+                a[x]||=0
+                a[x]=a[x]+1
+                a
+            }
+        end
 		# Plot frequencies on a chart, using gnuplot
         def plot_frequencies
                 require 'gnuplot'
@@ -551,8 +562,7 @@ class Vector
             # Return the median (percentil 50)
             def median
                 check_type :ordinal
-
-                if Statsample::OPTIMIZED and @type==:scale
+                if HAS_GSL and @type==:scale
                     GSL::Stats::median_from_sorted_data(@gsl)
                 else
                 percentil(50)

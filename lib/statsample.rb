@@ -72,16 +72,6 @@ end
     rescue LoadError
         HAS_ALGIB=false
     end
-        
-    
-    begin 
-        require 'statsamplert'
-    rescue LoadError
-        module Statsample
-            OPTIMIZED=false
-        end
-    end
-
 # 
 # Modules for statistical analysis
 # See first: 
@@ -249,9 +239,21 @@ module Statsample
             out
         end
     end
+    
+    module STATSAMPLE__
+    end
+
+end
+
+
+begin 
+    require 'statsamplert'
+rescue LoadError
+    module Statsample
+        OPTIMIZED=false
+    end
 end
 
 require 'statsample/vector'
 require 'statsample/dataset'
 require 'statsample/crosstab'
-

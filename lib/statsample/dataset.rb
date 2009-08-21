@@ -295,17 +295,35 @@ module Statsample
                     yield k,@vectors[k]
                 }
             end
-        if !Statsample::OPTIMIZED
-            def case_as_hash(c)
-                @fields.inject({}) {|a,x|
-                        a[x]=@vectors[x][c]
-                        a
-            }
+            if Statsample::STATSAMPLE__.respond_to?(:case_as_hash)
+                def case_as_hash(c)
+                    Statsample::STATSAMPLE__.case_as_hash(self,c)
+                end
+            else
+                def case_as_hash(c)
+                    _case_as_hash(c)
+                end                
             end
-            def case_as_array(c)
-                @fields.collect {|x| @vectors[x][c]}
-            end            
+            
+            if Statsample::STATSAMPLE__.respond_to?(:case_as_array)
+                def case_as_array(c)
+                    Statsample::STATSAMPLE__.case_as_array(self,c)
+                end
+            else
+                def case_as_array(c)
+                    _case_as_array(c)
+                end
+            end
+        def _case_as_hash(c)
+            @fields.inject({}) {|a,x|
+                a[x]=@vectors[x][c]
+                a
+            }
         end
+        def _case_as_array(c)
+            @fields.collect {|x| @vectors[x][c]}
+        end
+        
         def each
             begin
                 @i=0

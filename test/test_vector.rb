@@ -87,6 +87,7 @@ class StatsampleVectorTestCase < Test::Unit::TestCase
 	def test_nominal
 		assert_equal(@c[1],5)
 		assert_equal({ 1=>1,2=>1,3=>1,4=>1,5=>5,6=>2,7=>1,8=>1, 9=>1,10=>1},@c.frequencies)
+        assert_equal({ 1=>1,2=>1,3=>1,4=>1,5=>5,6=>2,7=>1,8=>1, 9=>1,10=>1},@c._frequencies)
 		assert_equal({ 1 => 1.quo(15) ,2=>1.quo(15), 3=>1.quo(15),4=>1.quo(15),5=>5.quo(15),6=>2.quo(15),7=>1.quo(15), 8=>1.quo(15), 9=>1.quo(15),10=>1.quo(15)}, @c.proportions)
         assert_equal(@c.proportion, 1.quo(15))
         assert_equal(@c.proportion(2), 1.quo(15))

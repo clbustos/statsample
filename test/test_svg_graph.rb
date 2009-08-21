@@ -1,13 +1,16 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
+require 'tmpdir'
 require 'tempfile'
+require 'fileutils'
 require 'test/unit'
 begin
 	require 'statsample/graph/svggraph'
 class StatsampleSvgGraphTestCase < Test::Unit::TestCase
 
 	def initialize(*args)
-		@image_path=File.dirname(__FILE__)+"/images"
+        @image_path=Dir::tmpdir+"/images"
+        FileUtils.mkdir(@image_path) if !File.exists? @image_path 
 		super
 	end
     def test_histogram
@@ -50,7 +53,7 @@ class StatsampleSvgGraphTestCase < Test::Unit::TestCase
 		file=@image_path+"/svggraph_histogram.svg"		
 		hist=vector.svggraph_histogram(5)
 		File.open(file,"wb") {|fp|
-		fp.write(hist.burn)
+            fp.write(hist.burn)
 		}
 		assert(File.exists?(file))
 		else

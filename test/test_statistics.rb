@@ -65,8 +65,23 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
     end
     def test_prop_pearson
 	if HAS_GSL    
-        assert_in_delta(0.42,Statsample::Bivariate.prop_pearson(Statsample::Bivariate.t_r(0.084,94),94),0.01)        
-        assert_in_delta(0.65,Statsample::Bivariate.prop_pearson(Statsample::Bivariate.t_r(0.046,95),95),0.01)
+        assert_in_delta(0.42, Statsample::Bivariate.prop_pearson(Statsample::Bivariate.t_r(0.084,94), 94),0.01)
+        assert_in_delta(0.65, Statsample::Bivariate.prop_pearson(Statsample::Bivariate.t_r(0.046,95), 95),0.01)
+        r=0.9
+        n=100
+        t=Statsample::Bivariate.t_r(r,n)
+        assert(Statsample::Bivariate.prop_pearson(t,n,:both)<0.05)
+        assert(Statsample::Bivariate.prop_pearson(t,n,:right)<0.05)
+        assert(Statsample::Bivariate.prop_pearson(t,n,:left)>0.05)
+
+        r=-0.9
+        n=100
+        t=Statsample::Bivariate.t_r(r,n)
+        assert(Statsample::Bivariate.prop_pearson(t,n,:both)<0.05)
+        assert(Statsample::Bivariate.prop_pearson(t,n,:right)>0.05)
+        assert(Statsample::Bivariate.prop_pearson(t,n,:left)<0.05)
+
+        
 	else
 		puts "Bivariate.prop_pearson not tested (no ruby-gsl)"
 	end

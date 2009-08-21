@@ -65,8 +65,17 @@ module Statsample
                 r*Math::sqrt(((size)-2).to_f / (1 - r**2))
             end
             # Retrieves the probability value (a la SPSS)
-            # for a given t, size and number of tails
+            # for a given t, size and number of tails.
+            # Uses a second parameter 
+            # * :both  or 2  : for r!=0
+            # * :right, :positive or 1  : for r > 0
+            # * :left, :negative        : for r < 0
+            
             def prop_pearson(t,size, tails=:both)
+                tails=:both if tails==2
+                tails=:right if tails==1 or tails==:positive
+                tails=:left if tails==:negative
+                
                 n_tails=case tails
                 when :both
                     2
@@ -74,9 +83,13 @@ module Statsample
                     1
                 end
                 if HAS_GSL
-                        t=-t if t>0 and (tails==:both or tails==:right)
+                        t=-t if t>0 and (tails==:both)
                         cdf=GSL::Cdf::tdist_P(t,size-2)
-                        cdf*n_tails
+                        if(tails==:right)
+                            1.0-(cdf*n_tails)
+                        else
+                            cdf*n_tails
+                        end
                 else
                 raise "Needs ruby-gsl"
                 end

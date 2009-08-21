@@ -9,7 +9,7 @@ class StatsampleCSVTestCase < Test::Unit::TestCase
 		super
 	end
     def test_read
-                assert_equal(6,@ds.cases)
+        assert_equal(6,@ds.cases)
         assert_equal(%w{id name age city a1},@ds.fields)
         id=[1,2,3,4,5,6].to_vector(:scale)
         name=["Alex","Claude","Peter","Franz","George","Fernand"].to_vector(:nominal)

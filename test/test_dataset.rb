@@ -148,7 +148,12 @@ class StatsampleDatasetTestCase < Test::Unit::TestCase
     def test_case_as
         assert_equal({'id'=>1,'name'=>'Alex','city'=>'New York','age'=>20,'a1'=>'a,b'},@ds.case_as_hash(0))
         assert_equal([5,'George',5,'Tome','a,b,c'],@ds.case_as_array(4))
+        # Native methods
+        assert_equal({'id'=>1,'name'=>'Alex','city'=>'New York','age'=>20,'a1'=>'a,b'},@ds._case_as_hash(0))
+        assert_equal([5,'George',5,'Tome','a,b,c'],@ds._case_as_array(4))
 
+        
+        
     end
     def test_delete_vector
         @ds.delete_vector('name')

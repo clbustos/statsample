@@ -1,3 +1,10 @@
+=== 0.3.4 / 2009-08-21
+* Works with statsample-optimization 2.0.0
+* Vector doesn't uses delegation. All methods are part of Vector
+* Added Combination. Generates all combination of n elements taken r at a time
+* Bivariate#prop_pearson now can uses as a second parameter :both, :left, :right, :positive or :negative
+* Added LICENSE.txt
+
 === 0.3.3 / 2009-08-11
 * Added i18n support. For now, only spanish translation available
 * Bug fix: Test now load libraries on ../lib path
