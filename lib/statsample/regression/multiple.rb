@@ -35,7 +35,20 @@ module Multiple
     def self.pairwise(ds,y_var)
         RubyEngine.new(ds,y_var)
     end
-
+    def self.listwise_by_exp(ds,exp)
+    end
+    # Returns a dataset and name of criteria using a expression.
+    # All nominal vectors are replaced by dummy coding
+    # and interactions are calculated
+    
+    def self.ds_by_exp(ds,exp)
+        parts=exp.split(/[\+=]/)
+        dependent=parts.pop
+        ds_out=[]
+        parts.each{|p|
+            
+        }
+    end
     # Base class for Multiple Regression Engines
     class BaseEngine
     def initialize(ds,y_var)

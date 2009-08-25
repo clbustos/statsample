@@ -23,7 +23,7 @@ $:.unshift(File.expand_path(File.dirname(__FILE__)+"/../ext"))
 
 require 'delegate'
 require 'matrix'
-
+require 'distribution'
 
 class Numeric
   def square ; self * self ; end
@@ -44,6 +44,7 @@ def create_test(*args,&proc)
     fields=args
     [description, fields, Proc.new]
 end
+#--
 # Test extensions
 begin
     require 'gettext'
@@ -72,7 +73,7 @@ end
     rescue LoadError
         HAS_ALGIB=false
     end
-# 
+# ++
 # Modules for statistical analysis
 # See first: 
 # * Converter : several modules to import and export data
@@ -80,7 +81,7 @@ end
 # * Dataset: An union of vectors.
 #
 module Statsample
-    VERSION = '0.3.4'
+    VERSION = '0.4.0'
     SPLIT_TOKEN = ","
 	autoload(:Database, 'statsample/converters')
     autoload(:Anova, 'statsample/anova')
@@ -245,11 +246,11 @@ module Statsample
 
 end
 
-
+#--
 begin 
     require 'statsamplert'
 rescue LoadError
-    module Statsample
+    module Statsample 
         OPTIMIZED=false
     end
 end

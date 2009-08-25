@@ -1,12 +1,22 @@
 module Statsample
     # Combination class systematically generates all combinations of n elements, taken r at a time.
-    # Use GSL::Combination is available for extra speed
+    # With rbgsl, GSL::Combination is available for extra speed
     # Source: http://snippets.dzone.com/posts/show/4666
     # Use:
     #  comb=Statsample::Combination.new(3,5)
-    #  comb.each{|c|
-    #     p c
-    #  }
+    #  => #<Statsample::Combination:0x7f6323804e08 @n=5, @d=#<Statsample::Combination::CombinationGsl:0x7f63237ff7f0 @n=5, @k=3, @c=GSL::Combination>, @k=3>
+    #  comb.each{|c| p c }
+    #  [0, 1, 2]
+    #  [0, 1, 3]
+    #  [0, 1, 4]
+    #  [0, 2, 3]
+    #  [0, 2, 4]
+    #  [0, 3, 4]
+    #  [1, 2, 3]
+    #  [1, 2, 4]
+    #  [1, 3, 4]
+    #  [2, 3, 4]
+    #
     class Combination
         attr_reader :d
         def initialize(k,n,only_ruby=false)

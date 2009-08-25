@@ -42,20 +42,38 @@ module Statsample
     
 class Vector
     include Enumerable
-    attr_reader :type, :data, :valid_data, :missing_values, :missing_data, :data_with_nils, :gsl
+    # Level of measurement. Could be :nominal, :ordinal or :scale
+    attr_reader :type
+    # Original data. 
+    attr_reader :data
+    # Valid data. Equal to data, minus values assigned as missing values
+    attr_reader :valid_data
+    # Array of values considered as missing. Nil is a missing value, by default
+    attr_reader :missing_values 
+    # Missing values array
+    attr_reader :missing_data
+    # Original data, with all missing values replaced by nils
+    attr_reader :data_with_nils
+    # GSL Object, only available with rbgsl extension and type==:scale
+    attr_reader :gsl
+    # Change label for specific values
     attr_accessor :labels
-        # Creates a new 
-        # data = Array of data
-        # t = level of meausurement. Could be: 
-        # [:nominal] : Nominal level of measurement
-        # [:ordinal] : Ordinal level of measurement
-        # [:scale]   : Scale level of meausurement
-        #
-		def initialize(data=[],t=:nominal,missing_values=[],labels={})
+    # Creates a new Vector object.
+    # [data]            Array of data.
+    # [type]            Level of meausurement. See Vector#type 
+    # [missing_values]  Array of missing values. See Vector#missing_values
+    # [labels]          Labels for data values
+    #
+    # The fast way to create a vector uses Array#to_vector. Remember
+    # to include as the first argument the level of measurement 
+    #
+    #  v=[1,2,3,4].to_vector(:scale)
+    #
+    def initialize(data=[], t=:nominal,missing_values=[],labels={})
             raise "Data should be an array" unless data.is_a? Array
-			@data=data
-			@missing_values=missing_values
-			@labels=labels
+            @data=data
+            @missing_values=missing_values
+            @labels=labels
             @type=t
             @valid_data=[]
             @data_with_nils=[]
@@ -65,6 +83,9 @@ class Vector
 			set_valid_data_intern
 			self.type=t
 		end
+        # Creates a duplicate of the Vector.
+        # Note: data, missing_values and labels are duplicated, so
+        # changes on original vector doesn't propages to copies.
         def dup
             Vector.new(@data.dup,@type,@missing_values.dup,@labels.dup)
         end
@@ -73,14 +94,17 @@ class Vector
         def dup_empty
             Vector.new([],@type,@missing_values.dup,@labels.dup)
         end
+        # Raises an exception if type of vector is inferior to t type
+        def check_type(t)
+            raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal)
+        end
+        private :check_type
+        
         # Return a vector usign the standarized values for data
         # with sd with denominator N
 		def vector_standarized_pop
 			vector_standarized(true)
 		end
-        def check_type(t)
-            raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal)
-        end
         # Return a vector usign the standarized values for data
         # with sd with denominator n-1
         
@@ -114,48 +138,63 @@ class Vector
             }.to_vector(:scale)
         end
         
-        # Vector equality
+        # Vector equality.
         # Two vector will be the same if their data, missing values, type, labels are equals
         def ==(v2)
             raise TypeError,"Argument should be a Vector" unless v2.instance_of? Statsample::Vector
             @data==v2.data and @missing_values==v2.missing_values and @type==v2.type and @labels=v2.labels
         end
         
-        def _dump(i)
+        def _dump(i) # :nodoc:
             Marshal.dump({'data'=>@data,'missing_values'=>@missing_values, 'labels'=>@labels, 'type'=>@type})
         end
-        def self._load(data)
+        
+        def self._load(data) # :nodoc:
             h=Marshal.load(data)
             Vector.new(h['data'], h['type'], h['missing_values'], h['labels'])
         end
+        # Returns a new vector, with data modified by block.
+        # Equivalent to create a Vector after #collect on data 
         def recode
             @data.collect{|x|
                 yield x
             }.to_vector(@type)
         end
+        # Modifies current vector, with data modified by block.
+        # Equivalent to #collect! on @data 
+
         def recode!
             @data.collect!{|x|
                 yield x
             }
             set_valid_data
         end
+        # Iterate on each item
+        # Equivalent to
+        #   @data.each{|x| yield x}
         def each
-            @data.each{|x|
-                yield(x)
-            }
+            @data.each{|x| yield(x) }
         end
+        
+        # Iterate on each item_index
+        
         def each_index
             (0...@data.size).each {|i|
                 yield(i)
             }
         end
-        # Add a value at the end of the vector
-        # If second argument set to false, you should update valid data usign
+        # Add a value at the end of the vector.
+        # If second argument set to false, you should update the Vector usign
         # Vector#set_valid_data at the end of your insertion cycle
+        #
         def add(v,update_valid=true)
             @data.push(v)
             set_valid_data if update_valid
         end
+        # Update valid_data, missing_data, data_with_nils and gsl
+        # at the end of an insertion
+        #
+        # Use after add(v,false) 
         def set_valid_data
 			@valid_data.clear
 			@missing_data.clear
@@ -186,6 +225,7 @@ class Vector
             end
             @has_missing_data=@missing_data.size>0
         end
+        
         # Retrieves true if data has one o more missing values
         def has_missing_data?
             @has_missing_data
@@ -193,7 +233,7 @@ class Vector
         def labeling(x)
             @labels.has_key?(x) ? @labels[x].to_s : x.to_s
         end
-        # Returns a Vector with the data with labels replaced by the label
+        # Returns a Vector with the data with labels replaced by the label.
         def vector_labeled
             d=@data.collect{|x|
                 if @labels.has_key? x
@@ -204,12 +244,18 @@ class Vector
             }
             Vector.new(d,@type)
         end
+        # Size of total data
         def size
             @data.size
         end
+        alias_method :n, :size
+
+        # Retrieves i element of data
         def [](i)
             @data[i]
         end
+        # Set i element of data. 
+        # Note: Use set_valid_data if you include missing values
         def []=(i,v)
             @data[i]=v
         end
@@ -227,7 +273,7 @@ class Vector
 			@type=t	
             set_scale_data if(t==:scale)
 		end
-        def n; @data.size ; end
+        
         def to_a
             @data.dup
         end
@@ -292,10 +338,11 @@ class Vector
             end
             
         end
-        # Return an array with the data splitted by a separator
-        # a=Vector.new(["a,b","c,d","a,b","d"])
-        # a.splitted
-        # [["a","b"],["c","d"],["a","b"],["d"]]
+        # Return an array with the data splitted by a separator.
+        #   a=Vector.new(["a,b","c,d","a,b","d"])
+        #   a.splitted
+        #     =>
+        #   [["a","b"],["c","d"],["a","b"],["d"]]
         def splitted(sep=Statsample::SPLIT_TOKEN)
             @data.collect{|x|
                 if x.nil?
@@ -311,11 +358,14 @@ class Vector
         # defined on the fields
         # Example:
         #
-        # a=Vector.new(["a,b","c,d","a,b"])
+        #  a=Vector.new(["a,b","c,d","a,b"])
         #  a.split_by_separator
-        #    {"a"=>#<Statsample::Type::Nominal:0x7f2dbcc09d88 @data=[1, 0, 1]>,
-        #     "b"=>#<Statsample::Type::Nominal:0x7f2dbcc09c48 @data=[1, 1, 0]>,
-        #     "c"=>#<Statsample::Type::Nominal:0x7f2dbcc09b08 @data=[0, 1, 1]>}
+        #  =>  {"a"=>#<Statsample::Type::Nominal:0x7f2dbcc09d88 
+        #        @data=[1, 0, 1]>, 
+        #       "b"=>#<Statsample::Type::Nominal:0x7f2dbcc09c48 
+        #        @data=[1, 1, 0]>, 
+        #      "c"=>#<Statsample::Type::Nominal:0x7f2dbcc09b08 
+        #        @data=[0, 1, 1]>}
         #
         def split_by_separator(sep=Statsample::SPLIT_TOKEN)
             split_data=splitted(sep)
@@ -393,7 +443,8 @@ class Vector
                 frequencies[x].nil? ? 0 : frequencies[x]
             end
         end
-        # returns the real type for the vector, according to its content
+        # returns the database type for the vector, according to its content
+        
         def db_type(dbs='mysql')
             # first, detect any character not number
             if @data.find {|v|  v.to_s=~/\d{2,2}-\d{2,2}-\d{4,4}/} or @data.find {|v|  v.to_s=~/\d{4,4}-\d{2,2}-\d{2,2}/}
@@ -417,6 +468,16 @@ class Vector
         def to_s
             sprintf("Vector(type:%s, n:%d)[%s]",@type.to_s,@data.size, @data.collect{|d| d.nil? ? "nil":d}.join(","))
         end
+        # Ugly name. Really, create a Vector for standard 'matrix' package.
+        # <tt>dir</tt> could. be :horizontal or :vertical
+        def to_matrix(dir=:horizontal)
+            case dir
+            when :horizontal
+                Matrix[@data]
+            when :vertical
+                Matrix.columns([@data])
+            end
+        end
 		def inspect
 			self.to_s
 		end
@@ -424,7 +485,7 @@ class Vector
             if @type==:scale
                 @scale_data.uniq.sort
             else
-                    @valid_data.uniq.sort
+                @valid_data.uniq.sort
             end
         end
         if Statsample::STATSAMPLE__.respond_to?(:frequencies)
@@ -472,16 +533,16 @@ class Vector
             end
 
 
-            # Returns the most frequent item
+            # Returns the most frequent item.
 			def mode
 				frequencies.max{|a,b| a[1]<=>b[1]}[0]
 			end
-            # The numbers of item with valid data
+            # The numbers of item with valid data.
             def n_valid
                 @valid_data.size
             end
             # Returns a hash with the distribution of proportions of
-            # the sample
+            # the sample.
             def proportions
                 frequencies.inject({}){|a,v|
                     a[v[0]] = v[1].quo(n_valid)
@@ -512,13 +573,11 @@ class Vector
                 out
             end
             
-
-            
-            
             # Variance of p, according to poblation size
             def variance_proportion(n_poblation, v=1)
                 Statsample::proportion_variance_sample(self.proportion(v), @valid_data.size, n_poblation)
             end
+            # Variance of p, according to poblation size
             def variance_total(n_poblation, v=1)
                 Statsample::total_variance_sample(self.proportion(v), @valid_data.size, n_poblation)
             end
@@ -534,7 +593,10 @@ class Vector
 				alias_method met_or, met
 			end
 		}
-        # Ordinal Methods
+        ######
+        ### Ordinal Methods
+        ######
+        
         # Return the value of the percentil q
             def percentil(q)
                 check_type :ordinal
@@ -546,7 +608,7 @@ class Vector
                     (sorted[(v-0.5).to_i].to_f + sorted[(v+0.5).to_i]).quo(2)
                 end
             end
-			# Returns a ranked vector
+			# Returns a ranked vector.
 			def ranked(type=:ordinal)
                 check_type :ordinal
 				i=0
@@ -593,6 +655,8 @@ class Vector
                 @gsl=GSL::Vector.alloc(@scale_data) if @scale_data.size>0
             end
           end
+          private :set_scale_data
+          
             # The range of the data (max - min)
 			def range; 
                 check_type :scale
@@ -608,9 +672,12 @@ class Vector
 
 					sum.to_f.quo(n_valid)
 			end
+            # Sum of squares for the data around a value.
+            # By default, this value is the  mean
+            #   ss= sum{(xi-m)^2}
+            # 
             def sum_of_squares(m=nil)
                 check_type :scale
-                
                 m||=mean
                 @scale_data.inject(0){|a,x| a+(x-m).square}
             end
@@ -618,27 +685,25 @@ class Vector
 			# Sum of squared deviation
 			def sum_of_squared_deviation
                 check_type :scale
-                
 				@scale_data.inject(0) {|a,x| x.square+a} - (sum.square.quo(n_valid))
 			end
             
-            # Population variance (divided by n)
+            # Population variance (denominator N)
             def variance_population(m=nil)
                 check_type :scale
-                
                 m||=mean
 				squares=@scale_data.inject(0){|a,x| x.square+a}
                 squares.quo(n_valid) - m.square
             end
 			
 		
-            # Population Standard deviation (divided by n)
+            # Population Standard deviation (denominator N)
             def standard_deviation_population(m=nil)
                 check_type :scale
                 
                 Math::sqrt( variance_population(m) )
             end
-            # Sample Variance (divided by n-1)
+            # Sample Variance (denominator n-1)
             
 			def variance_sample(m=nil)
                 check_type :scale
@@ -647,7 +712,7 @@ class Vector
 				sum_of_squares(m).quo(n_valid - 1)
 			end
 
-            # Sample Standard deviation (divided by n-1)
+            # Sample Standard deviation (denominator n-1)
             
 			def standard_deviation_sample(m=nil)
                 check_type :scale
@@ -655,13 +720,14 @@ class Vector
 				m||=m
 				Math::sqrt(variance_sample(m))
 			end
+            # Skewness of the sample
 			def skew
                 check_type :scale
-                
 				m=mean
 				thirds=@scale_data.inject(0){|a,x| a+((x-mean)**3)}
 				thirds.quo((@scale_data.size-1)*sd**3)
 			end
+            # Kurtosis of the sample
 			def kurtosis
                 check_type :scale
                 
@@ -670,9 +736,10 @@ class Vector
 				thirds.quo((@scale_data.size-1)*sd**4)
 				
 			end
+            # Product of all values on the sample
+            # 
 			def product
                 check_type :scale
-                
                 @scale_data.inject(1){|a,x| a*x }
             end
 			if HAS_GSL
@@ -712,11 +779,11 @@ class Vector
 					m||=mean
 					@gsl.sd_with_fixed_mean(m)
 				end
-				def skew
+				def skew # :nodoc:
                     check_type :scale
 					@gsl.skew
 				end
-				def kurtosis
+				def kurtosis # :nodoc:
                     check_type :scale
 					@gsl.kurtosis
 				end
@@ -752,8 +819,8 @@ class Vector
 			alias_method :sdp, :standard_deviation_population
 			alias_method :sds, :standard_deviation_sample
 			alias_method :cov, :coefficient_of_variation
-            alias_method :variance, :variance_sample
-            alias_method :sd, :standard_deviation_sample
-            alias_method :ss, :sum_of_squares
+			alias_method :variance, :variance_sample
+			alias_method :sd, :standard_deviation_sample
+			alias_method :ss, :sum_of_squares
 		end
 end

@@ -294,6 +294,18 @@ class StatsampleDatasetTestCase < Test::Unit::TestCase
         assert_equal(exp1,res)
         res=ds.verify('id',t1,t2,t3)
         assert_equal(exp2,res)
-
+    end
+    def test_compute_operation
+        v1=[1,2,3,4].to_vector(:scale)
+        v2=[4,3,2,1].to_vector(:scale)
+        v3=[10,20,30,40].to_vector(:scale)
+        vscale=[1.quo(2),1,3.quo(2),2].to_vector(:scale)
+        vsum=[1+4+10.0,2+3+20.0,3+2+30.0,4+1+40.0].to_vector(:scale)
+        vmult=[1*4,2*3,3*2,4*1].to_vector(:scale)
+        ds={'v1'=>v1,'v2'=>v2,'v3'=>v3}.to_dataset
+        assert_equal(vscale,ds.compute("v1/2"))        
+        assert_equal(vsum,ds.compute("v1+v2+v3"))
+        assert_equal(vmult,ds.compute("v1*v2"))
+        
     end
 end

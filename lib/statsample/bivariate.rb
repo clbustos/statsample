@@ -20,8 +20,8 @@ module Statsample
                }
                sum
             end
-			# Covariance. The denominator is n-1
-			def covariance_slow(v1a,v2a)
+
+			def covariance_slow(v1a,v2a) # :nodoc:
 				t=0
 				m1=v1a.mean
 				m2=v1a.mean
@@ -40,8 +40,8 @@ module Statsample
 					pearson_slow(v1a,v2a)
 				end
             end
-            #:nodoc:
-            def pearson_slow(v1a,v2a)
+            def pearson_slow(v1a,v2a) # :nodoc:
+
                 v1s,v2s=v1a.vector_standarized_pop,v2a.vector_standarized_pop
                 t=0
                 siz=v1s.size
@@ -106,6 +106,8 @@ module Statsample
                 }
                 nv.to_vector(:scale)
             end
+            # Correlation between v1 and v2, controling the effect of
+            # control on both.
             def partial_correlation(v1,v2,control)
                 v1a,v2a,cona=Statsample.only_valid(v1,v2,control)
                 rv1v2=pearson(v1a,v2a)
@@ -115,7 +117,9 @@ module Statsample
                 (rv1v2-(rv1con*rv2con)).quo(Math::sqrt(1-rv1con**2) * Math::sqrt(1-rv2con**2))
                 
             end
-            # Covariance matrix
+            # Covariance matrix.
+            # Order of rows and columns depends on Dataset#fields order
+           
             def covariance_matrix(ds)
                 ds.collect_matrix do |row,col|
                     if (ds[row].type!=:scale or ds[col].type!=:scale)
@@ -126,7 +130,8 @@ module Statsample
                 end
             end
             
-            # The classic correlation matrix for all fields of a dataset
+            # Correlation matrix.
+            # Order of rows and columns depends on Dataset#fields order
             
             def correlation_matrix(ds)
                 ds.collect_matrix {|row,col|
@@ -150,16 +155,19 @@ module Statsample
                         end
                 }
             end
-            def correlation_probability_matrix(ds)
+            # Matrix of correlation probability
+            # Order of rows and columns depends on Dataset#fields order
+
+            def correlation_probability_matrix(ds, tails=:both)
                 rows=ds.fields.collect{|row|
                     ds.fields.collect{|col|
                         v1a,v2a=Statsample.only_valid(ds[row],ds[col])
-                        (row==col or ds[row].type!=:scale or ds[col].type!=:scale) ? nil : prop_pearson(t_pearson(ds[row],ds[col]), v1a.size)
+                        (row==col or ds[row].type!=:scale or ds[col].type!=:scale) ? nil : prop_pearson(t_pearson(ds[row],ds[col]), v1a.size, tails)
                     }
                 }
                 Matrix.rows(rows)
             end
-			# Calculate Spearman correlation coefficient between 2 vectors
+			# Spearman ranked correlation coefficient between 2 vectors
 			def spearman(v1,v2)
 				v1a,v2a=Statsample.only_valid(v1,v2)
 				v1r,v2r=v1a.ranked(:scale),v2a.ranked(:scale)

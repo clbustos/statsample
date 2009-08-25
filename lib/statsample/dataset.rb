@@ -36,11 +36,26 @@ module Statsample
         include Writable
         attr_reader :vectors, :fields, :cases, :i
         attr_accessor :labels
-        # To create a dataset
-        # * Dataset.new()
-        # * Dataset.new(%w{v1 v2 v3})
-        # * Dataset.new({'v1'=>%w{1 2 3}.to_vector, 'v2'=>%w{4 5 6}.to_vector})
-        # * Dataset.new({'v2'=>v2,'v1'=>v1},['v1','v2'])
+        # Creates a new dataset. A dataset is a set of ordered named vectors
+        # of the same size.
+        # 
+        # [vectors] With an array, creates a set of empty vectors named as
+        # values on the array. With a hash, each Vector is assigned as 
+        # a variable of the Dataset named as its key
+        # [fields]  Array of names for vectors. Is only used for set the 
+        # order of variables. If empty, vectors keys on alfabethic order as 
+        # used as fields
+        # [labels]  Hash to set names for fields.
+        # 
+        # 
+        #   Dataset.new()
+        #   Dataset.new(%w{v1 v2 v3})
+        #   Dataset.new({'v1'=>%w{1 2 3}.to_vector, 'v2'=>%w{4 5 6}.to_vector})
+        #   Dataset.new({'v2'=>v2,'v1'=>v1},['v1','v2'])
+        #
+        # The fast way to create a dataset uses Hash#to_dataset, with
+        # fields and labels as arguments
+        #   ds = {'v1'=>[1,2,3].to_vector}.to_dataset
         #
         def initialize(vectors={}, fields=[], labels={})
             if vectors.instance_of? Array
@@ -296,7 +311,7 @@ module Statsample
                 }
             end
             if Statsample::STATSAMPLE__.respond_to?(:case_as_hash)
-                def case_as_hash(c)
+                def case_as_hash(c) # :nodoc:
                     Statsample::STATSAMPLE__.case_as_hash(self,c)
                 end
             else
@@ -306,7 +321,7 @@ module Statsample
             end
             
             if Statsample::STATSAMPLE__.respond_to?(:case_as_array)
-                def case_as_array(c)
+                def case_as_array(c) # :nodoc:
                     Statsample::STATSAMPLE__.case_as_array(self,c)
                 end
             else
@@ -314,13 +329,13 @@ module Statsample
                     _case_as_array(c)
                 end
             end
-        def _case_as_hash(c)
+            def _case_as_hash(c) # :nodoc:
             @fields.inject({}) {|a,x|
                 a[x]=@vectors[x][c]
                 a
             }
         end
-        def _case_as_array(c)
+        def _case_as_array(c) # :nodoc:
             @fields.collect {|x| @vectors[x][c]}
         end
         
@@ -495,6 +510,40 @@ module Statsample
             ms
 			
 		end
+        # Returns a vector, based on a string with a calculation based
+        # on vector
+        # The calculation will be eval'ed, so you can put any variable
+        # or expression valid on ruby
+        # For example:
+        #   a=[1,2].to_vector(scale)
+        #   b=[3,4].to_vector(scale)
+        #   ds={'a'=>a,'b'=>b}.to_dataset
+        #   ds.calculate("a+b")
+        #   => Vector [4,6]
+        def compute(text)
+            @fields.each{|f|
+                if @vectors[f].type=:scale
+                    text.gsub!(f,"row['#{f}'].to_f")
+                else
+                    text.gsub!(f,"row['#{f}']")
+
+                end
+                
+            }
+            collect_with_index {|i,row|
+                invalid=false
+                @fields.each{|f|
+                    if @vectors[f].data_with_nils[i].nil?
+                        invalid=true
+                    end
+                }
+                if invalid
+                    nil
+                else
+                    eval(text)
+                end
+            }
+        end
         # Test each row with one or more tests
         # each test is a Proc with the form
         #   Proc.new {|row| row['age']>0}

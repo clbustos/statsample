@@ -157,7 +157,7 @@ module Statsample
                         }
                     line_number+=1
                     if(line_number<=ignore_lines)
-                        #puts "Skip line"
+                    #puts "Skip line #{line_number}:#{row.to_s}"
                         next
                     end
                     # This should be fixed.

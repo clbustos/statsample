@@ -32,6 +32,7 @@ else
     
     
 end
+
 ds.update_valid_data
 
 if !File.exists? "regression.dab"
@@ -39,7 +40,7 @@ if !File.exists? "regression.dab"
 else
     da=Statsample.load("regression.dab")
 end
-times=1
+times=20
 if(true)
 Benchmark.bm(7) do |x|
     if HAS_GSL

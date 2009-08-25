@@ -17,6 +17,17 @@ class StatsampleVectorTestCase < Test::Unit::TestCase
         a=[1,2,3,4,5].to_vector(:scale)
         assert_equal(120,a.product)
     end
+    def test_matrix
+        a=[1,2,3,4,5].to_vector(:scale)
+        mh=Matrix[[1,2,3,4,5]]
+        mv=Matrix.columns([[1,2,3,4,5]])
+        assert_equal(mh,a.to_matrix)
+        assert_equal(mv,a.to_matrix(:vertical))
+        # 3*4 + 2*5 = 22
+        a=[3,2].to_vector(:scale)
+        b=[4,5].to_vector(:scale)
+        assert_equal(22,(a.to_matrix*b.to_matrix(:vertical))[0,0])
+    end
 	def test_missing_values
 		@c.missing_values=[10]
 		assert_equal([-99,-99,1,2,3,4,5,5,5,5,5,6,6,7,8,9], @c.valid_data.sort)
