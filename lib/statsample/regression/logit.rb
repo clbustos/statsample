@@ -54,7 +54,7 @@ module Regression
             }
             fd
         end
-        def test_first_derivative(pars)
+        def test_first_derivative(pars) #:nodoc:
             x=@ds_indep.to_matrix
             y=@dy.to_matrix(:vertical)
             pars=pars.to_matrix(:vertical)
@@ -95,26 +95,30 @@ module Regression
             end
             Matrix.rows(sd, true)
         end
+        
         def p_minus(x_row,p)
-        value = 0;
-        x_row.each_index { |i| value += x_row[i]*p[i,0]}
-        1/(1+Math.exp(-value))
+            value = 0;
+            x_row.each_index { |i| value += x_row[i]*p[i,0]}
+            1/(1+Math.exp(-value))
         end
         def p_plus(x_row,p)
-        value = 0;
-        x_row.each_index { |i| value += x_row[i]*p[i,0]}
-        1/(1+Math.exp(value))
+            value = 0;
+            x_row.each_index { |i| value += x_row[i]*p[i,0]}
+            1/(1+Math.exp(value))
         end
 
-        # Newton Raphson without
-        # automatic stopping criteria
+        # Newton Raphson without automatic stopping criteria.
+        # Source: Maximum Likelihood Estimation With Java and Ruby
+        # Author: Peter von Tessin
+        # Date: November 6, 2005
+
         def self.newton_raphson(x,y,start_values, model)
           # deep copy?
           parameters = start_values
           20.times do
             h = model.second_derivative(x,y,parameters)
             if h.singular?
-              puts "Hessian is singular!"
+                raise "Hessian is singular!"
             end
             fd = model.first_derivative(x,y,parameters)
             parameters = parameters-(h.inverse*(fd))
