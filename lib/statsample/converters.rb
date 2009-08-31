@@ -235,6 +235,7 @@ module Statsample
         # USE:
         #     Statsample::CSV.write(ds,"test_csv.csv")            
         def write(dataset,filename, convert_comma=false,*opts)
+ require 'csv'            
                 writer=::CSV.open(filename,'w',*opts)
                 writer << dataset.fields
                 dataset.each_array{|row|

@@ -12,9 +12,6 @@ class StatsampleLogitTestCase < Test::Unit::TestCase
         l=Statsample::Regression::Logit.new(ds,"y")
         b=[3,-0.5,4,2]
         assert_in_delta(Math::log(l.mle(b)), l.mle_log(b),0.0000001)
-        p l.test_first_derivative(b.to_vector(:scale))
-        p l.first_derivative(b.to_vector(:scale))
-
     end
     def atest_logit
         a=  [1,3,2,4,3,5,4,6,5,7].to_vector(:scale)

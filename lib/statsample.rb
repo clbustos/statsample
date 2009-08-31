@@ -100,7 +100,7 @@ module Statsample
 	autoload(:Multivariate, 'statsample/multivariate')
 	autoload(:Multiset, 'statsample/multiset')
 	autoload(:StratifiedSample, 'statsample/multiset')
-    
+	autoload(:MLE, 'statsample/mle')    
     
 	autoload(:Regression, 'statsample/regression')
 	autoload(:Test, 'statsample/test')

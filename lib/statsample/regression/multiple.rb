@@ -203,11 +203,7 @@ out.add_line
 out.add "ANOVA TABLE"
 
 t=Statsample::ReportTable.new(%w{source ss df ms f s})
-begin
-    t.add_row(["Regression", sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
-rescue RuntimeError
-    t.add_row(["Regression", sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), "???", "???"])
-end
+t.add_row(["Regression", sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
 t.add_row(["Error", sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse)])
 
 t.add_row(["Total", sprintf("%0.3f",sst), df_r+df_e])
@@ -218,10 +214,10 @@ begin
     out.add "Beta coefficientes"
     sc=standarized_coeffs
     cse=coeffs_se
-    t=Statsample::ReportTable.new(%w{coeff beta se t})
-    t.add_row(["Constant", "-",constant_se, constant_t])
+    t=Statsample::ReportTable.new(%w{coeff b beta se t})
+    t.add_row(["Constant", sprintf("%0.3f", constant), "-", sprintf("%0.3f", constant_se), sprintf("%0.3f", constant_t)])
     @fields.each{|f|
-        t.add_row([f, sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
+        t.add_row([f, sprintf("%0.3f", c[f]), sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
     }
     out.parse_table(t)
     

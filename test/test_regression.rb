@@ -136,9 +136,9 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
         @d=%w{a  b  c  a  a  c  a   a c  a}.to_vector(:nominal)
         @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
         ds={'a'=>@a,'b'=>@b,'c'=>@c,'d'=>@d,'y'=>@y}.to_dataset
-        puts Statsample::Regression::Multiple.ds_by_exp(ds,"a+b=y")
-        puts Statsample::Regression::Multiple.ds_by_exp(ds,"a+b*d=y")
-        puts Statsample::Regression::Multiple.ds_by_exp(ds,"c+d=y")
+        #puts Statsample::Regression::Multiple.ds_by_exp(ds,"a+b=y")
+        #puts Statsample::Regression::Multiple.ds_by_exp(ds,"a+b*d=y")
+        #puts Statsample::Regression::Multiple.ds_by_exp(ds,"c+d=y")
     end
 
 end
