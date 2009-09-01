@@ -41,29 +41,7 @@ module Statsample
             end
             parameters = Matrix.columns([fd])
         end
-        def self.scoring(x,y,model,start_values=nil)
-            if start_values.nil?
-                parameters=set_parameters(x,model)
-            else
-                parameters = start_values.dup
-            end
-            cv=Matrix.rows([([1.0]*parameters.row_size)])
-            last_diff=nil
-            raise "n on y != n on x" if x.row_size!=y.row_size
-            old_lmle=ln_mle(model,x,y,parameters)
-            ITERATIONS.times do |i|
-                sb = model.first_derivative(x,y,parameters)
-                #im= model.information_matrix(x,y,parameters)                
-                sd= model.second_derivative(x,y,parameters)
-                parameters=parameters+(((sd*-1).inverse)*sb)
-                new_lmle=ln_mle(model,x,y,parameters)
-                if(new_lmle < old_lmle) or ((new_lmle-old_lmle) / new_lmle).abs < MIN_DIFF
-                        break;
-                    end
-                    old_lmle=new_lmle
-            end
-            parameters
-        end
+        
         # Newton Raphson with automatic stopping criteria.
         # Based on: Von Tessin, P. (2005). Maximum Likelihood Estimation With Java and Ruby
         #

@@ -49,6 +49,13 @@ class Matrix
             false
         end
     end
+    def to_gsl
+        out=[]
+        self.row_size.times{|i|
+            out[i]=self.row(i).to_a
+        }
+        GSL::Matrix[*out]
+    end
     def orthogonal?
         if regular?
             (self * self.t).identity?
@@ -57,9 +64,15 @@ class Matrix
         end
     end
 end
-a=Matrix[[13,5],[2,4]]
-p a
-b=Matrix[[3,0],[0,14]]
-p b
-p a*b
 
+
+module GSL
+    class Matrix
+        def to_matrix
+            rows=self.size1
+            cols=self.size2
+            out=(0...rows).collect{|i| (0...cols).collect {|j| self[i,j]} }
+            ::Matrix.rows(out)
+        end
+    end
+end

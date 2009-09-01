@@ -23,21 +23,6 @@ module Statsample
             fbx=f(b,xi)
             (y_val.to_f*Math::log(fbx))+((1.0-y_val.to_f)*Math::log(1.0-fbx))
         end
-        # I(b)
-        def information_matrix(x,y,b)
-            raise "x.rows!=y.rows" if x.row_size!=y.row_size
-            raise "x.columns!=p.rows" if x.column_size!=b.row_size
-            n = x.row_size
-            k = x.column_size
-            sum=Matrix.zero(k)
-            n.times do |i|
-                xi=Matrix.rows([x.row(i).to_a])
-                fbx=f(b,xi)
-                val=(fbx*(1.0-fbx))*xi.t*xi
-                sum+=val
-            end
-            sum
-        end
         # First derivative of log-likehood function
         def first_derivative(x,y,p)
                 raise "x.rows!=y.rows" if x.row_size!=y.row_size

@@ -67,17 +67,6 @@ class StatsampleMLETestCase < Test::Unit::TestCase
         assert_in_delta(coeffs_nr[2,0], lr_coeffs["b"],0.0000001)
         assert_in_delta(coeffs_nr[3,0], lr_coeffs["c"],0.0000001)
     end
-    
-    def atest_scoring
-        b_newton=Statsample::MLE.newton_raphson(@mat_x,@mat_y, Statsample::MLE::Logit)
-        puts "Coeffs NR"
-        p b_newton
-        mle=Statsample::MLE::ln_mle(Statsample::MLE::Logit, @mat_x,@mat_y,b_newton)
-        puts "MLE:#{mle}"
-        puts "Scoring"
-        coeffs_scoring=Statsample::MLE.scoring(@mat_x,@mat_y, Statsample::MLE::Logit)
-        p coeffs_scoring
-    end
     def test_probit
         ds=Statsample::CSV.read("test_binomial.csv")
         constant=([1.0]*ds.cases).to_vector(:scale)

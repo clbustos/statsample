@@ -1,3 +1,4 @@
+require 'matrix_extension'
 module Statsample
     module MLE
         #Logit  model
@@ -35,12 +36,22 @@ module Statsample
             raise "x.columns!=p.rows" if x.column_size!=b.row_size
             n = x.row_size
             k = x.column_size
-            sum=Matrix.zero(k)
+            if HAS_GSL
+                sum=GSL::Matrix.zeros(k)
+            else
+                sum=Matrix.zero(k)
+            end
             n.times do |i|
                 xi=Matrix.rows([x.row(i).to_a])
                 fbx=f(b,xi)
                 val=((ff(b,xi)**2) / (fbx*(1.0-fbx)))*xi.t*xi
+                if HAS_GSL
+                    val=val.to_gsl
+                end
                 sum-=val
+            end
+            if HAS_GSL
+                sum=sum.to_matrix
             end
             sum
         end
