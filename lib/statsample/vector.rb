@@ -481,6 +481,9 @@ class Vector
 		def inspect
 			self.to_s
 		end
+        def as_r
+            @data.dup
+        end
         def factors
             if @type==:scale
                 @scale_data.uniq.sort

@@ -1,9 +1,5 @@
-require 'bigdecimal'
-require 'bigdecimal/math'
-require 'bigdecimal/util'
 module Statsample
     module MLE
-
         #Logit  model
         module Logit
         class << self
@@ -11,10 +7,7 @@ module Statsample
         def f(b,x)
             p_bx=(x*b)[0,0] 
             ebx=Math::exp(p_bx)
-            if ebx.infinite? == 1
-                raise "Infinite on logit calculation"
-                return 0.999999999999999
-            end
+            raise "Infinite on logit calculation" if ebx.infinite? == 1
             res=ebx / (1.0 + ebx)
             if res==0.0
                 res=1e-15
@@ -29,6 +22,21 @@ module Statsample
         def ln_mle(xi,y_val,b)
             fbx=f(b,xi)
             (y_val.to_f*Math::log(fbx))+((1.0-y_val.to_f)*Math::log(1.0-fbx))
+        end
+        # I(b)
+        def information_matrix(x,y,b)
+            raise "x.rows!=y.rows" if x.row_size!=y.row_size
+            raise "x.columns!=p.rows" if x.column_size!=b.row_size
+            n = x.row_size
+            k = x.column_size
+            sum=Matrix.zero(k)
+            n.times do |i|
+                xi=Matrix.rows([x.row(i).to_a])
+                fbx=f(b,xi)
+                val=(fbx*(1.0-fbx))*xi.t*xi
+                sum+=val
+            end
+            sum
         end
         # First derivative of log-likehood function
         def first_derivative(x,y,p)

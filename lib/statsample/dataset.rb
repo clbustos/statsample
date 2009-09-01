@@ -589,5 +589,10 @@ module Statsample
 			}
 			out 
 		end
+        def as_r
+            require 'rsruby/dataframe'
+            r=RSRuby.instance
+            
+        end
     end
 end

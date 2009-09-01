@@ -1,5 +1,6 @@
 require 'statsample/mle/normal'
 require 'statsample/mle/logit'
+require 'statsample/mle/probit'
 require 'mathn'
 module Statsample
     # Maximum Likehood Estimation
@@ -40,12 +41,32 @@ module Statsample
             end
             parameters = Matrix.columns([fd])
         end
-        # Newton Raphson without automatic stopping criteria.
-        # 
-        # Source: Maximum Likelihood Estimation With Java and Ruby
-        # Author: Peter von Tessin
-        # Date: November 6, 2005
-        # 
+        def self.scoring(x,y,model,start_values=nil)
+            if start_values.nil?
+                parameters=set_parameters(x,model)
+            else
+                parameters = start_values.dup
+            end
+            cv=Matrix.rows([([1.0]*parameters.row_size)])
+            last_diff=nil
+            raise "n on y != n on x" if x.row_size!=y.row_size
+            old_lmle=ln_mle(model,x,y,parameters)
+            ITERATIONS.times do |i|
+                sb = model.first_derivative(x,y,parameters)
+                #im= model.information_matrix(x,y,parameters)                
+                sd= model.second_derivative(x,y,parameters)
+                parameters=parameters+(((sd*-1).inverse)*sb)
+                new_lmle=ln_mle(model,x,y,parameters)
+                if(new_lmle < old_lmle) or ((new_lmle-old_lmle) / new_lmle).abs < MIN_DIFF
+                        break;
+                    end
+                    old_lmle=new_lmle
+            end
+            parameters
+        end
+        # Newton Raphson with automatic stopping criteria.
+        # Based on: Von Tessin, P. (2005). Maximum Likelihood Estimation With Java and Ruby
+        #
         # <tt>x</tt>: matrix of dependent variables. Should have nxk dimensions
         # <tt>y</tt>: matrix of independent values. Should have nx1 dimensions
         # <tt>model</tt>: class for modeling. Could be Normal or Logit
@@ -71,7 +92,7 @@ module Statsample
                 parameters = parameters-(h.inverse*(fd))
                 begin
                     new_lmle=ln_mle(model,x,y,parameters)
-                    puts "Log-MLE:#{new_lmle} (Diff:#{(new_lmle-old_lmle) / new_lmle})"
+                    #puts "[#{i}]Log-MLE:#{new_lmle} (Diff:#{(new_lmle-old_lmle) / new_lmle})"
                     if(new_lmle < old_lmle) or ((new_lmle-old_lmle) / new_lmle).abs < MIN_DIFF
                         break;
                     end

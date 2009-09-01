@@ -60,7 +60,7 @@ begin
             end
         end
 end
-    
+
     begin
         require 'rbgsl'
         HAS_GSL=true
@@ -81,6 +81,7 @@ end
 # * Dataset: An union of vectors.
 #
 module Statsample
+
     VERSION = '0.4.0'
     SPLIT_TOKEN = ","
 	autoload(:Database, 'statsample/converters')
