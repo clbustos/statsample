@@ -1,14 +1,19 @@
 module Statsample
     module MLE
-        #Logit  model
-        module Logit
-        class << self
+        # Logit MLE estimation.
+        # Usage:
+        # 
+        #   mle=Statsample::MLE::Logit.new
+        #   mle.newton_raphson(x,y)
+        #   beta=mle.parameters
+        #   likehood=mle.likehood(x,y,beta)
+        #   iterations=mle.iterations
+        #         
+        class Logit < BaseMLE
         # F(B'Xi)
-        def f(b,x)
-            p_bx=(x*b)[0,0] 
-            ebx=Math::exp(p_bx)
-            raise "Infinite on logit calculation" if ebx.infinite? == 1
-            res=ebx / (1.0 + ebx)
+        def f(b,xi)
+            p_bx=(xi*b)[0,0] 
+            res=(1.0/(1.0+Math::exp(-p_bx)))
             if res==0.0
                 res=1e-15
             elsif res==1.0
@@ -16,14 +21,20 @@ module Statsample
             end
             res
         end
-        def mle(xi,y_val,b)
-            (f(b,xi)**y_val)*((1-f(b,xi))**(1-y_val))
+        # Likehood for x_i vector, y_i scalar and b parameters
+        def likehood_i(xi,yi,b)
+            (f(b,xi)**yi)*((1-f(b,xi))**(1-yi))
         end
-        def ln_mle(xi,y_val,b)
+        # Log Likehood for x_i vector, y_i scalar and b parameters
+        def log_likehood_i(xi,yi,b)
             fbx=f(b,xi)
-            (y_val.to_f*Math::log(fbx))+((1.0-y_val.to_f)*Math::log(1.0-fbx))
+            (yi.to_f*Math::log(fbx))+((1.0-yi.to_f)*Math::log(1.0-fbx))
         end
+        
         # First derivative of log-likehood function
+        # x: Matrix (NxM)
+        # y: Matrix (Nx1)
+        # p: Matrix (Mx1)
         def first_derivative(x,y,p)
                 raise "x.rows!=y.rows" if x.row_size!=y.row_size
                 raise "x.columns!=p.rows" if x.column_size!=p.row_size            
@@ -42,7 +53,9 @@ module Statsample
 
         end
         # Second derivative of log-likehood function
-
+        # x: Matrix (NxM)
+        # y: Matrix (Nx1)
+        # p: Matrix (Mx1)
         def second_derivative(x,y,p)
                 raise "x.rows!=y.rows" if x.row_size!=y.row_size
                 raise "x.columns!=p.rows" if x.column_size!=p.row_size             
@@ -76,7 +89,7 @@ module Statsample
             x_row.each_index { |i| value += x_row[i]*p[i,0]}
             1/(1+Math.exp(value))
         end
-        end # class
+
         end # Logit
     end # MLE
 end # Statsample

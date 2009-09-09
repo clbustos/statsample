@@ -338,7 +338,7 @@ module Statsample
         def _case_as_array(c) # :nodoc:
             @fields.collect {|x| @vectors[x][c]}
         end
-        
+        # Returns each case as a hash
         def each
             begin
                 @i=0
@@ -352,6 +352,7 @@ module Statsample
                 raise DatasetException.new(self,e)
             end
         end
+        # Returns each case as index and hash
         def each_with_index
             begin
                 @i=0
@@ -365,6 +366,7 @@ module Statsample
                 raise DatasetException.new(self,e)
             end
         end
+        # Returns each case as an array
         def each_array
             @cases.times {|i|
                 @i=i

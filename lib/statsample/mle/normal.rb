@@ -1,9 +1,17 @@
 module Statsample
     module MLE
-        #multivariate normal model
-        module Normal
-        class << self
-            def total_ln_mle(x,y,b)
+        # Normal Distribution MLE estimation.
+        # Usage:
+        # 
+        #   mle=Statsample::MLE::Normal.new
+        #   mle.newton_raphson(x,y)
+        #   beta=mle.parameters
+        #   likehood=mle.likehood(x,y,beta)
+        #   iterations=mle.iterations
+
+        class Normal < BaseMLE
+            # Total MLE for given X, Y and B matrices
+            def log_likehood(x,y,b)
                 n=x.row_size.to_f
                 sigma2=b[b.row_size-1,0]
                 betas=Matrix.columns([b.column(0). to_a[0...b.row_size-1]])
@@ -11,8 +19,7 @@ module Statsample
                 last=(1 / (2*sigma2))*e.t*e
                 (-(n / 2.0) * Math::log(2*Math::PI))-((n / 2.0)*Math::log(sigma2)) - last[0,0]
             end
-
-            # first derivative for normal model.
+            # First derivative for Normal Model.
             # p should be [k+1,1], because the last parameter is sigma^2
             def first_derivative(x,y,p)
                 raise "x.rows!=y.rows" if x.row_size!=y.row_size
@@ -34,6 +41,7 @@ module Statsample
                 rows[k] = [ete[0,0] / (2*sigma4) - n / (2*sigma2)]
                 fd = Matrix.rows(rows, true)
             end
+            
             # second derivative for normal model
              # p should be [k+1,1], because the last parameter is sigma^2
             def second_derivative(x,y,p)
@@ -70,7 +78,6 @@ module Statsample
                 rows[k] = last_row
                 sd = Matrix.rows(rows, true)
             end
-        end
         end
     end
 end

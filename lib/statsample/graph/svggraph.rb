@@ -27,6 +27,7 @@ module Statsample
 			}
 		end
 		def svggraph_histogram(bins, options={})
+            check_type :scale
             options={:graph_title=>"Histogram", :show_graph_title=>true,:show_normal=>true, :mean=>self.mean, :sigma=>sdp }.merge! options
             graph = Statsample::Graph::SvgHistogram.new(options)
             graph.histogram=histogram(bins)
@@ -35,6 +36,7 @@ module Statsample
         # Returns a Run-Sequence Plot
         # Reference: http://www.itl.nist.gov/div898/handbook/eda/section3/runseqpl.htm
         def svggraph_runsequence_plot(options={})
+            check_type :scale
             options={:graph_title=>"Run-Sequence Plot", :show_graph_title=>true, :scale_x_integers => true, :add_popups=>true }.merge! options
             vx=(1..@data.size).to_a.to_vector(:scale)
             vy=@data.to_vector(:scale)
@@ -45,6 +47,7 @@ module Statsample
             graph
         end
         def svggraph_boxplot(options={})
+            check_type :scale
             options={:graph_title=>"Boxplot", :fields=>['vector'], :show_graph_title=>true}.merge! options
             vx=@data.to_a.to_vector(:scale)
             graph = Statsample::Graph::SvgBoxplot.new(options)
@@ -53,6 +56,7 @@ module Statsample
         end
         
         def svggraph_lag_plot(options={})
+            check_type :scale
             options={:graph_title=>"Lag Plot", :show_graph_title=>true}.merge! options
             vx=@data[0...(@data.size-1)].to_vector(:scale)
             vy=@data[1...@data.size].to_vector(:scale)
@@ -66,9 +70,9 @@ module Statsample
         # Returns a Normal Probability Plot
         # Reference: http://www.itl.nist.gov/div898/handbook/eda/section3/normprpl.htm
         def svggraph_normalprobability_plot(options={})
-                    extend Statsample::Util
-
-                    options={:graph_title=>"Normal Probability Plot", :show_graph_title=>true}.merge! options
+            extend Statsample::Util
+            check_type :scale
+            options={:graph_title=>"Normal Probability Plot", :show_graph_title=>true}.merge! options
             n=@data.size
             vx=(1..@data.size).to_a.collect{|i|
                 Distribution::Normal.p_value(normal_order_statistic_medians(i,n))

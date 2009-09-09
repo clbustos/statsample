@@ -21,7 +21,6 @@
 $:.unshift(File.dirname(__FILE__))
 $:.unshift(File.expand_path(File.dirname(__FILE__)+"/../ext"))
 
-require 'delegate'
 require 'matrix'
 require 'distribution'
 
@@ -88,6 +87,7 @@ module Statsample
     autoload(:Anova, 'statsample/anova')
 	autoload(:Combination, 'statsample/combination')
 	autoload(:CSV, 'statsample/converters')
+	autoload(:PlainText, 'statsample/converters')
 	autoload(:Excel, 'statsample/converters')
 	autoload(:GGobi, 'statsample/converters')
     autoload(:DominanceAnalysis, 'statsample/dominanceanalysis')
@@ -102,7 +102,6 @@ module Statsample
 	autoload(:Multiset, 'statsample/multiset')
 	autoload(:StratifiedSample, 'statsample/multiset')
 	autoload(:MLE, 'statsample/mle')    
-    
 	autoload(:Regression, 'statsample/regression')
 	autoload(:Test, 'statsample/test')
     def self.load(filename)
@@ -242,10 +241,12 @@ module Statsample
         end
     end
     
-    module STATSAMPLE__
+    module STATSAMPLE__ #:nodoc:
     end
 
 end
+
+
 
 #--
 begin 

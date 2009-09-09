@@ -12,13 +12,6 @@ end
 if File.exists? './local_rakefile.rb'
 	require './local_rakefile'
 end
-task :prim do |t|
-puts "primera"
-end
-task :prim do |t|
-puts "segunda"
-end
-
 desc 'Generate RDoc documentation'
 Rake::RDocTask.new(:docs) do |rdoc|
 	rdoc.rdoc_files.include('*.txt').
@@ -27,7 +20,7 @@ Rake::RDocTask.new(:docs) do |rdoc|
 	exclude('lib/statistics2.rb')
 	
 rdoc.main="README.txt"
-rdoc.title="Docu docu docu"
+rdoc.title="Statsample documentation"
 	rdoc.rdoc_dir="doc2"
 end
 

@@ -26,7 +26,7 @@ class RubyEngine < BaseEngine
         obtain_y_vector
         @matrix_x = Bivariate.correlation_matrix(@ds_indep)
         @coeffs_stan=(@matrix_x.inverse * @matrix_y).column(0).to_a
-@min_n_valid=nil
+        @min_n_valid=nil
     end
     def min_n_valid
         if @min_n_valid.nil?

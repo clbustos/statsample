@@ -42,6 +42,7 @@ module Multiple
     # and interactions are calculated
     
     def self.ds_by_exp(ds,exp)
+        raise "Not implemented"
         parts=exp.split(/[\+=]/)
         dependent=parts.pop
         ds_out=[]
@@ -172,7 +173,6 @@ module Multiple
             x=Matrix.columns(columns)
             matrix=((x.t*x)).inverse * mse
             matrix.collect {|i|
-    
                 Math::sqrt(i) if i>0
             }
         end
@@ -186,10 +186,10 @@ module Multiple
         end
         # Retrieves a summary for Regression
         def summary(report_type=ConsoleSummary)
-            c=coeffs
-            out=""
-            out.extend report_type
-out.add <<HEREDOC
+        c=coeffs
+        out=""
+        out.extend report_type
+        out.add <<HEREDOC
 Summary for regression of #{@fields.join(',')} over #{@y_var}
 *************************************************************
 Engine: #{self.class}
@@ -199,41 +199,39 @@ r2=#{sprintf("%0.3f",r2)}
 Equation=#{sprintf("%0.3f",constant)}+#{@fields.collect {|k| sprintf("%0.3f%s",c[k],k)}.join(' + ')}
 HEREDOC
 
-out.add_line
-out.add "ANOVA TABLE"
-
-t=Statsample::ReportTable.new(%w{source ss df ms f s})
-t.add_row(["Regression", sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
-t.add_row(["Error", sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse)])
-
-t.add_row(["Total", sprintf("%0.3f",sst), df_r+df_e])
-
-out.parse_table(t)
-
-begin
-    out.add "Beta coefficientes"
-    sc=standarized_coeffs
-    cse=coeffs_se
-    t=Statsample::ReportTable.new(%w{coeff b beta se t})
-    t.add_row(["Constant", sprintf("%0.3f", constant), "-", sprintf("%0.3f", constant_se), sprintf("%0.3f", constant_t)])
-    @fields.each{|f|
+        out.add_line
+        out.add "ANOVA TABLE"
+        
+        t=Statsample::ReportTable.new(%w{source ss df ms f s})
+        t.add_row(["Regression", sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
+        t.add_row(["Error", sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse)])
+        
+        t.add_row(["Total", sprintf("%0.3f",sst), df_r+df_e])
+        
+        out.parse_table(t)
+        
+        begin
+        out.add "Beta coefficientes"
+        sc=standarized_coeffs
+        cse=coeffs_se
+        t=Statsample::ReportTable.new(%w{coeff b beta se t})
+        t.add_row(["Constant", sprintf("%0.3f", constant), "-", sprintf("%0.3f", constant_se), sprintf("%0.3f", constant_t)])
+        @fields.each{|f|
         t.add_row([f, sprintf("%0.3f", c[f]), sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
-    }
-    out.parse_table(t)
-    
-rescue
-    
-end
-
-out
-end
-    def assign_names(c)
-            a={}
-            @fields.each_index {|i|
-                a[@fields[i]]=c[i]
-            }
-            a
-    end
+        }
+        out.parse_table(t)
+        
+        rescue
+        end
+            out
+        end
+        def assign_names(c)
+                a={}
+                @fields.each_index {|i|
+                    a[@fields[i]]=c[i]
+                }
+                a
+        end
 
         
     # Deprecated

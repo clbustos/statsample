@@ -117,6 +117,21 @@ module Statsample
                 
         end
     end
+    class PlainText < SpreadsheetBase
+        class << self
+            def read(filename, fields)
+                ds=Statsample::Dataset.new(fields)
+                fp=File.open(filename,"r")
+                fp.each_line do |line|
+                    row=process_row(line.strip.split(/\s+/),[""])
+                    ds.add_case_array(row)
+                end
+                convert_to_scale(ds,fields)
+                ds.update_valid_data
+                ds
+            end
+        end
+    end
     class Excel < SpreadsheetBase 
         class << self
             def write(dataset,filename)
