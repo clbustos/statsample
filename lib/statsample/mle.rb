@@ -56,8 +56,8 @@ module Statsample
         end
         # Creates a zero matrix Mx1, with M=x.M
         def set_default_parameters(x)
-            fd=x.column_size.times.collect{|i| 0.0}
-            fd.push(0.1)    if self.is_a? Statsample::MLE::Normal
+            fd=[0.0]*x.column_size
+	    fd.push(0.1)    if self.is_a? Statsample::MLE::Normal
             parameters = Matrix.columns([fd])
         end
         

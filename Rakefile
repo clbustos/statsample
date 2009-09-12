@@ -6,7 +6,7 @@ require 'hoe'
 require './lib/statsample'
 begin
 	require 'hanna/rdoctask'
-rescue
+rescue LoadError
 	require 'rake/rdoctask'
 end
 if File.exists? './local_rakefile.rb'

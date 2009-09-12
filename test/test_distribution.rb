@@ -4,7 +4,7 @@ require 'test/unit'
 begin
     require 'rbgsl'
     NOT_GSL=false
-rescue
+rescue LoadError
     NOT_GSL=true
 end
 class DistributionTestCase < Test::Unit::TestCase

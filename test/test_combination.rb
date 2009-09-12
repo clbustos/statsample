@@ -31,8 +31,8 @@ class StatsampleCombinationTestCase < Test::Unit::TestCase
         rb.each{|y|
             rb_array.push(y)
         }
-        assert(gsl.d.is_a? Statsample::Combination::CombinationGsl)
-        assert(rb.d.is_a?  Statsample::Combination::CombinationRuby)
+        assert(gsl.d.is_a?(Statsample::Combination::CombinationGsl))
+        assert(rb.d.is_a?(Statsample::Combination::CombinationRuby))
         
         assert_equal(rb_array,gsl_array)
     else

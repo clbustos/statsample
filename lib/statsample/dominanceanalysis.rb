@@ -193,7 +193,7 @@ module Statsample
             end
             
             g=general_averages
-                    t.add_horizontal_line
+	     t.add_horizontal_line
             
             row=[_("Overall averages"),"",""]+@fields.collect{|f|
                         sprintf("%0.3f",g[f])
