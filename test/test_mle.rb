@@ -97,17 +97,15 @@ class StatsampleMLETestCase < Test::Unit::TestCase
             ds=Statsample::CSV.read(@file_binomial)
             constant=([1.0]*ds.cases).to_vector(:scale)
             
-            ds_indep={'constant'=>constant, 'a'=>ds['a'],'b'=>ds['b'], 'c'=>ds['c']}.to_dataset(%w{constant a b c})
+            ds_indep={'constant'=>constant, 'a'=>ds['a'],'b'=>ds['b'], 'c'=>ds['c']}.to_dataset(%w{constant a b c} )
             
             mat_x=ds_indep.to_matrix
             mat_y=ds['y'].to_matrix(:vertical)
             log=Alglib::Logit.build_from_matrix(ds.to_matrix)
             coeffs=log.unpack[0]
-            b_alglib=Matrix.columns([[-coeffs[3],-coeffs[0],-coeffs[1],-coeffs[2]]])
+            b_alglib=Matrix.columns([[-coeffs[3], -coeffs[0], -coeffs[1], -coeffs[2]]])
             mle=Statsample::MLE::Logit.new
-            
             ll_alglib=mle.log_likehood(mat_x,mat_y,b_alglib)
-            
             b_newton=mle.newton_raphson(mat_x,mat_y)
             ll_pure_ruby=mle.log_likehood(mat_x,mat_y,b_newton)
             #p b_alglib

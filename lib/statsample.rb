@@ -48,13 +48,13 @@ end
 begin
     require 'gettext'
     rescue LoadError
-    def bindtextdomain(d)
+    def bindtextdomain(d) #:nodoc:
         d
     end
 
         # Bored module
-        module GetText
-            def _(t)
+        module GetText  #:nodoc:
+            def _(t)  
                 t
             end
         end

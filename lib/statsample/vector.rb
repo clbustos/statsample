@@ -6,10 +6,10 @@ end
 
 module Statsample
     class << self
-	# Create a matrix using vectors as columns
+	# Create a matrix using vectors as columns.
     # Use:
     #
-    # matrix=Statsample.vector_cols_matrix(v1,v2)
+    #   matrix=Statsample.vector_cols_matrix(v1,v2)
 	def vector_cols_matrix(*vs)
 		# test
 		size=vs[0].size
@@ -23,7 +23,7 @@ module Statsample
 	end
 	end
 	# Returns a duplicate of the input vectors, without missing data
-	# for any of the vectors
+	# for any of the vectors.
 	# 
 	#  a=[1,2,3,6,7,nil,3,5].to_vector(:scale)
 	#  b=[nil,nil,5,6,4,5,10,2].to_vector(:scale)
@@ -89,8 +89,8 @@ class Vector
         def dup
             Vector.new(@data.dup,@type,@missing_values.dup,@labels.dup)
         end
-        # Returns an empty duplicate of the vector. Maintains the type, missing
-        # values, labels
+        # Returns an empty duplicate of the vector. Maintains the type,
+        # missing values and labels.
         def dup_empty
             Vector.new([],@type,@missing_values.dup,@labels.dup)
         end
@@ -123,7 +123,7 @@ class Vector
         
         alias_method :standarized, :vector_standarized
         
-        def box_cox_transformation(lambda)
+        def box_cox_transformation(lambda) # :nodoc:
             raise "Should be a scale" unless @type==:scale
             @data_with_nils.collect{|x|
             if !x.nil?
@@ -162,21 +162,20 @@ class Vector
         end
         # Modifies current vector, with data modified by block.
         # Equivalent to #collect! on @data 
-
         def recode!
             @data.collect!{|x|
                 yield x
             }
             set_valid_data
         end
-        # Iterate on each item
+        # Iterate on each item.
         # Equivalent to
         #   @data.each{|x| yield x}
         def each
             @data.each{|x| yield(x) }
         end
         
-        # Iterate on each item_index
+        # Iterate on each item, retrieving index
         
         def each_index
             (0...@data.size).each {|i|
@@ -185,16 +184,27 @@ class Vector
         end
         # Add a value at the end of the vector.
         # If second argument set to false, you should update the Vector usign
-        # Vector#set_valid_data at the end of your insertion cycle
+        # Vector.set_valid_data at the end of your insertion cycle
         #
         def add(v,update_valid=true)
             @data.push(v)
             set_valid_data if update_valid
         end
         # Update valid_data, missing_data, data_with_nils and gsl
-        # at the end of an insertion
+        # at the end of an insertion.
         #
-        # Use after add(v,false) 
+        # Use after Vector.add(v,false)
+        # Usage:
+        #   v=Statsample::Vector.new
+        #   v.add(2,false)
+        #   v.add(4,false)
+        #   v.data
+        #   => [2,3]
+        #   v.valid_data
+        #   => []
+        #   v.set_valid_data
+        #   v.valid_data
+        #   => [2,3]
         def set_valid_data
 			@valid_data.clear
 			@missing_data.clear
@@ -203,17 +213,17 @@ class Vector
             set_valid_data_intern
             set_scale_data if(@type==:scale)
 		end
-        
+
         if Statsample::STATSAMPLE__.respond_to?(:set_valid_data_intern)
-            def set_valid_data_intern
+            def set_valid_data_intern #:nodoc:
                 Statsample::STATSAMPLE__.set_valid_data_intern(self)
             end
         else
-            def set_valid_data_intern
+            def set_valid_data_intern #:nodoc:
                 _set_valid_data_intern
             end
         end
-        def _set_valid_data_intern
+        def _set_valid_data_intern #:nodoc:
             @data.each do |n|
                 if is_valid? n
                     @valid_data.push(n)
@@ -225,15 +235,17 @@ class Vector
             end
             @has_missing_data=@missing_data.size>0
         end
-        
+
         # Retrieves true if data has one o more missing values
         def has_missing_data?
             @has_missing_data
         end
+        # Retrieves label for value x. Retrieves x if
+        # no label defined.
         def labeling(x)
             @labels.has_key?(x) ? @labels[x].to_s : x.to_s
         end
-        # Returns a Vector with the data with labels replaced by the label.
+        # Returns a Vector with data with labels replaced by the label.
         def vector_labeled
             d=@data.collect{|x|
                 if @labels.has_key? x
@@ -273,11 +285,11 @@ class Vector
 			@type=t	
             set_scale_data if(t==:scale)
 		end
-        
         def to_a
             @data.dup
         end
         alias_method :to_ary, :to_a 
+        
         # Vector sum. 
         # - If v is a scalar, add this value to all elements
         # - If v is a Array or a Vector, should be of the same size of this vector
@@ -296,8 +308,8 @@ class Vector
         def -(v)
             _vector_ari("-",v)
         end
-        # Reports all values that doesn't comply with a condition
-        # Returns a hash with the index of data and the invalid data
+        # Reports all values that doesn't comply with a condition.
+        # Returns a hash with the index of data and the invalid data.
         def verify
             h={}
             (0...@data.size).to_a.each{|i|
@@ -401,7 +413,7 @@ class Vector
         # only with valid data.
         #
         # In all the trails, every item have the same probability
-        # of been selected
+        # of been selected.
 		def sample_with_replacement(sample=1)
             if(@type!=:scale or !HAS_GSL)
                 vds=@valid_data.size
@@ -414,8 +426,9 @@ class Vector
         # Returns an random sample of size n, without replacement,
         # only with valid data.
         #
-        # Every element could only be selected once
-        # A sample of the same size of the vector is the vector itself
+        # Every element could only be selected once.
+        # 
+        # A sample of the same size of the vector is the vector itself.
             
         def sample_without_replacement(sample=1)
             if(@type!=:scale or !HAS_GSL)
@@ -432,6 +445,11 @@ class Vector
                 r.choose(@gsl, sample).to_a
             end
          end
+         # Retrieves number of cases which comply condition.
+         # If block given, retrieves number of instances where
+         # block returns true.
+         # If other values given, retrieves the frequency for
+         # this value.
         def count(x=false)
             if block_given?
                 r=@data.inject(0) {|s, i|
@@ -443,7 +461,8 @@ class Vector
                 frequencies[x].nil? ? 0 : frequencies[x]
             end
         end
-        # returns the database type for the vector, according to its content
+        
+        # Returns the database type for the vector, according to its content
         
         def db_type(dbs='mysql')
             # first, detect any character not number
@@ -465,11 +484,12 @@ class Vector
                 true
             end
         end
+        
         def to_s
             sprintf("Vector(type:%s, n:%d)[%s]",@type.to_s,@data.size, @data.collect{|d| d.nil? ? "nil":d}.join(","))
         end
         # Ugly name. Really, create a Vector for standard 'matrix' package.
-        # <tt>dir</tt> could. be :horizontal or :vertical
+        # <tt>dir</tt> could be :horizontal or :vertical
         def to_matrix(dir=:horizontal)
             case dir
             when :horizontal
@@ -481,9 +501,7 @@ class Vector
 		def inspect
 			self.to_s
 		end
-        def as_r
-            @data.dup
-        end
+        # Retrieves uniques values for data.
         def factors
             if @type==:scale
                 @scale_data.uniq.sort
@@ -492,17 +510,17 @@ class Vector
             end
         end
         if Statsample::STATSAMPLE__.respond_to?(:frequencies)
-            # Returns a hash with the distribution of frecuencies of
+            # Returns a hash with the distribution of frecuencies for
             # the sample                
             def frequencies
                 Statsample::STATSAMPLE__.frequencies(@valid_data)
             end
         else
-            def frequencies
+            def frequencies #:nodoc:
                 _frequencies
             end
 		end
-        def _frequencies
+        def _frequencies #:nodoc:
             @valid_data.inject(Hash.new) {|a,x|
                 a[x]||=0
                 a[x]=a[x]+1
@@ -589,7 +607,8 @@ class Vector
             end
             def proportion_confidence_interval_z(n_poblation,margin=0.95,v=1)
                 Statsample::proportion_confidence_interval_z(proportion(v), @valid_data.size, n_poblation, margin)
-            end            
+            end
+            
 		self.instance_methods.find_all{|met| met=~/_slow$/}.each{|met|
 			met_or=met.gsub("_slow","")
 			if !self.method_defined?(met_or)
@@ -672,8 +691,7 @@ class Vector
             # The arithmetical mean of data
 			def mean
                 check_type :scale
-
-					sum.to_f.quo(n_valid)
+                sum.to_f.quo(n_valid)
 			end
             # Sum of squares for the data around a value.
             # By default, this value is the  mean

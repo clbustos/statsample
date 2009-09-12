@@ -95,7 +95,7 @@ module Statsample
                 end
                 fd = first_derivative(x,y,parameters)
                 parameters = parameters-(h.inverse*(fd))
-                @var_cov_matrix = h
+
                 if @stop_criteria==:parameters
                     flag=true
                     k.times do |j|
@@ -104,14 +104,18 @@ module Statsample
                         @output.puts "Parameters #{j}: #{diff}" if @verbose
                     end
 
-                    return parameters if flag
+                    if flag
+                        @var_cov_matrix = h.inverse*-1.0
+                        return parameters
+                    end
                     old_parameters=parameters
                 else
                     begin
                         new_likehood = log_likehood(x,y,parameters)
                         @output.puts "[#{i}]Log-MLE:#{new_likehood} (Diff:#{(new_likehood-old_likehood) / new_likehood})" if @verbose
                         if(new_likehood < old_likehood) or ((new_likehood - old_likehood) / new_likehood).abs < MIN_DIFF
-                        @output.puts "Ok"
+                            @var_cov_matrix = h.inverse*-1.0
+                        #@output.puts "Ok"
                             break;
                         end
                         old_likehood=new_likehood

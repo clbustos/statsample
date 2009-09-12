@@ -2,20 +2,21 @@ $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 require 'test/unit'
 class StatsampleLogitTestCase < Test::Unit::TestCase
-    def test_logit
-        crime=File.dirname(__FILE__)+'/../data/crime.txt'
-        ds=Statsample::PlainText.read(crime, %w{crimerat maleteen south educ police60 police59 labor  males pop nonwhite unemp1  unemp2 median belowmed})
-        ds2=ds.dup(%w{maleteen south educ police59})
-        y=(ds.compute "(crimerat>=110) ? 1:0")
-        ds2.add_vector('y',y)
-        lr=Statsample::Regression::Binomial::Logit.new(ds2,'y')
-        assert_in_delta(-18.606959,lr.log_likehood,0.001)
-        assert_in_delta(-17.701,lr.constant,0.001)
+    def test_logit_1
+        crime=File.dirname(__FILE__)+'/../data/test_binomial.csv'
+        ds=Statsample::CSV.read(crime)
+        lr=Statsample::Regression::Binomial::Logit.new(ds,'y')
+        assert_in_delta(-38.8669,lr.log_likehood,0.001)
+        assert_in_delta(-5.3658,lr.constant,0.001)
         
-        exp={"maleteen"=>0.0833,"south"=>-1.117,"educ"=> 0.0229, "police59"=>0.0581}
-        exp.each{|k,v|
+        exp_coeffs={"a"=>0.3270,"b"=>0.8147, "c"=>-0.4031}
+        exp_coeffs.each{|k,v|
             assert_in_delta(v,lr.coeffs[k],0.001)
         }
-        assert_equal(5,lr.iterations)               
+        exp_errors={'a'=>0.4390,'b'=>0.4270,'c'=>0.3819}
+        exp_errors.each{|k,v|
+            assert_in_delta(v,lr.coeffs_se[k],0.001)
+        }
+        assert_equal(7,lr.iterations)               
     end
 end

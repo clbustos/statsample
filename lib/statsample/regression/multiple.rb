@@ -1,6 +1,6 @@
 module Statsample
 module Regression
-        # Module for Multiple Regression Analysis
+        # Module for Linear Multiple Regression Analysis
         # You can call Regression::Multiple.listwise or Regression::Multiple.pairwise or instance directly the engines
         # Example.
         #
@@ -146,13 +146,13 @@ module Multiple
             1-lr.r2
         end
         # Tolerances for each coefficient
-    def coeffs_tolerances
-        @fields.inject({}) {|a,f|
-            a[f]=tolerance(f);
-            a
-        }
-    end
-    # Standard Error for coefficients
+        def coeffs_tolerances
+            @fields.inject({}) {|a,f|
+                a[f]=tolerance(f);
+                a
+            }
+        end
+        # Standard Error for coefficients
         def coeffs_se
             out={}
             mse=sse.quo(df_e)

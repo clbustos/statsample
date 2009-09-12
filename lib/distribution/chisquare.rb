@@ -1,8 +1,7 @@
 module Distribution
     # Calculate cdf and inverse cdf for Chi Square Distribution.
     # 
-    # Based on Babatunde, Iyiola & Eni () : 
-    # "A Numerical Procedure for Computing Chi-Square Percentage Points"
+    # Based on Statistics2 module
     # 
     module ChiSquare
         class << self

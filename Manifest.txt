@@ -3,7 +3,9 @@ LICENSE.txt
 Manifest.txt
 README.txt
 bin/statsample
+data/crime.txt
 data/locale/es/LC_MESSAGES/statsample.mo
+data/test_binomial.csv
 demo/benchmark.rb
 demo/chi-square.rb
 demo/crosstab.rb
@@ -24,6 +26,7 @@ lib/distribution/chisquare.rb
 lib/distribution/f.rb
 lib/distribution/normal.rb
 lib/distribution/t.rb
+lib/matrix_extension.rb
 lib/spss.rb
 lib/statistics2.rb
 lib/statsample.rb
@@ -42,9 +45,15 @@ lib/statsample/graph/svggraph.rb
 lib/statsample/graph/svghistogram.rb
 lib/statsample/graph/svgscatterplot.rb
 lib/statsample/htmlreport.rb
+lib/statsample/mle.rb
+lib/statsample/mle/logit.rb
+lib/statsample/mle/normal.rb
+lib/statsample/mle/probit.rb
 lib/statsample/multiset.rb
 lib/statsample/regression.rb
-lib/statsample/regression/logit.rb
+lib/statsample/regression/binomial.rb
+lib/statsample/regression/binomial/logit.rb
+lib/statsample/regression/binomial/probit.rb
 lib/statsample/regression/multiple.rb
 lib/statsample/regression/multiple/alglibengine.rb
 lib/statsample/regression/multiple/gslengine.rb
@@ -68,6 +77,9 @@ test/test_csv.rb
 test/test_dataset.rb
 test/test_distribution.rb
 test/test_ggobi.rb
+test/test_gsl.rb
+test/test_logit.rb
+test/test_mle.rb
 test/test_multiset.rb
 test/test_regression.rb
 test/test_reliability.rb

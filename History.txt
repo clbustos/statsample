@@ -1,3 +1,11 @@
+=== 0.4.0 / 2009-09-10
+* New Distribution module, based on statistics2.rb by Shin-ichiro HARA. Replaces all instances of GSL distributions pdf and cdf calculations for native calculation.
+* New Maximum Likehood Estimation for Logit, Probit and Normal Distribution using Von Tessin(2005) algorithm. See MLE class and subclasses for more information.
+* New Binomial regression subclasses (Logit and Probit), usign MLE class
+* Added tests for gsl, Distribution, MLE and Logit
+* Bug fix on svggraph.rb. Added check_type for scale graphics
+* Bug fix on gdchart. Replaced old Nominal, Ordinal and Scale for Vector
+
 === 0.3.4 / 2009-08-21
 * Works with statsample-optimization 2.0.0
 * Vector doesn't uses delegation. All methods are part of Vector

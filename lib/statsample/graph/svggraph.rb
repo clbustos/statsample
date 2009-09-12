@@ -89,8 +89,8 @@ end
 
 # replaces all key and fill classes with similar ones, without opacity
 # this allows rendering of svg and png on rox and gqview without problems
-module SVG
-	module Graph
+module SVG #:nodoc:
+	module Graph 
 		class BarNoOp < Bar
 			def get_css; SVG::Graph.get_css_standard; end
 		end
