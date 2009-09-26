@@ -43,7 +43,7 @@ module Statsample
                     raise Exception, "Vector #{v_name} doesn't exists on Dataset" if !dataset.fields.include? v_name
                     v=dataset[v_name]
                     split_data=v.splitted(sep)
-                    factors=split_data.flatten.uniq.compact.sort.inject({}) {|a,v| a[v]=v;a}
+                    factors=split_data.flatten.uniq.compact.sort.inject({}) {|ac,val| ac[val]=val;ac}
                     h[v_name]=factors
                     h
                 }

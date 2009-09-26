@@ -8,11 +8,9 @@ rescue LoadError
 	puts "You should install spreadsheet (gem install spreadsheet)"
 end
 class StatsampleExcelTestCase < Test::Unit::TestCase
-	def initialize(*args)
+    def setup
         @ds=Statsample::Excel.read(File.dirname(__FILE__)+"/test_xls.xls")
-		super
-	end
-    
+    end    
     def test_read
         assert_equal(6,@ds.cases)
         assert_equal(%w{id name age city a1},@ds.fields)

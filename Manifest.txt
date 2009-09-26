@@ -34,6 +34,8 @@ lib/statsample/anova.rb
 lib/statsample/bivariate.rb
 lib/statsample/codification.rb
 lib/statsample/combination.rb
+lib/statsample/converter/csv18.rb
+lib/statsample/converter/csv19.rb
 lib/statsample/converters.rb
 lib/statsample/crosstab.rb
 lib/statsample/dataset.rb
@@ -56,6 +58,7 @@ lib/statsample/regression/binomial/logit.rb
 lib/statsample/regression/binomial/probit.rb
 lib/statsample/regression/multiple.rb
 lib/statsample/regression/multiple/alglibengine.rb
+lib/statsample/regression/multiple/baseengine.rb
 lib/statsample/regression/multiple/gslengine.rb
 lib/statsample/regression/multiple/rubyengine.rb
 lib/statsample/regression/simple.rb
@@ -67,7 +70,6 @@ lib/statsample/vector.rb
 po/es/statsample.po
 po/statsample.pot
 setup.rb
-test/_test_chart.rb
 test/test_anova.rb
 test/test_codification.rb
 test/test_combination.rb

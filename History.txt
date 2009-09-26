@@ -1,3 +1,12 @@
+=== 0.5.0 / 2009-09-26
+* Vector now uses a Hash as a third argument
+* Tested on Ruby 1.8.6, 1.8.7 and 1.9.1 with multiruby
+
+=== 0.4.1 / 2009-09-12
+* More methods and usage documentation
+* Logit tests
+* Bug fix: rescue for requires doesn't specify LoadError
+* Binomial::BaseEngine new methods: coeffs_se, coeffs, constant and constant_se
 === 0.4.0 / 2009-09-10
 * New Distribution module, based on statistics2.rb by Shin-ichiro HARA. Replaces all instances of GSL distributions pdf and cdf calculations for native calculation.
 * New Maximum Likehood Estimation for Logit, Probit and Normal Distribution using Von Tessin(2005) algorithm. See MLE class and subclasses for more information.

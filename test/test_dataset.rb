@@ -1,18 +1,24 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 require 'test/unit'
-
+require 'tmpdir'
 class StatsampleDatasetTestCase < Test::Unit::TestCase
-	def initialize(*args)
+	def setup
         @ds=Statsample::Dataset.new({'id' => Statsample::Vector.new([1,2,3,4,5]), 'name'=>Statsample::Vector.new(%w{Alex Claude Peter Franz George}), 'age'=>Statsample::Vector.new([20,23,25,27,5]),
         'city'=>Statsample::Vector.new(['New York','London','London','Paris','Tome']),
         'a1'=>Statsample::Vector.new(['a,b','b,c','a',nil,'a,b,c'])}, ['id','name','age','city','a1'])
-		super
 	end
     def test_basic
         assert_equal(5,@ds.cases)
         assert_equal(%w{id name age city a1}, @ds.fields)
     end
+    def test_saveload
+            outfile=Dir::tmpdir+"/dataset.ds"
+            @ds.save(outfile)
+            a=Statsample.load(outfile)
+            assert_equal(@ds,a)
+    end
+
     def test_matrix
         matrix=Matrix[[1,2],[3,4],[5,6]]
         ds=Statsample::Dataset.new('v1'=>[1,3,5].to_vector,'v2'=>[2,4,6].to_vector)
@@ -250,6 +256,19 @@ class StatsampleDatasetTestCase < Test::Unit::TestCase
             @ds.from_to("name","a2")
         end
     end
+        def test_each_array_with_nils
+            v1=[1,-99,3,4,"na"].to_vector(:scale,:missing_values=>[-99,"na"])
+            v2=[5,6,-99,8,20].to_vector(:scale,:missing_values=>[-99])
+            v3=[9,10,11,12,20].to_vector(:scale,:missing_values=>[-99])
+            ds1=Statsample::Dataset.new({'v1'=>v1,'v2'=>v2,'v3'=>v3})
+            ds2=ds1.dup_empty
+            ds1.each_array_with_nils {|row|
+                ds2.add_case_array(row)
+            }
+            ds2.update_valid_data
+            assert_equal([1,nil,3,4,nil],ds2['v1'].data)
+            assert_equal([5,6,nil,8,20],ds2['v2'].data)
+        end
     def test_dup_only_valid
         v1=[1,nil,3,4].to_vector(:scale)
         v2=[5,6,nil,8].to_vector(:scale)

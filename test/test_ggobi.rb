@@ -13,8 +13,8 @@ class StatsampleGGobiTestCase < Test::Unit::TestCase
 		@ds={'v1'=>v1,'v2'=>@v2,'v3'=>v3}.to_dataset
 	end
 	def test_values_definition
-		a=[1.0,2,"a"]
-		assert_equal("<real>1.0</real> <int>2</int> <string>a</string>",Statsample::GGobi.values_definition(a))
+		a=[1.0,2,"a",nil]
+		assert_equal("1.0 2 a NA", Statsample::GGobi.values_definition(a,"NA"))
 	end
 	def test_variable_definition
 		carrier=OpenStruct.new

@@ -38,7 +38,6 @@ class StatsampleSvgGraphTestCase < Test::Unit::TestCase
 		vector=ar.to_vector
         file=@image_path+"/svggraph_default.svg"
 		vector.svggraph_frequencies(file)
-        
 		file=@image_path+"/svggraph_Bar.svg"
 		vector.svggraph_frequencies(file,800,600,SVG::Graph::Bar,:graph_title=>'Bar')
 		assert(File.exists?(file))

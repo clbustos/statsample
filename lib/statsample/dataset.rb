@@ -292,7 +292,7 @@ module Statsample
         end
         def check_length
             size=nil
-            @vectors.each{|k,v|
+            @vectors.each do |k,v|
                 raise Exception, "Data #{v.class} is not a vector on key #{k}" if !v.is_a? Statsample::Vector
                 if size.nil?
                     size=v.size
@@ -302,38 +302,33 @@ module Statsample
                         raise Exception, "Vector #{k} have size #{v.size} and dataset have size #{size}"
                     end
                 end
-            }
+            end
             @cases=size
+        end
+        def each_vector
+            @fields.each{|k| yield k,@vectors[k]}
+        end
+        if Statsample::STATSAMPLE__.respond_to?(:case_as_hash)
+            def case_as_hash(c) # :nodoc:
+                Statsample::STATSAMPLE__.case_as_hash(self,c)
             end
-            def each_vector
-                @fields.each{|k|
-                    yield k,@vectors[k]
-                }
+        else
+            def case_as_hash(c)
+                _case_as_hash(c)
+            end                
+        end
+        
+        if Statsample::STATSAMPLE__.respond_to?(:case_as_array)
+            def case_as_array(c) # :nodoc:
+                Statsample::STATSAMPLE__.case_as_array(self,c)
             end
-            if Statsample::STATSAMPLE__.respond_to?(:case_as_hash)
-                def case_as_hash(c) # :nodoc:
-                    Statsample::STATSAMPLE__.case_as_hash(self,c)
-                end
-            else
-                def case_as_hash(c)
-                    _case_as_hash(c)
-                end                
+        else
+            def case_as_array(c)
+                _case_as_array(c)
             end
-            
-            if Statsample::STATSAMPLE__.respond_to?(:case_as_array)
-                def case_as_array(c) # :nodoc:
-                    Statsample::STATSAMPLE__.case_as_array(self,c)
-                end
-            else
-                def case_as_array(c)
-                    _case_as_array(c)
-                end
-            end
-            def _case_as_hash(c) # :nodoc:
-            @fields.inject({}) {|a,x|
-                a[x]=@vectors[x][c]
-                a
-            }
+        end
+        def _case_as_hash(c) # :nodoc:
+        @fields.inject({}) {|a,x| a[x]=@vectors[x][c];a }
         end
         def _case_as_array(c) # :nodoc:
             @fields.collect {|x| @vectors[x][c]}
@@ -365,6 +360,20 @@ module Statsample
             rescue =>e
                 raise DatasetException.new(self,e)
             end
+        end
+        # Returns each case as an array, coding missing values as nils
+        def each_array_with_nils
+            m=fields.size
+            @cases.times {|i|
+                @i=i
+                row=Array.new(m)
+                fields.each_index{|j|
+                    f=fields[j]
+                    row[j]=@vectors[f].data_with_nils[i]
+                }
+                yield row
+            }
+            @i=nil
         end
         # Returns each case as an array
         def each_array

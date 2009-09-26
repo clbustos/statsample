@@ -50,13 +50,13 @@ module Statsample
     class StratifiedSample
 		class << self
 			# mean for an array of vectors
-			def mean(*v)
+			def mean(*vectors)
 				n_total=0
-				a=v.inject(0){|a,v|
+				means=vectors.inject(0){|a,v|
 					n_total+=v.size
 					a+v.sum
 				}
-				a.to_f/n_total
+				means.to_f/n_total
 			end
 
             def standard_error_ksd_wr(es)

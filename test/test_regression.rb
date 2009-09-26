@@ -120,13 +120,22 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
         model_test(lr)
         predicted=[nil,1.7857, 6.0989, 3.2433, 7.2908, 4.9667, 10.3428, 8.8158, 10.4717, 23.6639, 25.3198]
         c_predicted = lr.predicted
+        
         predicted.each_index{|i|
-            assert_in_delta(predicted[i],c_predicted[i],0.001)
+            if c_predicted[i].nil?
+                assert(predicted[i].nil?)
+            else
+            assert_in_delta(predicted[i], c_predicted[i], 0.001)
+            end
         }
         residuals=[nil,1.2142, -2.0989, 1.7566, -1.29085, 2.033, -2.3428, 0.18414, -0.47177, -3.66395, 4.6801]
         c_residuals=lr.residuals
         residuals.each_index{|i|
-            assert_in_delta(residuals[i],c_residuals[i],0.001)
+            if c_residuals[i].nil?
+                assert(residuals[i].nil?)
+            else
+                assert_in_delta(residuals[i],c_residuals[i],0.001)
+            end
         }
     end
     def test_ds_by_exp

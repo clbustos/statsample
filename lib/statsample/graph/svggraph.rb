@@ -9,19 +9,20 @@ module Statsample
 	class Vector
 		# Creates a barchart using ruby-gdchart
 		def svggraph_frequencies(file, width=600, height=300, chart_type=SVG::Graph::BarNoOp, options={})
-			labels,data=[],[]
+			labels, data1=[],[]
 			self.frequencies.sort.each{|k,v|
 				labels.push(k.to_s)
-				data.push(v) 
+				data1.push(v) 
 			}
             options[:height]=height
             options[:width]=width
             options[:fields]=labels  
 			graph = chart_type.new(options)
 			graph.add_data(
-            :data => data,
+            :data => data1,
             :title => "Frequencies"
 			)
+            
 			File.open(file,"w") {|f|
               f.puts(graph.burn)
 			}
@@ -49,7 +50,7 @@ module Statsample
         def svggraph_boxplot(options={})
             check_type :scale
             options={:graph_title=>"Boxplot", :fields=>['vector'], :show_graph_title=>true}.merge! options
-            vx=@data.to_a.to_vector(:scale)
+            vx=@valid_data.to_a.to_vector(:scale)
             graph = Statsample::Graph::SvgBoxplot.new(options)
             graph.add_data(:title=>"vector", :data=>@data.to_a)
             graph
@@ -58,8 +59,8 @@ module Statsample
         def svggraph_lag_plot(options={})
             check_type :scale
             options={:graph_title=>"Lag Plot", :show_graph_title=>true}.merge! options
-            vx=@data[0...(@data.size-1)].to_vector(:scale)
-            vy=@data[1...@data.size].to_vector(:scale)
+            vx=@valid_data[0...(@valid_data.size-1)].to_vector(:scale)
+            vy=@valid_data[1...@valid_data.size].to_vector(:scale)
             ds={'x_minus_1'=>vx,'x'=>vy}.to_dataset            
             graph = Statsample::Graph::SvgScatterplot.new(ds,options)
             graph.set_x('x_minus_1')
@@ -73,11 +74,11 @@ module Statsample
             extend Statsample::Util
             check_type :scale
             options={:graph_title=>"Normal Probability Plot", :show_graph_title=>true}.merge! options
-            n=@data.size
-            vx=(1..@data.size).to_a.collect{|i|
+            n=@valid_data.size
+            vx=(1..@valid_data.size).to_a.collect{|i|
                 Distribution::Normal.p_value(normal_order_statistic_medians(i,n))
             }.to_vector(:scale)
-            vy=@data.sort.to_vector(:scale)
+            vy=@valid_data.sort.to_vector(:scale)
             ds={'normal_order_statistics_medians'=>vx, 'ordered_response'=>vy}.to_dataset            
             graph = Statsample::Graph::SvgScatterplot.new(ds,options)
             graph.set_x('normal_order_statistics_medians')

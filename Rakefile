@@ -1,5 +1,6 @@
 #!/usr/bin/ruby
 # -*- ruby -*-
+# -*- coding: utf-8 -*-
 
 require 'rubygems'
 require 'hoe'
@@ -23,6 +24,17 @@ rdoc.main="README.txt"
 rdoc.title="Statsample documentation"
 	rdoc.rdoc_dir="doc2"
 end
+desc "Ruby Lint"
+task :lint do
+    executable=Config::CONFIG['RUBY_INSTALL_NAME']
+    Dir.glob("lib/**/*.rb") {|f|
+        
+        if !system %{#{executable} -cw -W2 "#{f}"} 
+            puts "Error on: #{f}"
+        end
+    }
+end
+
 
 desc "Update pot/po files."
 task :updatepo do
@@ -37,14 +49,14 @@ task :makemo do
   # GetText.create_mofiles(true, "po", "locale")  # This is for "Ruby on Rails".
 end
 
-Hoe.spec('statsample') do |p|
-	p.version=Statsample::VERSION
-	p.rubyforge_name = "ruby-statsample"
-	p.developer('Claudio Bustos', 'clbustos@gmail.com')
-	p.extra_deps << ["spreadsheet","=0.6.4"] << ["svg-graph", ">=1.0.0"]
-	p.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"
+Hoe.spec('statsample') do 
+	self.version=Statsample::VERSION
+	self.rubyforge_name = "ruby-statsample"
+	self.developer('Claudio Bustos', 'clbustos@gmail.com')
+	self.extra_deps << ["spreadsheet","=0.6.4"] << ["svg-graph", ">=1.0.0"]
+	self.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"
 	#  p.rdoc_pattern = /^(lib|bin|ext\/distributions)|txt$/
-	p.local_rdoc_dir="doc2"
+	self.local_rdoc_dir="doc2"
 end
 
 

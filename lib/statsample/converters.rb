@@ -1,7 +1,6 @@
 module Statsample
     # Create and dumps Datasets on a database
 	module Database
-        require 'dbi'
 		class << self
         # Read a database query and returns a Dataset
         #
@@ -11,6 +10,7 @@ module Statsample
         #  Statsample.read(dbh, "SELECT * FROM test")
         #
         def read(dbh,query)
+            require 'dbi'
             sth=dbh.execute(query)
             vectors={}
             fields=[]
@@ -35,6 +35,7 @@ module Statsample
         #  Statsample::Database.insert(ds,dbh,"test")
         #
         def insert(ds, dbh,table)
+            require 'dbi'            
             query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"
             sth=dbh.prepare(query)
             ds.each_array{|c|
@@ -64,15 +65,11 @@ module Statsample
             def write(dataset,filename)
                 File.open(filename,"wb") do |fp|
                     fp.puts dataset.fields.join("\t")
-                    dataset.each {|row|
-                        values=dataset.fields.collect{|f|
-                            if dataset[f].is_valid? row[f]
-                                row[f]
-                            else
-                                ""
-                            end
+                    dataset.each_array_with_nils{|row|
+                        row2=row.collect{|v|
+                            v.nil? ? "NA" : v.to_s.gsub(/\s+/,"_")
                         }
-                        fp.puts(values.join("\t"))
+                        fp.puts row2.join("\t")
                     }
                 end
         end
@@ -194,7 +191,7 @@ module Statsample
                         first_row=false
                     else
                         rowa=process_row(row,empty)
-                        (fields.size - rowa.size).times {|i|
+                        (fields.size - rowa.size).times {
                             rowa << nil
                         }
                         ds.add_case(rowa,false)
@@ -209,59 +206,6 @@ module Statsample
                 ds
             end
         end
-    end
-    class CSV < SpreadsheetBase
-		class << self
-        # Returns a Dataset  based on a csv file
-        #
-        # USE:
-        #     ds=Statsample::CSV.read("test_csv.csv")
-        def read(filename, empty=[''],ignore_lines=0,fs=nil,rs=nil)
-        require 'csv'
-                first_row=true
-                fields=[]
-                fields_data={}
-                ds=nil
-                line_number=0
-                ::CSV.open(filename,'r',fs,rs) do |row|
-                    line_number+=1
-                    if(line_number<=ignore_lines)
-                        #puts "Skip line"
-                        next
-                    end
-                    row.collect!{|c|
-                        c.to_s
-                    }
-                    if first_row
-                        fields=extract_fields(row)
-                        ds=Statsample::Dataset.new(fields)
-                        first_row=false
-                    else
-                        rowa=process_row(row,empty)
-                        ds.add_case(rowa,false)
-                    end
-                end
-                convert_to_scale(ds,fields)
-                ds.update_valid_data
-                ds
-            end
-        # Save a Dataset on a csv file
-        #
-        # USE:
-        #     Statsample::CSV.write(ds,"test_csv.csv")            
-        def write(dataset,filename, convert_comma=false,*opts)
- require 'csv'            
-                writer=::CSV.open(filename,'w',*opts)
-                writer << dataset.fields
-                dataset.each_array{|row|
-                    if(convert_comma)
-                        row.collect!{|v| v.to_s.gsub(".",",")}
-                    end
-                    writer << row
-                }
-                writer.close
-            end
-		end
     end
     module Mx
         class << self
@@ -309,13 +253,13 @@ module Statsample
             end
 			def out(dataset,opt={})
 				require 'ostruct'
-				default_opt = {:dataname => "Default", :description=>""}
+				default_opt = {:dataname => "Default", :description=>"", :missing=>"NA"}
 				default_opt.merge! opt
 				carrier=OpenStruct.new
 				carrier.categorials=[]
 				carrier.conversions={}
-				variables_def=dataset.vectors.collect{|k,v|
-					variable_definition(carrier,v,k)
+				variables_def=dataset.fields.collect{|k|
+					variable_definition(carrier,dataset[k],k)
 				}.join("\n")
 				
 				indexes=carrier.categorials.inject({}) {|s,c|
@@ -327,7 +271,7 @@ module Statsample
 					indexes.each{|ik,iv|
 						c[ik]=carrier.conversions[iv][c[ik]]
 					}
-					records << "<record>#{values_definition(c)}</record>\n"
+					records << "<record>#{values_definition(c, default_opt[:missing])}</record>\n"
 				}
 				
 out=<<EOC
@@ -339,7 +283,7 @@ out=<<EOC
 <variables count="#{dataset.fields.size}">
 #{variables_def}
 </variables>
-<records count="#{dataset.cases}">
+    <records count="#{dataset.cases}" missingValue="#{default_opt[:missing]}">
 #{records}
 </records>
 
@@ -350,14 +294,14 @@ EOC
 out
 
 			end
-			def values_definition(c)
+			def values_definition(c,missing)
 				c.collect{|v|
-					if v.is_a? Float
-						"<real>#{v}</real>"
-					elsif v.is_a? Integer
-						"<int>#{v}</int>"
+                    if v.nil?
+                        "#{missing}"
+                    elsif v.is_a? Numeric
+						"#{v}"
 					else
-						"<string>#{v}</string>"
+						"#{v.gsub(/\s+/,"_")}"
 					end
 				}.join(" ")
 			end
@@ -370,7 +314,7 @@ out
 				if v.type==:nominal or v.data.find {|d|  d.is_a? String }
 					carrier.categorials.push(name)
 					carrier.conversions[name]={}
-					factors=v.data.uniq.sort
+					factors=v.factors
 					out ="<categoricalvariable name=\"#{name}\" #{nickname}>\n"
 					out << "<levels count=\"#{factors.size}\">\n"
 					out << (1..factors.size).to_a.collect{|i|
@@ -389,3 +333,10 @@ out
 		end
 	end
 end
+
+if RUBY_VERSION<"1.9"
+    require 'statsample/converter/csv18.rb'
+else
+    require 'statsample/converter/csv19.rb'
+end
+

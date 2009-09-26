@@ -1,13 +1,12 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
-	require 'tmpdir'
+require 'tmpdir'
 require 'test/unit'
 
 class StatsampleCSVTestCase < Test::Unit::TestCase
-	def initialize(*args)
+    def setup
         @ds=Statsample::CSV.read(File.dirname(__FILE__)+"/test_csv.csv")
-		super
-	end
+    end
     def test_read
         assert_equal(6,@ds.cases)
         assert_equal(%w{id name age city a1},@ds.fields)

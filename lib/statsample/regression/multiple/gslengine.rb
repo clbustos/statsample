@@ -34,8 +34,8 @@ class GslEngine < BaseEngine
         j=0
         @ds.fields.each{|f|
             if f!=@y_var
-                @ds[f].each_index{|i|
-                    max_deps.set(i,j,@ds[f][i])
+                @ds[f].each_index{|i1|
+                    max_deps.set(i1,j,@ds[f][i1])
                 }
                 columns.push(@ds[f].to_a)
                 @fields.push(f)

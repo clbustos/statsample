@@ -81,7 +81,7 @@ end
 #
 module Statsample
 
-    VERSION = '0.4.0'
+    VERSION = '0.5.0'
     SPLIT_TOKEN = ","
 	autoload(:Database, 'statsample/converters')
     autoload(:Anova, 'statsample/anova')
@@ -90,9 +90,9 @@ module Statsample
 	autoload(:PlainText, 'statsample/converters')
 	autoload(:Excel, 'statsample/converters')
 	autoload(:GGobi, 'statsample/converters')
-    autoload(:DominanceAnalysis, 'statsample/dominanceanalysis')
+        autoload(:DominanceAnalysis, 'statsample/dominanceanalysis')
 	autoload(:HtmlReport, 'statsample/htmlreport')
-    autoload(:Mx, 'statsample/converters')
+        autoload(:Mx, 'statsample/converters')
 	autoload(:Resample, 'statsample/resample')
 	autoload(:SRS, 'statsample/srs')
 	autoload(:Codification, 'statsample/codification')

@@ -11,7 +11,8 @@ module Statsample
 				options.each{|k,v|
 					gdc.send(k+"=",v)
 				}
-				f=File.open(file,"w") {|f|
+                
+				File.open(file,"w") {|f|
 					gdc.out_graph(width,height,f,chart_type, data.length/num_datasets,labels,num_datasets,data)
 				}
 		end

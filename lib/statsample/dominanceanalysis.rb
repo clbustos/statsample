@@ -124,8 +124,8 @@ module Statsample
                 }
             }
             out={}
-            averages.each{|k,v|
-                out[k]=v.to_vector(:scale).mean
+            averages.each{|key,val|
+                out[key]=val.to_vector(:scale).mean
             }
             out
         end
@@ -139,8 +139,8 @@ module Statsample
                     }
                 end
                 out={}
-                averages.each{|k,v|
-                    out[k]=v.to_vector(:scale).mean
+                averages.each{|key,val|
+                    out[key]=val.to_vector(:scale).mean
                 }
                 @general_averages=out
             end
@@ -152,8 +152,8 @@ module Statsample
             for i in 1..@fields.size
                 c=Statsample::Combination.new(i,@fields.size)
                 c.each{|data|
-                    convert=data.collect {|i|
-                        @fields[i]
+                    convert=data.collect {|i1|
+                        @fields[i1]
                     }
                     @models.push(convert)
                     ds_prev=@ds.dup(convert+[@y_var])

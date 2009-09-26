@@ -1,17 +1,42 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 require 'test/unit'
-
+require 'tmpdir'
 class StatsampleVectorTestCase < Test::Unit::TestCase
 
-	def initialize(*args)
-		super
+    def setup
 		@c = Statsample::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :nominal)
 		@c.missing_values=[-99]
-	end
+
+    end
+    def test_save_load
+        outfile=Dir::tmpdir+"/vector.vec"
+        @c.save(outfile)
+        a=Statsample.load(outfile)
+        assert_equal(@c,a)
+        
+    end
+    def test_lazy_methods
+        data=[1,2,3,4,5,nil]
+        correct=Statsample::Vector.new(data,:scale)
+        lazy1=data.to_vector(:scale)
+        lazy2=data.to_scale
+        assert_equal(correct,lazy1)
+        assert_equal(correct,lazy2)
+        assert_equal(:scale,lazy2.type)
+        assert_equal([1,2,3,4,5],lazy2.valid_data)
+    end
     def test_enumerable
         val=@c.collect {|v| v}
         assert_equal(val,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99])
+    end
+    def test_recode
+        a=@c.recode{|v| @c.is_valid?(v) ? 0 : 1 }
+        exp=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1].to_vector
+        assert_equal(exp,a)
+        exp.recode!{|v| v==0 ? 1:0}
+        exp2=(([1]*15)+([0]*3)).to_vector
+        assert_equal(exp2,exp)
     end
     def test_product
         a=[1,2,3,4,5].to_vector(:scale)
@@ -205,7 +230,27 @@ class StatsampleVectorTestCase < Test::Unit::TestCase
         assert_equal(@c.valid_data.to_a.sort, @c.sample_without_replacement(15).sort)
         
     end
-    
+    def test_valid_data
+        a=Statsample::Vector.new([1,2,3,4,"STRING"])
+        a.missing_values=[-99]
+        a.add(1,false)
+        a.add(2,false)
+        a.add(-99,false)
+        a.set_valid_data
+        exp_valid_data=[1,2,3,4,"STRING",1,2]
+        assert_equal(exp_valid_data,a.valid_data)
+        a.add(20,false)
+        a.add(30,false)
+        assert_equal(exp_valid_data,a.valid_data)
+        a.set_valid_data
+        exp_valid_data_2=[1,2,3,4,"STRING",1,2,20,30]
+        assert_equal(exp_valid_data_2,a.valid_data)
+    end
+    def test_set_value
+        @c[2]=10
+        expected=[5,5,10,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99].to_vector
+        assert_equal(expected.data,@c.data)
+    end
     def test_gsl
 		if HAS_GSL
 			a=Statsample::Vector.new([1,2,3,4,"STRING"], :scale)
