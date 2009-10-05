@@ -81,14 +81,18 @@ module Statsample
             }
             Matrix.rows(m)
         end
-        def summary(report_type=ConsoleSummary)
+        def cols_empty_hash
+          cols_names.inject({}) {|a,x| a[x]=0;a}
+        end
+        
+        def summary(report_type = ConsoleSummary)
             out=""
             out.extend report_type
             fq=frequencies
             rn=rows_names
             cn=cols_names
             total=0
-            total_cols=cn.inject({}) {|a,x| a[x]=0;a}
+            total_cols=cols_empty_hash
             out.add "Chi Square: #{chi_square}\n"
             out.add(_("Rows: %s\n") % @row_label) unless @row_label.nil?
             out.add(_("Columns: %s\n") % @column_label) unless @column_label.nil?
@@ -122,7 +126,7 @@ module Statsample
             rn=rows_names
             cn=cols_names
             total=0
-            total_cols=cn.inject({}) {|a,x| a[x]=0;a}
+            total_cols=cols_empty_hash
             max_row_size = rn.inject(0) {|s,x| sl=@v_rows.labeling(x).size; sl>s ? sl : s}
             
             max_row_size=max_row_size<6 ? 6 : max_row_size

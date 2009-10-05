@@ -12,17 +12,16 @@ module Statsample
 				total=ds.vector_sum
 				(n_items / (n_items-1).to_f) * (1-(sum_var_items/ total.variance_sample))
 			end
-            # Calculate Chonbach's alpha for a given dataset
-            # using standarized values for every vector.
-            # Only uses tuples without missing data
-
-            def cronbach_alpha_standarized(ods)
-                ds=ods.fields.inject({}){|a,f|
-                    a[f]=ods[f].vector_standarized
-                    a
-                }.to_dataset
-                cronbach_alpha(ds)
-            end
+      # Calculate Chonbach's alpha for a given dataset
+      # using standarized values for every vector.
+      # Only uses tuples without missing data
+      
+      def cronbach_alpha_standarized(ods)
+        ds=ods.dup_only_valid.fields.inject({}){|a,f|
+            a[f]=ods[f].vector_standarized; a
+        }.to_dataset
+        cronbach_alpha(ds)
+      end
 		end
         
 		class ItemCharacteristicCurve
@@ -62,22 +61,22 @@ module Statsample
             end
         end
 		class ItemAnalysis
-            attr_reader :mean, :sd,:valid_n, :alpha , :alpha_standarized
+      attr_reader :mean, :sd,:valid_n, :alpha , :alpha_standarized
 			def initialize(ds)
-				@ds=ds.dup_only_valid
-				@total=@ds.vector_sum
-				@mean=@total.mean
-                @median=@total.median
-                @skew=@total.skew
-                @kurtosis=@total.kurtosis
-				@sd=@total.sdp
-				@valid_n=@total.size
-                begin
-				@alpha=Statsample::Reliability.cronbach_alpha(ds)
-				@alpha_standarized=Statsample::Reliability.cronbach_alpha_standarized(ds)
-                rescue => e
-                    raise DatasetException.new(@ds,e), "Problem on calculate alpha" 
-                end
+        @ds=ds.dup_only_valid
+        @total=@ds.vector_sum
+        @mean=@total.mean
+        @median=@total.median
+        @skew=@total.skew
+        @kurtosis=@total.kurtosis
+        @sd = @total.sd
+        @valid_n = @total.size
+        begin
+          @alpha = Statsample::Reliability.cronbach_alpha(ds)
+          @alpha_standarized = Statsample::Reliability.cronbach_alpha_standarized(ds)
+        rescue => e
+          raise DatasetException.new(@ds,e), "Problem on calculate alpha" 
+        end
 			end
             # Returns a hash with structure
 			def item_characteristic_curve
@@ -171,7 +170,30 @@ module Statsample
 					a
 				end
 			end
-			
+			def item_difficulty_analysis
+        dif={}
+        @ds.fields.each{|f|
+          dif[f]=@ds[f].mean
+        }
+        dif_sort=dif.sort{|a,b| -(a[1]<=>b[1])}
+        scores_sort={}
+        scores=@ds.vector_mean
+        scores.each_index{|i|
+          scores_sort[i]=scores[i]
+        }
+        scores_sort=scores_sort.sort{|a,b| a[1]<=>b[1]}
+        ds_new=Statsample::Dataset.new(['case','score'] + dif_sort.collect{|a,b| a})
+        scores_sort.each{|i,score|
+          row=[i, score]
+          case_row=@ds.case_as_hash(i)
+          dif_sort.each{|variable,dif_value|
+            row.push(case_row[variable])
+          }
+          ds_new.add_case_array(row)
+        }
+        ds_new.update_valid_data
+        ds_new
+      end
 			def stats_if_deleted
 				@ds.fields.inject({}){|a,v|
 					ds2=@ds.dup

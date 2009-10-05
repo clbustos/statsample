@@ -6,6 +6,11 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
 	def initialize(*args)
 		super
 	end
+  def test_recode_repeated
+    a=%w{a b c c d d d e}
+    exp=["a","b","c_1","c_2","d_1","d_2","d_3","e"]
+    assert_equal(exp,a.recode_repeated)
+  end
     def test_is_number
         assert("10".is_number?)
         assert("-10".is_number?)

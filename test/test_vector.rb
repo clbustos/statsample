@@ -2,7 +2,9 @@ $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 require 'test/unit'
 require 'tmpdir'
-class StatsampleVectorTestCase < Test::Unit::TestCase
+class TestStatsample
+end
+class TestStatsample::TestVector < Test::Unit::TestCase
 
     def setup
 		@c = Statsample::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :nominal)
@@ -121,15 +123,15 @@ class StatsampleVectorTestCase < Test::Unit::TestCase
 		end
 	end
 	def test_nominal
-		assert_equal(@c[1],5)
-		assert_equal({ 1=>1,2=>1,3=>1,4=>1,5=>5,6=>2,7=>1,8=>1, 9=>1,10=>1},@c.frequencies)
-        assert_equal({ 1=>1,2=>1,3=>1,4=>1,5=>5,6=>2,7=>1,8=>1, 9=>1,10=>1},@c._frequencies)
-		assert_equal({ 1 => 1.quo(15) ,2=>1.quo(15), 3=>1.quo(15),4=>1.quo(15),5=>5.quo(15),6=>2.quo(15),7=>1.quo(15), 8=>1.quo(15), 9=>1.quo(15),10=>1.quo(15)}, @c.proportions)
-        assert_equal(@c.proportion, 1.quo(15))
-        assert_equal(@c.proportion(2), 1.quo(15))
-		assert_equal([1,2,3,4,5,6,7,8,9,10], @c.factors.sort)
-		assert_equal(@c.mode,5)
-		assert_equal(@c.n_valid,15)
+    assert_equal(@c[1],5)
+    assert_equal({ 1=>1,2=>1,3=>1,4=>1,5=>5,6=>2,7=>1,8=>1, 9=>1,10=>1},@c.frequencies)
+    assert_equal({ 1=>1,2=>1,3=>1,4=>1,5=>5,6=>2,7=>1,8=>1, 9=>1,10=>1},@c._frequencies)
+    assert_equal({ 1 => 1.quo(15) ,2=>1.quo(15), 3=>1.quo(15),4=>1.quo(15),5=>5.quo(15),6=>2.quo(15),7=>1.quo(15), 8=>1.quo(15), 9=>1.quo(15),10=>1.quo(15)}, @c.proportions)
+    assert_equal(@c.proportion, 1.quo(15))
+    assert_equal(@c.proportion(2), 1.quo(15))
+    assert_equal([1,2,3,4,5,6,7,8,9,10], @c.factors.sort)
+    assert_equal(@c.mode,5)
+    assert_equal(@c.n_valid,15)
 	end
     def test_equality
         v1=[1,2,3].to_vector

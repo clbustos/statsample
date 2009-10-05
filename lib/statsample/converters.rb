@@ -1,90 +1,81 @@
 module Statsample
     # Create and dumps Datasets on a database
-	module Database
-		class << self
-        # Read a database query and returns a Dataset
-        #
-        # USE:
-        #
-        #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
-        #  Statsample.read(dbh, "SELECT * FROM test")
-        #
-        def read(dbh,query)
-            require 'dbi'
-            sth=dbh.execute(query)
-            vectors={}
-            fields=[]
-            sth.column_info.each {|c|
-                vectors[c['name']]=Statsample::Vector.new([])
-                vectors[c['name']].type= (c['type_name']=='INTEGER' or c['type_name']=='DOUBLE') ? :scale : :nominal
-                fields.push(c['name'])
-            }
-            ds=Statsample::Dataset.new(vectors,fields)
-            sth.fetch do |row|
-                ds.add_case(row.to_a, false )
-            end
-            ds.update_valid_data
-            ds
+  module Database
+    class << self
+      # Read a database query and returns a Dataset
+      #
+      # USE:
+      #
+      #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
+      #  Statsample.read(dbh, "SELECT * FROM test")
+      #
+      def read(dbh,query)
+        require 'dbi'
+        sth=dbh.execute(query)
+        vectors={}
+        fields=[]
+        sth.column_info.each {|c|
+            vectors[c['name']]=Statsample::Vector.new([])
+            vectors[c['name']].type= (c['type_name']=='INTEGER' or c['type_name']=='DOUBLE') ? :scale : :nominal
+            fields.push(c['name'])
+        }
+        ds=Statsample::Dataset.new(vectors,fields)
+        sth.fetch do |row|
+            ds.add_case(row.to_a, false )
         end
-        # Insert each case of the Dataset on the selected table
-        #
-        # USE:
-        #        
-        #  ds={'id'=>[1,2,3].to_vector, 'name'=>["a","b","c"].to_vector}.to_dataset
-        #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
-        #  Statsample::Database.insert(ds,dbh,"test")
-        #
-        def insert(ds, dbh,table)
-            require 'dbi'            
-            query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"
-            sth=dbh.prepare(query)
-            ds.each_array{|c|
-                sth.execute(*c)
-            }
-        end
-        # Create a sql, basen on a given Dataset
-        #
-        # USE:
-        #        
-        #  ds={'id'=>[1,2,3,4,5].to_vector,'name'=>%w{Alex Peter Susan Mary John}.to_vector}.to_dataset
-        #  Statsample::Database.create_sql(ds,'names')
-        #   ==>"CREATE TABLE names (id INTEGER,\n name VARCHAR (255)) CHARACTER SET=UTF8;"
-	# 
-        def create_sql(ds,table,charset="UTF8")
-            sql="CREATE TABLE #{table} ("
-            fields=ds.fields.collect{|f|
-                v=ds[f]
-                f+" "+v.db_type
-            }
-            sql+fields.join(",\n ")+") CHARACTER SET=#{charset};"
-        end
-		end
+        ds.update_valid_data
+        ds
+      end
+      # Insert each case of the Dataset on the selected table
+      #
+      # USE:
+      #        
+      #  ds={'id'=>[1,2,3].to_vector, 'name'=>["a","b","c"].to_vector}.to_dataset
+      #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
+      #  Statsample::Database.insert(ds,dbh,"test")
+      #
+      def insert(ds, dbh,table)
+        require 'dbi'            
+        query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"
+        sth=dbh.prepare(query)
+        ds.each_array{|c| sth.execute(*c) }
+      end
+      # Create a sql, basen on a given Dataset
+      #
+      # USE:
+      #        
+      #  ds={'id'=>[1,2,3,4,5].to_vector,'name'=>%w{Alex Peter Susan Mary John}.to_vector}.to_dataset
+      #  Statsample::Database.create_sql(ds,'names')
+      #   ==>"CREATE TABLE names (id INTEGER,\n name VARCHAR (255)) CHARACTER SET=UTF8;"
+      # 
+      def create_sql(ds,table,charset="UTF8")
+        sql="CREATE TABLE #{table} ("
+        fields=ds.fields.collect{|f|
+            v=ds[f]
+            f+" "+v.db_type
+        }
+        sql+fields.join(",\n ")+") CHARACTER SET=#{charset};"
+      end
     end
-    module Mondrian
-        class << self
-            def write(dataset,filename)
-                File.open(filename,"wb") do |fp|
-                    fp.puts dataset.fields.join("\t")
-                    dataset.each_array_with_nils{|row|
-                        row2=row.collect{|v|
-                            v.nil? ? "NA" : v.to_s.gsub(/\s+/,"_")
-                        }
-                        fp.puts row2.join("\t")
-                    }
-                end
+  end
+  module Mondrian
+    class << self
+      def write(dataset,filename)
+        File.open(filename,"wb") do |fp|
+          fp.puts dataset.fields.join("\t")
+          dataset.each_array_with_nils do |row|
+            row2=row.collect{|v| v.nil? ? "NA" : v.to_s.gsub(/\s+/,"_") }
+            fp.puts row2.join("\t")
+          end
         end
-        end
+      end
     end
+  end
     class SpreadsheetBase
         class << self
             def extract_fields(row)
                 fields=row.to_a.collect{|c| c.downcase}
-                if fields.size!=fields.uniq.size
-                    repeated=fields.inject({}) {|a,v|
-                    (a[v].nil? ? a[v]=1 : a[v]+=1); a }.find_all{|k,v| v>1}.collect{|k,v|k}.join(",")
-                    raise "There are some repeated fields on the header:#{repeated}. Please, fix" 
-                end
-                fields
+                fields.recode_repeated
             end
             
             def process_row(row,empty)

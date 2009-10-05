@@ -13,10 +13,10 @@ class StatsampleDatasetTestCase < Test::Unit::TestCase
         assert_equal(%w{id name age city a1}, @ds.fields)
     end
     def test_saveload
-            outfile=Dir::tmpdir+"/dataset.ds"
-            @ds.save(outfile)
-            a=Statsample.load(outfile)
-            assert_equal(@ds,a)
+      outfile=Dir::tmpdir+"/dataset.ds"
+      @ds.save(outfile)
+      a=Statsample.load(outfile)
+      assert_equal(@ds,a)
     end
 
     def test_matrix
@@ -31,6 +31,24 @@ class StatsampleDatasetTestCase < Test::Unit::TestCase
         @ds.fields=%w{id name age}
         assert_equal(%w{id name age a1 city}, @ds.fields) 
     end
+    def test_merge
+      a=[1,2,3].to_scale
+       b=[3,4,5].to_vector
+       c=[4,5,6].to_scale
+       d=[7,8,9].to_vector
+       e=[10,20,30].to_vector
+       ds1={'a'=>a,'b'=>b}.to_dataset       
+       ds2={'c'=>c,'d'=>d}.to_dataset       
+       exp={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
+       
+       assert_equal(exp,ds1.merge(ds2))
+       exp.fields=%w{c d a b}
+       assert_equal(exp,ds2.merge(ds1))
+       ds3={'a'=>e}.to_dataset
+       exp={'a_1'=>a,'b'=>b,'a_2'=>e}.to_dataset
+       exp.fields=%w{a_1 b a_2}
+       assert_equal(exp,ds1.merge(ds3))
+     end
     def test_each_vector
         a=[1,2,3].to_vector
         b=[3,4,5].to_vector
@@ -185,7 +203,18 @@ class StatsampleDatasetTestCase < Test::Unit::TestCase
         assert_equal([1,1,0,nil,1],@ds.col('a1_b').to_a)
         assert_equal([0,1,0,nil,1],@ds.col('a1_c').to_a)
     end
-    
+    def test_percentiles
+      v1=(1..100).to_a.to_scale
+      assert_equal(50.5,v1.median)
+      assert_equal(25.5, v1.percentil(25))
+      v2=(1..99).to_a.to_scale
+      assert_equal(50,v2.median)
+      assert_equal(25,v2.percentil(25))
+      v3=(1..50).to_a.to_scale
+      assert_equal(25.5, v3.median)
+      assert_equal(13, v3.percentil(25))
+      
+    end
     def test_add_case
         ds=Statsample::Dataset.new({'a'=>[].to_vector, 'b'=>[].to_vector, 'c'=>[].to_vector})
         ds.add_case([1,2,3])

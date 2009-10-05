@@ -26,6 +26,12 @@ class StatsampleCSVTestCase < Test::Unit::TestCase
     def test_nil
         assert_equal(nil,@ds['age'][5])
     end
+    def test_repeated
+      ds=Statsample::CSV.read(File.dirname(__FILE__)+"/../data/repeated_fields.csv")
+      assert_equal(%w{id name_1 age_1 city a1 name_2 age_2},ds.fields)
+      age=[3,4,5,6,nil,8].to_vector(:scale)
+      assert_equal(age,ds['age_2'])
+    end
     def test_write
         filename=Dir::tmpdir+"/test_write.csv"
         Statsample::CSV.write(@ds,filename)

@@ -114,6 +114,11 @@ module Statsample
             }
             out
         end
+        def get_averages(averages)
+          out={}
+          averages.each{|key,val| out[key]=val.to_vector(:scale).mean }
+          out
+        end
         def average_k(k)
             return nil if k==@fields.size
             models=md_k(k)
@@ -123,11 +128,7 @@ module Statsample
                     averages[f].push(m.contributions[f]) unless m.contributions[f].nil?
                 }
             }
-            out={}
-            averages.each{|key,val|
-                out[key]=val.to_vector(:scale).mean
-            }
-            out
+            get_averages(averages)
         end
         def general_averages
             if @general_averages.nil?
@@ -138,11 +139,7 @@ module Statsample
                         averages[f].push(ak[f])
                     }
                 end
-                out={}
-                averages.each{|key,val|
-                    out[key]=val.to_vector(:scale).mean
-                }
-                @general_averages=out
+                @general_averages=get_averages(averages)
             end
             @general_averages
         end

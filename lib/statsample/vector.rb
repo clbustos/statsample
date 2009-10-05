@@ -190,7 +190,6 @@ module Statsample
     end
     
     # Iterate on each item, retrieving index
-    
     def each_index
         (0...@data.size).each {|i|
             yield(i)
