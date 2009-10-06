@@ -1,3 +1,14 @@
+=== 0.5.1 / 2009-10-06
+
+* New Dataset.merge
+* New Vector.dichotomize
+* New ItemReliability.item_difficulty_analysis
+* New Class Bivariate::Tetrachoric, for calculation of tetrachoric correlations. See http://www.john-uebersax.com/stat/tetra.htm for information.
+* New module Statsample::SPSS, to export information to SPSS. For now, only tetrachoric correlation matrix are provided
+* All SpreadSheet based importers now accept repeated variable names and renames they on the fly
+* MultipleRegression::BaseEngine moved to new file
+* Bug fix for MultipleRegression::GslEngine checks for Alglib, not GSL
+
 === 0.5.0 / 2009-09-26
 * Vector now uses a Hash as a third argument
 * Tested on Ruby 1.8.6, 1.8.7 and 1.9.1 with multiruby

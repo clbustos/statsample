@@ -7,6 +7,8 @@ data/crime.txt
 data/locale/es/LC_MESSAGES/statsample.mo
 data/repeated_fields.csv
 data/test_binomial.csv
+data/tetmat_matrix.txt
+data/tetmat_test.txt
 demo/benchmark.rb
 demo/chi-square.rb
 demo/crosstab.rb
@@ -19,6 +21,7 @@ demo/nunnally_6.rb
 demo/proportion.rb
 demo/regression.rb
 demo/sample_test.csv
+demo/spss_matrix.rb
 demo/strata_proportion.rb
 demo/stratum.rb
 demo/t-student.rb
@@ -38,6 +41,7 @@ lib/statsample/codification.rb
 lib/statsample/combination.rb
 lib/statsample/converter/csv18.rb
 lib/statsample/converter/csv19.rb
+lib/statsample/converter/spss.rb
 lib/statsample/converters.rb
 lib/statsample/crosstab.rb
 lib/statsample/dataset.rb
@@ -73,6 +77,7 @@ po/es/statsample.po
 po/statsample.pot
 setup.rb
 test/test_anova.rb
+test/test_bivariate.rb
 test/test_codification.rb
 test/test_combination.rb
 test/test_crosstab.rb

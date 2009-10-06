@@ -1,12 +1,13 @@
 module Statsample
   module Bivariate
+    # Calculate Tetrachoric correlation for two vectors.
     def self.tetrachoric(v1,v2)
       tc=Tetrachoric.new_with_vectors(v1,v2)
       tc.r
     end
+    
     # Tetrachoric correlation matrix.
     # Order of rows and columns depends on Dataset#fields order
-    
     def self.tetrachoric_correlation_matrix(ds)
       ds.collect_matrix do |row,col|
         if row==col
@@ -20,7 +21,7 @@ module Statsample
         end
       end
     end
-    # Class to compute tetrachoric correlation
+    # Compute tetrachoric correlation
     # ALGORITHM  AS 116 APPL. STATIST. (1977) VOL.26, NO.3
     # URL: http:lib.stat.cmu.eduapstat116
     # 
@@ -33,6 +34,8 @@ module Statsample
     #   x = 1 |  c  |  d  |
     #         -----------
     # 
+    # See http://www.john-uebersax.com/stat/tetra.htm for extensive documentation
+    #
     # Use:
     #   tc=Statsample::Bivariate::Tetrachoric.new(a,b,c,d)
     #   tc.r

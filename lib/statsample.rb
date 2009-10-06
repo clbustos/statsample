@@ -108,7 +108,7 @@ end
 # * Dataset: An union of vectors.
 #
 module Statsample
-  VERSION = '0.5.0'
+  VERSION = '0.5.1'
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')
@@ -117,6 +117,7 @@ module Statsample
   autoload(:PlainText, 'statsample/converters')
   autoload(:Excel, 'statsample/converters')
   autoload(:GGobi, 'statsample/converters')
+  autoload(:SPSS, 'statsample/converter/spss')
   autoload(:DominanceAnalysis, 'statsample/dominanceanalysis')
   autoload(:HtmlReport, 'statsample/htmlreport')
   autoload(:Mx, 'statsample/converters')
