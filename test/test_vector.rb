@@ -330,4 +330,18 @@ class TestStatsample::TestVector < Test::Unit::TestCase
         expected=[2,2,2,4.5,4.5,6,7.5,7.5,10,10,10].to_vector(:ordinal)
         assert_equal(expected,a.ranked)
     end
+    def test_dichotomize
+      a=  [0,0,0,1,2,3,nil].to_vector
+      exp=[0,0,0,1,1,1,nil].to_scale
+      assert_equal(exp,a.dichotomize)
+      a=  [1,1,1,2,2,2,3].to_vector
+      exp=[0,0,0,1,1,1,1].to_scale
+      assert_equal(exp,a.dichotomize)      
+      a=  [0,0,0,1,2,3,nil].to_vector
+      exp=[0,0,0,0,1,1,nil].to_scale
+      assert_equal(exp,a.dichotomize(1))
+      a= %w{a a a b c d}.to_vector
+      exp=[0,0,0,1,1,1].to_scale
+      assert_equal(exp, a.dichotomize)
+    end
 end

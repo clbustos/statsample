@@ -1,14 +1,13 @@
 module Statsample
-	module Reliability
-		class << self
-            # Calculate Chonbach's alpha for a given dataset.
-            # only uses tuples without missing data
+  module Reliability
+	  class << self
+      # Calculate Chonbach's alpha for a given dataset.
+      # only uses tuples without missing data
 			def cronbach_alpha(ods)
 				ds=ods.dup_only_valid
 				n_items=ds.fields.size
 				sum_var_items=ds.vectors.inject(0) {|ac,v|
-					ac+v[1].variance_sample
-				}
+          ac+v[1].variance_sample }
 				total=ds.vector_sum
 				(n_items / (n_items-1).to_f) * (1-(sum_var_items/ total.variance_sample))
 			end
@@ -18,48 +17,47 @@ module Statsample
       
       def cronbach_alpha_standarized(ods)
         ds=ods.dup_only_valid.fields.inject({}){|a,f|
-            a[f]=ods[f].vector_standarized; a
+          a[f]=ods[f].vector_standarized; a
         }.to_dataset
         cronbach_alpha(ds)
       end
-		end
-        
+		end   
 		class ItemCharacteristicCurve
-            attr_reader :totals, :counts,:vector_total
-            def initialize (ds, vector_total=nil)
-                vector_total||=ds.vector_sum
-                raise "Total size != Dataset size" if vector_total.size!=ds.cases
-                @vector_total=vector_total
-                @ds=ds
-                @totals={}
-                @counts=@ds.fields.inject({}) {|a,v| a[v]={};a}
-                process
-            end
-            def process
-                i=0
-                @ds.each{|row|
-					tot=@vector_total[i]
-                   @totals[tot]||=0
-                   @totals[tot]+=1
-					@ds.fields.each {|f|
-                        item=row[f].to_s
-                       @counts[f][tot]||={}
-                       @counts[f][tot][item]||=0
-                       @counts[f][tot][item] += 1 
-					}
+      attr_reader :totals, :counts,:vector_total
+      def initialize (ds, vector_total=nil)
+        vector_total||=ds.vector_sum
+        raise "Total size != Dataset size" if vector_total.size!=ds.cases
+        @vector_total=vector_total
+        @ds=ds
+        @totals={}
+        @counts=@ds.fields.inject({}) {|a,v| a[v]={};a}
+        process
+      end
+      def process
+        i=0
+        @ds.each do |row|
+          tot=@vector_total[i]
+          @totals[tot]||=0
+          @totals[tot]+=1
+					@ds.fields.each  do |f|
+            item=row[f].to_s
+            @counts[f][tot]||={}
+            @counts[f][tot][item]||=0
+            @counts[f][tot][item] += 1 
+          end
 					i+=1
-				}
-            end
-            def curve_field(field, item)
-                out={}
-                item=item.to_s
-                @totals.each{|value,n|
-                    count_value= @counts[field][value][item].nil? ? 0 : @counts[field][value][item] 
-                    out[value]=count_value.to_f/n.to_f
-                }
-                out
-            end
         end
+      end
+      def curve_field(field, item)
+        out={}
+        item=item.to_s
+        @totals.each{|value,n|
+            count_value= @counts[field][value][item].nil? ? 0 : @counts[field][value][item] 
+            out[value]=count_value.to_f/n.to_f
+        }
+        out
+      end
+    end
 		class ItemAnalysis
       attr_reader :mean, :sd,:valid_n, :alpha , :alpha_standarized
 			def initialize(ds)
@@ -80,80 +78,80 @@ module Statsample
 			end
             # Returns a hash with structure
 			def item_characteristic_curve
-				i=0
-				out={}
-                total={}
-				@ds.each{|row|
-					tot=@total[i]
-					@ds.fields.each {|f|
-						out[f]||= {}
-                        total[f]||={}
-						out[f][tot]||= 0
-                        total[f][tot]||=0
-						out[f][tot]+= row[f] 
-                        total[f][tot]+=1
-					}
-					i+=1
-				}
-                total.each{|f,var|
-                    var.each{|tot,v|
-                        out[f][tot]=out[f][tot].to_f / total[f][tot]
-                    }
-                }
-                out
+        i=0
+        out={}
+        total={}
+        @ds.each do |row|
+          tot=@total[i]
+          @ds.fields.each do |f|
+            out[f]||= {}
+            total[f]||={}
+            out[f][tot]||= 0
+            total[f][tot]||=0
+            out[f][tot]+= row[f] 
+            total[f][tot]+=1
+          end
+          i+=1
+        end
+        total.each do |f,var|
+          var.each do |tot,v|
+            out[f][tot]=out[f][tot].to_f / total[f][tot]
+          end
+        end
+        out
 			end
-            def gnuplot_item_characteristic_curve(directory, base="crd",options={})
-                require 'gnuplot'
-
-                crd=item_characteristic_curve
-                @ds.fields.each {|f|
-                    x=[]
-                    y=[]
-                Gnuplot.open do |gp|
-                Gnuplot::Plot.new( gp ) do |plot|
-                    crd[f].sort.each{|tot,prop|
-                       x.push(tot)
-                       y.push((prop*100).to_i.to_f/100)
-                   }
-                plot.data << Gnuplot::DataSet.new( [x, y] ) do |ds|
-                ds.with = "linespoints"
-                ds.notitle
-                end
-
-                end
-                end
-            }
-            
-            end
-            def svggraph_item_characteristic_curve(directory, base="icc",options={})
-                require 'statsample/graph/svggraph'
-                crd=ItemCharacteristicCurve.new(@ds)
-               @ds.fields.each {|f|
-                   factors=@ds[f].factors.sort
-                   options={
-                           :height=>500,
-                           :width=>800,
-                           :key=>true
-                   }.update(options)
-                   graph = ::SVG::Graph::Plot.new(options)
-                   factors.each{|factor|
-                       factor=factor.to_s
-                       dataset=[]
-                           crd.curve_field(f, factor).each{|tot,prop|
-                               dataset.push(tot)
-                               dataset.push((prop*100).to_i.to_f/100)
-                            }
-                        graph.add_data({
-                                :title=>"#{factor}",
-                               :data=>dataset
-                        })
-                   }
-                   File.open(directory+"/"+base+"_#{f}.svg","w") {|fp|
-                       fp.puts(graph.burn())
-                   }
-               }
-               
-           end
+      def gnuplot_item_characteristic_curve(directory, base="crd",options={})
+        require 'gnuplot'
+        
+        crd=item_characteristic_curve
+        @ds.fields.each {|f|
+            x=[]
+            y=[]
+        Gnuplot.open do |gp|
+        Gnuplot::Plot.new( gp ) do |plot|
+            crd[f].sort.each{|tot,prop|
+               x.push(tot)
+               y.push((prop*100).to_i.to_f/100)
+           }
+        plot.data << Gnuplot::DataSet.new( [x, y] ) do |ds|
+        ds.with = "linespoints"
+        ds.notitle
+        end
+        
+        end
+        end
+        }
+        
+      end
+      def svggraph_item_characteristic_curve(directory, base="icc",options={})
+        require 'statsample/graph/svggraph'
+        crd=ItemCharacteristicCurve.new(@ds)
+        @ds.fields.each {|f|
+         factors=@ds[f].factors.sort
+         options={
+                 :height=>500,
+                 :width=>800,
+                 :key=>true
+         }.update(options)
+         graph = ::SVG::Graph::Plot.new(options)
+         factors.each{|factor|
+             factor=factor.to_s
+             dataset=[]
+                 crd.curve_field(f, factor).each{|tot,prop|
+                     dataset.push(tot)
+                     dataset.push((prop*100).to_i.to_f/100)
+                  }
+              graph.add_data({
+                      :title=>"#{factor}",
+                     :data=>dataset
+              })
+         }
+         File.open(directory+"/"+base+"_#{f}.svg","w") {|fp|
+             fp.puts(graph.burn())
+         }
+        }
+         
+      end
 			def item_total_correlation
 				@ds.fields.inject({}) do |a,v|
 					vector=@ds[v].dup
@@ -162,7 +160,7 @@ module Statsample
 					total=ds2.vector_sum
 					a[v]=Statsample::Bivariate.pearson(vector,total)
 					a
-				end
+        end
 			end
 			def item_statistics
 				@ds.fields.inject({}) do |a,v|
@@ -170,32 +168,29 @@ module Statsample
 					a
 				end
 			end
+      # Returns a dataset with cases ordered by score
+      # and variables ordered by difficulty
+      
 			def item_difficulty_analysis
         dif={}
-        @ds.fields.each{|f|
-          dif[f]=@ds[f].mean
-        }
+        @ds.fields.each{|f| dif[f]=@ds[f].mean }
         dif_sort=dif.sort{|a,b| -(a[1]<=>b[1])}
         scores_sort={}
         scores=@ds.vector_mean
-        scores.each_index{|i|
-          scores_sort[i]=scores[i]
-        }
+        scores.each_index{|i| scores_sort[i]=scores[i] }
         scores_sort=scores_sort.sort{|a,b| a[1]<=>b[1]}
         ds_new=Statsample::Dataset.new(['case','score'] + dif_sort.collect{|a,b| a})
-        scores_sort.each{|i,score|
+        scores_sort.each do |i,score|
           row=[i, score]
           case_row=@ds.case_as_hash(i)
-          dif_sort.each{|variable,dif_value|
-            row.push(case_row[variable])
-          }
+          dif_sort.each{|variable,dif_value| row.push(case_row[variable]) }
           ds_new.add_case_array(row)
-        }
+        end
         ds_new.update_valid_data
         ds_new
       end
 			def stats_if_deleted
-				@ds.fields.inject({}){|a,v|
+				@ds.fields.inject({}) do |a,v|
 					ds2=@ds.dup
 					ds2.delete_vector(v)
 					total=ds2.vector_sum
@@ -205,7 +200,7 @@ module Statsample
 					a[v][:variance_sample]=total.variance_sample
 					a[v][:alpha]=Statsample::Reliability.cronbach_alpha(ds2)
 					a
-				}
+        end
 			end
 			def html_summary
 				html = <<EOF

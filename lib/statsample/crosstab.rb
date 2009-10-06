@@ -26,22 +26,22 @@ module Statsample
 			@v_cols.frequencies
 		end
 		def frequencies
-			base=rows_names.inject([]){|s,row| 
-				s+=cols_names.collect{|col| [row,col]}
-			}.inject({}) {|s,par|
-				s[par]=0
-				s
-			}
+      base=rows_names.inject([]){|s,row| 
+        s+=cols_names.collect{|col| [row,col]}
+      }.inject({}) {|s,par|
+        s[par]=0
+        s
+      }
 			base.update(Statsample::vector_cols_matrix(@v_rows,@v_cols).to_a.to_vector.frequencies)
 		end
-        def to_matrix
-            f=frequencies
-            rn=rows_names
-            cn=cols_names
-            Matrix.rows(rn.collect{|row|
-                cn.collect{|col| f[[row,col]]}
-            })
-        end
+    def to_matrix
+        f=frequencies
+        rn=rows_names
+        cn=cols_names
+        Matrix.rows(rn.collect{|row|
+            cn.collect{|col| f[[row,col]]}
+        })
+    end
         def frequencies_by_row
             f=frequencies
             rows_names.inject({}){|sr,row|

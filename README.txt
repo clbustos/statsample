@@ -18,7 +18,7 @@ A suite for your basic and advanced statistics needs. Descriptive statistics, mu
 * Module Crosstab provides function to create crosstab for categorical data
 * Module HtmlReport provides methods to create a report for scale analysis and matrix correlation
 * Regression module provides linear regression methods
-* Reliability analysis provides functions to analyze scales. Class ItemAnalysis provides statistics like mean, standard deviation for a scale, alpha and standarized alpha, and for each item: mean, correlation with total scale, mean if deleted, alpha is deleted. With HtmlReport, graph the histogram of the scale and the Item Characteristic Curve for each item
+* Reliability analysis provides functions to analyze scales. Class ItemAnalysis provides statistics like mean, standard deviation for a scale, Cronbach's alpha and standarized Cronbach's alpha, and for each item: mean, correlation with total scale, mean if deleted, Cronbach's alpha is deleted. With HtmlReport, graph the histogram of the scale and the Item Characteristic Curve for each item
 * Module SRS (Simple Random Sampling) provides a lot of functions to estimate standard error for several type of samples
 * Interfaces to gdchart, gnuplot and SVG::Graph 
 

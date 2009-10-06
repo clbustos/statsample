@@ -1,4 +1,4 @@
-if HAS_ALGIB
+if HAS_GSL
 module Statsample
 module Regression
 module Multiple

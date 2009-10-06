@@ -8,7 +8,7 @@ module Statsample
         @y_var=y_var
         @r2=nil
         end
-        
+
         # Retrieves a vector with predicted values for y
         def predicted
         (0...@ds.cases).collect { |i|
@@ -52,13 +52,13 @@ module Statsample
         # Sum of squares (Error)
         def sse
         sst - ssr
-        end            
+        end
         # T values for coeffs
         def coeffs_t
         out={}
         se=coeffs_se
         coeffs.each{|k,v|
-        out[k]=v / se[k] 
+        out[k]=v / se[k]
         }
         out
         end
@@ -69,7 +69,7 @@ module Statsample
         # Mean Square Error
         def mse
         sse.quo(df_e)
-        end            
+        end
         # Degrees of freedom for regression
         def df_r
         @dep_columns.size
@@ -113,7 +113,7 @@ module Statsample
         out
         end
         # Estimated Variance-Covariance Matrix
-        # Used for calculation of se of constant 
+        # Used for calculation of se of constant
         def estimated_variance_covariance_matrix
         mse_p=mse
         columns=[]
@@ -129,7 +129,7 @@ module Statsample
         end
         # T for constant
         def constant_t
-        constant.to_f/constant_se 
+        constant.to_f/constant_se
         end
         # Standard error for constant
         def constant_se
@@ -140,27 +140,27 @@ module Statsample
         c=coeffs
         out=""
         out.extend report_type
-        out.add <<HEREDOC
-        Summary for regression of #{@fields.join(',')} over #{@y_var}
-        *************************************************************
-        Engine: #{self.class}
-        Cases(listwise)=#{@ds.cases}(#{@ds_valid.cases})
-        r=#{sprintf("%0.3f",r)}
-        r2=#{sprintf("%0.3f",r2)}
-        Equation=#{sprintf("%0.3f",constant)}+#{@fields.collect {|k| sprintf("%0.3f%s",c[k],k)}.join(' + ')}
+        out.add <<-HEREDOC
+Summary for regression of #{@fields.join(',')} over #{@y_var}
+*************************************************************
+Engine: #{self.class}
+Cases(listwise)=#{@ds.cases}(#{@ds_valid.cases})
+r=#{sprintf("%0.3f",r)}
+r2=#{sprintf("%0.3f",r2)}
+Equation=#{sprintf("%0.3f",constant)}+#{@fields.collect {|k| sprintf("%0.3f%s",c[k],k)}.join(' + ')}
 HEREDOC
-        
+
         out.add_line
         out.add "ANOVA TABLE"
-        
+
         t=Statsample::ReportTable.new(%w{source ss df ms f s})
         t.add_row(["Regression", sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
         t.add_row(["Error", sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse)])
-        
+
         t.add_row(["Total", sprintf("%0.3f",sst), df_r+df_e])
-        
+
         out.parse_table(t)
-        
+
         begin
         out.add "Beta coefficientes"
         sc=standarized_coeffs
@@ -171,63 +171,63 @@ HEREDOC
         t.add_row([f, sprintf("%0.3f", c[f]), sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
         }
         out.parse_table(t)
-        
+
         rescue
         end
         out
         end
         def assign_names(c)
-        a={}
-        @fields.each_index {|i|
-        a[@fields[i]]=c[i]
-        }
-        a
+          a={}
+          @fields.each_index {|i|
+          a[@fields[i]]=c[i]
+          }
+          a
         end
-        
-        
+
+
         # Deprecated
         # Sum of squares of error (manual calculation)
         # using the predicted value minus the y_i value
         def sse_manual
-        pr=predicted
-        cases=0
-        sse=(0...@ds.cases).inject(0) {|a,i|
-        if !@dy.data_with_nils[i].nil? and !pr[i].nil?
-        cases+=1
-        a+((pr[i]-@dy[i])**2)
-        else
-        a
-        end
-        }
-        sse*(min_n_valid-1.0).quo(cases-1)
+          pr=predicted
+          cases=0
+          sse=(0...@ds.cases).inject(0) {|a,i|
+          if !@dy.data_with_nils[i].nil? and !pr[i].nil?
+          cases+=1
+          a+((pr[i]-@dy[i])**2)
+          else
+          a
+          end
+          }
+          sse*(min_n_valid-1.0).quo(cases-1)
         end
         # Sum of squares of regression
         # using the predicted value minus y mean
         def ssr_direct
-        mean=@dy.mean
-        cases=0
-        ssr=(0...@ds.cases).inject(0) {|a,i|
-        invalid=false
-        v=@dep_columns.collect{|c| invalid=true if c[i].nil?; c[i]}
-        if !invalid
-        cases+=1
-        a+((process(v)-mean)**2)
-        else
-        a
-        end
-        }
-        ssr
+          mean=@dy.mean
+          cases=0
+          ssr=(0...@ds.cases).inject(0) {|a,i|
+            invalid=false
+            v=@dep_columns.collect{|c| invalid=true if c[i].nil?; c[i]}
+            if !invalid
+              cases+=1
+              a+((process(v)-mean)**2)
+            else
+              a
+            end
+          }
+          ssr
         end
         def sse_direct
-        sst-ssr
+          sst-ssr
         end
         def process(v)
-        c=coeffs
-        total=constant
-        @fields.each_index{|i|
-        total+=c[@fields[i]]*v[i]
-        }
-        total
+          c=coeffs
+          total=constant
+          @fields.each_index{|i|
+            total+=c[@fields[i]]*v[i]
+          }
+          total
         end
       end
     end

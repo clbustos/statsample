@@ -182,6 +182,22 @@ module Statsample
         }
         set_valid_data
     end
+    # Dicotomize the vector with 0 and 1, based on lowest value
+    # If parameter if defined, this value and lower
+    # will be 0 and higher, 1
+    def dichotomize(low=nil)
+      fs=factors
+      low||=factors.min
+      @data_with_nils.collect{|x|
+        if x.nil?
+          nil
+        elsif x>low
+          1
+        else
+          0
+        end
+      }.to_scale
+    end
     # Iterate on each item.
     # Equivalent to
     #   @data.each{|x| yield x}
@@ -519,7 +535,6 @@ module Statsample
     # Retrieves uniques values for data.
     def factors
         if @type==:scale
-            
             @scale_data.uniq.sort
         else
             @valid_data.uniq.sort

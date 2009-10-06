@@ -5,6 +5,7 @@ README.txt
 bin/statsample
 data/crime.txt
 data/locale/es/LC_MESSAGES/statsample.mo
+data/repeated_fields.csv
 data/test_binomial.csv
 demo/benchmark.rb
 demo/chi-square.rb
@@ -32,6 +33,7 @@ lib/statistics2.rb
 lib/statsample.rb
 lib/statsample/anova.rb
 lib/statsample/bivariate.rb
+lib/statsample/bivariate/tetrachoric.rb
 lib/statsample/codification.rb
 lib/statsample/combination.rb
 lib/statsample/converter/csv18.rb

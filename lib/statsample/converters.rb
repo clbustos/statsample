@@ -1,3 +1,4 @@
+require 'statsample/converter/spss'
 module Statsample
     # Create and dumps Datasets on a database
   module Database
@@ -112,6 +113,7 @@ module Statsample
                 fp=File.open(filename,"r")
                 fp.each_line do |line|
                     row=process_row(line.strip.split(/\s+/),[""])
+                    next if row==["\x1A"]
                     ds.add_case_array(row)
                 end
                 convert_to_scale(ds,fields)
