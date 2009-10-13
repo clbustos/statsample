@@ -1,9 +1,9 @@
 === 0.5.1 / 2009-10-06
 
-* New Dataset.merge
-* New Vector.dichotomize
+* New class Statsample::Bivariate::Tetrachoric, for calculation of tetrachoric correlations. See http://www.john-uebersax.com/stat/tetra.htm for information.
+* New Statsample::Dataset.merge
+* New Statsample::Vector.dichotomize
 * New ItemReliability.item_difficulty_analysis
-* New Class Bivariate::Tetrachoric, for calculation of tetrachoric correlations. See http://www.john-uebersax.com/stat/tetra.htm for information.
 * New module Statsample::SPSS, to export information to SPSS. For now, only tetrachoric correlation matrix are provided
 * All SpreadSheet based importers now accept repeated variable names and renames they on the fly
 * MultipleRegression::BaseEngine moved to new file

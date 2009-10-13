@@ -21,27 +21,31 @@ module Statsample
         end
       end
     end
-    # Compute tetrachoric correlation
-    # ALGORITHM  AS 116 APPL. STATIST. (1977) VOL.26, NO.3
-    # URL: http:lib.stat.cmu.eduapstat116
+    #
+    # Compute tetrachoric correlation.
     # 
-    # With two variables x and y with a contingency table
+    # See http://www.john-uebersax.com/stat/tetra.htm for extensive documentation about tetrachoric correlation
+    # This class uses algorithm AS116 from Applied Statistics(1977) 
+    # vol.26, no.3.
+    # You can see FORTRAN code on http://lib.stat.cmu.edu/apstat/116
+    # 
+    # <b>Usage</b>.
+    # With two variables x and y on a crosstab like this:
+    # 
     #         -------------
     #         | y=0 | y=1 |
     #         -------------
     #   x = 0 |  a  |  b  |
-    #         -----------
+    #         -------------
     #   x = 1 |  c  |  d  |
-    #         -----------
-    # 
-    # See http://www.john-uebersax.com/stat/tetra.htm for extensive documentation
+    #         -------------
     #
     # Use:
     #   tc=Statsample::Bivariate::Tetrachoric.new(a,b,c,d)
-    #   tc.r
-    #   tc.se
-    #   tc.threshold_y
-    #   tc.threshold_x 
+    #   tc.r # correlation
+    #   tc.se # standard error
+    #   tc.threshold_y # threshold for y variable
+    #   tc.threshold_x # threshold for x variable
     
     
     class Tetrachoric
@@ -60,6 +64,8 @@ module Statsample
       NITER = 25
       X=[0,0.9972638618,  0.9856115115,  0.9647622556, 0.9349060759,  0.8963211558, 0.8493676137, 0.7944837960, 0.7321821187, 0.6630442669, 0.5877157572, 0.5068999089, 0.4213512761, 0.3318686023, 0.2392873623, 0.1444719616, 0.0483076657]
       W=[0, 0.0070186100,  0.0162743947,  0.0253920653, 0.0342738629,  0.0428358980,  0.0509980593, 0.0586840935,  0.0658222228,  0.0723457941, 0.0781938958, 0.0833119242, 0.0876520930, 0.0911738787, 0.0938443991, 0.0956387201, 0.0965400885]
+      # Creates a Tetrachoric object based on two vectors.
+      # The vectors are dichotomized previously.
       def self.new_with_vectors(v1,v2)
         v1a,v2a=Statsample.only_valid(v1,v2)
         v1a=v1a.dichotomize

@@ -14,7 +14,7 @@ A suite for your basic and advanced statistics needs. Descriptive statistics, mu
 * Classes for Vector, Datasets (set of Vectors) and Multisets (multiple datasets with same fields and type of vectors), and multiple methods to manipulate them
 * Module Codification, to help to codify open questions
 * Converters to and from database and csv files, and to output Mx and GGobi files
-* Module Correlation provides covariance and pearson, spearman, point biserial, tau a, tau b and gamma correlations. Include methods to create correlation and covariance matrices
+* Module Bivariate provides covariance and pearson, spearman, point biserial, tau a, tau b, gamma and tetrachoric correlations. Include methods to create correlation (pearson and tetrachoric) and covariance matrices
 * Module Crosstab provides function to create crosstab for categorical data
 * Module HtmlReport provides methods to create a report for scale analysis and matrix correlation
 * Regression module provides linear regression methods
