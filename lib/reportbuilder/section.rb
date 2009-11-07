@@ -21,15 +21,10 @@ class ReportBuilder::Section
   end
   
   def to_rb_text(generator)
-    require 'reportbuilder/generator/text/sectiongenerator'
-    section_generator=ReportBuilder::Generator::Text::SectionGenerator.new( generator, self)
-    section_generator.generate
-  end
-  def to_rb_text(generator)
     generator.add_text(("="*generator.parse_level)+" "+name)
     generator.parse_cycle(self)
-    
   end
+  
   def to_rb_html(generator)
     htag="h#{generator.parse_level+1}"
     anchor=generator.add_toc_entry(name)

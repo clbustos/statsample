@@ -1,7 +1,6 @@
 class ReportBuilder
-  class Generator
-    class Text
-      class TableGenerator < ElementGenerator
+  class Table
+    class TextGenerator < ElementGenerator
         
       def generate()
         t=@element
@@ -51,5 +50,4 @@ class ReportBuilder
       end
       end
     end
-  end
 end

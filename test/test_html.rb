@@ -3,7 +3,7 @@ $:.unshift(File.dirname(__FILE__)+"/../lib")
 require "reportbuilder"
 require 'fileutils'
 require 'tmpdir'
-class TestReportbuilderSection < Test::Unit::TestCase
+class TestReportbuilderHtml < Test::Unit::TestCase
   def setup
     @tmpdir=Dir::mktmpdir
     @rp=ReportBuilder.new("Test Html", @tmpdir)

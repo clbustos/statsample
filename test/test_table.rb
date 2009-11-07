@@ -1,8 +1,8 @@
 require "test/unit"
 $:.unshift(File.dirname(__FILE__)+"/../lib")
 require "reportbuilder"
-require "reportbuilder/generator/html/tablegenerator"
-require "reportbuilder/generator/text/tablegenerator"
+require "reportbuilder/table/htmlgenerator"
+require "reportbuilder/table/textgenerator"
 
 class TestReportbuilderTable < Test::Unit::TestCase
   def setup
@@ -32,7 +32,7 @@ class TestReportbuilderTable < Test::Unit::TestCase
   end
   def test_table_text
     
-    tg=ReportBuilder::Generator::Text::TableGenerator.new(@mock_generator,@table)
+    tg=ReportBuilder::Table::TextGenerator.new(@mock_generator,@table)
     tg.generate
         expected= <<HEREDOC
 ----------------------------------------------------
@@ -52,7 +52,7 @@ assert_equal(expected,@mock_generator)
   end
   def test_table_html
         
-    tg=ReportBuilder::Generator::Html::TableGenerator.new(@mock_generator,@table)
+    tg=ReportBuilder::Table::HtmlGenerator.new(@mock_generator,@table)
     tg.generate
         expected= <<HEREDOC
 <a name='MOCK'> </a>

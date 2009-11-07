@@ -94,13 +94,13 @@ class ReportBuilder
     }
     end
     def to_rb_text(generator)
-      require 'reportbuilder/generator/text/tablegenerator'
-      table_generator=ReportBuilder::Generator::Text::TableGenerator.new( generator, self)
+      require 'reportbuilder/table/textgenerator'
+      table_generator=ReportBuilder::Table::TextGenerator.new( generator, self)
       table_generator.generate
     end
     def to_rb_html(generator)
-      require 'reportbuilder/generator/html/tablegenerator'
-      table_generator=ReportBuilder::Generator::Html::TableGenerator.new(generator, self)
+      require 'reportbuilder/table/htmlgenerator'
+      table_generator=ReportBuilder::Table::HtmlGenerator.new(generator, self)
       table_generator.generate
     end
 

@@ -1,7 +1,6 @@
 class ReportBuilder
-  class Generator
-    class Html
-      class TableGenerator < ElementGenerator
+  class Table
+    class HtmlGenerator < ElementGenerator
         def generate()
           t=@element
           anchor=@generator.add_table_entry(t.name)
@@ -46,7 +45,6 @@ class ReportBuilder
           end
           row_ary.join("")
         end
-      end
     end
   end
 end
