@@ -1,0 +1,25 @@
+Loaded suite test_section
+Started
+<html><head><title>Report Sat Nov 07 04:10:58 -0300 2009</title></head><body>
+<h1>Report Sat Nov 07 04:10:58 -0300 2009</h1><div class='toc'><div class='title'>List of contents</div></div><ul>
+<li><a href='#toc_1'>Section 1</a></li>
+<ul>
+<li><a href='#toc_2'>Section 1.1</a></li>
+</ul>
+<li><a href='#toc_3'>Section 2</a></li>
+</ul>
+</div>
+    <div class='section'><h2>Section 1</h2><a name='toc_1'></a>
+<pre>Texto 1</pre>
+<pre>2</pre>
+        <div class='section'><h3>Section 1.1</h3><a name='toc_2'></a>
+        </div>
+<pre>Texto 1.1</pre>
+    </div>
+    <div class='section'><h2>Section 2</h2><a name='toc_3'></a>
+    </div>
+</body></html>
+.
+Finished in 0.001959 seconds.
+
+1 tests, 0 assertions, 0 failures, 0 errors
