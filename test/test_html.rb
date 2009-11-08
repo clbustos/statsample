@@ -16,12 +16,12 @@ class TestReportbuilderHtml < Test::Unit::TestCase
     mock_element = ""
     eval(" class << mock_element 
       def to_rb_html(generator)
-        generator.add_js('"+@datadir+"/test.js')
+        generator.add_js('"+@datadir+"/reportbuilder.js')
       end
     end ")
     @rp.add(mock_element)
-    assert_match(/script.+js\/test.js/, @rp.to_html)
-    assert(File.exists? @tmpdir+"/js/test.js")
+    assert_match(/script.+js\/reportbuilder.js/, @rp.to_html)
+    assert(File.exists? @tmpdir+"/js/reportbuilder.js")
   end
   def test_save_html
     exp=@rp.to_html
@@ -36,12 +36,12 @@ class TestReportbuilderHtml < Test::Unit::TestCase
     mock_element = ""
     eval(" class << mock_element 
       def to_rb_html(generator)
-        generator.add_css('"+@datadir+"/test.css')
+        generator.add_css('"+@datadir+"/reportbuilder.css')
       end
     end ")
     @rp.add(mock_element)
-    assert_match(/link rel='stylesheet'.+css\/test.css/, @rp.to_html)
-    assert(File.exists? @tmpdir+"/css/test.css")
+    assert_match(/link rel='stylesheet'.+css\/reportbuilder.css/, @rp.to_html)
+    assert(File.exists? @tmpdir+"/css/reportbuilder.css")
   end  
   
 end

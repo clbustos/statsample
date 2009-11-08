@@ -1,7 +1,5 @@
 require 'reportbuilder/table'
 require 'reportbuilder/section'
-require 'reportbuilder/toc'
-
 require 'reportbuilder/generator'
 
 class ReportBuilder
