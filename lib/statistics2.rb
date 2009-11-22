@@ -10,7 +10,7 @@
 #     [1] http://www.matsusaka-u.ac.jp/~okumura/algo/
 #     [2] http://www5.airnet.ne.jp/tomy/cpro/sslib11.htm
 
-module Statistics2
+module Statistics2  # :nodoc:
   SQ2PI = Math.sqrt(2 * Math::PI)
 
   # Newton approximation

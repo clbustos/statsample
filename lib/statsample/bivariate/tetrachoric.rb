@@ -24,9 +24,12 @@ module Statsample
     #
     # Compute tetrachoric correlation.
     # 
-    # See http://www.john-uebersax.com/stat/tetra.htm for extensive documentation about tetrachoric correlation
+    # See http://www.john-uebersax.com/stat/tetra.htm for extensive 
+    # documentation about tetrachoric correlation.
+    #
     # This class uses algorithm AS116 from Applied Statistics(1977) 
     # vol.26, no.3.
+    #
     # You can see FORTRAN code on http://lib.stat.cmu.edu/apstat/116
     # 
     # <b>Usage</b>.
@@ -407,6 +410,7 @@ module Statsample
         @sdzero = Math::sqrt(((@aa + @bb) * (@aa + @cc) * (@bb + @dd) * (@cc + @dd)).quo(@tot)).quo(@tot ** 2 * @ss)
         @sdr = @sdzero if (@r == 0)
       end
+      private :calculate_cosine, :calculate_sdr, :compute, :gaussian_quadrature
     end
   end
 end

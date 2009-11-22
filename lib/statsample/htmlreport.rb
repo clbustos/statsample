@@ -27,6 +27,29 @@ module Statsample
         @uniq_file+=1
         "#{prepend}_#{@uniq_file}_#{Time.now.to_i}"
     end
+    
+    def add_tetrachoric_correlation_matrix(ds)
+      add_anchor("Tetrachoric correlation Matrix")
+      html="<h2>Tetrachoric Correlation Matrix</h2> <table><thead><th>-</th><th>"+ds.fields.join("</th><th>")+"</th> </thead> <tbody>"
+        matrix=Statsample::Bivariate.tetrachoric_correlation_matrix(ds)
+
+      
+        (0...(matrix.row_size)).each {|row|
+            html+="<tr><td>"+ds.fields[row]+"</td>"
+            (0...(matrix.column_size)).each {|col|
+                if matrix[row,col].nil?
+                    html+="<td>--</td>"
+                else
+                    html+="<td><strong>#{sprintf("%0.2f",matrix[row,col])}</td>"
+                end
+            }
+            html+="</tr>"
+        }
+        html+="</tbody></table>"
+        @partials.push(html)
+    end
+    
+    
     def add_correlation_matrix(ds)
         add_anchor("Correlation Matrix")
         html="<h2>Correlation Matrix</h2> <table><thead><th>-</th><th>"+ds.fields.join("</th><th>")+"</th> </thead> <tbody>"

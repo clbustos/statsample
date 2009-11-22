@@ -32,6 +32,52 @@ module Statsample
     include Writable
     attr_reader :vectors, :fields, :cases, :i
     attr_accessor :labels
+    
+    # Generates a new dataset, using three vectors
+    # - Rows
+    # - Columns
+    # - Values
+    # For example, you have these values
+    #
+    #   x   y   v
+    #   a   a   0
+    #   a   b   1
+    #   b   a   1
+    #   b   b   0
+    #
+    # You obtain
+    #   id  a   b
+    #    a  0   1
+    #    b  1   0
+    #
+    # Useful to process outputs from databases
+    #    
+    def self.crosstab_by_asignation(rows,columns,values)
+      raise "Three vectors should be equal size" if rows.size!=columns.size or rows.size!=values.size
+      cols_values=columns.factors
+      cols_n=cols_values.size
+      h_rows=rows.factors.inject({}){|a,v| a[v]=cols_values.inject({}){
+        |a1,v1| a1[v1]=nil; a1
+        }
+        ;a}
+      values.each_index{|i|
+        h_rows[rows[i]][columns[i]]=values[i]
+      }      
+      ds=Dataset.new(["_id"]+cols_values)
+      cols_values.each{|c|
+        ds[c].type=values.type
+      }
+      rows.factors.each {|row|
+        n_row=Array.new(cols_n+1)
+        n_row[0]=row
+          cols_values.each_index {|i|
+            n_row[i+1]=h_rows[row][cols_values[i]]
+        }
+        ds.add_case_array(n_row)
+      }
+      ds.update_valid_data
+      ds
+    end
     # Creates a new dataset. A dataset is a set of ordered named vectors
     # of the same size.
     #
@@ -58,6 +104,7 @@ module Statsample
         @fields=vectors.dup
         @vectors=vectors.inject({}){|a,x| a[x]=Statsample::Vector.new(); a}
       else
+        # Check vectors
         @vectors=vectors
         @fields=fields
         check_order
@@ -202,7 +249,7 @@ module Statsample
           v.each_index {|i| @vectors[@fields[i]].add(v[i],false)}
         end
       when Hash
-        raise ArgumentError, "Hash keys should be equal to fields" if @fields.sort!=v.keys.sort
+        raise ArgumentError, "Hash keys should be equal to fields #{(v.keys - @fields).join(",")}" if @fields.sort!=v.keys.sort
         @fields.each{|f| @vectors[f].add(v[f],false)}
       else
         raise TypeError, 'Value must be a Array or a Hash'

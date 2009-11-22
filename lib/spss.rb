@@ -6,7 +6,7 @@
 #
 # Claudio Bustos mailto:clbustos@gmail.com
 
-module SPSS
+module SPSS # :nodoc: all
     module Dictionary
         class Element
             def add(a)

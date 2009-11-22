@@ -63,6 +63,7 @@ module Statsample
 			def initialize(ds)
         @ds=ds.dup_only_valid
         @total=@ds.vector_sum
+        @item_mean=@ds.vector_mean.mean
         @mean=@total.mean
         @median=@total.median
         @skew=@total.skew
@@ -206,7 +207,9 @@ module Statsample
 				html = <<EOF
 <p><strong>Summary for scale:</strong></p>
 <ul>
-<li>Mean=#{@mean}</li>
+<li>Items=#{@ds.fields.size}</li>
+<li>Total Mean=#{@mean}</li>
+<li>Item Mean=#{@item_mean}</li>
 <li>Std.Dv.=#{@sd}</li>
 <li>Median=#{@median}</li>
 <li>Skewness=#{sprintf("%0.3f",@skew)}</li>

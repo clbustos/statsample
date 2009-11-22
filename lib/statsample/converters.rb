@@ -171,7 +171,11 @@ module Statsample
                     row.collect!{|c|
                         i+=1
                         if c.is_a? Spreadsheet::Formula
+                          if(c.value.is_a? Spreadsheet::Excel::Error)
+                            nil
+                          else
                             c.value
+                          end
                         elsif dates.include? i and !c.nil? and c.is_a? Numeric
                             row.date(i)
                         else

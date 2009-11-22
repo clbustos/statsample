@@ -356,4 +356,19 @@ class StatsampleDatasetTestCase < Test::Unit::TestCase
         assert_equal(vmult,ds.compute("v1*v2"))
         
     end
+        def test_crosstab_with_asignation
+      v1=%w{a a a b b b c c c}.to_vector
+      v2=%w{a b c a b c a b c}.to_vector
+      v3=%w{0 1 0 0 1 1 0 0 1}.to_scale
+      ds=Statsample::Dataset.crosstab_by_asignation(v1,v2,v3)
+      assert_equal(:nominal, ds['_id'].type)
+      assert_equal(:scale, ds['a'].type)
+      assert_equal(:scale, ds['b'].type)
+      ev_id=%w{a b c}.to_vector
+      ev_a =%w{0 0 0}.to_scale
+      ev_b =%w{1 1 0}.to_scale
+      ev_c =%w{0 1 1}.to_scale
+      ds2={'_id'=>ev_id, 'a'=>ev_a, 'b'=>ev_b, 'c'=>ev_c}.to_dataset
+      assert_equal(ds, ds2)
+    end
 end

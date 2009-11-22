@@ -1,30 +1,30 @@
 require 'yaml'
 
 module Statsample
-# Codification
-#
-# This tool aids to code open questions
-# * Load one or more vectors on the workflow, to create a file on yaml of values. If data have Statsample::SEPARATOR_TOKEN, the value will be splitted on two or more values 
-# * Edit the yaml and replace the values with your codes. If you need to create two or mores codes for an answer, use the separator (default Statsample::SEPARATOR_TOKEN)
+# This module aids to code open questions
+# * Select one or more vectors of a dataset, to create a yaml files, on which each vector is a hash, which keys and values are the vector's factors . If data have Statsample::SPLIT_TOKEN on a value, each value will be separated on two or more hash keys. 
+# * Edit the yaml and replace the values of hashes with your codes. If you need to create two or mores codes for an answer, use the separator (default Statsample::SPLIT_TOKEN)
 # * Recode the vectors, loading the yaml file:
-#   * The new vectors have the same name of the original plus "_recoded"
-#   * Instead of load new recoded vectors, create many vectors as values, as add_vectors_by_split
+#   * recode_dataset_simple!() : The new vectors have the same name of the original plus "_recoded"
+#   * recode_dataset_split!() : Create equal number of vectors as values. See Vector.add_vectors_by_split() for arguments
 #
 # Usage:
 #   recode_file="recodification.yaml"
 #   phase=:first # flag
 #   if phase==:first
-#       File.open(recode_file,"w") {|fp|
-#   Statsample::Codification.create_yaml(ds,%w{vector1 vector2}, ",",fp)
-#   } # Edit the file recodification.yaml
+#     File.open(recode_file,"w") {|fp|
+#       Statsample::Codification.create_yaml(ds,%w{vector1 vector2}, ",",fp)
+#     } 
+#   # Edit the file recodification.yaml and verify changes
 #   elsif phase==:second 
-#       File.open(recode_file,"r") {|fp|
+#     File.open(recode_file,"r") {|fp|
 #       Statsample::Codification.verify(fp,['vector1'])
-#       }
+#     }
+#   # Add new vectors to the dataset
 #   elsif phase==:third
-#       File.open(recode_file,"r") {|fp|
-#   Statsample::Codification.recode_dataset_split!(ds,fp,"*")
-#   }
+#     File.open(recode_file,"r") {|fp|
+#       Statsample::Codification.recode_dataset_split!(ds,fp,"*")
+#     }
 #   end
 #     
     module Codification

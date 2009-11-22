@@ -344,4 +344,5 @@ class TestStatsample::TestVector < Test::Unit::TestCase
       exp=[0,0,0,1,1,1].to_scale
       assert_equal(exp, a.dichotomize)
     end
+
 end
