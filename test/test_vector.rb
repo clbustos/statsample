@@ -149,6 +149,10 @@ class TestStatsample::TestVector < Test::Unit::TestCase
 		assert_equal(5,@c.median)
 		assert_equal(4,@c.percentil(25))
 		assert_equal(7,@c.percentil(75))
+    
+    v=[200000, 200000, 210000, 220000, 230000, 250000, 250000, 250000, 270000, 300000, 450000, 130000, 140000, 140000, 140000, 145000, 148000, 165000, 170000, 180000, 180000, 180000, 180000, 180000, 180000 ].to_scale
+    assert_equal(180000,v.median)
+
 	end
 	def test_ranked
 		v1=[0.8,1.2,1.2,2.3,18].to_vector(:ordinal)
@@ -344,5 +348,25 @@ class TestStatsample::TestVector < Test::Unit::TestCase
       exp=[0,0,0,1,1,1].to_scale
       assert_equal(exp, a.dichotomize)
     end
+    def test_can_be_methods
+      a=  [0,0,0,1,2,3,nil].to_vector
+      assert(a.can_be_scale?)
+      a=[0,"s",0,1,2,3,nil].to_vector
+      assert(!a.can_be_scale?)
+      a.missing_values=["s"]
+      assert(a.can_be_scale?)
+      
+      a=[Date.new(2009,10,10), Date.today(), "2009-10-10", "2009-1-1", nil, "NOW"].to_vector
+      assert(a.can_be_date?)
+      a=[Date.new(2009,10,10), Date.today(),nil,"sss"].to_vector
+      assert(!a.can_be_date?)      
+    end
+    def test_date_vector
+      a=[Date.new(2009,10,10), :NOW, "2009-10-10", "2009-1-1", nil, "NOW","MISSING"].to_vector(:date, :missing_values=>["MISSING"])
+      
+      assert(a.type==:date)
+      expected=[Date.new(2009,10,10), Date.today(), Date.new(2009,10,10), Date.new(2009,1,1), nil, Date.today(), nil ]
+      assert_equal(expected, a.date_data_with_nils)
 
+    end
 end
