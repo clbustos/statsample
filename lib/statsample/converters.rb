@@ -40,6 +40,7 @@ module Statsample
         query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"
         sth=dbh.prepare(query)
         ds.each_array{|c| sth.execute(*c) }
+        return true
       end
       # Create a sql, basen on a given Dataset
       #
@@ -72,182 +73,186 @@ module Statsample
       end
     end
   end
-    class SpreadsheetBase
-        class << self
-            def extract_fields(row)
-                fields=row.to_a.collect{|c| c.downcase}
-                fields.recode_repeated
+  class SpreadsheetBase
+    class << self
+      def extract_fields(row)
+        fields=row.to_a.collect{|c| c.downcase}
+        fields.recode_repeated
+      end
+    
+      def process_row(row,empty)
+        row.to_a.collect do |c|
+          if empty.include?(c)
+              nil
+          else
+            if c.is_a? String and c.is_number?
+              if c=~/^\d+$/
+                c.to_i
+              else
+                c.gsub(",",".").to_f
+              end
+            else
+              c
             end
-            
-            def process_row(row,empty)
-                row.to_a.collect do |c|
-                    if empty.include?(c)
-                        nil
-                    else
-                        if c.is_a? String and c.is_number?
-                            if c=~/^\d+$/
-                                c.to_i
-                            else
-                                c.gsub(",",".").to_f
-                            end
-                        else
-                            c
-                        end
-                    end
-                end
-            end
-            def convert_to_scale(ds,fields)
-                fields.each do |f|
-                    if ds[f].can_be_scale?
-                        ds[f].type=:scale
-                    end
-                end
-            end
-                
+          end
         end
+      end
+      def convert_to_scale_and_date(ds,fields)
+        fields.each do |f|
+          if ds[f].can_be_scale?
+            ds[f].type=:scale
+          elsif ds[f].can_be_date?
+            ds[f].type=:date
+          end
+        end
+      end
+    
     end
+  end
     class PlainText < SpreadsheetBase
-        class << self
-            def read(filename, fields)
-                ds=Statsample::Dataset.new(fields)
-                fp=File.open(filename,"r")
-                fp.each_line do |line|
-                    row=process_row(line.strip.split(/\s+/),[""])
-                    next if row==["\x1A"]
-                    ds.add_case_array(row)
-                end
-                convert_to_scale(ds,fields)
-                ds.update_valid_data
-                ds
-            end
+      class << self
+        def read(filename, fields)
+          ds=Statsample::Dataset.new(fields)
+          fp=File.open(filename,"r")
+          fp.each_line do |line|
+            row=process_row(line.strip.split(/\s+/),[""])
+            next if row==["\x1A"]
+            ds.add_case_array(row)
+          end
+          convert_to_scale_and_date(ds,fields)
+          ds.update_valid_data
+          ds
         end
+      end
     end
-    class Excel < SpreadsheetBase 
-        class << self
-            def write(dataset,filename)
-                require 'spreadsheet'
-                book = Spreadsheet::Workbook.new
-                sheet = book.create_worksheet
-                format = Spreadsheet::Format.new :color => :blue,
-                                   :weight => :bold
-                sheet.row(0).concat(dataset.fields)
-                sheet.row(0).default_format = format
-                i=1
-                dataset.each_array{|row|
-                    sheet.row(i).concat(row)
-                    i+=1
-                }
-                book.write(filename)
+  class Excel < SpreadsheetBase 
+    class << self
+      # Write a Excel spreadsheet based on a dataset
+      # * TODO: Format nicely date values
+      def write(dataset,filename)
+        require 'spreadsheet'
+        book = Spreadsheet::Workbook.new
+        sheet = book.create_worksheet
+        format = Spreadsheet::Format.new :color => :blue,
+                           :weight => :bold
+        sheet.row(0).concat(dataset.fields)
+        sheet.row(0).default_format = format
+        i=1
+        dataset.each_array{|row|
+          sheet.row(i).concat(row)
+          i+=1
+        }
+        book.write(filename)
+      end
+      # Returns a dataset based on a xls file
+      # USE:
+      #     ds = Statsample::Excel.read("test.xls")
+      #
+      def read(filename, worksheet_id=0, ignore_lines=0, empty=[''])
+        require 'spreadsheet'
+        first_row=true
+        fields=[]
+        fields_data={}
+        ds=nil
+        line_number=0
+        book = Spreadsheet.open filename
+        sheet= book.worksheet worksheet_id
+        sheet.each do |row|
+          begin
+            dates=[]
+            row.formats.each_index{|i|
+              if !row.formats[i].nil? and row.formats[i].number_format=="DD/MM/YYYY"
+                dates.push(i)
+              end
+            }
+            line_number+=1
+            if(line_number<=ignore_lines)
+            #puts "Skip line #{line_number}:#{row.to_s}"
+                next
             end
-            # Returns a dataset based on a xls file
-            # USE:
-            #     ds = Statsample::Excel.read("test.xls")
-            #
-            def read(filename, worksheet_id=0, ignore_lines=0, empty=[''])
-            require 'spreadsheet'
-                first_row=true
-                fields=[]
-                fields_data={}
-                ds=nil
-                line_number=0
-                book = Spreadsheet.open filename
-                sheet= book.worksheet worksheet_id
-                sheet.each do |row|
-                    begin
-                        dates=[]
-                        row.formats.each_index{|i|
-                            if !row.formats[i].nil? and row.formats[i].number_format=="DD/MM/YYYY"
-                                dates.push(i)
-                            end
-                        }
-                    line_number+=1
-                    if(line_number<=ignore_lines)
-                    #puts "Skip line #{line_number}:#{row.to_s}"
-                        next
-                    end
-                    # This should be fixed.
-                    # If we have a Formula, should be resolver first
-                    i=-1
-                    row.collect!{|c|
-                        i+=1
-                        if c.is_a? Spreadsheet::Formula
-                          if(c.value.is_a? Spreadsheet::Excel::Error)
-                            nil
-                          else
-                            c.value
-                          end
-                        elsif dates.include? i and !c.nil? and c.is_a? Numeric
-                            row.date(i)
-                        else
-                            c
-                        end
-                    }
-                    if first_row
-                        fields=extract_fields(row)
-                        ds=Statsample::Dataset.new(fields)
-                        first_row=false
-                    else
-                        rowa=process_row(row,empty)
-                        (fields.size - rowa.size).times {
-                            rowa << nil
-                        }
-                        ds.add_case(rowa,false)
-                    end
-                    rescue => e
-                        error="#{e.to_s}\nError on Line # #{line_number}:#{row.join(",")}"
-                        raise
-                    end
-                end
-                convert_to_scale(ds,fields)
-                ds.update_valid_data
-                ds
-            end
-        end
-    end
-    module Mx
-        class << self
-            def write(dataset,filename,type=:covariance)
-            puts "Writing MX File"
-            File.open(filename,"w") {|fp|
-                fp.puts "! #{filename}"
-                fp.puts "! Output generated by Statsample"
-                fp.puts "Data Ninput=#{dataset.fields.size} Nobservations=#{dataset.cases}"
-                fp.puts "Labels "+dataset.fields.join(" ")
-                case type
-                when :raw
-                    fp.puts "Rectangular"
-                    dataset.each {|row|
-                        out=dataset.fields.collect {|f|
-                            if dataset[f].is_valid? row[f]
-                                row[f]
-                            else
-                                "."
-                            end
-                        }
-                        fp.puts out.join("\t")
-                    }
-                    fp.puts "End Rectangular"
-                when :covariance
-                    fp.puts " CMatrix Full"
-                    cm=Statsample::Bivariate.covariance_matrix(dataset)
-                    d=(0...(cm.row_size)).collect {|row|
-                        (0...(cm.column_size)).collect{|col|
-                            cm[row,col].nil? ? "." : sprintf("%0.3f", cm[row,col])
-                        }.join(" ")
-                    }.join("\n")
-                    fp.puts d
+            # This should be fixed.
+            # If we have a Formula, should be resolver first
+            i=-1
+            row.collect!{|c|
+                i+=1
+                if c.is_a? Spreadsheet::Formula
+                  if(c.value.is_a? Spreadsheet::Excel::Error)
+                    nil
+                  else
+                    c.value
+                  end
+                elsif dates.include? i and !c.nil? and c.is_a? Numeric
+                    row.date(i)
+                else
+                    c
                 end
             }
+            if first_row
+              fields=extract_fields(row)
+              ds=Statsample::Dataset.new(fields)
+              first_row=false
+            else
+              rowa=process_row(row,empty)
+              (fields.size - rowa.size).times {
+                rowa << nil
+              }
+              ds.add_case(rowa,false)
+            end
+          rescue => e
+              error="#{e.to_s}\nError on Line # #{line_number}:#{row.join(",")}"
+              raise
+          end
         end
+        convert_to_scale_and_date(ds, fields)
+        ds.update_valid_data
+        ds
+      end
     end
+  end
+  module Mx
+    class << self
+      def write(dataset,filename,type=:covariance)
+        puts "Writing MX File"
+        File.open(filename,"w") do |fp|
+          fp.puts "! #{filename}"
+          fp.puts "! Output generated by Statsample"
+          fp.puts "Data Ninput=#{dataset.fields.size} Nobservations=#{dataset.cases}"
+          fp.puts "Labels "+dataset.fields.join(" ")
+          case type
+            when :raw
+            fp.puts "Rectangular"
+            dataset.each do |row|
+              out=dataset.fields.collect do |f|
+                if dataset[f].is_valid? row[f]
+                  row[f]
+                else
+                  "."
+                end
+              end
+              fp.puts out.join("\t")
+            end
+            fp.puts "End Rectangular"
+          when :covariance
+            fp.puts " CMatrix Full"
+            cm=Statsample::Bivariate.covariance_matrix(dataset)
+            d=(0...(cm.row_size)).collect {|row|
+              (0...(cm.column_size)).collect{|col|
+                cm[row,col].nil? ? "." : sprintf("%0.3f", cm[row,col])
+              }.join(" ")
+            }.join("\n")
+            fp.puts d
+          end
+        end
+      end
     end
+  end
 	module GGobi
 		class << self
-            def write(dataset,filename,opt={})
-                File.open(filename,"w") {|fp|
-                    fp.write(self.out(dataset,opt))
-                }
-            end
+      def write(dataset,filename,opt={})
+        File.open(filename,"w") {|fp|
+          fp.write(self.out(dataset,opt))
+        }
+      end
 			def out(dataset,opt={})
 				require 'ostruct'
 				default_opt = {:dataname => "Default", :description=>"", :missing=>"NA"}
@@ -291,17 +296,17 @@ EOC
 out
 
 			end
-			def values_definition(c,missing)
-				c.collect{|v|
-                    if v.nil?
-                        "#{missing}"
-                    elsif v.is_a? Numeric
-						"#{v}"
-					else
-						"#{v.gsub(/\s+/,"_")}"
-					end
-				}.join(" ")
-			end
+      def values_definition(c,missing)
+        c.collect{|v|
+          if v.nil?
+            "#{missing}"
+          elsif v.is_a? Numeric
+            "#{v}"
+          else
+            "#{v.gsub(/\s+/,"_")}"
+          end
+        }.join(" ")
+      end
 			# Outputs a string for a variable definition
 			# v = vector
 			# name = name of the variable

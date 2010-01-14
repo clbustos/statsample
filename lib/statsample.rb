@@ -108,7 +108,7 @@ end
 # * Dataset: An union of vectors.
 #
 module Statsample
-  VERSION = '0.5.1'
+  VERSION = '0.5.2'
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')
@@ -118,6 +118,8 @@ module Statsample
   autoload(:Excel, 'statsample/converters')
   autoload(:GGobi, 'statsample/converters')
   autoload(:SPSS, 'statsample/converter/spss')
+  autoload(:Histogram, 'statsample/histogram')
+
   autoload(:DominanceAnalysis, 'statsample/dominanceanalysis')
   autoload(:HtmlReport, 'statsample/htmlreport')
   autoload(:Mx, 'statsample/converters')
@@ -157,9 +159,9 @@ module Statsample
 	end
   module Writable
     def save(filename)
-        fp=File.open(filename,"w")
-        Marshal.dump(self,fp)
-        fp.close
+      fp=File.open(filename,"w")
+      Marshal.dump(self,fp)
+      fp.close
     end        
   end
   module HtmlSummary

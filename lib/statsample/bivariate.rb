@@ -59,13 +59,14 @@ module Statsample
       end
       # Retrieves the value for t test for a pearson correlation
       # giving r and vector size
+      # Source : http://faculty.chass.ncsu.edu/garson/PA765/correl.htm
       def t_r(r,size)
         r * Math::sqrt(((size)-2).to_f / (1 - r**2))
       end
       # Retrieves the probability value (a la SPSS)
       # for a given t, size and number of tails.
       # Uses a second parameter 
-      # * :both  or 2  : for r!=0
+      # * :both  or 2  : for r!=0 (default)
       # * :right, :positive or 1  : for r > 0
       # * :left, :negative        : for r < 0
       
@@ -112,6 +113,7 @@ module Statsample
         (rv1v2-(rv1con*rv2con)).quo(Math::sqrt(1-rv1con**2) * Math::sqrt(1-rv2con**2))
         
       end
+      
       # Covariance matrix.
       # Order of rows and columns depends on Dataset#fields order
       
@@ -139,7 +141,8 @@ module Statsample
           end
         end
       end
-      # Retrieves the n valid pairwise
+      
+      # Retrieves the n valid pairwise.
       def n_valid_matrix(ds)
         ds.collect_matrix do |row,col|
           if row==col
@@ -150,7 +153,8 @@ module Statsample
           end
         end
       end
-      # Matrix of correlation probability
+      
+      # Matrix of correlation probabilities.
       # Order of rows and columns depends on Dataset#fields order
       
       def correlation_probability_matrix(ds, tails=:both)

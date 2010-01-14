@@ -35,6 +35,8 @@ module Statsample
             n0=estimation_n0(d,prop,margin)
             n0.quo( 1 + ((n0 - 1).quo(n_pobl)))
         end
+        
+        
         # Proportion confidence interval with t values
         # Uses estimated proportion, sample without replacement.
         
@@ -42,6 +44,7 @@ module Statsample
             t = Distribution::T.p_value(1-((1-margin).quo(2)) , n_sample-1)
             proportion_confidence_interval(prop,n_sample,n_population, t)
         end
+        
         # Proportion confidence interval with z values
         # Uses estimated proportion, sample without replacement.
         def proportion_confidence_interval_z(p, n_sample, n_population, margin=0.95)
@@ -53,7 +56,7 @@ module Statsample
         
         def proportion_confidence_interval(p, sam,pop , x)
             f=sam.quo(pop)
-            one_range=x * Math::sqrt((qf(sam, pop) * p * (1-p)) / (sam-1)) + (1.quo(sam * 2.0))
+            one_range=x * Math::sqrt((qf(sam, pop) * p * (1-p)).quo (sam-1)) + (1.quo(sam * 2.0))
             [p-one_range, p+one_range]
         end
         # Standard deviation for sample distribution of a proportion

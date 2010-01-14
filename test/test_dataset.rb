@@ -356,7 +356,7 @@ class StatsampleDatasetTestCase < Test::Unit::TestCase
         assert_equal(vmult,ds.compute("v1*v2"))
         
     end
-        def test_crosstab_with_asignation
+    def test_crosstab_with_asignation
       v1=%w{a a a b b b c c c}.to_vector
       v2=%w{a b c a b c a b c}.to_vector
       v3=%w{0 1 0 0 1 1 0 0 1}.to_scale
@@ -371,4 +371,22 @@ class StatsampleDatasetTestCase < Test::Unit::TestCase
       ds2={'_id'=>ev_id, 'a'=>ev_a, 'b'=>ev_b, 'c'=>ev_c}.to_dataset
       assert_equal(ds, ds2)
     end
+    def test_one_to_many
+      cases=[
+        ['1','george','red',10,'blue',20,nil,nil],
+        ['2','fred','green',15,'orange',30,'white',20],
+        ['3','alfred',nil,nil,nil,nil,nil,nil]
+      ]
+      ds=Statsample::Dataset.new(%w{id name car_color1 car_value1 car_color2 car_value2 car_color3 car_value3})
+      cases.each {|c| ds.add_case_array c }
+      ds.update_valid_data
+      ids=%w{1 1 2 2 2}.to_vector
+      colors=%w{red blue green orange white}.to_vector
+      values=[10,20,15,30,20].to_vector
+      col_ids=[1,2,1,2,3].to_scale
+      ds_expected={'id'=>ids, '_col_id'=>col_ids, 'color'=>colors, 'value'=>values}.to_dataset(['id','_col_id', 'color','value'])
+      assert_equal(ds_expected, ds.one_to_many(%w{id}, "car_%v%n"))
+      
+    end
+    
 end

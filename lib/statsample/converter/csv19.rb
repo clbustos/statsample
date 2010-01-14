@@ -32,7 +32,7 @@ module Statsample
             ds.add_case(rowa,false)
           end
         end
-        convert_to_scale(ds,fields)
+        convert_to_scale_and_date(ds,fields)
         ds.update_valid_data
         ds
       end

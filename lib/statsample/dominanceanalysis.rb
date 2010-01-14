@@ -38,15 +38,16 @@ module Statsample
             return 0.5 if dm==0.5
             dominances=[dm]
             @models_data.each{|k,m|
-                if !m.contributions[i].nil? and !m.contributions[j].nil?
-                    if m.contributions[i]>m.contributions[j]
-                        dominances.push(1)
-                    elsif m.contributions[i]<m.contributions[j]
-                        dominances.push(0)
-                    else
-                        dominances.push(0.5)
-                    end
+              if !m.contributions[i].nil? and !m.contributions[j].nil?
+                if m.contributions[i]>m.contributions[j]
+                    dominances.push(1)
+                elsif m.contributions[i]<m.contributions[j]
+                    dominances.push(0)
+                else
+                  return 0.5
+                    #dominances.push(0.5)
                 end
+              end
             }
             final=dominances.uniq
             final.size>1 ? 0.5 : final[0]
@@ -64,7 +65,8 @@ module Statsample
                 elsif a[i]<a[j]
                     dominances.push(0)
                 else
-                    a(0.5)
+                  return 0.5
+                    dominances.push(0.5)
                 end                 
             end
             final=dominances.uniq
@@ -72,34 +74,34 @@ module Statsample
         end
         # Returns 1 if i gD k, 0 if j gD i and 0.5 if undetermined        
         def general_dominance_pairwise(i,j)
-            ga=general_averages
-            if ga[i]>ga[j]
-                1
-            elsif ga[i]<ga[j]
-                0
-            else
-                0.5
-            end                 
+          ga=general_averages
+          if ga[i]>ga[j]
+              1
+          elsif ga[i]<ga[j]
+              0
+          else
+              0.5
+          end                 
         end
         def pairs
-            @models.find_all{|m| m.size==2}
+          @models.find_all{|m| m.size==2}
         end
         def total_dominance
             pairs.inject({}){|a,pair|
-                a[pair]=total_dominance_pairwise(pair[0], pair[1])
-                a
+              a[pair]=total_dominance_pairwise(pair[0], pair[1])
+              a
             }
         end
         def conditional_dominance
             pairs.inject({}){|a,pair|
-                a[pair]=conditional_dominance_pairwise(pair[0], pair[1])
-                a
+              a[pair]=conditional_dominance_pairwise(pair[0], pair[1])
+              a
             }
         end
         def general_dominance
             pairs.inject({}){|a,pair|
-                a[pair]=general_dominance_pairwise(pair[0], pair[1])
-                a
+              a[pair]=general_dominance_pairwise(pair[0], pair[1])
+              a
             }
         end
         
@@ -108,56 +110,61 @@ module Statsample
         end
         # Get all model of size k
         def md_k(k)
-            out=[]
-            models=@models.each{|m|
-                out.push(md(m)) if m.size==k
-            }
-            out
+          out=[]
+          models=@models.each{|m| out.push(md(m)) if m.size==k }
+          out
         end
+        
+        # For a hash with arrays of numbers as values
+        # Returns a hash with same keys and 
+        # value as the mean of values of original hash
+        
         def get_averages(averages)
           out={}
           averages.each{|key,val| out[key]=val.to_vector(:scale).mean }
           out
         end
+        # Hash with average for each k size 
+        # model
         def average_k(k)
-            return nil if k==@fields.size
-            models=md_k(k)
-            averages=@fields.inject({}) {|a,v| a[v]=[];a}
-            models.each{|m|
-                @fields.each{|f|
-                    averages[f].push(m.contributions[f]) unless m.contributions[f].nil?
-                }
-            }
-            get_averages(averages)
+          return nil if k==@fields.size
+          models=md_k(k)
+          averages=@fields.inject({}) {|a,v| a[v]=[];a}
+          models.each do |m|
+            @fields.each do |f|
+              averages[f].push(m.contributions[f]) unless m.contributions[f].nil?
+            end
+          end
+          get_averages(averages)
         end
         def general_averages
-            if @general_averages.nil?
-                averages=@fields.inject({}) {|a,v| a[v]=[md(v).r2];a}
-                for k in 1...@fields.size
-                    ak=average_k(k)
-                    @fields.each{|f|
-                        averages[f].push(ak[f])
-                    }
-                end
-                @general_averages=get_averages(averages)
-            end
-            @general_averages
-        end
-        def create_models
-            @models=[]
-            @models_data={}
-            for i in 1..@fields.size
-                c=Statsample::Combination.new(i,@fields.size)
-                c.each{|data|
-                    convert=data.collect {|i1|
-                        @fields[i1]
-                    }
-                    @models.push(convert)
-                    ds_prev=@ds.dup(convert+[@y_var])
-                    modeldata=ModelData.new(convert,ds_prev, @y_var, @fields, @r_class)
-                    @models_data[convert.sort]=modeldata
+          if @general_averages.nil?
+            averages=@fields.inject({}) {|a,v| a[v]=[md(v).r2];a}
+            for k in 1...@fields.size
+                ak=average_k(k)
+                @fields.each{|f|
+                    averages[f].push(ak[f])
                 }
             end
+            @general_averages=get_averages(averages)
+          end
+          @general_averages
+        end
+        def create_models
+          @models=[]
+          @models_data={}
+          for i in 1..@fields.size
+              c=Statsample::Combination.new(i,@fields.size)
+              c.each{|data|
+                  convert=data.collect {|i1|
+                      @fields[i1]
+                  }
+                  @models.push(convert)
+                  ds_prev=@ds.dup(convert+[@y_var])
+                  modeldata=ModelData.new(convert,ds_prev, @y_var, @fields, @r_class)
+                  @models_data[convert.sort]=modeldata
+              }
+          end
         end
         def summary(report_type=ConsoleSummary)
             out=""

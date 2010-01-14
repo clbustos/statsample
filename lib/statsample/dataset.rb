@@ -23,8 +23,8 @@ module Statsample
       @exp=e
     end
     def to_s
-      m="Error: "+@exp.message+"\n"+@exp.backtrace.join("\n")+"\nOn Dataset:"+@ds.inspect
-      m+="\nRow: #{@i}" unless @i.nil?
+      m="Error on iteration: "+@exp.message+"\n"+@exp.backtrace.join("\n")
+      m+="\nRow: #{@ds.i}" unless @ds.i.nil?
       m
     end
   end
@@ -120,7 +120,7 @@ module Statsample
       end
       matrix
     end
-    def vector_label(v_id)
+    def label(v_id)
       raise "Vector #{v} doesn't exists" unless @fields.include? v_id
       @labels[v_id].nil? ? v_id : @labels[v_id]
     end
@@ -334,7 +334,7 @@ module Statsample
       a=[]
       fields=check_fields(fields)
       size=fields.size
-      each_with_index do |i, row|
+      each_with_index do |row, i |
         # numero de invalidos
         sum=0
         invalids=0
@@ -407,21 +407,21 @@ module Statsample
         }
         @i=nil
       rescue =>e
-        raise DatasetException.new(self,e)
+        raise DatasetException.new(self, e)
       end
     end
-    # Returns each case as index and hash
+    # Returns each case as hash and index
     def each_with_index
       begin
         @i=0
         @cases.times{|i|
           @i=i
           row=case_as_hash(i)
-          yield i,row
+          yield row, i
         }
         @i=nil
       rescue =>e
-        raise DatasetException.new(self,e)
+        raise DatasetException.new(self, e)
       end
     end
     # Returns each case as an array, coding missing values as nils
@@ -473,26 +473,28 @@ module Statsample
     def collect(type=:scale)
       data=[]
       each {|row|
-        data.push(yield(row))
+        data.push yield(row)
       }
       Statsample::Vector.new(data,type)
     end
     def collect_with_index(type=:scale)
       data=[]
-      each_with_index {|i,row|
+      each_with_index {|row, i|
         data.push(yield(i,row))
       }
       Statsample::Vector.new(data,type)
     end
     # Recode a vector based on a block
     def recode!(vector_name)
+      
       0.upto(@cases-1) {|i|
         @vectors[vector_name].data[i]=yield case_as_hash(i)
       }
       @vectors[vector_name].set_valid_data
     end
-    def crosstab(v1,v2)
-      Statsample::Crosstab.new(@vectors[v1],@vectors[v2])
+    
+    def crosstab(v1,v2,opts={})
+      Statsample::Crosstab.new(@vectors[v1], @vectors[v2],opts)
     end
     def[]=(i,v)
       if v.instance_of? Statsample::Vector
@@ -640,6 +642,77 @@ module Statsample
     def inspect
       self.to_s
     end
+    # Creates a new dataset for one to many relations
+    # on a dataset, based on pattern of field names.
+    # for example, you have a survey for number of children
+    # with this structure:
+    #   id, name, child_name_1, child_age_1, child_name_2, child_age_2
+    # with 
+    #   ds.one_to_many(%w{id}, "child_%v_%n"
+    # the field of first parameters will be copied verbatim
+    # to new dataset, and fields which responds to second 
+    # pattern will be added one case for each different %n.
+    # For example
+    #   cases=[
+    #     ['1','george','red',10,'blue',20,nil,nil],
+    #     ['2','fred','green',15,'orange',30,'white',20],
+    #     ['3','alfred',nil,nil,nil,nil,nil,nil]
+    #   ]
+    #   ds=Statsample::Dataset.new(%w{id name car_color1 car_value1 car_color2 car_value2 car_color3 car_value3})
+    #   cases.each {|c| ds.add_case_array c }
+    #   ds.one_to_many(['id'],'car_%v%n').to_matrix
+    #   => Matrix[
+    #      ["red", "1", 10], 
+    #      ["blue", "1", 20],
+    #      ["green", "2", 15],
+    #      ["orange", "2", 30],
+    #      ["white", "2", 20]
+    #      ]
+    # 
+    def one_to_many(parent_fields, pattern)
+      base_pattern=pattern.gsub(/%v|%n/,"")
+      re=Regexp.new pattern.gsub("%v","(.+?)").gsub("%n","(\\d+?)")
+      ds_vars=parent_fields
+      vars=[]
+      max_n=0
+      h=parent_fields.inject({}) {|a,v| a[v]=Statsample::Vector.new([], @vectors[v].type);a }
+      # Adding _row_id
+      h['_col_id']=[].to_scale
+      ds_vars.push("_col_id")
+      @fields.each do |f|
+        if f=~re
+          if !vars.include? $1
+            vars.push($1) 
+            h[$1]=Statsample::Vector.new([], @vectors[f].type)
+          end
+          max_n=$2.to_i if max_n < $2.to_i
+        end
+      end
+      ds=Dataset.new(h,ds_vars+vars)
+      each do |row|
+        row_out={}
+        parent_fields.each do |f|
+          row_out[f]=row[f]
+        end
+        max_n.times do |n1|
+          n=n1+1
+          any_data=false
+          vars.each do |v|
+            data=row[pattern.gsub("%v",v.to_s).gsub("%n",n.to_s)]
+            row_out[v]=data
+            any_data=true if !data.nil?
+          end
+          if any_data
+            row_out["_col_id"]=n
+            ds.add_case(row_out,false)
+          end
+          
+        end
+      end
+      ds.update_valid_data
+      ds
+    end
+   
 		def summary
 			out=""
 			out << "Summary for dataset\n"
