@@ -7,16 +7,16 @@ module Statsample
   # 
   #  * Verbatim: *
   #
-  # The range for bin[i] is given by range[i] to range[i+1]. 
-  # For n bins there are n+1 entries in the array range. 
-  # Each bin is inclusive at the lower end and exclusive at the upper end. 
-  # Mathematically this means that the bins are defined 
-  # by the following inequality,
+  #  The range for bin[i] is given by range[i] to range[i+1]. 
+  #  For n bins there are n+1 entries in the array range. 
+  #  Each bin is inclusive at the lower end and exclusive at the upper end. 
+  #  Mathematically this means that the bins are defined 
+  #  by the following inequality,
   # 
   #   bin[i] corresponds to range[i] <= x < range[i+1]
   # 
-  # Here is a diagram of the correspondence between ranges and bins
-  # on the number-line for x,
+  #  Here is a diagram of the correspondence between ranges and bins
+  #  on the number-line for x,
   # 
   # 
   #      [ bin[0] )[ bin[1] )[ bin[2] )[ bin[3] )[ bin[4] )
@@ -24,14 +24,14 @@ module Statsample
   #    r[0]      r[1]      r[2]      r[3]      r[4]      r[5]
   # 
   # 
-  # In this picture the values of the range array are denoted by r. 
-  # On the left-hand side of each bin the square bracket ‘[’ denotes 
-  # an inclusive lower bound ( r <= x), and the round parentheses ‘)’ 
-  # on the right-hand side denote an exclusive upper bound (x < r). 
-  # Thus any samples which fall on the upper end of the histogram are 
-  # excluded. 
-  # If you want to include this value for the last bin you will need to 
-  # add an extra bin to your histogram. 
+  #  In this picture the values of the range array are denoted by r. 
+  #  On the left-hand side of each bin the square bracket ‘[’ denotes 
+  #  an inclusive lower bound ( r <= x), and the round parentheses ‘)’ 
+  #  on the right-hand side denote an exclusive upper bound (x < r). 
+  #  Thus any samples which fall on the upper end of the histogram are 
+  #  excluded. 
+  #  If you want to include this value for the last bin you will need to 
+  #  add an extra bin to your histogram. 
   #
   #
   # Reference:

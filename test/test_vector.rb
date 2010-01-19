@@ -258,36 +258,28 @@ class TestStatsample::TestVector < Test::Unit::TestCase
         assert_equal(expected.data,@c.data)
     end
     def test_gsl
-		if HAS_GSL
-			a=Statsample::Vector.new([1,2,3,4,"STRING"], :scale)
-			assert_equal(2,a.mean)
-			assert_equal(a.variance_sample_slow,a.variance_sample)
-			assert_equal(a.standard_deviation_sample_slow,a.sds)
-			assert_equal(a.variance_population_slow,a.variance_population)
-			assert_equal(a.standard_deviation_population_slow,a.standard_deviation_population)
-            assert_nothing_raised do
-                a=[].to_vector(:scale)
-            end
-            a.add(1,false)
-            a.add(2,false)
-            a.set_valid_data
-            assert_equal(3,a.sum)
-            b=[1,2,nil,3,4,5,nil,6].to_vector(:scale)
-            assert_equal(21, b.sum)
-            
-            assert_equal(3.5, b.mean)
-            assert_equal(6,b.gsl.size)
-            # histogram
-            a=[11,12,13,15,21,22,23,32,33].to_vector(:scale)
-            h=a.histogram(3)
-            assert_equal(4,h[0])
-            assert_equal(3,h[1])
-            assert_equal(2,h[2])
-            h=a.histogram([10,20,30,40])
-            assert_equal(4,h[0])
-            assert_equal(3,h[1])
-            assert_equal(2,h[2])
-            
+      if HAS_GSL
+        a=Statsample::Vector.new([1,2,3,4,"STRING"], :scale)
+        assert_equal(2,a.mean)
+        assert_equal(a.variance_sample_slow,a.variance_sample)
+        assert_equal(a.standard_deviation_sample_slow,a.sds)
+        assert_equal(a.variance_population_slow,a.variance_population)
+        assert_equal(a.standard_deviation_population_slow,a.standard_deviation_population)
+        assert_nothing_raised do
+          a=[].to_vector(:scale)
+        end
+        a.add(1,false)
+        a.add(2,false)
+        a.set_valid_data
+        assert_equal(3,a.sum)
+        b=[1,2,nil,3,4,5,nil,6].to_vector(:scale)
+        assert_equal(21, b.sum)        
+        assert_equal(3.5, b.mean)
+        assert_equal(6,b.gsl.size)
+        c=[10,20,30,40,50,100,1000,2000,5000].to_scale
+        assert_in_delta(c.skew,     c.skew_slow     ,0.0001)
+        assert_in_delta(c.kurtosis, c.kurtosis_slow ,0.0001)
+        
 		end
 	end
 	def test_vector_matrix        

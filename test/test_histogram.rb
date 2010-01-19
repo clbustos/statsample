@@ -22,7 +22,5 @@ class StatsampleHistogramTestCase < Test::Unit::TestCase
     assert_equal([3.0,0.0,1.0,2.0,0.0], h.bin)
     h.increment(5)
     assert_equal([3.0,0.0,1.0,2.0,0.0], h.bin)
-    
-    
   end
 end

@@ -811,23 +811,22 @@ module Statsample
     def standard_deviation_sample(m=nil)
         check_type :scale
         
-        m||=m
+        m||=mean
         Math::sqrt(variance_sample(m))
     end
     # Skewness of the sample
-    def skew
+    def skew(m=nil)
         check_type :scale
-        m=mean
-        thirds=@scale_data.inject(0){|a,x| a+((x-mean)**3)}
-        thirds.quo((@scale_data.size-1)*sd**3)
+        m||=mean
+        th=@scale_data.inject(0){|a,x| a+((x-m)**3)}
+        th.quo((@scale_data.size)*sd(m)**3)
     end
     # Kurtosis of the sample
-    def kurtosis
+    def kurtosis(m=nil)
         check_type :scale
-        
-        m=mean
-        thirds=@scale_data.inject(0){|a,x| a+((x-mean)**4)}
-        thirds.quo((@scale_data.size-1)*sd**4)
+        m||=mean
+        fo=@scale_data.inject(0){|a,x| a+((x-m)**4)}
+        fo.quo((@scale_data.size)*sd(m)**4)-3
         
     end
     # Product of all values on the sample

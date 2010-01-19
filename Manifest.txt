@@ -52,6 +52,7 @@ lib/statsample/graph/svgboxplot.rb
 lib/statsample/graph/svggraph.rb
 lib/statsample/graph/svghistogram.rb
 lib/statsample/graph/svgscatterplot.rb
+lib/statsample/histogram.rb
 lib/statsample/htmlreport.rb
 lib/statsample/mle.rb
 lib/statsample/mle/logit.rb
@@ -72,6 +73,7 @@ lib/statsample/reliability.rb
 lib/statsample/resample.rb
 lib/statsample/srs.rb
 lib/statsample/test.rb
+lib/statsample/test/umannwhitney.rb
 lib/statsample/vector.rb
 po/es/statsample.po
 po/statsample.pot
@@ -87,6 +89,7 @@ test/test_dataset.rb
 test/test_distribution.rb
 test/test_ggobi.rb
 test/test_gsl.rb
+test/test_histogram.rb
 test/test_logit.rb
 test/test_mle.rb
 test/test_multiset.rb
