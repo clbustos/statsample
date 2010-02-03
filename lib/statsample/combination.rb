@@ -40,8 +40,6 @@ module Statsample
     def next_value
         @d.next_value
     end
-    
-    # Ruby engine for Combinations
     class CombinationRuby
       attr_reader :data
       def initialize(k,n)

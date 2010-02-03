@@ -1,14 +1,100 @@
 module Statsample
   module Test
-    # U Mann-Whitney test
+    #
+    # = U Mann-Whitney test =
+    #
+    # Non-parametric test for assessing whether two independent samples
+    # of observations come from the same distribution.
     # 
+    # == Assumptions ==
+    #
+    # * The two samples under investigation in the test are independent of each other and the observations within each sample are independent.
+    # * The observations are comparable (i.e., for any two observations, one can assess whether they are equal or, if not, which one is greater).
+    # * The variances in the two groups are approximately equal.
+    #
+    # Higher differences of distributions correspond to 
+    # to lower values of U.
+    #
     class UMannWhitney
+      # Max for m*n allowed for exact calculation of probability
+      MAX_MN_EXACT=10000
+      # Exact probability based on Dinneen & Blakesley (1973) algorithm
+      # This is the algorithm used on SPSS
+      #
+      #  Reference: Dinneen, L., & Blakesley, B. (1973). Algorithm AS 62: A Generator for the Sampling Distribution of the Mann- Whitney U Statistic. Journal of the Royal Statistical Society, 22(2), 269-273
+      # 
+      def self.exact_probability_distribution_as62(n1,n2)
+
+        freq=[]
+        work=[]
+        mn1=n1*n2+1
+        max_u=n1*n2
+        minmn=n1<n2 ? n1 : n2
+        maxmn=n1>n2 ? n1 : n2
+        n1=maxmn+1
+        (1..n1).each{|i| freq[i]=1}
+        n1+=1
+        (n1..mn1).each{|i| freq[i]=0}
+        work[1]=0
+        xin=maxmn
+        (2..minmn).each do |i|
+          work[i]=0
+          xin=xin+maxmn
+          n1=xin+2
+          l=1+xin.quo(2)
+          k=i
+          (1..l).each do |j|
+            k=k+1
+            n1=n1-1
+            sum=freq[j]+work[j]
+            freq[j]=sum
+            work[k]=sum-freq[n1]
+            freq[n1]=sum
+          end
+        end
+        
+        # Generate percentages for normal U
+        dist=(1+max_u/2).to_i
+        freq.shift
+        total=freq.inject(0) {|a,v| a+v }
+        (0...dist).collect {|i|
+          if i!=max_u-i
+            ues=freq[i]*2
+          else
+            ues=freq[i]
+          end
+          ues.quo(total)
+        }
+      end
+      
+      # Generate distribution for permutations
+      
+      def self.distribution_permutations(n1,n2)
+        base=[0]*n1+[1]*n2
+        po=Statsample::Permutation.new(base)
+        upper=0
+        total=n1*n2
+        req={}
+        po.each do |perm|
+          r0,s0=0,0
+          perm.each_index {|c_i|
+            if perm[c_i]==0
+              r0+=c_i+1
+              s0+=1
+            end
+          }
+          u1=r0-((s0*(s0+1)).quo(2))
+          u2=total-u1
+          temp_u= (u1 <= u2) ? u1 : u2
+          req[perm]=temp_u
+        end
+        req
+      end
       attr_reader :r1, :r2, :u1, :u2, :u, :t
       def initialize(v1,v2)
         @n1=v1.valid_data.size
         @n2=v2.valid_data.size
-        
-        
+
         data=(v1.valid_data+v2.valid_data).to_scale
         groups=(([0]*@n1)+([1]*@n2)).to_vector
         ds={'g'=>groups, 'data'=>data}.to_dataset
@@ -26,6 +112,30 @@ module Statsample
         @u1=r1-((@n1*(@n1+1)).quo(2))
         @u2=r2-((@n2*(@n2+1)).quo(2))
         @u=(u1<u2) ? u1 : u2
+      end
+      def summary
+        out=<<-HEREDOC
+Mann-Whitney U
+Sum of ranks v1: #{@r1.to_f}
+Sum of ranks v1: #{@r2.to_f}
+U Value: #{@u.to_f}
+Z: #{sprintf("%0.3f",z)} (p: #{sprintf("%0.3f",z_probability)})
+        HEREDOC
+        if @n1*@n2<MAX_MN_EXACT
+          out+="Exact p (Dinneen & Blakesley): #{sprintf("%0.3f",exact_probability)}"
+        end
+          out
+      end
+      # Exact probability of finding values of U lower or equal
+      # to sample on U distribution.
+      # Use with caution with m*n>100000
+      def exact_probability
+        dist=UMannWhitney.exact_probability_distribution_as62(@n1,@n2)
+        sum=0
+        (0..@u.to_i).each {|i|
+          sum+=dist[i]
+        }
+        sum
       end
       # Reference: http://europe.isixsigma.com/library/content/c080806a.asp
       def adjust_for_ties(data)
@@ -49,13 +159,13 @@ module Statsample
         end
         (@u-mu).quo(ou)
       end
-      def p
-        if(@n1+@n2>30)
-          (1-Distribution::Normal.cdf(z.abs()))*2
-        else
-          raise "Not implemented"
-        end
+      # Assuming H_0, the proportion of cdf with values of U lower
+      # than the sample. 
+      # Use with more than 30 cases per group
+      def z_probability
+        (1-Distribution::Normal.cdf(z.abs()))*2
       end
     end
+      
   end
 end
