@@ -5,10 +5,12 @@ Rakefile
 bin/reportbuilder
 data/reportbuilder.css
 data/reportbuilder.js
+data/sheep.jpg
+lib/reportbuilder.rb
 lib/reportbuilder/generator.rb
 lib/reportbuilder/generator/html.rb
 lib/reportbuilder/generator/text.rb
-lib/reportbuilder.rb
+lib/reportbuilder/image.rb
 lib/reportbuilder/section.rb
 lib/reportbuilder/table.rb
 lib/reportbuilder/table/htmlgenerator.rb

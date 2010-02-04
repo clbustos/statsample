@@ -19,8 +19,8 @@ class ReportBuilder
   #   | 4  | London   |George | ab-4          |
   #   -----------------------------------------
   class Table
-    @@n=1
-    # :nodoc:
+    @@n=1 # :nodoc:
+    
     DEFAULT_OPTIONS={
       :header =>  [],
       :name   =>   nil
@@ -36,6 +36,7 @@ class ReportBuilder
     # Use:
     #   table=ReportBuilder::Table.new(:header =>["var1","var2"])
     def initialize(opts=Hash.new)
+      raise ArgumentError,"opts should be a Hash" if !opts.is_a? Hash
       opts=DEFAULT_OPTIONS.merge opts
       if opts[:name].nil?
         @name= "Table #{@@n}"
@@ -57,6 +58,7 @@ class ReportBuilder
     def add_hr
       @rows.push(:hr)
     end
+    alias_method  :add_horizontal_line, :add_hr
     # Adds a rowspan on a cell
     #   table.add_row(["a",table.rowspan("b",2)])
     def rowspan(data,n)
@@ -93,12 +95,12 @@ class ReportBuilder
       }
     }
     end
-    def to_rb_text(generator)
+    def to_reportbuilder_text(generator)
       require 'reportbuilder/table/textgenerator'
       table_generator=ReportBuilder::Table::TextGenerator.new( generator, self)
       table_generator.generate
     end
-    def to_rb_html(generator)
+    def to_reportbuilder_html(generator)
       require 'reportbuilder/table/htmlgenerator'
       table_generator=ReportBuilder::Table::HtmlGenerator.new(generator, self)
       table_generator.generate

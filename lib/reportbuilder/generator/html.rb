@@ -5,31 +5,49 @@ class ReportBuilder
     class Html < Generator
       PREFIX="html"
       attr_reader :toc
-      def initialize(builder)
+      def initialize(builder, options)
         super
         @body=""
-        @toc=[]
-        @table_n=1
-        @entry_n=1
-        @list_tables=[]
         @headers=[]
         @footers=[]
       end
       def parse
+        # add_css(File.dirname(__FILE__)+"/../../../data/reportbuilder.css")
+        # add_js(File.dirname(__FILE__)+"/../../../data/reportbuilder.js")
         parse_cycle(@builder)
       end
+      def basic_css
+<<-HERE
+<style>
+body {
+margin:0;
+padding:1em;
+}
+table {
+border-collapse: collapse;
+
+}
+table td {
+border: 1px solid black;
+}
+.section {
+margin:0.5em;
+}
+</style>
+HERE
+      end
       def out
-        out="<html><head><title>#{@builder.name}</title>"
+        out= <<-HERE
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>#{@builder.name}</title>
+#{basic_css}
+HERE
         out << @headers.join("\n")
         out << "</head><body>\n"
         out << "<h1>#{@builder.name}</h1>"
-        if (@list_tables.size>0) 
-          out << "<div class='tot'><div class='title'>List of tables</div><ul>"
-          @list_tables.each {|anchor,name|
-            out << "<li><a href='#"+anchor+"'>#{name}</a></li>"
-          }
-          out << "</ul></div>\n"
-        end
         if(@toc.size>0)
         out << "<div class='toc'><div class='title'>List of contents</div></div>"
           actual_level=0
@@ -47,10 +65,30 @@ class ReportBuilder
           actual_level.times { out << "</ul>\n"}
           out << "</div>\n"
         end
+        if (@list_tables.size>0) 
+          out << "<div class='tot'><div class='title'>List of tables</div><ul>"
+          @list_tables.each {|anchor,name|
+            out << "<li><a href='#"+anchor+"'>#{name}</a></li>"
+          }
+          out << "</ul></div>\n"
+        end
+        
         out << @body
         out << @footers.join("\n")
         out << "</body></html>"
       end
+
+      
+      def add_image(filename)
+        if(File.exists? filename)
+          if(!File.exists? @builder.dir+"/images/"+File.basename(filename))
+            FileUtils.mkdir @builder.dir+"/images"
+            FileUtils.cp filename, @builder.dir+"/images/"+File.basename(filename)
+          end
+        end
+        "images/"+File.basename(filename)
+      end
+
       def add_js(js)
         if(File.exists? js)
           if(!File.exists? @builder.dir+"/js/"+File.basename(js))
@@ -74,26 +112,18 @@ class ReportBuilder
       
       def add_text(t)
         ws=(" "*parse_level*2)
-        @body << ws << "<pre>#{t}</pre>\n"
+        @body << ws << "<p>#{t}</p>\n"
       end
-      def add_raw(t)
+      def add_html(t)
         ws=(" "*parse_level*2)
         @body << ws << t << "\n"
       end
-      def add_toc_entry(name)
-        anchor="toc_#{@entry_n}"
-        @entry_n+=1
-        @toc.push([anchor, name, parse_level])
-        anchor
+      def add_preformatted(t)
+        ws=(" "*parse_level*2)
+        @body << ws << "<pre>#{t}</pre>\n"
+        
       end
-      # Add an entry for a table
-      # Returns the name of the anchor
-      def add_table_entry(name)
-        anchor="table_#{@table_n}"
-        @table_n+=1
-        @list_tables.push([anchor,name])
-        anchor
-      end
+        
     end
   end
 end

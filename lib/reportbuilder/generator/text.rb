@@ -4,7 +4,7 @@ class ReportBuilder
       PREFIX="text"
       attr_reader :toc
       attr_reader :out
-      def initialize(builder)
+      def initialize(builder, options)
         super
         @out=""
       end
@@ -17,8 +17,11 @@ class ReportBuilder
         ws=" "*parse_level*2
         @out << ws << t << "\n"
       end
-      def add_text_raw(t)
+      def add_preformatted(t)
         @out << t
+      end
+      def add_html(t)
+        # Nothing printed
       end
     end
   end

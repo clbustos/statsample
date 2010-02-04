@@ -4,7 +4,7 @@ class ReportBuilder
         def generate()
           t=@element
           anchor=@generator.add_table_entry(t.name)
-          out="<a name='#{anchor}'></a><table>"
+          out="<a name='#{anchor}'></a><table><caption>#{t.name}</caption>"
           @rowspans=[]
           if t.header.size>0
             out+="<thead>"+parse_row(t,t.header,"th")+"</thead>\n"
@@ -21,7 +21,7 @@ class ReportBuilder
           end
           }
           out+="</tbody>\n</table>\n"
-          @generator.add_raw(out)
+          @generator.add_html(out)
         end
         def parse_row(t,row,tag="td")
           row_ary=[]

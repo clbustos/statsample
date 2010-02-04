@@ -6,7 +6,7 @@ class ReportBuilder
         t=@element
         t.calculate_widths
         total_width=t.total_width
-        out=""
+        out="Table: #{t.name}\n"
         if t.header.size>0
           out+=parse_hr(total_width)+"\n"                
           out+=parse_row(t,t.header)+"\n"
