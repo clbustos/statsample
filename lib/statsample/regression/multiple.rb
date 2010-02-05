@@ -37,18 +37,10 @@ module Statsample
         def self.listwise_by_exp(ds,exp)
           raise "Not implemented yet"
         end
-        # Returns a dataset and name of criteria using a expression.
-        # All nominal vectors are replaced by dummy coding
-        # and interactions are calculated
-        
-        def self.ds_by_exp(ds,exp)
-          raise "Not implemented"
-          parts=exp.split(/[\+=]/)
-          dependent=parts.pop
-          ds_out=[]
-          parts.each{|p|
-          
-          }
+        # Obtain r2 for regressors
+        def self.r2_from_matrices(rxx,rxy)
+          matrix=(rxy.transpose*rxx.inverse*rxy)
+          matrix[0,0]
         end
         
     end

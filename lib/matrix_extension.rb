@@ -37,31 +37,31 @@ class Matrix
     end
     # Test if a Matrix is a identity one
     def identity?
-        if regular?
-            rows=(0...row_size).each{|i|
-                (0...column_size).each {|j|
-                    v = self[i,j]
-                    return false if (i==j and v!=1) or (i!=j and v!=0)
-                }
-            }
-            true
-        else
-            false
-        end
+      if regular?
+      rows=(0...row_size).each{|i|
+      (0...column_size).each {|j|
+        v = self[i,j]
+        return false if (i==j and v!=1) or (i!=j and v!=0)
+      }
+      }
+      true
+      else
+      false
+      end
     end
     def to_gsl
-        out=[]
-        self.row_size.times{|i|
-            out[i]=self.row(i).to_a
-        }
-        GSL::Matrix[*out]
+      out=[]
+      self.row_size.times{|i|
+        out[i]=self.row(i).to_a
+      }
+      GSL::Matrix[*out]
     end
     def orthogonal?
-        if regular?
-            (self * self.t).identity?
-        else
-            false
-        end
+      if regular?
+        (self * self.t).identity?
+      else
+        false
+      end
     end
 end
 

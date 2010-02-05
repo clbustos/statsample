@@ -135,6 +135,7 @@ module Statsample
   autoload(:MLE, 'statsample/mle')    
   autoload(:Regression, 'statsample/regression')
   autoload(:Test, 'statsample/test')
+  autoload(:Factor, 'statsample/factor')
   def self.load(filename)
     if File.exists? filename
       o=false

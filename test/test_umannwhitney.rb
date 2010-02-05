@@ -13,8 +13,5 @@ class StatsampleSrsTestCase < Test::Unit::TestCase
       assert_in_delta(-2.205,u.z,0.001)
       assert_in_delta(0.027,u.z_probability,0.001)
       assert_in_delta(0.028,u.exact_probability,0.001)
-      
-      
-      
     end
 end

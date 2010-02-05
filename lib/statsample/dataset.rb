@@ -511,6 +511,15 @@ module Statsample
       }
       Matrix.rows(rows)
     end
+    if HAS_GSL
+      def to_matrix_gsl
+      rows=[]
+      self.each_array{|c|
+        rows.push(c)
+      }
+      GSL::Matrix.alloc(*rows)
+      end
+    end
 		def to_multiset_by_split(*fields)
 			require 'statsample/multiset'
 			if fields.size==1

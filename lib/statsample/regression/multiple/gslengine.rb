@@ -78,7 +78,7 @@ class GslEngine < BaseEngine
         r**2
     end
     def r
-        Bivariate::pearson(@dy,predicted)
+        Bivariate::pearson(@dy, predicted)
     end  
     def sst
         @dy.ss

@@ -16,53 +16,53 @@ module Multiple
 #   lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y')
 
 class RubyEngine < BaseEngine 
-    def initialize(ds,y_var)
+  def initialize(ds,y_var)
     super
-        @dy=ds[@y_var]
-        @ds_valid=ds.dup_only_valid
-        @ds_indep=ds.dup(ds.fields-[y_var])
-        @fields=@ds_indep.fields
-        set_dep_columns
-        obtain_y_vector
-        @matrix_x = Bivariate.correlation_matrix(@ds_indep)
-        @coeffs_stan=(@matrix_x.inverse * @matrix_y).column(0).to_a
-        @min_n_valid=nil
-    end
-    def min_n_valid
-        if @min_n_valid.nil?
-            min=@ds.cases
-            m=Bivariate::n_valid_matrix(@ds)
-            for x in 0...m.row_size
-                for y in 0...m.column_size
-                    min=m[x,y] if m[x,y] < min
-                end
-            end
-            @min_n_valid=min
+    @dy=ds[@y_var]
+    @ds_valid=ds.dup_only_valid
+    @ds_indep=ds.dup(ds.fields-[y_var])
+    @fields=@ds_indep.fields
+    set_dep_columns
+    obtain_y_vector
+    @matrix_x = Bivariate.correlation_matrix(@ds_indep)
+    @coeffs_stan=(@matrix_x.inverse * @matrix_y).column(0).to_a
+    @min_n_valid=nil
+  end
+  def min_n_valid
+    if @min_n_valid.nil?
+      min=@ds.cases
+      m=Bivariate::n_valid_matrix(@ds)
+      for x in 0...m.row_size
+        for y in 0...m.column_size
+          min=m[x,y] if m[x,y] < min
         end
-        @min_n_valid
+      end
+      @min_n_valid=min
     end
-    def set_dep_columns
-        @dep_columns=[]
-        @ds_indep.each_vector{|k,v|
-            @dep_columns.push(v.data_with_nils)
-        }                
-    end
+    @min_n_valid
+  end
+  def set_dep_columns
+    @dep_columns=[]
+    @ds_indep.each_vector{|k,v|
+      @dep_columns.push(v.data_with_nils)
+    }                
+  end
     # Sum of square total
-    def sst
-        #if @sst.nil?
-        @sst=@dy.variance*(min_n_valid-1.0)
-        #end
-        @sst
+  def sst
+    #if @sst.nil?
+    @sst=@dy.variance*(min_n_valid-1.0)
+    #end
+    @sst
+  end
+  def r2
+    if @r2.nil?
+      c=@matrix_y
+      rxx=obtain_predictor_matrix
+      matrix=(c.t*rxx.inverse*c)
+      @r2=matrix[0,0]
     end
-    def r2
-        if @r2.nil?
-        c=@matrix_y
-        rxx=obtain_predictor_matrix
-        matrix=(c.t*rxx.inverse*c)
-        @r2=matrix[0,0]
-        end
-        @r2
-    end
+    @r2
+  end
     def r
         Math::sqrt(r2)
     end
@@ -71,19 +71,19 @@ class RubyEngine < BaseEngine
         min_n_valid-@dep_columns.size-1
     end
     def fix_with_mean
-        i=0
-        @ds_indep.each{|row|
-            empty=[]
-            row.each{|k,v|
-                empty.push(k) if v.nil?
-            }
-            if empty.size==1
-                @ds_indep[empty[0]][i]=@ds[empty[0]].mean
-            end
-            i+=1
-        }
-        @ds_indep.update_valid_data
-        set_dep_columns
+      i=0
+      @ds_indep.each do |row|
+        empty=[]
+        row.each do |k,v|
+          empty.push(k) if v.nil?
+        end
+        if empty.size==1
+          @ds_indep[empty[0]][i]=@ds[empty[0]].mean
+        end
+        i+=1
+      end
+      @ds_indep.update_valid_data
+      set_dep_columns
     end
     def fix_with_regression
         i=0
