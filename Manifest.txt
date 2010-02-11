@@ -16,6 +16,7 @@ lib/reportbuilder/table.rb
 lib/reportbuilder/table/htmlgenerator.rb
 lib/reportbuilder/table/textgenerator.rb
 test/test_html.rb
+test/test_image.rb
 test/test_reportbuilder.rb
 test/test_section.rb
 test/test_table.rb

@@ -2,7 +2,7 @@
 class ReportBuilder::Section
   @@n=1
   attr_reader :parent, :elements, :name
-  def initialize(options={})
+  def initialize(options=Hash.new)
     if !options.has_key? :name
       @name="Section #{@nn}"
       @nn+=1

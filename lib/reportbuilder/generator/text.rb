@@ -9,7 +9,7 @@ class ReportBuilder
         @out=""
       end
       def parse
-        @out="Report: #{@builder.name}\n"
+        @out="#{@builder.name}\n"
         parse_cycle(@builder)
         @out << "\n"
       end

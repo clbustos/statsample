@@ -7,7 +7,7 @@ class ReportBuilder
   attr_reader :elements
   attr_reader :name
   attr_reader :dir
-  VERSION = '0.1.0'
+  VERSION = '0.2.0'
   # Create a new Report
   def initialize(name=nil,dir=nil)
     name||="Report "+Time.new.to_s

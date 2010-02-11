@@ -29,7 +29,7 @@ class ReportBuilder
     end
     
     def parse_element(element)
-      method=("to_reportbuilder_"+self.class::PREFIX).intern
+      method=("to_reportbuilder_" + self.class::PREFIX).intern
       if element.respond_to? method
         element.send(method, self)
       elsif element.respond_to? :to_reportbuilder
@@ -48,12 +48,14 @@ class ReportBuilder
     def add_preformatted(t)
       raise "Implement this"
     end
+    
     def add_toc_entry(name)
       anchor="toc_#{@entry_n}"
       @entry_n+=1
       @toc.push([anchor, name, parse_level])
       anchor
     end
+    
     # Add an entry for a table
     # Returns the name of the anchor
     def add_table_entry(name)
