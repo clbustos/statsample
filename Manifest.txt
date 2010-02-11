@@ -20,7 +20,6 @@ lib/distribution/f.rb
 lib/distribution/normal.rb
 lib/distribution/normalbivariate.rb
 lib/distribution/t.rb
-lib/matrix_extension.rb
 lib/spss.rb
 lib/statistics2.rb
 lib/statsample.rb

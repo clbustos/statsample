@@ -40,8 +40,8 @@ module Factor
       @iterations=0
       t.times do |i|
         @iterations+=1
-        prev_com.each_with_index{|v,i|
-          work_matrix[i][i]=v
+        prev_com.each_with_index{|v,it|
+          work_matrix[it][it]=v
         }
         pca=Statsample::PCA.new(::Matrix.rows(work_matrix))
         

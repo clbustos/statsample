@@ -133,7 +133,7 @@ module Statsample
       # Order of rows and columns depends on Dataset#fields order
       
       def correlation_matrix(ds)
-        ds.collect_matrix do |row,col|
+        cm=ds.collect_matrix do |row,col|
           if row==col
             1.0
           elsif (ds[row].type!=:scale or ds[col].type!=:scale)
@@ -142,6 +142,9 @@ module Statsample
             pearson(ds[row],ds[col])
           end
         end
+        cm.extend(Statsample::CorrelationMatrix)
+        cm.labels=ds.fields
+        cm
       end
       
       # Retrieves the n valid pairwise.

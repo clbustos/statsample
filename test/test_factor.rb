@@ -1,7 +1,6 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 require 'test/unit'
-require 'matrix_extension'
 class StatsampleFactorTestCase < Test::Unit::TestCase
     def test_pca
       require 'gsl'
