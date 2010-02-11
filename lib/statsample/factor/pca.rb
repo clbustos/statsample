@@ -1,18 +1,29 @@
 module Statsample
 module Factor
+  # Principal Component Analysis of a given covariance or correlation matrix. 
+  # For factorial Analysis, use Statsample::Factor::PrincipalAxis
+  # Reference: SPSS manual
+  #   Use:
+  #   a=[2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2.0, 1.0, 1.5, 1.1].to_scale
+  #   b=[2.4,0.7,2.9,2.2,3.0,2.7,1.6,1.1,1.6,0.9].to_scale
+  #   ds={'a'=>a,'b'=>b}.to_dataset
+  #   cor_matrix=Statsample::Bivariate.correlation_matrix(ds)
+  #   pca=Statsample::Factor::PCA.new(cor_matrix)
+  #   p pca.component_matrix
   class PCA
     attr_accessor :name, :m
     include GetText
     bindtextdomain("statsample")
+    
+    
     def initialize(matrix ,opts=Hash.new)
-      if matrix.is_a? ::Matrix
-        require 'matrix_extension'
+      if matrix.respond_to? :to_gsl
         matrix=matrix.to_gsl
       end
       @name=""
       @matrix=matrix
       @n_variables=@matrix.size1
-      
+      @m=nil
       opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
       }

@@ -16,7 +16,7 @@ module Multiple
 #   lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y')
 
 class RubyEngine < BaseEngine 
-  def initialize(ds,y_var)
+  def initialize(ds,y_var, opts=Hash.new)
     super
     @dy=ds[@y_var]
     @ds_valid=ds.dup_only_valid

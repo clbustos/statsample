@@ -17,105 +17,102 @@ module Multiple
 #   lr=Statsample::Regression::Multiple::GslEngine.new(ds,'y')
 #            
 class GslEngine < BaseEngine
-    def initialize(ds,y_var)
-        @ds=ds.dup_only_valid
-        @ds_valid=@ds
-        @y_var=y_var
-        @dy=@ds[@y_var]
-        @ds_indep=ds.dup(ds.fields-[y_var])
-        # Create a custom matrix
-        columns=[]
-        @fields=[]
-        max_deps = GSL::Matrix.alloc(@ds.cases, @ds.fields.size)
-        constant_col=@ds.fields.size-1
-        for i in 0...@ds.cases
-            max_deps.set(i,constant_col,1)
+  def initialize(ds,y_var, opts=Hash.new)
+    super
+    @ds=ds.dup_only_valid
+    @ds_valid=@ds
+    @dy=@ds[@y_var]
+    @ds_indep=ds.dup(ds.fields-[y_var])
+    # Create a custom matrix
+    columns=[]
+    @fields=[]
+    max_deps = GSL::Matrix.alloc(@ds.cases, @ds.fields.size)
+    constant_col=@ds.fields.size-1
+    for i in 0...@ds.cases
+        max_deps.set(i,constant_col,1)
+    end
+    j=0
+    @ds.fields.each{|f|
+        if f!=@y_var
+            @ds[f].each_index{|i1|
+                max_deps.set(i1,j,@ds[f][i1])
+            }
+            columns.push(@ds[f].to_a)
+            @fields.push(f)
+            j+=1
         end
-        j=0
-        @ds.fields.each{|f|
-            if f!=@y_var
-                @ds[f].each_index{|i1|
-                    max_deps.set(i1,j,@ds[f][i1])
-                }
-                columns.push(@ds[f].to_a)
-                @fields.push(f)
-                j+=1
-            end
-        }
-        @dep_columns=columns.dup
-        @lr_s=nil
-        c, @cov, @chisq, @status = GSL::MultiFit.linear(max_deps, @dy.gsl)
-        @constant=c[constant_col]
-        @coeffs_a=c.to_a.slice(0...constant_col)
-        @coeffs=assign_names(@coeffs_a)
-        c=nil
-    end
+    }
+    @dep_columns=columns.dup
+    @lr_s=nil
+    c, @cov, @chisq, @status = GSL::MultiFit.linear(max_deps, @dy.gsl)
+    @constant=c[constant_col]
+    @coeffs_a=c.to_a.slice(0...constant_col)
+    @coeffs=assign_names(@coeffs_a)
+    c=nil
+  end
     
-    def _dump(i)
-        Marshal.dump({'ds'=>@ds,'y_var'=>@y_var})
+  def _dump(i)
+    Marshal.dump({'ds'=>@ds,'y_var'=>@y_var})
+  end
+  def self._load(data)
+    h=Marshal.load(data)
+    self.new(h['ds'], h['y_var'])
+  end
+  
+  def coeffs
+    @coeffs
+  end
+  # Coefficients using a constant
+  # Based on http://www.xycoon.com/ols1.htm
+  def matrix_resolution
+    mse_p=mse
+    columns=@dep_columns.dup.map {|xi| xi.map{|i| i.to_f}}
+    columns.unshift([1.0]*@ds.cases)
+    y=Matrix.columns([@dy.data.map  {|i| i.to_f}])
+    x=Matrix.columns(columns)
+    xt=x.t
+    matrix=((xt*x)).inverse*xt
+    matrix*y
+  end
+  def r2
+    r**2
+  end
+  def r
+    Bivariate::pearson(@dy, predicted)
+  end  
+  def sst
+    @dy.ss
+  end
+  def constant
+    @constant
+  end
+  def standarized_coeffs
+    l=lr_s
+    l.coeffs
+  end
+  def lr_s
+    if @lr_s.nil?
+        build_standarized
     end
-    def self._load(data)
-        h=Marshal.load(data)
-        self.new(h['ds'], h['y_var'])
-    end
-    
-    def coeffs
-        @coeffs
-    end
-    # Coefficients using a constant
-    # Based on http://www.xycoon.com/ols1.htm
-    def matrix_resolution
-        mse_p=mse
-        columns=@dep_columns.dup.map {|xi| xi.map{|i| i.to_f}}
-        columns.unshift([1.0]*@ds.cases)
-        y=Matrix.columns([@dy.data.map  {|i| i.to_f}])
-        x=Matrix.columns(columns)
-        xt=x.t
-        matrix=((xt*x)).inverse*xt
-        matrix*y
-    end
-    def r2
-        r**2
-    end
-    def r
-        Bivariate::pearson(@dy, predicted)
-    end  
-    def sst
-        @dy.ss
-    end
-    def constant
-        @constant
-    end
-    def standarized_coeffs
-        l=lr_s
-        l.coeffs
-    end
-    def lr_s
-        if @lr_s.nil?
-            build_standarized
-        end
-        @lr_s
-    end
-    def build_standarized
-        @ds_s=@ds.standarize
-        @lr_s=GslEngine.new(@ds_s,@y_var)
-    end
-    def process_s(v)
-        lr_s.process(v)
-    end
-    # ???? Not equal to SPSS output
-    def standarized_residuals
-        res=residuals
-        red_sd=residuals.sds
-        res.collect {|v|
-            v.quo(red_sd)
-        }.to_vector(:scale)
-    end
+    @lr_s
+  end
+  def build_standarized
+    @ds_s=@ds.standarize
+    @lr_s=GslEngine.new(@ds_s,@y_var)
+  end
+  def process_s(v)
+    lr_s.process(v)
+  end
+  # ???? Not equal to SPSS output
+  def standarized_residuals
+    res=residuals
+    red_sd=residuals.sds
+    res.collect {|v|
+        v.quo(red_sd)
+    }.to_vector(:scale)
+  end
 end
 end
 end
 end # for Statsample
 end # for if
-
-        
-

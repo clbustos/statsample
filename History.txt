@@ -1,3 +1,21 @@
+=== 0.6.2 / 2010-02-11
+* New Statsample::Bivariate::Polychoric. For implement: X2 and G2
+* New Statsample::Matrix, for faster development of Contingence Tables and Correlation Matrix
+
+=== 0.6.1 / 2010-02-08
+* Bug fix on DominanceAnalysis summary for Ruby1.9
+* Some extra documentation
+=== 0.6.0 / 2010-02-05
+* New Statsample::Factor module. Include classes for extracting factors (Statsample::Factor::PCA and  Statsample::Factor::PrincipalAxis) and rotate component matrix  ( Statsample::Factor::Rotation subclasses). For now, only orthogonal rotations
+* New Statsample::Dataset.crosstab_with_asignation, Statsample::Dataset.one_to_many
+* New class Statsample::Permutation to produce permutations of a given array
+* New class Statsample::Histogram, with same interface as GSL one 
+* New class Statsample::Test::UMannWhitney, to perform Mann-Whitney's U test. Gives z based and exact calculation of probability
+* Improved support for ReportBuilder
+* Statsample::Codification module reworked
+* Fixed bugs on Dominance Analysis classes
+* Fixed bugs on Statsample::Vector.kurtosis and Statsample::Vector.skew 
+
 === 0.5.1 / 2009-10-06
 
 * New class Statsample::Bivariate::Tetrachoric, for calculation of tetrachoric correlations. See http://www.john-uebersax.com/stat/tetra.htm for information.
@@ -18,6 +36,7 @@
 * Logit tests
 * Bug fix: rescue for requires doesn't specify LoadError
 * Binomial::BaseEngine new methods: coeffs_se, coeffs, constant and constant_se
+
 === 0.4.0 / 2009-09-10
 * New Distribution module, based on statistics2.rb by Shin-ichiro HARA. Replaces all instances of GSL distributions pdf and cdf calculations for native calculation.
 * New Maximum Likehood Estimation for Logit, Probit and Normal Distribution using Von Tessin(2005) algorithm. See MLE class and subclasses for more information.

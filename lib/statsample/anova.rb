@@ -6,8 +6,13 @@ module Statsample
     #   v2=[3,3,4,5,6].to_scale
     #   v3=[5,3,1,5,6].to_scale
     #   anova=Statsample::Anova::OneWay.new([v1,v2,v3])
-    #   puts anova.f
-    #   puts anova.significance
+    #   anova.f
+    #   => 0.0243902439024391
+    #   anova.significance
+    #   => 0.975953044203438
+    #   anova.sst 
+    #   => 32.9333333333333
+    #
     class OneWay
       def initialize(vectors)
         @vectors=vectors

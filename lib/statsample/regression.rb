@@ -8,7 +8,7 @@ require 'statsample/regression/binomial/logit'
 require 'statsample/regression/binomial/probit'
 
 module Statsample
-    # Module for regression procedures 
+    # Module for regression procedures.
     module Regression
     end
 end

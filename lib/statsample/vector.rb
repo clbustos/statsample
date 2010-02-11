@@ -689,18 +689,14 @@ module Statsample
       end
       # Returns a ranked vector.
       def ranked(type=:ordinal)
-          check_type :ordinal
-          i=0
-          r=frequencies.sort.inject({}){|a,v|
-            
-              a[v[0]]=(i+1 + i+v[1]).quo(2)
-              
-              i+=v[1]
-              a
-          }
-          @data.collect {|c|
-              r[c]
-          }.to_vector(type)
+        check_type :ordinal
+        i=0
+        r=frequencies.sort.inject({}){|a,v|
+          a[v[0]]=(i+1 + i+v[1]).quo(2)
+          i+=v[1]
+          a
+        }
+        @data.collect {|c| r[c] }.to_vector(type)
       end
     # Return the median (percentil 50)
     def median
@@ -884,19 +880,19 @@ module Statsample
       # With a fixnum, creates X bins within the range of data
       # With an Array, each value will be a cut point
       def histogram(bins=10)
-          check_type :scale
-          
-          if bins.is_a? Array
-            #h=Statsample::Histogram.new(self, bins)
-            h=GSL::Histogram.alloc(bins)                        
-          else
-            # ugly patch. The upper limit for a bin has the form
-            # x < range
-            #h=Statsample::Histogram.new(self, bins)
-            h=GSL::Histogram.alloc(bins,[@valid_data.min,@valid_data.max+0.0001])
-          end
-          h.increment(@gsl)
-          h
+        check_type :scale
+        
+        if bins.is_a? Array
+          #h=Statsample::Histogram.new(self, bins)
+          h=GSL::Histogram.alloc(bins)                        
+        else
+          # ugly patch. The upper limit for a bin has the form
+          # x < range
+          #h=Statsample::Histogram.new(self, bins)
+          h=GSL::Histogram.alloc(bins,[@valid_data.min,@valid_data.max+0.0001])
+        end
+        h.increment(@gsl)
+        h
       end
       def plot_histogram(bins=10,options="")
           check_type :scale

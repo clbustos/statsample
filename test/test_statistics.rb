@@ -24,13 +24,10 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
   
   end
   def test_chi_square
-    assert_raise TypeError do
-        Statsample::Test.chi_square(1,1)
-    end
     real=Matrix[[95,95],[45,155]]
     expected=Matrix[[68,122],[72,128]]
     assert_nothing_raised do
-        chi=Statsample::Test.chi_square(real,expected)
+      chi=Statsample::Test.chi_square(real,expected)
     end
     chi=Statsample::Test.chi_square(real,expected)
     assert_in_delta(32.53,chi,0.1)

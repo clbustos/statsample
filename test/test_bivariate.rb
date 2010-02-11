@@ -25,6 +25,24 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
       end
     end
   end
+  def test_polychoric
+    # Should be the same results as Tetrachoric for 2x2 matrix
+    
+    matrix=Matrix[[rand(100)+10,rand(100)+10],[rand(100)+10,rand(100)+10]]
+    tetra = Statsample::Bivariate::Tetrachoric.new_with_matrix(matrix)
+    poly  = Statsample::Bivariate::Polychoric.new(matrix)
+    assert_in_delta(tetra.r,poly.r,0.0001)
+    
+    # Example for http://www.john-uebersax.com/stat/tetra.htm#exampl
+    
+    matrix=Matrix[[58,52,1],[26,58,3],[8,12,9]]
+    poly=Statsample::Bivariate::Polychoric.new(matrix)
+    assert_in_delta(0.4199, poly.r, 0.0001)
+    assert_in_delta(-0.2397, poly.threshold_y[0],0.001)
+    assert_in_delta(-0.0276, poly.threshold_x[0],0.001)
+    
+
+  end
   def test_tetrachoric
     a,b,c,d=0,0,0,0
     assert_raise RuntimeError do
@@ -51,8 +69,9 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     tc  = Statsample::Bivariate::Tetrachoric.new(a,b,c,d)
     assert_in_delta(-0.53980,tc.r,0.0001)
     assert_in_delta(0.09940,tc.se,0.0001)
-    assert_in_delta(0.31864,tc.threshold_x,0.0001)
-    assert_in_delta(-0.15731,tc.threshold_y,0.0001)
+    assert_in_delta(-0.15731,tc.threshold_x, 0.0001)
+    assert_in_delta(0.31864,tc.threshold_y, 0.0001)
+
     x=%w{a a a a b b b a b b a a b b}.to_vector
     y=%w{0 0 1 1 0 0 1 1 1 1 0 0 1 1}.to_vector
     # crosstab

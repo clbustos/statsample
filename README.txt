@@ -5,10 +5,11 @@ http://ruby-statsample.rubyforge.org/
 
 == DESCRIPTION:
 
-A suite for your basic and advanced statistics needs. Descriptive statistics, multiple regression, dominance analysis, scale's reliability analysis, bivariate statistics and others procedures.
+A suite for your basic and advanced statistics needs. Descriptive statistics, multiple regression, factorial analysis, dominance analysis, scale's reliability analysis, bivariate statistics and others procedures.
 
 == FEATURES:
 
+* Factorial Analysis. Principal Component Analysis and Principal Axis extraction, with orthogonal rotations (Varimax, Equimax, Quartimax)
 * Multiple Regression. Listwise analysis optimized with use of Alglib library. Pairwise analysis is executed on pure ruby and reports same values as SPSS
 * Dominance Analysis. Based on Budescu and Azen papers, <strong>DominanceAnalysis</strong> class can report dominance analysis for a sample and <strong>DominanceAnalysisBootstrap</strong> can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/]. 
 * Classes for Vector, Datasets (set of Vectors) and Multisets (multiple datasets with same fields and type of vectors), and multiple methods to manipulate them

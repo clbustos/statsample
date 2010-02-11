@@ -27,11 +27,11 @@ module Statsample
     # See http://www.john-uebersax.com/stat/tetra.htm for extensive 
     # documentation about tetrachoric correlation.
     #
-    # This class uses algorithm AS116 from Applied Statistics(1977) 
-    # vol.26, no.3.
-    #
-    # You can see FORTRAN code on http://lib.stat.cmu.edu/apstat/116
+    # This class uses Brown (1977) algorithm. You can see FORTRAN code on http://lib.stat.cmu.edu/apstat/116
     # 
+    # == References:
+    # * Brown, MB. (1977) Algorithm AS 116: the tetrachoric correlation and its standard error. _Applied Statistics, 26_, 343-351.
+    #
     # <b>Usage</b>.
     # With two variables x and y on a crosstab like this:
     # 
@@ -52,8 +52,10 @@ module Statsample
     
     
     class Tetrachoric
-      
+      include GetText
+      bindtextdomain("statsample")
       attr_reader :r
+      attr_accessor :name
       
       TWOPI=Math::PI*2
       SQT2PI= 2.50662827
@@ -67,10 +69,14 @@ module Statsample
       NITER = 25
       X=[0,0.9972638618,  0.9856115115,  0.9647622556, 0.9349060759,  0.8963211558, 0.8493676137, 0.7944837960, 0.7321821187, 0.6630442669, 0.5877157572, 0.5068999089, 0.4213512761, 0.3318686023, 0.2392873623, 0.1444719616, 0.0483076657]
       W=[0, 0.0070186100,  0.0162743947,  0.0253920653, 0.0342738629,  0.0428358980,  0.0509980593, 0.0586840935,  0.0658222228,  0.0723457941, 0.0781938958, 0.0833119242, 0.0876520930, 0.0911738787, 0.0938443991, 0.0956387201, 0.0965400885]
+      # Creates a Tetrachoric object based on a 2x2 Matrix.
+      def self.new_with_matrix(m)
+        Tetrachoric.new(m[0,0], m[0,1], m[1,0],m[1,1])
+      end
       # Creates a Tetrachoric object based on two vectors.
       # The vectors are dichotomized previously.
       def self.new_with_vectors(v1,v2)
-        v1a,v2a=Statsample.only_valid(v1,v2)
+        v1a, v2a=Statsample.only_valid(v1,v2)
         v1a=v1a.dichotomize
         v2a=v2a.dichotomize
         raise "v1 have only 0" if v1a.factors==[0]
@@ -90,17 +96,42 @@ module Statsample
         @sdr
       end
       # Threshold for variable x (rows)
+      # Point on gauss curve under X rater select cases
       def threshold_x
-        @zac
+        @zab
       end
 
       # Threshold for variable y (columns)
+      # Point on gauss curve under Y rater select cases
+
       def threshold_y
-        @zab
+        @zac
+      end
+      def summary
+        rp=ReportBuilder.new()
+        rp.add(self)
+        rp.to_text
+      end
+      
+      def to_reportbuilder(generator)
+        section=ReportBuilder::Section.new(:name=>@name)
+        t=ReportBuilder::Table.new(:name=>_("Contingence Table"),:header=>["","Y=0","Y=1", "T"])
+        t.add_row(["X=0", @a,@b,@a+@b])
+        t.add_row(["X=1", @c,@d,@c+@d])
+        t.add_hr
+        t.add_row(["T", @a+@c,@b+@d,@a+@b+@c+@d])
+        section.add(t)
+        #generator.parse_element(t)
+        section.add(sprintf("r: %0.3f",r))
+        section.add(_("SE: %0.3f") % se)
+        section.add(_("Threshold X: %0.3f ") % [threshold_x] )
+        section.add(_("Threshold Y: %0.3f ") % [threshold_y] )
+        generator.parse_element(section)
       end
       
       def initialize(a,b,c,d)
         @a,@b,@c,@d=a,b,c,d
+        @name=_("Tetrachoric correlation")
         #
         #       CHECK IF ANY CELL FREQUENCY IS NEGATIVE
         #
@@ -396,6 +427,7 @@ module Statsample
         pdf = Math::exp(-0.5 * (@zac ** 2 - 2 * @r * @zac * @zab + @zab ** 2)  / rrsq ** 2) / (TWOPI * rrsq)
         @pac = Distribution::Normal.cdf((@zac - @r * @zab) / rrsq) - 0.5
         @pab = Distribution::Normal.cdf((@zab - @r * @zac) / rrsq) - 0.5
+        
         @sdr = ((@aa+@dd) * (@bb + @cc)).quo(4) + @pab ** 2 * (@aa + @cc) * (@bb + @dd) + @pac ** 2 * (@aa + @bb) * (@cc + @dd) + 2.0 * @pab * @pac * (@aa * @dd - @bb * @cc) - @pab * (@aa * @bb - @cc * @dd) - @pac * (@aa * @cc - @bb * @dd)
         @sdr=0 if (@sdr<0)
         @sdr= Math::sqrt(@sdr) / (@tot * pdf * Math::sqrt(@tot))

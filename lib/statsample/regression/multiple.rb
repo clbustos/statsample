@@ -1,18 +1,46 @@
 require 'statsample/regression/multiple/baseengine'
 module Statsample
   module Regression
-    # Module for Linear Multiple Regression Analysis
-    # You can call Regression::Multiple.listwise or Regression::Multiple.pairwise or instance directly the engines
-    # Example.
+    # Module for Linear Multiple Regression Analysis.
+    # 
+    # You can call Statsample::Regression::Multiple.listwise,  Statsample::Regression::Multiple.pairwise or instance directly the engines.
+    # 
+    #  Use:.
     #
     #  require 'statsample'
-    #  @a=[1,3,2,4,3,5,4,6,5,7].to_vector(:scale)
-    #  @b=[3,3,4,4,5,5,6,6,4,4].to_vector(:scale)
-    #  @c=[11,22,30,40,50,65,78,79,99,100].to_vector(:scale)
-    #  @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
-    #  ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
-    #  lr=Statsample::Regression::Multiple.listwise(ds,'y')        
-    #  #<Statsample::Regression::Multiple::AlglibEngine:0x7f21912e4758 @ds_valid=#<Statsample::Dataset:69891073182680 @fields=[a,b,c,y] labels={"a"=>nil, "b"=>nil, "y"=>nil, "c"=>nil} cases=10, @lr=#<Alglib::LinearRegression:0x7f21912df118 @model=#<Alglib_ext::LinearModel:0x7f21912df708>, @ivars=3, @cases=10, @report=#<Alglib_ext::LrReport:0x7f21912df168>>, @y_var="y", @ds=#<Statsample::Dataset:69891073182680 @fields=[a,b,c,y] labels={"a"=>nil, "b"=>nil, "y"=>nil, "c"=>nil} cases=10, @fields=["a", "b", "c"], @lr_s=nil, @dep_columns=[[1, 3, 2, 4, 3, 5, 4, 6, 5, 7], [3, 3, 4, 4, 5, 5, 6, 6, 4, 4], [11, 22, 30, 40, 50, 65, 78, 79, 99, 100]], @ds_indep=#<Statsample::Dataset:69891073180060 @fields=[a,b,c] labels={"a"=>nil, "b"=>nil, "c"=>nil} cases=10, @dy=Vector(type:scale, n:10)[3,4,5,6,7,8,9,10,20,30]>
+    #  a=1000.times.collect {rand}.to_scale
+    #  b=1000.times.collect {rand}.to_scale
+    #  c=1000.times.collect {rand}.to_scale
+    #  ds={'a'=>a,'b'=>b,'c'=>c}.to_dataset
+    #  ds['y']=ds.collect{|row| row['a']*5+row['b']*3+row['c']*2+rand()}
+    #  lr=Statsample::Regression::Multiple.listwise(ds,'y')
+    #  puts lr.summary
+    #  Summary for regression of a,b,c over y
+    #  *************************************************************
+    #  Engine: Statsample::Regression::Multiple::AlglibEngine
+    #  Cases(listwise)=1000(1000)
+    #  r=0.986
+    #  r2=0.973
+    #  Equation=0.504+5.011a + 2.995b + 1.988c
+    #  ----------------------------
+    #  ANOVA TABLE
+    #  --------------------------------------------------------------
+    #  |  source     | ss       | df  | ms      | f         | s     |
+    #  --------------------------------------------------------------
+    #  |  Regression | 2979.321 | 3   | 993.107 | 12040.067 | 0.000 |
+    #  |  Error      | 82.154   | 996 | 0.082   |           |       |
+    #  |  Total      | 3061.475 | 999 |         |           |       |
+    #  --------------------------------------------------------------
+    #  Beta coefficientes
+    #  -----------------------------------------------
+    #  |  coeff    | b     | beta  | se    | t       |
+    #  -----------------------------------------------
+    #  |  Constant | 0.504 | -     | 0.030 | 16.968  |
+    #  |  a        | 5.011 | 0.832 | 0.031 | 159.486 |
+    #  |  b        | 2.995 | 0.492 | 0.032 | 94.367  |
+    #  |  c        | 1.988 | 0.323 | 0.032 | 62.132  |
+    #  -----------------------------------------------
+    # 
     module Multiple
         # Creates an object for listwise regression. 
         # Alglib is faster, so is prefered over GSL

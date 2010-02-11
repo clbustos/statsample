@@ -1,12 +1,12 @@
 module Statsample
   module Test
     #
-    # = U Mann-Whitney test =
+    # = U Mann-Whitney test
     #
     # Non-parametric test for assessing whether two independent samples
     # of observations come from the same distribution.
     # 
-    # == Assumptions ==
+    # == Assumptions
     #
     # * The two samples under investigation in the test are independent of each other and the observations within each sample are independent.
     # * The observations are comparable (i.e., for any two observations, one can assess whether they are equal or, if not, which one is greater).
@@ -18,12 +18,15 @@ module Statsample
     class UMannWhitney
       # Max for m*n allowed for exact calculation of probability
       MAX_MN_EXACT=10000
-      # Exact probability based on Dinneen & Blakesley (1973) algorithm
+      
+      # U sampling distribution, based on Dinneen & Blakesley (1973) algorithm.
       # This is the algorithm used on SPSS
-      #
-      #  Reference: Dinneen, L., & Blakesley, B. (1973). Algorithm AS 62: A Generator for the Sampling Distribution of the Mann- Whitney U Statistic. Journal of the Royal Statistical Society, 22(2), 269-273
+      # Parameters:
+      # * n1: group 1 size
+      # * n2: group 2 size 
+      # Reference: Dinneen, L., & Blakesley, B. (1973). Algorithm AS 62: A Generator for the Sampling Distribution of the Mann- Whitney U Statistic. Journal of the Royal Statistical Society, 22(2), 269-273
       # 
-      def self.exact_probability_distribution_as62(n1,n2)
+      def self.u_sampling_distribution_as62(n1,n2)
 
         freq=[]
         work=[]
@@ -67,7 +70,8 @@ module Statsample
         }
       end
       
-      # Generate distribution for permutations
+      # Generate distribution for permutations. 
+      # Very expensive, but useful for demostrations
       
       def self.distribution_permutations(n1,n2)
         base=[0]*n1+[1]*n2
@@ -90,7 +94,18 @@ module Statsample
         end
         req
       end
-      attr_reader :r1, :r2, :u1, :u2, :u, :t
+      # Sample 1 Rank sum
+      attr_reader :r1
+      # Sample 2 Rank sum
+      attr_reader :r2
+      # Sample 1 U
+      attr_reader :u1
+      # Sample 2 U
+      attr_reader :u2
+      # U Value
+      attr_reader :u
+      # Compensation for ties
+      attr_reader :t
       def initialize(v1,v2)
         @n1=v1.valid_data.size
         @n2=v2.valid_data.size
@@ -126,11 +141,10 @@ Z: #{sprintf("%0.3f",z)} (p: #{sprintf("%0.3f",z_probability)})
         end
           out
       end
-      # Exact probability of finding values of U lower or equal
-      # to sample on U distribution.
-      # Use with caution with m*n>100000
+      # Exact probability of finding values of U lower or equal to sample on U distribution. Use with caution with m*n>100000
+      # Reference: Dinneen & Blakesley (1973)
       def exact_probability
-        dist=UMannWhitney.exact_probability_distribution_as62(@n1,@n2)
+        dist=UMannWhitney.u_sampling_distribution_as62(@n1,@n2)
         sum=0
         (0..@u.to_i).each {|i|
           sum+=dist[i]
@@ -161,7 +175,7 @@ Z: #{sprintf("%0.3f",z)} (p: #{sprintf("%0.3f",z_probability)})
       end
       # Assuming H_0, the proportion of cdf with values of U lower
       # than the sample. 
-      # Use with more than 30 cases per group
+      # Use with more than 30 cases per group.
       def z_probability
         (1-Distribution::Normal.cdf(z.abs()))*2
       end

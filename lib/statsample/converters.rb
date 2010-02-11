@@ -76,6 +76,17 @@ module Statsample
   class SpreadsheetBase
     class << self
       def extract_fields(row)
+=begin
+        fields=[]
+        row.to_a.collect {|c|
+          if c.nil?
+            break
+          else
+            fields.push(c)
+          end
+        }
+=end
+raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all {|c| c.nil?}.count>0
         fields=row.to_a.collect{|c| c.downcase}
         fields.recode_repeated
       end

@@ -10,7 +10,7 @@ module Statsample
       #   lr=Statsample::Regression::Binomial.logit(dataset,y)
       #   
       def self.logit(ds,y_var)
-          Logit.new(ds,y_var)                
+        Logit.new(ds,y_var)                
       end
       # Create a Probit model object.
       # ds:: Dataset
@@ -22,7 +22,7 @@ module Statsample
       #   
       
       def self.probit(ds,y_var)
-          Probit.new(ds,y_var)                
+        Probit.new(ds,y_var)                
       end
       # Base Engine for binomial regression analysis.
       # See Statsample::Regression::Binomial.logit() and
@@ -63,9 +63,11 @@ module Statsample
         out.delete("_constant")
         out
       end
+      # Constant value
       def constant
         @coeffs['_constant']
       end
+      # Regression coefficients
       def coeffs
         c=@coeffs.dup
         c.delete("_constant")
@@ -78,13 +80,12 @@ module Statsample
       end
       def assign_names(c)
         a={}
-        @fields.each_index {|i|
-            a[@fields[i]]=c[i]
-        }
+        @fields.each_index do |i|
+          a[@fields[i]]=c[i]
+        end
         a
       end
       end # Base Engine
-      
     end # Dichotomic
   end # Regression
 end # Stasample

@@ -1,5 +1,20 @@
 module Statsample
 module Factor
+  # Base class for rotate matrixes
+  # References: 
+  # * SPSS Manual
+  # * Johnny Lin code for IDL: http://www.johnny-lin.com/idl_code/varimax_k58.pro
+  # Use Varimax, Equimax or Quartimax for desired type of rotation
+  #   Use:
+  #   a = Matrix[ [ 0.4320,  0.8129,  0.3872] 
+  #     , [ 0.7950, -0.5416,  0.2565]  
+  #     , [ 0.5944,  0.7234, -0.3441]  
+  #     , [ 0.8945, -0.3921, -0.1863] ]
+  #   rotation = Statsample::Factor::Varimax(a)
+  #   rotation.iterate
+  #   p rotation.rotated
+  #   p rotation.component_transformation_matrix
+  # 
   class Rotation
     MAX_PRECISION=1e-15
     attr_reader :iterations, :rotated, :component_transformation_matrix, :h2
@@ -8,14 +23,15 @@ module Factor
       @n=@matrix.row_size # Variables, p on original
       @m=@matrix.column_size # Factors, r on original
       @component_transformation_matrix=nil
-      @h2=(@matrix.collect {|c| c**2} * Matrix.rows([[1]]*@m)).column(0).to_a
+      @h2=(@matrix.collect {|c| c**2} * Matrix.column_vector([1]*@m)).column(0).to_a
     end
     alias_method :communalities, :h2
     alias_method :rotated_component_matrix, :rotated
+    # Start iteration of 
     def iterate(max_i=25)
       t=Matrix.identity(@m)
       b=@matrix.dup
-      h=Matrix.diagonal(*((@matrix.collect {|c| c**2} * Matrix.rows([[1]]*@m)).column(0).to_a)).collect {|c| Math::sqrt(c)}
+      h=Matrix.diagonal(*@h2).collect {|c| Math::sqrt(c)}
       h_inverse=h.collect {|c| c!=0 ? 1/c : 0 }
       bh=h_inverse*b
       @not_converged=true

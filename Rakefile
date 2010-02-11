@@ -26,13 +26,12 @@ rdoc.title="Statsample documentation"
 end
 desc "Ruby Lint"
 task :lint do
-    executable=Config::CONFIG['RUBY_INSTALL_NAME']
-    Dir.glob("lib/**/*.rb") {|f|
-        
-        if !system %{#{executable} -cw -W2 "#{f}"} 
-            puts "Error on: #{f}"
-        end
-    }
+  executable=Config::CONFIG['RUBY_INSTALL_NAME']
+  Dir.glob("lib/**/*.rb") {|f|
+    if !system %{#{executable} -cw -W2 "#{f}"} 
+        puts "Error on: #{f}"
+    end
+  }
 end
 
 
@@ -53,7 +52,7 @@ Hoe.spec('statsample') do
 	self.version=Statsample::VERSION
 	self.rubyforge_name = "ruby-statsample"
 	self.developer('Claudio Bustos', 'clbustos@gmail.com')
-	self.extra_deps << ["spreadsheet","=0.6.4"] << ["svg-graph", ">=1.0.0"]
+	self.extra_deps << ["spreadsheet","=0.6.4"] << ["svg-graph", ">=1.0.0"] << ["reportbuilder", ">=0.2.0"]
 	self.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"
 	#  p.rdoc_pattern = /^(lib|bin|ext\/distributions)|txt$/
 	self.local_rdoc_dir="doc2"

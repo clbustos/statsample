@@ -17,29 +17,29 @@ module Multiple
 #   lr=Statsample::Regression::Multiple::AlglibEngine.new(ds,'y')
 #            
 class AlglibEngine < BaseEngine
-    def initialize(ds,y_var)
-        @ds=ds.dup_only_valid
-        @ds_valid=@ds
-        @y_var=y_var
-        @dy=@ds[@y_var]
-        @ds_indep=ds.dup(ds.fields-[y_var])
-        # Create a custom matrix
-        columns=[]
-        @fields=[]
-        @ds.fields.each{|f|
-            if f!=@y_var
-                columns.push(@ds[f].to_a)
-                @fields.push(f)
-            end
-        }
-        @dep_columns=columns.dup
-        columns.push(@ds[@y_var])
-        matrix=Matrix.columns(columns)
-        @lr_s=nil
-        @lr=::Alglib::LinearRegression.build_from_matrix(matrix)
-        @coeffs=assign_names(@lr.coeffs)
-        
-    end
+  def initialize(ds,y_var, opts=Hash.new)
+    super    
+    @ds=ds.dup_only_valid
+    @ds_valid=@ds
+    @dy=@ds[@y_var]
+    @ds_indep=ds.dup(ds.fields-[y_var])
+    # Create a custom matrix
+    columns=[]
+    @fields=[]
+    @ds.fields.each{|f|
+        if f!=@y_var
+            columns.push(@ds[f].to_a)
+            @fields.push(f)
+        end
+    }
+    @dep_columns=columns.dup
+    columns.push(@ds[@y_var])
+    matrix=Matrix.columns(columns)
+    @lr_s=nil
+    @lr=::Alglib::LinearRegression.build_from_matrix(matrix)
+    @coeffs=assign_names(@lr.coeffs)
+    
+  end
     
     def _dump(i)
         Marshal.dump({'ds'=>@ds,'y_var'=>@y_var})

@@ -1,11 +1,11 @@
 module Statsample
-  # module for several statistical tests 
+  # Module for several statistical tests
+  
   module Test
     autoload(:UMannWhitney, 'statsample/test/umannwhitney')
     # Calculate chi square for two Matrix
     class << self
       def chi_square(real,expected)
-        raise TypeError, "Both argument should be Matrix" unless real.is_a? Matrix and expected.is_a?Matrix
         sum=0
         (0...real.row_size).each {|row_i|
           (0...real.column_size).each {|col_i|

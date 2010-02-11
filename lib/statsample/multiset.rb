@@ -263,7 +263,7 @@ module Statsample
                 s_size=@strata_sizes[s_name]
                 (s_size**2 * (1-(nh/s_size)) * prop * (1-prop) / (nh -1 ))
             }
-            (1/@population_size.to_f) * Math::sqrt(sum)
+            (1.quo(@population_size)) * Math::sqrt(sum)
         end
         # Cochran(1971), p. 150 
         def variance_pst(field,v=1)

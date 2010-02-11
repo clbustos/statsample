@@ -57,188 +57,182 @@ module Statsample
           cn.collect{|col| f[[row,col]]}
       })
     end
-      def frequencies_by_row
-          f=frequencies
-          rows_names.inject({}){|sr,row|
-              sr[row]=cols_names.inject({}) {|sc,col|
-                  sc[col]=f[[row,col]]
-                  sc
-              }
-              sr
+    def frequencies_by_row
+    f=frequencies
+    rows_names.inject({}){|sr,row|
+      sr[row]=cols_names.inject({}) {|sc,col| sc[col]=f[[row,col]]; sc}
+      sr
+    }
+    end
+    def frequencies_by_col
+      f=frequencies
+      cols_names.inject({}){|sc,col| 
+        sc[col]=rows_names.inject({}) {|sr,row| sr[row]=f[[row,col]]; sr}
+        sc
+      }
+    end
+    # Chi square, based on expected and real matrix
+    def chi_square
+        require 'statsample/test'
+        Statsample::Test.chi_square(self.to_matrix, matrix_expected)
+    end
+    # Useful to obtain chi square
+    def matrix_expected
+      rn=rows_names
+      cn=cols_names
+      rt=rows_total
+      ct=cols_total
+      t=@v_rows.size
+      m=rn.collect{|row|
+        cn.collect{|col|
+          (rt[row]*ct[col]).quo(t) 
           }
-      end
-      def frequencies_by_col
-          f=frequencies
-          cols_names.inject({}){|sc,col|
-              sc[col]=rows_names.inject({}) {|sr,row|
-                  sr[row]=f[[row,col]]
-                  sr
-              }
-              sc
-          }
-      end
-      # Chi square, based on expected and real matrix
-      def chi_square
-          require 'statsample/test'
-          Statsample::Test.chi_square(self.to_matrix, matrix_expected)
-      end
-      # Useful to obtain chi square
-      def matrix_expected
-          rn=rows_names
-          cn=cols_names
-          rt=rows_total
-          ct=cols_total
-          t=@v_rows.size.to_f
-          m=rn.collect{|row|
-              cn.collect{|col|
-                  (rt[row]*ct[col]) / t 
-              }
-          }
-          Matrix.rows(m)
-      end
-      def cols_empty_hash
-        cols_names.inject({}) {|a,x| a[x]=0;a}
-      end
-      def to_reportbuilder(generator)
-        anchor=generator.add_toc_entry(_("Crosstab: ")+name)
-        generator.add_html "<div class='crosstab'>"+_("Crosstab")+" #{@name}<a name='#{anchor}'></a>"
-        fq=frequencies
-        rn=rows_names
-        cn=cols_names
-        total=0
-        total_cols=cols_empty_hash
-        generator.add_text "Chi Square: #{chi_square}"
-        generator.add_text(_("Rows: %s") % @row_label) unless @row_label.nil?
-        generator.add_text(_("Columns: %s") % @column_label) unless @column_label.nil?
-        
-        t=ReportBuilder::Table.new(:name=>@name+" - "+_("Raw"), :header=>[""]+cols_names.collect {|c| @v_cols.labeling(c)}+[_("Total")])
-        rn.each{|row|
-            total_row=0
-            t_row=[@v_rows.labeling(row)]
-            cn.each{|col|
-                data=fq[[row,col]]
-                total_row+=fq[[row,col]]
-                total+=fq[[row,col]]                    
-                total_cols[col]+=fq[[row,col]]                    
-                t_row.push(data)
-            }
-            t_row.push(total_row)
-            t.add_row(t_row)
-        }
-        t.add_horizontal_line
-        t_row=[_("Total")]
-        cn.each{|v|
-            t_row.push(total_cols[v])
-        }
-        t_row.push(total)
+      }
+      Matrix.rows(m)
+    end
+    def cols_empty_hash
+      cols_names.inject({}) {|a,x| a[x]=0;a}
+    end
+    def to_reportbuilder(generator)
+      anchor=generator.add_toc_entry(_("Crosstab: ")+name)
+      generator.add_html "<div class='crosstab'>"+_("Crosstab")+" #{@name}<a name='#{anchor}'></a>"
+      fq=frequencies
+      rn=rows_names
+      cn=cols_names
+      total=0
+      total_cols=cols_empty_hash
+      generator.add_text "Chi Square: #{chi_square}"
+      generator.add_text(_("Rows: %s") % @row_label) unless @row_label.nil?
+      generator.add_text(_("Columns: %s") % @column_label) unless @column_label.nil?
+      
+      t=ReportBuilder::Table.new(:name=>@name+" - "+_("Raw"), :header=>[""]+cols_names.collect {|c| @v_cols.labeling(c)}+[_("Total")])
+      rn.each do |row|
+        total_row=0
+        t_row=[@v_rows.labeling(row)]
+        cn.each do |col|
+          data=fq[[row,col]]
+          total_row+=fq[[row,col]]
+          total+=fq[[row,col]]                    
+          total_cols[col]+=fq[[row,col]]                    
+          t_row.push(data)
+        end
+        t_row.push(total_row)
         t.add_row(t_row)
-        generator.parse_element(t)
-        
-        if(@percentage_row)
-          table_percentage(generator,:row)
-        end
-        if(@percentage_column)
-        table_percentage(generator,:column)
-        end
-        if(@percentage_total)
-        table_percentage(generator,:total)
-        end
-        
-        generator.add_html("</div>")
+      end
+      t.add_horizontal_line
+      t_row=[_("Total")]
+      cn.each do |v|
+        t_row.push(total_cols[v])
+      end
+      t_row.push(total)
+      t.add_row(t_row)
+      generator.parse_element(t)
+      
+      if(@percentage_row)
+        table_percentage(generator,:row)
+      end
+      if(@percentage_column)
+      table_percentage(generator,:column)
+      end
+      if(@percentage_total)
+      table_percentage(generator,:total)
       end
       
+      generator.add_html("</div>")
+    end
       
     
-      def table_percentage(generator,type)
-        fq=frequencies
-        cn=cols_names
-        rn=rows_names
-        rt=rows_total
-        ct=cols_total
-        
-        type_name=case type
-          when :row     then  _("% Row")
-          when :column  then  _("% Column")
-          when :total   then  _("% Total")
-        end
-        
-        t=ReportBuilder::Table.new(:name=>@name+" - "+_(type_name), :header=>[""]+cols_names.collect {|c| @v_cols.labeling(c) } + [_("Total")])
-          rn.each do |row|
-            t_row=[@v_rows.labeling(row)]
-            cn.each do |col|
-              total=case type
-                when :row     then  rt[row]
-                when :column  then  ct[col]
-                when :total   then  @cases
-              end
-              data = sprintf("%0.2f%%", fq[[row,col]]*100.0/ total )
-              t_row.push(data)
-            end
+  
+    def table_percentage(generator,type)
+      fq=frequencies
+      cn=cols_names
+      rn=rows_names
+      rt=rows_total
+      ct=cols_total
+      
+      type_name=case type
+        when :row     then  _("% Row")
+        when :column  then  _("% Column")
+        when :total   then  _("% Total")
+      end
+      
+      t=ReportBuilder::Table.new(:name=>@name+" - "+_(type_name), :header=>[""]+cols_names.collect {|c| @v_cols.labeling(c) } + [_("Total")])
+        rn.each do |row|
+          t_row=[@v_rows.labeling(row)]
+          cn.each do |col|
             total=case type
               when :row     then  rt[row]
-              when :column  then  @cases
-              when :total   then  @cases
-            end              
-            t_row.push(sprintf("%0.2f%%", rt[row]*100.0/total))
-            t.add_row(t_row)
-          end
-          
-          t.add_horizontal_line
-          t_row=[_("Total")]
-          cn.each{|col|
-            total=case type
-              when :row     then  @cases
               when :column  then  ct[col]
               when :total   then  @cases
             end
-            t_row.push(sprintf("%0.2f%%", ct[col]*100.0/total))
-          }
-        t_row.push("100%")
-        t.add_row(t_row)
-        generator.parse_element(t)
-      end
+            data = sprintf("%0.2f%%", fq[[row,col]]*100.0/ total )
+            t_row.push(data)
+          end
+          total=case type
+            when :row     then  rt[row]
+            when :column  then  @cases
+            when :total   then  @cases
+          end              
+          t_row.push(sprintf("%0.2f%%", rt[row]*100.0/total))
+          t.add_row(t_row)
+        end
+        
+        t.add_horizontal_line
+        t_row=[_("Total")]
+        cn.each{|col|
+          total=case type
+            when :row     then  @cases
+            when :column  then  ct[col]
+            when :total   then  @cases
+          end
+          t_row.push(sprintf("%0.2f%%", ct[col]*100.0/total))
+        }
+      t_row.push("100%")
+      t.add_row(t_row)
+      generator.parse_element(t)
+    end
+  
+  
     
-    
+    def to_s
+      fq=frequencies
+      rn=rows_names
+      cn=cols_names
+      total=0
+      total_cols=cols_empty_hash
+      max_row_size = rn.inject(0) {|s,x| sl=@v_rows.labeling(x).size; sl>s ? sl : s}
       
-      def to_s
-        fq=frequencies
-        rn=rows_names
-        cn=cols_names
-        total=0
-        total_cols=cols_empty_hash
-        max_row_size = rn.inject(0) {|s,x| sl=@v_rows.labeling(x).size; sl>s ? sl : s}
-        
-        max_row_size=max_row_size<6 ? 6 : max_row_size
-        
-        max_col_size = cn.inject(0) {|s,x| sl=@v_cols.labeling(x).size; sl>s ? sl : s}
-        max_col_size = frequencies.inject(max_col_size) {|s,x| x[1].to_s.size>s ? x[1].to_s.size : s}
-        
-        out=""
-        out << " " * (max_row_size+2) << "|" << cn.collect{|c| name=@v_cols.labeling(c); " "+name+(" "*(max_col_size-name.size))+" "}.join("|") << "| Total\n"
-        linea="-" * (max_row_size+2) << "|" << ("-"*(max_col_size+2) +"|")*cn.size << "-"*7 << "\n"
-        out << linea
-        rn.each{|row|
-            total_row=0;
-            name=@v_rows.labeling(row)
-            out << " " +name  << " "*(max_row_size-name.size) << " | "
-            cn.each{|col|
-                data=fq[[row,col]].to_s
-                total_row+=fq[[row,col]]
-                total+=fq[[row,col]]                    
-                total_cols[col]+=fq[[row,col]]                    
-                out << " " << data << " "*(max_col_size-data.size) << "| "
-            }
-            out << " " << total_row.to_s
-        out << "\n"
-        }
-        out << linea
-        out << " Total " << " "*(max_row_size-5) << "| "
-        cn.each{|v|
-            data=total_cols[v].to_s
-            out << " " << data << " "*(max_col_size-data.size) << "| "
-        }
-        out << " " << total.to_s
-        out
-      end
+      max_row_size=max_row_size<6 ? 6 : max_row_size
+      
+      max_col_size = cn.inject(0) {|s,x| sl=@v_cols.labeling(x).size; sl>s ? sl : s}
+      max_col_size = frequencies.inject(max_col_size) {|s,x| x[1].to_s.size>s ? x[1].to_s.size : s}
+      
+      out=""
+      out << " " * (max_row_size+2) << "|" << cn.collect{|c| name=@v_cols.labeling(c); " "+name+(" "*(max_col_size-name.size))+" "}.join("|") << "| Total\n"
+      linea="-" * (max_row_size+2) << "|" << ("-"*(max_col_size+2) +"|")*cn.size << "-"*7 << "\n"
+      out << linea
+      rn.each{|row|
+          total_row=0;
+          name=@v_rows.labeling(row)
+          out << " " +name  << " "*(max_row_size-name.size) << " | "
+          cn.each{|col|
+              data=fq[[row,col]].to_s
+              total_row+=fq[[row,col]]
+              total+=fq[[row,col]]                    
+              total_cols[col]+=fq[[row,col]]                    
+              out << " " << data << " "*(max_col_size-data.size) << "| "
+          }
+          out << " " << total_row.to_s
+      out << "\n"
+      }
+      out << linea
+      out << " Total " << " "*(max_row_size-5) << "| "
+      cn.each{|v|
+          data=total_cols[v].to_s
+          out << " " << data << " "*(max_col_size-data.size) << "| "
+      }
+      out << " " << total.to_s
+      out
+    end
   end
 end

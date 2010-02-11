@@ -1,4 +1,5 @@
 require 'statsample/bivariate/tetrachoric'
+require 'statsample/bivariate/polychoric'
 module Statsample
   # Diverse correlation methods 
   module Bivariate
@@ -13,6 +14,7 @@ module Statsample
           covariance_slow(v1a,v2a)
         end
       end
+      # Estimate the ML between two dichotomic vectors
       def maximum_likehood_dichotomic(pred,real)
         preda,reala=Statsample.only_valid(pred,real)                
         sum=0
@@ -166,6 +168,7 @@ module Statsample
         end
         Matrix.rows(rows)
       end
+      
       # Spearman ranked correlation coefficient between 2 vectors
       def spearman(v1,v2)
         v1a,v2a=Statsample.only_valid(v1,v2)
@@ -222,16 +225,16 @@ module Statsample
         rs=matrix.row_size
         cs=matrix.column_size
         conc=disc=ties_x=ties_y=0
-        (0...(rs-1)).each {|x|
-          (0...(cs-1)).each{|y|
-            ((x+1)...rs).each{|x2|
-              ((y+1)...cs).each{|y2|
+        (0...(rs-1)).each do |x|
+          (0...(cs-1)).each do |y|
+            ((x+1)...rs).each do |x2|
+              ((y+1)...cs).each do |y2|
                 # #p sprintf("%d:%d,%d:%d",x,y,x2,y2)
                 conc+=matrix[x,y]*matrix[x2,y2]
-              }
-            }
-          }
-        }
+              end
+            end
+          end
+        end
         (0...(rs-1)).each {|x|
           (1...(cs)).each{|y|
             ((x+1)...rs).each{|x2|

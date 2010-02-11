@@ -50,7 +50,7 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
             assert_in_delta(residuals[i],c_residuals[i],0.001)
         }
 	else
-		puts "Regression::Multiple::AlglibEngine not tested (no Alglib)"
+		puts "Regression::Multiple::GslEngine not tested (no Gsl)"
 	end
     end
 

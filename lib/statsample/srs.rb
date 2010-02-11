@@ -56,7 +56,7 @@ module Statsample
         
         def proportion_confidence_interval(p, sam,pop , x)
             f=sam.quo(pop)
-            one_range=x * Math::sqrt((qf(sam, pop) * p * (1-p)).quo (sam-1)) + (1.quo(sam * 2.0))
+            one_range=x * Math::sqrt((qf(sam, pop) * p * (1-p)).quo(sam-1)) + (1.quo(sam * 2.0))
             [p-one_range, p+one_range]
         end
         # Standard deviation for sample distribution of a proportion
