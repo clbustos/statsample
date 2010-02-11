@@ -1,6 +1,6 @@
 === 0.6.2 / 2010-02-11
 * New Statsample::Bivariate::Polychoric. For implement: X2 and G2
-* New Statsample::Matrix, for faster development of Contingence Tables and Correlation Matrix
+* New matrix.rb, for faster development of Contingence Tables and Correlation Matrix
 
 === 0.6.1 / 2010-02-08
 * Bug fix on DominanceAnalysis summary for Ruby1.9
