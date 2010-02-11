@@ -47,7 +47,6 @@ lib/statsample/graph/svggraph.rb
 lib/statsample/graph/svghistogram.rb
 lib/statsample/graph/svgscatterplot.rb
 lib/statsample/histogram.rb
-lib/statsample/htmlreport.rb
 lib/statsample/matrix.rb
 lib/statsample/mle.rb
 lib/statsample/mle/logit.rb

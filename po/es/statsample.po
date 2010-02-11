@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: statsample 0.3.3\n"
-"POT-Creation-Date: 2009-08-10 11:59-0400\n"
-"PO-Revision-Date: 2009-08-04 15:57-0300\n"
+"Project-Id-Version: statsample 0.6.2\n"
+"POT-Creation-Date: 2010-02-11 18:44-0300\n"
+"PO-Revision-Date: 2010-02-11 18:48-0300\n"
 "Last-Translator: Claudio Bustos <clbustos@gmail.com>\n"
 "Language-Team: Desarrollador\n"
 "MIME-Version: 1.0\n"
@@ -11,98 +11,260 @@ msgstr ""
 "X-Poedit-Language: Spanish\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:32
+#: lib/statsample/regression/multiple/baseengine.rb:14
+msgid "Multiple Regression:  %s over %s"
+msgstr "Regresión Múltiple: %s sobre %s"
+
+#: lib/statsample/regression/multiple/baseengine.rb:150
+msgid "Multiple Regression: "
+msgstr "Regresión Múltiple:"
+
+#: lib/statsample/regression/multiple/baseengine.rb:153
+msgid "Engine: %s"
+msgstr "Motor: %s"
+
+#: lib/statsample/regression/multiple/baseengine.rb:154
+msgid "Cases(listwise)=%d(%d)"
+msgstr "Casos (sólo válidos)=%d(%d)"
+
+#: lib/statsample/regression/multiple/baseengine.rb:158
+msgid "Equation"
+msgstr "Ecuación"
+
+#: lib/statsample/regression/multiple/baseengine.rb:161
+msgid "Regression"
+msgstr "Regresión"
+
+#: lib/statsample/regression/multiple/baseengine.rb:162
+msgid "Error"
+msgstr "Error"
+
+#: lib/statsample/regression/multiple/baseengine.rb:164
+#: lib/statsample/crosstab.rb:108
+#: lib/statsample/crosstab.rb:123
+#: lib/statsample/crosstab.rb:159
+#: lib/statsample/crosstab.rb:181
+#: lib/statsample/dominanceanalysis.rb:281
+msgid "Total"
+msgstr "Total"
+
+#: lib/statsample/regression/multiple/baseengine.rb:170
+msgid "Constant"
+msgstr "Constante"
+
+#: lib/statsample/dominanceanalysis/bootstrap.rb:42
+msgid "Bootstrap dominance Analysis:  %s over %s"
+msgstr "Resultados del Análisis de Dominancia Bootstrap: %s en %s"
+
+#: lib/statsample/dominanceanalysis/bootstrap.rb:65
 msgid "Bootstrap %d of %d"
 msgstr "Bootstrap: %d de %d"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:71
-msgid "Summary for Bootstrap Dominance Analysis of %s on %s\n"
-msgstr "Resultados del Análisis de Dominancia Bootstrap de %s en %s\n"
+#: lib/statsample/dominanceanalysis/bootstrap.rb:106
+msgid "DAB: "
+msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:72
+#: lib/statsample/dominanceanalysis/bootstrap.rb:109
 msgid "Sample size: %d\n"
 msgstr "Tamaño de muestra: %d\n"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:77
+#: lib/statsample/dominanceanalysis/bootstrap.rb:111
+msgid "Linear Regression Engine: %s"
+msgstr "Motor de Regresión Linear: %s"
+
+#: lib/statsample/dominanceanalysis/bootstrap.rb:113
 msgid "pairs"
 msgstr "pares"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:77
+#: lib/statsample/dominanceanalysis/bootstrap.rb:113
 msgid "SE(Dij)"
 msgstr "EE(Dij)"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:77
+#: lib/statsample/dominanceanalysis/bootstrap.rb:113
 msgid "Reproducibility"
 msgstr "Reproducibilidad"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:79
+#: lib/statsample/dominanceanalysis/bootstrap.rb:114
 msgid "Complete dominance"
 msgstr "Dominancia Completa"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:87
+#: lib/statsample/dominanceanalysis/bootstrap.rb:122
 msgid "Conditional dominance"
 msgstr "Dominancia Condicional"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:96
+#: lib/statsample/dominanceanalysis/bootstrap.rb:131
 msgid "General Dominance"
 msgstr "Dominancia General"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:104
+#: lib/statsample/dominanceanalysis/bootstrap.rb:140
 msgid "General averages"
 msgstr "Promedios generales"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:106
+#: lib/statsample/dominanceanalysis/bootstrap.rb:140
 msgid "var"
 msgstr "var"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:106
+#: lib/statsample/dominanceanalysis/bootstrap.rb:140
 msgid "mean"
 msgstr "promedio"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:106
+#: lib/statsample/dominanceanalysis/bootstrap.rb:140
 msgid "se"
 msgstr "de"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:106
+#: lib/statsample/dominanceanalysis/bootstrap.rb:140
 msgid "p.5"
 msgstr "p.5"
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:106
+#: lib/statsample/dominanceanalysis/bootstrap.rb:140
 msgid "p.95"
 msgstr "p.95"
 
-#: lib/statsample/crosstab.rb:93
-msgid "Rows: %s\n"
-msgstr ""
+#: lib/statsample/bivariate/polychoric.rb:560
+#: lib/statsample/bivariate/tetrachoric.rb:118
+msgid "Contingence Table"
+msgstr "Tabla de Contingencia"
 
-#: lib/statsample/crosstab.rb:94
-msgid "Columns: %s\n"
-msgstr ""
+#: lib/statsample/bivariate/polychoric.rb:569
+msgid "Thresholds"
+msgstr "Umbrales"
 
-#: lib/statsample/crosstab.rb:96 lib/statsample/crosstab.rb:111
-msgid "Total"
-msgstr ""
+#: lib/statsample/bivariate/tetrachoric.rb:126
+msgid "SE: %0.3f"
+msgstr "EE: %0.3f"
 
-#: lib/statsample/dominanceanalysis.rb:169
-msgid "Summary for Dominance Analysis of %s on %s\n"
-msgstr "Resultado del Análisis de Dominancia de %s en %s\n"
+#: lib/statsample/bivariate/tetrachoric.rb:127
+msgid "Threshold X: %0.3f "
+msgstr "Umbral X: %0.3f"
 
-#: lib/statsample/dominanceanalysis.rb:172
+#: lib/statsample/bivariate/tetrachoric.rb:128
+msgid "Threshold Y: %0.3f "
+msgstr "Umbral Y:%0.3f"
+
+#: lib/statsample/bivariate/tetrachoric.rb:134
+msgid "Tetrachoric correlation"
+msgstr "Correlación tetracórica"
+
+#: lib/statsample/histogram.rb:92
+msgid "Histogram %s"
+msgstr "Histograma: %s"
+
+#: lib/statsample/factor/pca.rb:99
+msgid "PCA: "
+msgstr "ACP:"
+
+#: lib/statsample/factor/pca.rb:100
+msgid "PCA"
+msgstr "ACP"
+
+#: lib/statsample/factor/pca.rb:103
+#: lib/statsample/factor/principalaxis.rb:106
+msgid "Communalities"
+msgstr "Comunalidades"
+
+#: lib/statsample/factor/pca.rb:109
+#: lib/statsample/factor/principalaxis.rb:112
+msgid "Eigenvalues"
+msgstr "Eigenvalues"
+
+#: lib/statsample/factor/pca.rb:115
+#: lib/statsample/factor/principalaxis.rb:118
+msgid "Component Matrix"
+msgstr "Matriz de componentes"
+
+#: lib/statsample/factor/principalaxis.rb:97
+msgid "Factor Analysis: "
+msgstr "Análisis de Factores:"
+
+#: lib/statsample/factor/principalaxis.rb:98
+msgid "Factor Analysis"
+msgstr "Análisis de Factores"
+
+#: lib/statsample/crosstab.rb:25
+msgid "Crosstab %s - %s"
+msgstr "Tabulación cruzada %s - %s"
+
+#: lib/statsample/crosstab.rb:27
+#: lib/statsample/crosstab.rb:98
+msgid "Crosstab"
+msgstr "Tabulación cruzada"
+
+#: lib/statsample/crosstab.rb:97
+msgid "Crosstab: "
+msgstr "Tabulación cruzada:"
+
+#: lib/statsample/crosstab.rb:105
+msgid "Rows: %s"
+msgstr "Filas: %s"
+
+#: lib/statsample/crosstab.rb:106
+msgid "Columns: %s"
+msgstr "Columnas: %s"
+
+#: lib/statsample/crosstab.rb:108
+msgid "Raw"
+msgstr "En Bruto"
+
+#: lib/statsample/crosstab.rb:154
+msgid "% Row"
+msgstr "% Fila"
+
+#: lib/statsample/crosstab.rb:155
+msgid "% Column"
+msgstr "% Columna"
+
+#: lib/statsample/crosstab.rb:156
+msgid "% Total"
+msgstr "% Total"
+
+#: lib/statsample/dominanceanalysis.rb:79
+msgid "Dominance Analysis:  %s over %s"
+msgstr "Análisis de dominancia: %s en %s"
+
+#: lib/statsample/dominanceanalysis.rb:241
+msgid "DA: "
+msgstr "AD:"
+
+#: lib/statsample/dominanceanalysis.rb:243
+msgid "Dominance Analysis result"
+msgstr "Resultados del análisis de dominancia"
+
+#: lib/statsample/dominanceanalysis.rb:244
+msgid "sign"
+msgstr "signo"
+
+#: lib/statsample/dominanceanalysis.rb:245
 msgid "Model 0"
 msgstr "Modelo 0"
 
-#: lib/statsample/dominanceanalysis.rb:186
+#: lib/statsample/dominanceanalysis.rb:259
 msgid "k=%d Average"
 msgstr "k=%d Promedio"
 
-#: lib/statsample/dominanceanalysis.rb:199
+#: lib/statsample/dominanceanalysis.rb:272
 msgid "Overall averages"
 msgstr "Promedios generales"
 
-#: lib/statsample/dominanceanalysis.rb:206
-msgid "Pairwise"
-msgstr "De a pares"
+#: lib/statsample/dominanceanalysis.rb:281
+msgid "Pairwise dominance"
+msgstr "Dominancia en pares"
 
-#: lib/statsample/dominanceanalysis.rb:210
+#: lib/statsample/dominanceanalysis.rb:281
 msgid "Pairs"
 msgstr "Pares"
+
+#: lib/statsample/dominanceanalysis.rb:281
+msgid "Conditional"
+msgstr "Condicional"
+
+#: lib/statsample/dominanceanalysis.rb:281
+msgid "General"
+msgstr "General"
+
+#: lib/statsample/converters.rb:317
+msgid ")}"
+msgstr ""
+
+#~ msgid "Pairwise"
+#~ msgstr "De a pares"
+

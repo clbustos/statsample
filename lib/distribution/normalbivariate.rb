@@ -1,24 +1,32 @@
 module Distribution
-  # Calculate pdf and cdf for bivariate normal distribution
+  # Calculate pdf and cdf for bivariate normal distribution.
   module NormalBivariate
     
     class << self
-      SIDE=0.1
-      LIMIT=5
-      # Probability density function
+      SIDE=0.1 # :nodoc:
+      LIMIT=5 # :nodoc:
+      
+      # Probability density function for a given x, y and rho value.
+      # 
       # Source: http://en.wikipedia.org/wiki/Multivariate_normal_distribution
       def pdf(x,y, rho, sigma1=1.0, sigma2=1.0)
         (1.quo(2 * Math::PI * sigma1*sigma2 * Math::sqrt( 1 - rho**2 ))) *
           Math::exp(-(1.quo(2*(1-rho**2))) *
           ((x**2/sigma1) + (y**2/sigma2) - (2*rho*x*y).quo(sigma1*sigma2)  ))
       end
-      def f(x,y,aprime,bprime,rho)
+      
+      def f(x,y,aprime,bprime,rho) 
         r=aprime*(2*x-aprime)+bprime*(2*y-bprime)+2*rho*(x-aprime)*(y-bprime)
         Math::exp(r)
       end
+      
+      # CDF for a given x, y and rho value.
+      # Uses cdf_math method.
+      #
       def cdf(a,b,rho)
         cdf_math(a,b,rho)
       end
+      
       def sgn(x)
         if(x>=0)
         1
@@ -26,7 +34,12 @@ module Distribution
         -1
         end     
       end
-      # As http://finance.bi.no/~bernt/gcc_prog/recipes/recipes/node23.html
+      
+      # Normal cumulative distribution function (cdf) for a given x, y and rho.
+      # Based on (Hull, 1993, cited by Arne, 2003)
+      #
+      # References:
+      # * Arne, B.(2003). Financial Numerical Recipes in C ++. Available on  http://finance.bi.no/~bernt/gcc_prog/recipes/recipes/node23.html
       def cdf_math(a,b,rho)
         #puts "a:#{a} - b:#{b} - rho:#{rho}"
         if (a<=0 and b<=0 and rho<=0)
@@ -64,11 +77,13 @@ module Distribution
         end
         raise "Should'nt be here! #{a} - #{b} #{rho}"
       end
-      # Cdf for a given x and y 
+      
+      # CDF. Iterative method. 
+      # 
       # Reference:
       # * Jantaravareerat, M. & Thomopoulos, N. (n/d). Tables for standard bivariate normal distribution
      
-      def cdf_iterate(x,y,rho,s1=1,s2=1)
+      def cdf_iterate(x,y,rho,s1=1,s2=1) # :nodoc:
         # Special cases
         return 1 if x>LIMIT and y>LIMIT
         return 0 if x<-LIMIT or y<-LIMIT
@@ -95,6 +110,8 @@ module Distribution
         end
         sum
       end
+      private :f, :sgn 
+
     end
   end
 end

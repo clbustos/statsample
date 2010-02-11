@@ -60,6 +60,22 @@ module Statsample
       def new_with_vectors(v1,v2)
         Polychoric.new(Crosstab.new(v1,v2).to_matrix)
       end
+      # Calculate Polychoric correlation
+      # You should enter a Matrix with ordered data. For 
+      #         -------------------
+      #         | y=0 | y=1 | y=2 | 
+      #         -------------------
+      #   x = 0 |  1  |  10 | 20  |
+      #         -------------------
+      #   x = 1 |  20 |  20 | 50  |
+      #         -------------------
+      # 
+      # The code will be
+      #
+      #   matrix=Matrix[[1,10,20],[20,20,50]]
+      #   poly=Statsample::Bivariate::Polychoric.new(matrix)
+      #   puts poly.r
+      
       
       def initialize(matrix, opts=Hash.new)
         @matrix=matrix
@@ -102,7 +118,8 @@ module Statsample
       end
       
       
-      
+      # Start the computation of polychoric correlation
+      # based on @method
       def compute
         if @method==:two_step
           compute_two_step_mle_drasgow
@@ -112,12 +129,12 @@ module Statsample
           raise "Not implemented"
         end
       end
-      # *Computation of polychoric correlation usign two-step ML estimation.*
+      # Computation of polychoric correlation usign two-step ML estimation.
       # 
       # Two-step ML estimation "first estimates the thresholds from the one-way marginal frequencies, then estimates rho, conditional on these thresholds, via maximum likelihood" (Uebersax, 2006).
       #
-      # The algorithm is based on Drasgow(1986, cited by Gegenfurtner (1992)
-      # References:
+      # The algorithm is based on Drasgow(1986, cited by Gegenfurtner (1992).
+      # <b>References</b>:
       # * Gegenfurtner, K. (1992). PRAXIS: Brent's algorithm for function minimization. Behavior Research Methods, Instruments & Computers, 24(4), 560-564. Available on http://www.allpsych.uni-giessen.de/karl/pdf/03.praxis.pdf
       # * Uebersax, J.S. (2006). The tetrachoric and polychoric correlation coefficients. Statistical Methods for Rater Agreement web site. 2006. Available at: http://john-uebersax.com/stat/tetra.htm . Accessed February, 11, 2010
       #
@@ -214,24 +231,24 @@ module Statsample
       @r=gmf.x_minimum
       end
       # Chi-square to test r=0
-      def chi_square_independence
+      def chi_square_independence # :nodoc:
         Statsample::Test::chi_square(@matrix, expected)
       end
       # Chi-square to test model==independence
       
-      def chi_square_model_expected
+      def chi_square_model_expected # :nodoc:
         calculate if @r.nil?
         model=Matrix.rows(@pd).collect {|c| c*@total}
         Statsample::Test::chi_square(model, expected)
 
       end
       # Chi-square to test real == calculated with rho
-      def  chi_square_model
+      def  chi_square_model # :nodoc:
         calculate if @r.nil?
         e=Matrix.rows(@pd).collect {|c| c*@total}
         Statsample::Test::chi_square(@matrix, e)
       end
-      def matrix_for_rho(rho)
+      def matrix_for_rho(rho) # :nodoc:
         pd=@nr.times.collect{ [0]*@nc}
         pc=@nr.times.collect{ [0]*@nc}
         @nr.times { |i|
@@ -246,7 +263,7 @@ module Statsample
          }
          Matrix.rows(pc)
       end
-      def g2
+      def g2 # :nodoc:
         raise "Doesn't work"
         e=expected
         no_r_likehood=0
@@ -276,7 +293,7 @@ module Statsample
         -2*(no_r_likehood-model_likehood)
         
       end
-      def expected
+      def expected # :nodoc:
         rt=[]
         ct=[]
         t=0
@@ -303,7 +320,7 @@ module Statsample
       # Compute polychoric using AS87.
       # Doesn't work for now! I can't find the error :(
       
-      def compute_two_step_as87
+      def compute_two_step_as87 # :nodoc:
         @nn=@n-1
         @mm=@m-1
         @nn7=7*@nn
@@ -524,7 +541,7 @@ module Statsample
         @r=pcorl
       end
       #Computes vector h(mm7) of orthogonal hermite...
-      def hermit(s,k)
+      def hermit(s,k) # :nodoc:
         h=[]
         (1..k).each do |i| # do 14
           l=i
@@ -544,7 +561,7 @@ module Statsample
         end
         h
       end
-      def xnorm(t)
+      def xnorm(t) # :nodoc:
         Math::exp(-0.5 * t **2) * (1.0/Math::sqrt(2*Math::PI))
       end
       

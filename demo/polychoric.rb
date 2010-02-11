@@ -8,6 +8,4 @@ ct=Matrix[[30,1,0,0,0,0],[0,10,2,0,0,0], [0,4,8,3,1,0], [0,3,3,37,9,0], [0,0,1, 
 poly=Statsample::Bivariate::Polychoric.new(ct)
 
 puts poly.summary
-puts poly.chi_square_independence
-puts poly.chi_square_model
-puts poly.chi_square_independence
+

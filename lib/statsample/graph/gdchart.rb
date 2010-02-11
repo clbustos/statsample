@@ -1,6 +1,6 @@
 require 'GDChart'
 module Statsample
-	module Util
+	module Util # :nodoc:
 	class << self
 		def chart_gdchart(file,width,height,chart_type, labels, options,num_datasets,data)
 				require 'GDChart'
@@ -18,7 +18,7 @@ module Statsample
 		end
 		end
 	end
-	class Vector
+	class Vector # :nodoc:
 		# Creates a barchart using ruby-gdchart
 		def gdchart_frequencies(file, width=300, height=150, chart_type=GDChart::BAR, options={})
 			labels,data=[],[]

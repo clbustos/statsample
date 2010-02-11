@@ -1,6 +1,6 @@
 module Statsample
   module Graph
-    class SvgHistogram < SVG::Graph::BarBase
+    class SvgHistogram < SVG::Graph::BarBase # :nodoc:
       attr_accessor :inner_margin, :mean, :sigma, :show_normal
       def initialize(config)
         config[:fields]=[:dummy]

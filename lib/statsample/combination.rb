@@ -40,7 +40,7 @@ module Statsample
     def next_value
         @d.next_value
     end
-    class CombinationRuby
+    class CombinationRuby # :nodoc:
       attr_reader :data
       def initialize(k,n)
           raise "k<=n" if k>n
@@ -83,7 +83,7 @@ module Statsample
     end
     
     # rb-gsl engine for Combinations
-    class CombinationGsl
+    class CombinationGsl # :nodoc:
       def initialize(k,n)
           require 'gsl'
           raise "k<=n" if k>n

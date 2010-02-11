@@ -92,7 +92,7 @@ end
 # this allows rendering of svg and png on rox and gqview without problems
 module SVG #:nodoc:
 	module Graph 
-		class BarNoOp < Bar
+		class BarNoOp < Bar # :nodoc:
 			def get_css; SVG::Graph.get_css_standard; end
 		end
 		class BarHorizontalNoOp < BarHorizontal
