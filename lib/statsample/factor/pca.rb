@@ -95,7 +95,7 @@ module Factor
       }
       @eigenpairs=@eigenpairs.sort.reverse
     end
-    def to_reportbuilder(generator)
+    def to_reportbuilder(generator) # :nodoc:
       anchor=generator.add_toc_entry(_("PCA: ")+name)
       generator.add_html "<div class='pca'>"+_("PCA")+" #{@name}<a name='#{anchor}'></a>"
 

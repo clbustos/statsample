@@ -21,31 +21,41 @@ module Statsample
         end
       end
     end
-    # Compute polychoric correlation.
+    # == Polychoric correlation.
     #
-    # The polychoric correlation estimate what the correlation between raters, who classified on a ordered category scale,  would be if ratings were made on a continuous scale; they are, theoretically, invariant over changes in the number or "width" of rating categories. 
-    # See extensive documentation on http://www.john-uebersax.com/stat/tetra.htm
-    
+    # The <em>polychoric</em> correlation is a measure of 
+    # bivariate association arising when both observed variates
+    # are ordered, categorical variables that result from polychotomizing
+    # the two undelying continuous variables (Drasgow, 2006)
+    # 
+    # According to Drasgow(2006), there are tree methods to estimate
+    # the polychoric correlation: 
+    # 1. Maximum Likehood Estimator
+    # 2. Two-step estimator and 
+    # 3. Polychoric series estimate. 
+    # 
+    # Currently, the class implements two-step estimator and polychoric series.
+    # See extensive documentation on Uebersax(2002) and Drasgow(2006)    
     class Polychoric
       include GetText
       bindtextdomain("statsample")
       # Name of the analysis
       attr_accessor :name
-      # Max number of iterations used on iterative methods. Default to 100
+      # Max number of iterations used on iterative methods. Default to MAX_ITERATIONS
       attr_accessor :max_iterations
       # Debug algorithm (See iterations, for example)
       attr_accessor :debug
       # Minimizer type. Default GSL::Min::FMinimizer::BRENT
       # See http://rb-gsl.rubyforge.org/min.html for reference.  
       attr_accessor :minimizer_type
-      # Method of calculation.
-      #
-      # Drasgow (1988, cited by Uebersax, 2002) describe two method: joint maximum likelihood (ML) approach and two-step ML estimation.
-      # For now, only implemented two-step ML (:two_step), with algorithm
-      # based on Drasgow(1986, cited by Gegenfurtner, 1992)
+      # Method of calculation of polychoric series. 
+      # 
+      # :two_step: two-step ML, based on code by Gegenfurtner(1992)
+      # :polychoric_series: polychoric series estimate, using 
+      # algorithm AS87 by Martinson and Hamdan (1975)
       #
       attr_accessor :method
-      # Absolute error for iteration. Default to 0.001
+      # Absolute error for iteration. Default to EPSILON
       attr_accessor :epsilon
       
       # Number of iterations
@@ -54,8 +64,10 @@ module Statsample
       # Log of algorithm
       attr_reader :log
       attr_reader :loglike
+      
+      METHOD=:two_step
       MAX_ITERATIONS=100
-      EPSILON=0.001
+      EPSILON=0.00001
       MINIMIZER_TYPE=GSL::Min::FMinimizer::BRENT
       def new_with_vectors(v1,v2)
         Polychoric.new(Crosstab.new(v1,v2).to_matrix)
@@ -84,7 +96,7 @@ module Statsample
         raise "row size <1" if @m<=1
         raise "column size <1" if @n<=1
         
-        @method=:two_step
+        @method=METHOD
         @name="Polychoric correlation"
         @max_iterations=MAX_ITERATIONS
         @epsilon=EPSILON
@@ -96,12 +108,14 @@ module Statsample
         }
         @r=nil
       end
+      # Returns the polychoric correlation
       def r
         if @r.nil?
           compute
         end
         @r
       end
+      # Returns the rows thresholds
       
       def threshold_x
         if @alpha.nil?
@@ -109,6 +123,7 @@ module Statsample
         end
         @alpha[0,@alpha.size-1]
       end
+      # Returns the column thresholds
       
       def threshold_y
         if @beta.nil?
@@ -119,12 +134,12 @@ module Statsample
       
       
       # Start the computation of polychoric correlation
-      # based on @method
+      # based on attribute method
       def compute
         if @method==:two_step
           compute_two_step_mle_drasgow
-        elsif @method==:as87
-          compute_two_step_as87
+        elsif @method==:polychoric_series
+          compute_polychoric_series
         else
           raise "Not implemented"
         end
@@ -133,7 +148,8 @@ module Statsample
       # 
       # Two-step ML estimation "first estimates the thresholds from the one-way marginal frequencies, then estimates rho, conditional on these thresholds, via maximum likelihood" (Uebersax, 2006).
       #
-      # The algorithm is based on Drasgow(1986, cited by Gegenfurtner (1992).
+      # The algorithm is based on code by Gegenfurtner(1992).
+      # 
       # <b>References</b>:
       # * Gegenfurtner, K. (1992). PRAXIS: Brent's algorithm for function minimization. Behavior Research Methods, Instruments & Computers, 24(4), 560-564. Available on http://www.allpsych.uni-giessen.de/karl/pdf/03.praxis.pdf
       # * Uebersax, J.S. (2006). The tetrachoric and polychoric correlation coefficients. Statistical Methods for Rater Agreement web site. 2006. Available at: http://john-uebersax.com/stat/tetra.htm . Accessed February, 11, 2010
@@ -183,15 +199,14 @@ module Statsample
               pd[i][j] = pd[i][j] + pc[i-1][j-1] if (i>0 and j>0)
               res= pd[i][j]
               
-              if res==0.0
-                res=1e-15
-               end 
-               
-              # puts "i:#{i} | j:#{j} | ac: #{sprintf("%0.4f", pc[i][j])} | pd: #{sprintf("%0.4f", pd[i][j])} | res:#{sprintf("%0.4f", res)}"
+              
+               #puts "i:#{i} | j:#{j} | ac: #{sprintf("%0.4f", pc[i][j])} | pd: #{sprintf("%0.4f", pd[i][j])} | res:#{sprintf("%0.4f", res)}"
+            if (res==0)
+              res=1e-16
+            end
               loglike+= @matrix[i,j]  * Math::log( res )
             }
           }
-          # p pd
           @loglike=loglike
           @pd=pd
           -loglike
@@ -200,8 +215,8 @@ module Statsample
       max_iter = @max_iterations
       m = 0             # initial guess
       m_expected = 0.5
-      a=-0.99999
-      b=+0.99999
+      a=-0.999999
+      b=+0.999999
       gmf = GSL::Min::FMinimizer.alloc(@minimizer_type)
       gmf.set(fn1, m, a, b)
       header=sprintf("using %s method\n", gmf.name)
@@ -214,7 +229,7 @@ module Statsample
       begin
         @iteration += 1
         status = gmf.iterate
-        status = gmf.test_interval(0.001, 0.0)
+        status = gmf.test_interval(@epsilon, 0.0)
         
         if status == GSL::SUCCESS
           @log+="Converged:"
@@ -264,33 +279,31 @@ module Statsample
          Matrix.rows(pc)
       end
       def g2 # :nodoc:
-        raise "Doesn't work"
-        e=expected
+        compute if @r.nil?
+        e=@matrix.collect {|i| i.quo(@total)}
         no_r_likehood=0
         @nr.times {|i|
           @nc.times {|j|
             #p @matrix[i,j]
             if @matrix[i,j]!=0
-              no_r_likehood+= @matrix[i,j]*Math::log(e[i,j])
+              no_r_likehood+= @matrix[i,j] * Math::log(e[i,j])
             end
           }
         }
-        p no_r_likehood
-        model=Matrix.rows(@pd).collect {|c| c*@total}
+        
+        model=Matrix.rows(@pd).collect {|c| c}
 
         model_likehood=0
         @nr.times {|i|
           @nc.times {|j|
-            #p @matrix[i,j]
             if @matrix[i,j]!=0
               model_likehood+= @matrix[i,j] * Math::log(model[i,j])
             end
           }
         }
         
-        p model_likehood
         
-        -2*(no_r_likehood-model_likehood)
+        -2*(model_likehood-no_r_likehood)
         
       end
       def expected # :nodoc:
@@ -317,10 +330,14 @@ module Statsample
         
         Matrix.rows(m)
       end
-      # Compute polychoric using AS87.
-      # Doesn't work for now! I can't find the error :(
       
-      def compute_two_step_as87 # :nodoc:
+      # Compute polychoric correlation using polychoric series.
+      # Algorithm: AS87, by Martinson and Hamdam(1975).
+      # 
+      # <b>Warning</b>: According to Drasgow(2006), this
+      # computation diverges greatly of joint and two-step methods.
+      # 
+      def compute_polychoric_series 
         @nn=@n-1
         @mm=@m-1
         @nn7=7*@nn
@@ -409,8 +426,8 @@ module Statsample
         end # 21
         @alpha=alpha[1,alpha.size] << nil
         @beta=beta[1,beta.size] << nil
-        @sumr=sumr
-        @sumc=sumc
+        @sumr=row[1,row.size]
+        @sumc=colmn[1,colmn.size]
         @total=sum
         
         # Compute Fourier coefficients a and b. Verified
@@ -571,7 +588,7 @@ module Statsample
         rp.to_text
       end
       
-      def to_reportbuilder(generator)
+      def to_reportbuilder(generator) # :nodoc: 
         compute if @r.nil?
         section=ReportBuilder::Section.new(:name=>@name)
         t=ReportBuilder::Table.new(:name=>_("Contingence Table"),:header=>[""]+(@n.times.collect {|i| "Y=#{i}"})+["Total"])

@@ -13,4 +13,5 @@ module Distribution
     autoload(:F, 'distribution/f')
     autoload(:Normal, 'distribution/normal')
     autoload(:NormalBivariate, 'distribution/normalbivariate')
+    autoload(:NormalMultivariate, 'distribution/normalmultivariate')
 end

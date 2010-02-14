@@ -33,13 +33,25 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     poly  = Statsample::Bivariate::Polychoric.new(matrix)
     assert_in_delta(tetra.r,poly.r,0.0001)
     
-    # Example for http://www.john-uebersax.com/stat/tetra.htm#exampl
+    # Example for Tallis(1962, cited by Drasgow, 2006)
     
     matrix=Matrix[[58,52,1],[26,58,3],[8,12,9]]
     poly=Statsample::Bivariate::Polychoric.new(matrix)
-    assert_in_delta(0.4199, poly.r, 0.0001)
-    assert_in_delta(-0.2397, poly.threshold_y[0],0.001)
-    assert_in_delta(-0.0276, poly.threshold_x[0],0.001)
+    poly.method=:two_step
+    poly.compute
+    assert_in_delta(0.420, poly.r, 0.001)
+    assert_in_delta(-0.240, poly.threshold_y[0],0.001)
+    assert_in_delta(-0.027, poly.threshold_x[0],0.001)
+    assert_in_delta(1.578, poly.threshold_y[1],0.001)
+    assert_in_delta(1.137, poly.threshold_x[1],0.001)
+    poly.method=:polychoric_series
+    poly.compute
+    
+    assert_in_delta(0.556, poly.r, 0.001)
+    assert_in_delta(-0.240, poly.threshold_y[0],0.001)
+    assert_in_delta(-0.027, poly.threshold_x[0],0.001)
+    assert_in_delta(1.578, poly.threshold_y[1],0.001)
+    assert_in_delta(1.137, poly.threshold_x[1],0.001)
     
 
   end

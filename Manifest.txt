@@ -9,6 +9,7 @@ data/repeated_fields.csv
 data/test_binomial.csv
 data/tetmat_matrix.txt
 data/tetmat_test.txt
+demo/correlation_matrix.rb
 demo/dominance_analysis_bootstrap.rb
 demo/dominanceanalysis.rb
 demo/multiple_regression.rb

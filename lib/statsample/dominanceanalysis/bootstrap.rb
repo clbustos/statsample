@@ -23,13 +23,16 @@ module Statsample
       attr_accessor :ds
       # Name of analysis
       attr_accessor :name
-      # Alpha level of confidence
+      # Alpha level of confidence. Default: ALPHA
       attr_accessor :alpha
+      # Debug?
+      attr_accessor :debug
       # Create a new Dominance Analysis Bootstrap Object
       # 
       # * ds: A Dataset object
       # * y_var: Name of dependent variable
       # * opts: Any other attribute of the class 
+      ALPHA=0.95
       def initialize(ds,y_var, opts=Hash.new)
         @ds=ds
         @y_var=y_var
@@ -37,7 +40,8 @@ module Statsample
         @fields=ds.fields-[y_var]
         @samples_ga=@fields.inject({}){|a,v| a[v]=[];a}
         @n_samples=0
-        @alpha=0.95
+        @alpha=ALPHA
+        @debug=false
         @regression_class=Regression::Multiple::RubyEngine
         @name=_("Bootstrap dominance Analysis:  %s over %s") % [ ds.fields.join(",") , @y_var]
         opts.each{|k,v|
@@ -58,11 +62,11 @@ module Statsample
       # 
       # * number_samples: Number of new samples to add
       # * n: size of each new sample. If nil, equal to original sample size
-      # * report: if true, echo number of current resample and total
-      def bootstrap(number_samples,n=nil,report=false)
+      
+      def bootstrap(number_samples,n=nil)
         number_samples.times{ |t|
           @n_samples+=1
-          puts _("Bootstrap %d of %d") % [t+1, number_samples] if report
+          puts _("Bootstrap %d of %d") % [t+1, number_samples] if @debug
           ds_boot=@ds.bootstrap(n)
           da_1=DominanceAnalysis.new(ds_boot, @y_var, :regression_class => @regression_class)
           da_1.total_dominance.each{|k,v|
@@ -93,6 +97,7 @@ module Statsample
           }
         end
       end
+      # Summary of analysis
       def summary
         rp=ReportBuilder.new()
         rp.add(self)
@@ -101,7 +106,7 @@ module Statsample
       def t
         Distribution::T.p_value(1-((1-@alpha) / 2), @n_samples - 1)
       end
-      def to_reportbuilder(generator)
+      def to_reportbuilder(generator) # :nodoc:
         raise "You should bootstrap first" if @n_samples==0
         anchor=generator.add_toc_entry(_("DAB: ")+@name)
         generator.add_html "<div class='dominance-analysis-bootstrap'>#{@name}<a name='#{anchor}'></a>"

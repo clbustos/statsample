@@ -107,13 +107,14 @@ module Statsample
       def threshold_y
         @zac
       end
+      # Summary of the analysis
       def summary
         rp=ReportBuilder.new()
         rp.add(self)
         rp.to_text
       end
       
-      def to_reportbuilder(generator)
+      def to_reportbuilder(generator) # :nodoc:
         section=ReportBuilder::Section.new(:name=>@name)
         t=ReportBuilder::Table.new(:name=>_("Contingence Table"),:header=>["","Y=0","Y=1", "T"])
         t.add_row(["X=0", @a,@b,@a+@b])
@@ -129,6 +130,7 @@ module Statsample
         generator.parse_element(section)
       end
       
+      # Creates a new tetrachoric object for analysis 
       def initialize(a,b,c,d)
         @a,@b,@c,@d=a,b,c,d
         @name=_("Tetrachoric correlation")
@@ -138,7 +140,9 @@ module Statsample
         raise "All frequencies should be positive" if  (@a < 0 or @b < 0 or @c < 0  or @d < 0)        
         compute
       end
-      
+      # Compute the tetrachoric correlation.
+      # Called on object creation.
+      #
       def compute
       
       #
@@ -412,7 +416,7 @@ module Statsample
       end
       
       
-      def calculate_sdr
+      def calculate_sdr # :nodoc:
         #
         # COMPUTE SDR
         #
@@ -442,7 +446,7 @@ module Statsample
         @sdzero = Math::sqrt(((@aa + @bb) * (@aa + @cc) * (@bb + @dd) * (@cc + @dd)).quo(@tot)).quo(@tot ** 2 * @ss)
         @sdr = @sdzero if (@r == 0)
       end
-      private :calculate_cosine, :calculate_sdr, :compute, :gaussian_quadrature
+      private :calculate_cosine, :calculate_sdr, :compute_sdzero, :compute, :gaussian_quadrature
     end
   end
 end

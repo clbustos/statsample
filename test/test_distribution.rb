@@ -10,34 +10,34 @@ end
 class DistributionTestCase < Test::Unit::TestCase
   def test_chi
     if !NOT_GSL
-    [2,3,4,5].each{|k|
+      [2,3,4,5].each{|k|
         chis=rand()*10
         area=Distribution::ChiSquare.cdf(chis, k)
         assert_in_delta(area, GSL::Cdf.chisq_P(chis,k),0.0001)
         assert_in_delta(chis, Distribution::ChiSquare.p_value(area,k),0.0001,"Error on prob #{area} and k #{k}")
-    }
+      }
     end
   end
   def test_t
     if !NOT_GSL
-        [-2,0.1,0.5,1,2].each{|t|
-            [2,5,10].each{|n|
-                area=Distribution::T.cdf(t,n)
-                assert_in_delta(area, GSL::Cdf.tdist_P(t,n),0.0001)
-                assert_in_delta(Distribution::T.p_value(area,n), GSL::Cdf.tdist_Pinv(area,n),0.0001)
-                
-            }
+      [-2,0.1,0.5,1,2].each{|t|
+        [2,5,10].each{|n|
+          area=Distribution::T.cdf(t,n)
+          assert_in_delta(area, GSL::Cdf.tdist_P(t,n),0.0001)
+          assert_in_delta(Distribution::T.p_value(area,n), GSL::Cdf.tdist_Pinv(area,n),0.0001)
+          
         }
+      }
     end
   end
   def test_normal
     if !NOT_GSL
-        [-2,0.1,0.5,1,2].each{|x|
-            area=Distribution::Normal.cdf(x)
-            assert_in_delta(area, GSL::Cdf.ugaussian_P(x),0.0001)
-            assert_in_delta(Distribution::Normal.p_value(area), GSL::Cdf.ugaussian_Pinv(area),0.0001)
-            assert_in_delta(Distribution::Normal.pdf(x), GSL::Ran::ugaussian_pdf(x),0.0001)
-        }
+      [-2,0.1,0.5,1,2].each{|x|
+        area=Distribution::Normal.cdf(x)
+        assert_in_delta(area, GSL::Cdf.ugaussian_P(x),0.0001)
+        assert_in_delta(Distribution::Normal.p_value(area), GSL::Cdf.ugaussian_Pinv(area),0.0001)
+        assert_in_delta(Distribution::Normal.pdf(x), GSL::Ran::ugaussian_pdf(x),0.0001)
+      }
     end
   end
   def test_normal_bivariate
@@ -49,7 +49,8 @@ class DistributionTestCase < Test::Unit::TestCase
     end
     
     [-3,-2,-1,0,1,1.5].each {|x|
-      assert_in_delta(Distribution::NormalBivariate.cdf_math(x,x,0.5), Distribution::NormalBivariate.cdf_iterate(x,x,0.5), 0.001)
+      assert_in_delta(Distribution::NormalBivariate.cdf_hull(x,x,0.5), Distribution::NormalBivariate.cdf_genz(x,x,0.5), 0.001)
+      assert_in_delta(Distribution::NormalBivariate.cdf_genz(x,x,0.5), Distribution::NormalBivariate.cdf_jantaravareerat(x,x,0.5), 0.001)
     }
     
     assert_in_delta(0.686, Distribution::NormalBivariate.cdf(2,0.5,0.5), 0.001)
