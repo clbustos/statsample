@@ -30,11 +30,14 @@ module Statsample
     # 
     # According to Drasgow(2006), there are tree methods to estimate
     # the polychoric correlation: 
+    #
     # 1. Maximum Likehood Estimator
     # 2. Two-step estimator and 
     # 3. Polychoric series estimate. 
     # 
-    # Currently, the class implements two-step estimator and polychoric series.
+    # By default, Two-step estimation are used. You can select 
+    # the estimation method with method attribute
+    #
     # See extensive documentation on Uebersax(2002) and Drasgow(2006)    
     class Polychoric
       include GetText
@@ -47,15 +50,22 @@ module Statsample
       attr_accessor :debug
       # Minimizer type. Default GSL::Min::FMinimizer::BRENT
       # See http://rb-gsl.rubyforge.org/min.html for reference.  
-      attr_accessor :minimizer_type
+      attr_accessor :minimizer_type_two_step
+      
+      # Minimizer type. Default GSL::Min::FMinimizer::BRENT
+      # See http://rb-gsl.rubyforge.org/min.html for reference.  
+      attr_accessor :minimizer_type_joint
+      
+      
       # Method of calculation of polychoric series. 
       # 
-      # :two_step: two-step ML, based on code by Gegenfurtner(1992)
-      # :polychoric_series: polychoric series estimate, using 
-      # algorithm AS87 by Martinson and Hamdan (1975)
-      #
+      # :two_step:: two-step ML, based on code by Gegenfurtner(1992)
+      # :polychoric_series:: polychoric series estimate, using 
+      #                      algorithm AS87 by Martinson and Hamdan (1975)
+      # :joint:              one-step ML, based on R package 'polycor' 
+      #                      by J.Fox.
       attr_accessor :method
-      # Absolute error for iteration. Default to EPSILON
+      # Absolute error for iteration.
       attr_accessor :epsilon
       
       # Number of iterations
@@ -66,9 +76,10 @@ module Statsample
       attr_reader :loglike
       
       METHOD=:two_step
-      MAX_ITERATIONS=100
-      EPSILON=0.00001
-      MINIMIZER_TYPE=GSL::Min::FMinimizer::BRENT
+      MAX_ITERATIONS=300
+      EPSILON=0.000001
+      MINIMIZER_TYPE_TWO_STEP="brent"
+      MINIMIZER_TYPE_JOINT="nmsimplex"
       def new_with_vectors(v1,v2)
         Polychoric.new(Crosstab.new(v1,v2).to_matrix)
       end
@@ -85,7 +96,7 @@ module Statsample
       # The code will be
       #
       #   matrix=Matrix[[1,10,20],[20,20,50]]
-      #   poly=Statsample::Bivariate::Polychoric.new(matrix)
+      #   poly=Statsample::Bivariate::Polychoric.new(matrix, :method=>:joint)
       #   puts poly.r
       
       
@@ -100,13 +111,15 @@ module Statsample
         @name="Polychoric correlation"
         @max_iterations=MAX_ITERATIONS
         @epsilon=EPSILON
-        @minimizer_type=GSL::Min::FMinimizer::BRENT
+        @minimizer_type_two_step=MINIMIZER_TYPE_TWO_STEP
+        @minimizer_type_joint=MINIMIZER_TYPE_JOINT
         @debug=false
         @iteration=nil
         opts.each{|k,v|
           self.send("#{k}=",v) if self.respond_to? k
         }
         @r=nil
+        compute_basic_parameters
       end
       # Returns the polychoric correlation
       def r
@@ -121,7 +134,7 @@ module Statsample
         if @alpha.nil?
           compute
         end
-        @alpha[0,@alpha.size-1]
+        @alpha
       end
       # Returns the column thresholds
       
@@ -129,7 +142,7 @@ module Statsample
         if @beta.nil?
           compute
         end
-        @beta[0,@beta.size-1]
+        @beta
       end
       
       
@@ -138,31 +151,82 @@ module Statsample
       def compute
         if @method==:two_step
           compute_two_step_mle_drasgow
+        elsif @method==:joint
+          compute_one_step_mle
         elsif @method==:polychoric_series
           compute_polychoric_series
         else
           raise "Not implemented"
         end
       end
-      # Computation of polychoric correlation usign two-step ML estimation.
-      # 
-      # Two-step ML estimation "first estimates the thresholds from the one-way marginal frequencies, then estimates rho, conditional on these thresholds, via maximum likelihood" (Uebersax, 2006).
-      #
-      # The algorithm is based on code by Gegenfurtner(1992).
-      # 
-      # <b>References</b>:
-      # * Gegenfurtner, K. (1992). PRAXIS: Brent's algorithm for function minimization. Behavior Research Methods, Instruments & Computers, 24(4), 560-564. Available on http://www.allpsych.uni-giessen.de/karl/pdf/03.praxis.pdf
-      # * Uebersax, J.S. (2006). The tetrachoric and polychoric correlation coefficients. Statistical Methods for Rater Agreement web site. 2006. Available at: http://john-uebersax.com/stat/tetra.htm . Accessed February, 11, 2010
-      #
-      def compute_two_step_mle_drasgow
+      
+      def loglike_data
+        loglike=0
+        @nr.times { |i|
+          @nc.times { |j|
+            res=@matrix[i,j].quo(@total)
+            if (res==0)
+           #    puts "Correccion"
+            res=1e-16
+          end
+          loglike+= @matrix[i,j]  * Math::log(res )
+          }
+        }
+        loglike
+      end
+      def chi_square
+        if @loglike_model.nil?
+          compute
+        end
+        -2*(@loglike_model-loglike_data)
+      end
+      def chi_square_df
+        (@nr*@nc)-@nc-@nr
+      end
+      def loglike(alpha,beta,rho)
+        if rho.abs>0.9999
+          rho= (rho>0) ? 0.9999 : -0.9999
+        end
+        
+        loglike=0
+        pd=@nr.times.collect{ [0]*@nc}
+        pc=@nr.times.collect{ [0]*@nc}
+        @nr.times { |i|
+          @nc.times { |j|
+            #puts "i:#{i} | j:#{j}"
+            if i==@nr-1 and j==@nc-1
+              pd[i][j]=1.0
+            else
+              a=(i==@nr-1) ? 100: alpha[i]
+              b=(j==@nc-1) ? 100: beta[j]
+              #puts "a:#{a} b:#{b}"
+              pd[i][j]=Distribution::NormalBivariate.cdf(a, b, rho)
+            end
+            pc[i][j] = pd[i][j]
+            pd[i][j] = pd[i][j] - pc[i-1][j] if i>0
+            pd[i][j] = pd[i][j] - pc[i][j-1] if j>0
+            pd[i][j] = pd[i][j] + pc[i-1][j-1] if (i>0 and j>0)
+            res= pd[i][j]
+             #puts "i:#{i} | j:#{j} | ac: #{sprintf("%0.4f", pc[i][j])} | pd: #{sprintf("%0.4f", pd[i][j])} | res:#{sprintf("%0.4f", res)}"
+          if (res==0)
+           #    puts "Correccion"
+            res=1e-16
+          end
+            loglike+= @matrix[i,j]  * Math::log( res )
+          }
+        }
+        @pd=pd
+        -loglike
+      end
+      def compute_basic_parameters
         @nr=@matrix.row_size
         @nc=@matrix.column_size
         @sumr=[0]*@matrix.row_size
         @sumrac=[0]*@matrix.row_size
         @sumc=[0]*@matrix.column_size
         @sumcac=[0]*@matrix.column_size
-        @alpha=[0]*@matrix.row_size
-        @beta=[0]*@matrix.row_size
+        @alpha=[0]*(@nr-1)
+        @beta=[0]*(@nc-1)
         @total=0
         @nr.times do |i|
           @nc.times do |j|
@@ -183,43 +247,31 @@ module Statsample
           @beta[i]=Distribution::Normal.p_value(@sumcac[i] / @total.to_f)
           ac=@sumcac[i]
         end
-        @alpha[@nr-1]=10
-        @beta[@nc-1]=10
-        fn1=GSL::Function.alloc {|x| 
-          loglike=0
-          pd=@nr.times.collect{ [0]*@nc}
-          pc=@nr.times.collect{ [0]*@nc}
-
-          @nr.times { |i|
-            @nc.times { |j|
-              pd[i][j]=Distribution::NormalBivariate.cdf(@alpha[i], @beta[j], x)
-              pc[i][j] = pd[i][j]
-              pd[i][j] = pd[i][j] - pc[i-1][j] if i>0
-              pd[i][j] = pd[i][j] - pc[i][j-1] if j>0
-              pd[i][j] = pd[i][j] + pc[i-1][j-1] if (i>0 and j>0)
-              res= pd[i][j]
-              
-              
-               #puts "i:#{i} | j:#{j} | ac: #{sprintf("%0.4f", pc[i][j])} | pd: #{sprintf("%0.4f", pd[i][j])} | res:#{sprintf("%0.4f", res)}"
-            if (res==0)
-              res=1e-16
-            end
-              loglike+= @matrix[i,j]  * Math::log( res )
-            }
-          }
-          @loglike=loglike
-          @pd=pd
-          -loglike
+      end
+      # Computation of polychoric correlation usign two-step ML estimation.
+      # 
+      # Two-step ML estimation "first estimates the thresholds from the one-way marginal frequencies, then estimates rho, conditional on these thresholds, via maximum likelihood" (Uebersax, 2006).
+      #
+      # The algorithm is based on code by Gegenfurtner(1992).
+      # 
+      # <b>References</b>:
+      # * Gegenfurtner, K. (1992). PRAXIS: Brent's algorithm for function minimization. Behavior Research Methods, Instruments & Computers, 24(4), 560-564. Available on http://www.allpsych.uni-giessen.de/karl/pdf/03.praxis.pdf
+      # * Uebersax, J.S. (2006). The tetrachoric and polychoric correlation coefficients. Statistical Methods for Rater Agreement web site. 2006. Available at: http://john-uebersax.com/stat/tetra.htm . Accessed February, 11, 2010
+      #
+      def compute_two_step_mle_drasgow
+        
+        fn1=GSL::Function.alloc {|rho| 
+          loglike(@alpha,@beta, rho)
         }
       @iteration = 0
       max_iter = @max_iterations
       m = 0             # initial guess
-      m_expected = 0.5
-      a=-0.999999
-      b=+0.999999
-      gmf = GSL::Min::FMinimizer.alloc(@minimizer_type)
+      m_expected = 0
+      a=-0.9999
+      b=+0.9999
+      gmf = GSL::Min::FMinimizer.alloc(@minimizer_type_two_step)
       gmf.set(fn1, m, a, b)
-      header=sprintf("using %s method\n", gmf.name)
+      header=sprintf("Two step minimization using %s method\n", gmf.name)
       header+=sprintf("%5s [%9s, %9s] %9s %10s %9s\n", "iter", "lower", "upper", "min",
          "err", "err(est)")
         
@@ -232,8 +284,8 @@ module Statsample
         status = gmf.test_interval(@epsilon, 0.0)
         
         if status == GSL::SUCCESS
-          @log+="Converged:"
-          puts "Converged:" if @debug
+          @log+="converged:"
+          puts "converged:" if @debug
         end
         a = gmf.x_lower
         b = gmf.x_upper
@@ -244,25 +296,65 @@ module Statsample
         puts message if @debug
       end while status == GSL::CONTINUE and @iteration < @max_iterations
       @r=gmf.x_minimum
+      @loglike_model=-gmf.f_minimum
       end
-      # Chi-square to test r=0
-      def chi_square_independence # :nodoc:
-        Statsample::Test::chi_square(@matrix, expected)
-      end
-      # Chi-square to test model==independence
       
-      def chi_square_model_expected # :nodoc:
-        calculate if @r.nil?
-        model=Matrix.rows(@pd).collect {|c| c*@total}
-        Statsample::Test::chi_square(model, expected)
+      # Compute Polychoric correlation with joint estimate.
+      # Rho and thresholds are estimated at same time.
+      # Code based on R package "polycor", by J.Fox.
+      #
+      
+      def compute_one_step_mle
+        # Get initial values with two-step aproach
+        compute_two_step_mle_drasgow
+        # Start iteration with past values
+        rho=@r
+        cut_alpha=@alpha
+        cut_beta=@beta
+        parameters=[rho]+cut_alpha+cut_beta
+        minimization = Proc.new { |v, params|
+         rho=v[0]
+         alpha=v[1,@nr-1]
+         beta=v[@nr,@nc-1]
+         loglike(alpha,beta,rho)
+        }
+        np=@nc-1+@nr
+        my_func = GSL::MultiMin::Function.alloc(minimization, np)
+        my_func.set_params(parameters)      # parameters
+        
+        x = GSL::Vector.alloc(parameters.dup)
+        
+        ss = GSL::Vector.alloc(np)
+        ss.set_all(1.0)
+        
+        minimizer = GSL::MultiMin::FMinimizer.alloc(minimizer_type_joint,np)
+        minimizer.set(my_func, x, ss)
+        
+        iter = 0
+        message=""
+        begin
+          iter += 1
+          status = minimizer.iterate()
+          status = minimizer.test_size(@epsilon)
+          if status == GSL::SUCCESS
+            message="Joint MLE converged to minimum at\n"
+          end
+          x = minimizer.x
+          message+= sprintf("%5d iterations", iter)+"\n";
+          for i in 0...np do
+            message+=sprintf("%10.3e ", x[i])
+          end
+          message+=sprintf("f() = %7.3f size = %.3f\n", minimizer.fval, minimizer.size)+"\n";
+        end while status == GSL::CONTINUE and iter < @max_iterations
+        @iteration=@iter
+        @log+=message
+        puts message if @debug
+        @r=minimizer.x[0]
+        @alpha=minimizer.x[1,@nr-1].to_a
+        @beta=minimizer.x[@nr,@nc-1].to_a
+        @loglike_model= -minimizer.minimum
+      end
 
-      end
-      # Chi-square to test real == calculated with rho
-      def  chi_square_model # :nodoc:
-        calculate if @r.nil?
-        e=Matrix.rows(@pd).collect {|c| c*@total}
-        Statsample::Test::chi_square(@matrix, e)
-      end
       def matrix_for_rho(rho) # :nodoc:
         pd=@nr.times.collect{ [0]*@nc}
         pc=@nr.times.collect{ [0]*@nc}
@@ -278,34 +370,7 @@ module Statsample
          }
          Matrix.rows(pc)
       end
-      def g2 # :nodoc:
-        compute if @r.nil?
-        e=@matrix.collect {|i| i.quo(@total)}
-        no_r_likehood=0
-        @nr.times {|i|
-          @nc.times {|j|
-            #p @matrix[i,j]
-            if @matrix[i,j]!=0
-              no_r_likehood+= @matrix[i,j] * Math::log(e[i,j])
-            end
-          }
-        }
-        
-        model=Matrix.rows(@pd).collect {|c| c}
-
-        model_likehood=0
-        @nr.times {|i|
-          @nc.times {|j|
-            if @matrix[i,j]!=0
-              model_likehood+= @matrix[i,j] * Math::log(model[i,j])
-            end
-          }
-        }
-        
-        
-        -2*(model_likehood-no_r_likehood)
-        
-      end
+      
       def expected # :nodoc:
         rt=[]
         ct=[]
@@ -424,8 +489,8 @@ module Statsample
         (1..@nn).each do |i| #do 22
           beta[i]=Distribution::Normal.p_value(sumc[i] / sum.to_f)
         end # 21
-        @alpha=alpha[1,alpha.size] << nil
-        @beta=beta[1,beta.size] << nil
+        @alpha=alpha[1,alpha.size] 
+        @beta=beta[1,beta.size]
         @sumr=row[1,row.size]
         @sumc=colmn[1,colmn.size]
         @total=sum
@@ -556,6 +621,9 @@ module Statsample
         end # 43
         raise "Error" if norts==0
         @r=pcorl
+        
+        @loglike_model=-loglike(@alpha, @beta, @r)
+        
       end
       #Computes vector h(mm7) of orthogonal hermite...
       def hermit(s,k) # :nodoc:
@@ -608,6 +676,7 @@ module Statsample
           t.add_row(["Threshold Y #{i}", sprintf("%0.4f", val)])
         }
         section.add(t)
+        section.add(_("Test of bivariate normality: X2 = %0.3f, df = %d, p= %0.5f" % [ chi_square, chi_square_df, 1-Distribution::ChiSquare.cdf(chi_square, chi_square_df)])) 
         generator.parse_element(section)
       end
     end

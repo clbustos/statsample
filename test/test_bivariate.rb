@@ -44,6 +44,8 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     assert_in_delta(-0.027, poly.threshold_x[0],0.001)
     assert_in_delta(1.578, poly.threshold_y[1],0.001)
     assert_in_delta(1.137, poly.threshold_x[1],0.001)
+    
+    
     poly.method=:polychoric_series
     poly.compute
     
@@ -53,6 +55,15 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     assert_in_delta(1.578, poly.threshold_y[1],0.001)
     assert_in_delta(1.137, poly.threshold_x[1],0.001)
     
+    
+    poly.method=:joint
+    poly.compute
+    
+    assert_in_delta(0.4192, poly.r, 0.0001)
+    assert_in_delta(-0.2421, poly.threshold_y[0],0.0001)
+    assert_in_delta(-0.0297, poly.threshold_x[0],0.0001)
+    assert_in_delta(1.5938, poly.threshold_y[1],0.0001)
+    assert_in_delta(1.1331, poly.threshold_x[1],0.0001)
 
   end
   def test_tetrachoric
