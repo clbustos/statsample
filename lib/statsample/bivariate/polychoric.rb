@@ -73,7 +73,9 @@ module Statsample
       
       # Log of algorithm
       attr_reader :log
-      attr_reader :loglike
+      
+      
+      attr_reader :loglike_model
       
       METHOD=:two_step
       MAX_ITERATIONS=300
@@ -162,16 +164,15 @@ module Statsample
       
       def loglike_data
         loglike=0
-        @nr.times { |i|
-          @nc.times { |j|
+        @nr.times do |i|
+          @nc.times do |j|
             res=@matrix[i,j].quo(@total)
             if (res==0)
-           #    puts "Correccion"
-            res=1e-16
-          end
+              res=1e-16
+            end
           loglike+= @matrix[i,j]  * Math::log(res )
-          }
-        }
+          end
+        end
         loglike
       end
       def chi_square
@@ -346,7 +347,7 @@ module Statsample
           end
           message+=sprintf("f() = %7.3f size = %.3f\n", minimizer.fval, minimizer.size)+"\n";
         end while status == GSL::CONTINUE and iter < @max_iterations
-        @iteration=@iter
+        @iteration=iter
         @log+=message
         puts message if @debug
         @r=minimizer.x[0]

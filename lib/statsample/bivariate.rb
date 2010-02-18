@@ -123,6 +123,8 @@ module Statsample
         matrix=ds.collect_matrix do |row,col|
           if (ds[row].type!=:scale or ds[col].type!=:scale)
             nil
+          elsif row==col
+            ds[row].variance
           else
             covariance(ds[row], ds[col])
           end

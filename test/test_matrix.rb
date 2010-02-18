@@ -3,6 +3,7 @@ require 'test/unit'
 require 'statsample'
 
 class StatsampleMatrixTestCase < Test::Unit::TestCase
+        
     def setup
     end
     def test_subindex
@@ -47,7 +48,5 @@ class StatsampleMatrixTestCase < Test::Unit::TestCase
           assert_in_delta(corr[i,j], real[i,j],1e-15)
         end
       end
-     
-      
     end
 end

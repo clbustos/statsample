@@ -222,14 +222,14 @@ module Statsample
       @models=[]
       @models_data={}
       for i in 1..@fields.size
-      c=Statsample::Combination.new(i,@fields.size)
-      c.each  do |data|
-        convert=data.collect {|i1| @fields[i1] }
-        @models.push(convert)
-        ds_prev=@ds.dup(convert+[@y_var])
-        modeldata=ModelData.new(convert,ds_prev, @y_var, @fields, @regression_class)
-        @models_data[convert.sort]=modeldata
-      end
+        c=Statsample::Combination.new(i,@fields.size)
+        c.each  do |data|
+          convert=data.collect {|i1| @fields[i1] }
+          @models.push(convert)
+          ds_prev=@ds.dup(convert+[@y_var])
+          modeldata=ModelData.new(convert, ds_prev, @y_var, @fields, @regression_class)
+          @models_data[convert.sort]=modeldata
+        end
       end
     end
     def summary

@@ -103,16 +103,12 @@ module Statsample
       @type=v
     end
     def type
-      if @type.nil? 
-        if row_size.times.find {|i| self[i,i]!=1.0}
-          @type=:covariance
-          :covariance
-        else
-          @type=:correlation
-          :correlation
-        end
+      if row_size.times.find {|i| self[i,i]!=1.0}
+        :covariance
+      else
+        :correlation
       end
-      @type
+      
     end
     def correlation
       if(type==:covariance)

@@ -66,7 +66,7 @@ A suite for basic and advanced statistics. Includes:
 Optional: 
 
 * Plotting: gnuplot and rbgnuplot, SVG::Graph
-* Factorial analysis and polychorical correlation: gsl and rb-gsl (http://rb-gsl.rubyforge.org/)
+* Factorial analysis and polychorical correlation: gsl library and rb-gsl (http://rb-gsl.rubyforge.org/). You should install it using <tt>gem install gsl</tt>
 
 == DOWNLOAD
 * Gems and bugs report: http://rubyforge.org/projects/ruby-statsample/
@@ -78,7 +78,7 @@ Optional:
 
 For optimization on *nix env
 
-  sudo gem install ruby-statsample-optimization
+  sudo gem install gsl ruby-statsample-optimization
 
 Available setup.rb file
 

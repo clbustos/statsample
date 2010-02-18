@@ -63,6 +63,7 @@ lib/statsample/regression/multiple.rb
 lib/statsample/regression/multiple/alglibengine.rb
 lib/statsample/regression/multiple/baseengine.rb
 lib/statsample/regression/multiple/gslengine.rb
+lib/statsample/regression/multiple/matrixengine.rb
 lib/statsample/regression/multiple/rubyengine.rb
 lib/statsample/regression/simple.rb
 lib/statsample/reliability.rb
@@ -88,6 +89,7 @@ test/test_ggobi.rb
 test/test_gsl.rb
 test/test_histogram.rb
 test/test_logit.rb
+test/test_matrix.rb
 test/test_mle.rb
 test/test_multiset.rb
 test/test_permutation.rb

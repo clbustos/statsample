@@ -59,6 +59,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     poly.method=:joint
     poly.compute
     
+    
     assert_in_delta(0.4192, poly.r, 0.0001)
     assert_in_delta(-0.2421, poly.threshold_y[0],0.0001)
     assert_in_delta(-0.0297, poly.threshold_x[0],0.0001)

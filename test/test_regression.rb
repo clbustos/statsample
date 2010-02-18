@@ -21,7 +21,7 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
     ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
     lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y')
     assert_in_delta(2407.436,lr.sst,0.001)
-    assert_in_delta(0.752,lr.r,0.001)
+    assert_in_delta(0.752,lr.r,0.001, "pairwise r")
     assert_in_delta(0.565,lr.r2,0.001)
     assert_in_delta(1361.130,lr.ssr,0.001)
     assert_in_delta(1046.306,lr.sse,0.001)
@@ -38,7 +38,7 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
       @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
       ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
       lr=Statsample::Regression::Multiple::GslEngine.new(ds,'y')
-      model_test(lr)
+      model_test(lr,'gsl')
       predicted=[1.7857, 6.0989, 3.2433, 7.2908, 4.9667, 10.3428, 8.8158, 10.4717, 23.6639, 25.3198]
       c_predicted=lr.predicted
       predicted.each_index{|i|
@@ -63,7 +63,7 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
       @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
       ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
       lr=Statsample::Regression::Multiple::AlglibEngine.new(ds,'y')
-      model_test(lr)
+      model_test(lr,'alglib')
       predicted=[1.7857, 6.0989, 3.2433, 7.2908, 4.9667, 10.3428, 8.8158, 10.4717, 23.6639, 25.3198]
       c_predicted=lr.predicted
       predicted.each_index{|i|
@@ -78,18 +78,17 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
     puts "Regression::Multiple::AlglibEngine not tested (no Alglib)"
     end
   end
-  def model_test_matrix(lr)
-    
+  def model_test_matrix(lr,name='undefined')
     
     stan_coeffs={'a'=>0.151,'b'=>-0.547,'c'=>0.997}
     unstan_coeffs={'a'=>0.695, 'b'=>-4.286, 'c'=>0.266}
-    
+     
     unstan_coeffs.each_key{|k|
-      assert_in_delta(unstan_coeffs[k], lr.coeffs[k],0.001)
+      assert_in_delta(unstan_coeffs[k], lr.coeffs[k],0.001,"b coeffs - #{name}")
     }
 
-    stan_coeffs.each_key{|k|
-      assert_in_delta(stan_coeffs[k], lr.standarized_coeffs[k],0.001)
+   stan_coeffs.each_key{|k|
+     assert_in_delta(stan_coeffs[k], lr.standarized_coeffs[k],0.001, "beta coeffs - #{name}")
     }
     
     assert_in_delta(11.027,lr.constant,0.001)
@@ -102,6 +101,8 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
     assert_in_delta(0.226,lr.tolerance("a"),0.001)
     
     coeffs_se={"a"=>1.171,"b"=>1.129,"c"=>0.072}
+
+    
     
     ccoeffs_se=lr.coeffs_se
     coeffs_se.each_key{|k|
@@ -118,8 +119,8 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
     assert_in_delta(55.840,lr.sse,0.001)
     
   end
-  def model_test(lr)
-    model_test_matrix(lr)
+  def model_test(lr,name='undefined')
+    model_test_matrix(lr,name)
     assert_in_delta(4.559, lr.constant_se,0.001)
     assert_in_delta(2.419, lr.constant_t,0.001)
     
@@ -135,11 +136,11 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
     cor=Statsample::Bivariate.correlation_matrix(ds)
     lr=Statsample::Regression::Multiple::MatrixEngine.new(cor,'y', :y_mean=>@y.mean, :x_mean=>{'a'=>ds['a'].mean, 'b'=>ds['b'].mean, 'c'=>ds['c'].mean}, :cases=>@a.size, :y_sd=>@y.sd , :x_sd=>{'a' => @a.sd, 'b' => @b.sd, 'c' => @c.sd})
     
-    model_test_matrix(lr)
+    model_test_matrix(lr, "correlation matrix")
     
     covariance=Statsample::Bivariate.covariance_matrix(ds)
     lr=Statsample::Regression::Multiple::MatrixEngine.new(covariance,'y', :y_mean=>@y.mean, :x_mean=>{'a'=>ds['a'].mean, 'b'=>ds['b'].mean, 'c'=>ds['c'].mean}, :cases=>@a.size)
-    model_test_matrix(lr)
+    model_test_matrix(lr , "covariance matrix")
   end
   def test_regression_rubyengine
     @a=[nil,1,3,2,4,3,5,4,6,5,7].to_vector(:scale)
@@ -148,7 +149,8 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
     @y=[nil,3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
     ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
     lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y')
-    model_test(lr)
+    model_test(lr, 'rubyengine with missing data')
+    
     predicted=[nil,1.7857, 6.0989, 3.2433, 7.2908, 4.9667, 10.3428, 8.8158, 10.4717, 23.6639, 25.3198]
     c_predicted = lr.predicted
     
@@ -168,5 +170,6 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
         assert_in_delta(residuals[i],c_residuals[i],0.001)
       end
     end
+    
   end
 end

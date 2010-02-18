@@ -15,31 +15,38 @@ module Multiple
 #   ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
 #   lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y')
 
-class RubyEngine < BaseEngine 
+class RubyEngine < MatrixEngine
   def initialize(ds,y_var, opts=Hash.new)
-    super
+    matrix=Statsample::Bivariate.correlation_matrix(ds)
+    fields_indep=ds.fields-[y_var]
+    default={
+      :y_mean=>ds[y_var].mean,
+      :x_mean=>fields_indep.inject({}) {|ac,f|  ac[f]=ds[f].mean; ac},
+      :y_sd=>ds[y_var].sd,
+      :x_sd=>fields_indep.inject({}) {|ac,f|  ac[f]=ds[f].sd; ac},
+      :cases=>min_n_valid(ds)
+    }
+    opts=opts.merge(default)
+    super(matrix, y_var, opts)
+    @ds=ds
     @dy=ds[@y_var]
     @ds_valid=ds.dup_only_valid
-    @ds_indep=ds.dup(ds.fields-[y_var])
-    @fields=@ds_indep.fields
+    @ds_indep = ds.dup(ds.fields-[y_var])
+    
+#    p obtain_predictor_matrix
+#    p @matrix_x.correlation
+    
     set_dep_columns
-    obtain_y_vector
-    @matrix_x = Bivariate.correlation_matrix(@ds_indep)
-    @coeffs_stan=(@matrix_x.inverse * @matrix_y).column(0).to_a
-    @min_n_valid=nil
   end
-  def min_n_valid
-    if @min_n_valid.nil?
-      min=@ds.cases
-      m=Bivariate::n_valid_matrix(@ds)
-      for x in 0...m.row_size
-        for y in 0...m.column_size
-          min=m[x,y] if m[x,y] < min
-        end
+  def min_n_valid(ds)
+    min=ds.cases
+    m=Bivariate::n_valid_matrix(ds)
+    for x in 0...m.row_size
+      for y in 0...m.column_size
+        min=m[x,y] if m[x,y] < min
       end
-      @min_n_valid=min
     end
-    @min_n_valid
+    min
   end
   def set_dep_columns
     @dep_columns=[]
@@ -47,29 +54,7 @@ class RubyEngine < BaseEngine
       @dep_columns.push(v.data_with_nils)
     }                
   end
-    # Sum of square total
-  def sst
-    #if @sst.nil?
-    @sst=@dy.variance*(min_n_valid-1.0)
-    #end
-    @sst
-  end
-  def r2
-    if @r2.nil?
-      c=@matrix_y
-      rxx=obtain_predictor_matrix
-      matrix=(c.t*rxx.inverse*c)
-      @r2=matrix[0,0]
-    end
-    @r2
-  end
-  def r
-    Math::sqrt(r2)
-  end
-  
-  def df_e
-    min_n_valid-@dep_columns.size-1
-  end
+
   def fix_with_mean
     i=0
     @ds_indep.each do |row|
@@ -88,45 +73,29 @@ class RubyEngine < BaseEngine
   def fix_with_regression
     i=0
     @ds_indep.each{|row|
-        empty=[]
-        row.each{|k,v|
-            empty.push(k) if v.nil?
+      empty=[]
+      row.each{|k,v|
+          empty.push(k) if v.nil?
+      }
+      if empty.size==1
+        field=empty[0]
+        lr=MultipleRegression.new(@ds_indep,field)
+        fields=[]
+        @ds_indep.fields.each{|f|
+            fields.push(row[f]) unless f==field
         }
-        if empty.size==1
-            field=empty[0]
-            lr=MultipleRegression.new(@ds_indep,field)
-            fields=[]
-            @ds_indep.fields.each{|f|
-                fields.push(row[f]) unless f==field
-            }
-            @ds_indep[field][i]=lr.process(fields)
-        end
-        i+=1
+        @ds_indep[field][i]=lr.process(fields)
+      end
+      i+=1
     }
     @ds_indep.update_valid_data
     set_dep_columns
   end
-  def obtain_y_vector
-    @matrix_y=Matrix.columns([@ds_indep.fields.collect{|f|
-        Bivariate.pearson(@dy, @ds_indep[f])
-    }])
-  end
-  def obtain_predictor_matrix
-    Bivariate::correlation_matrix(@ds_indep)
-  end
-  def constant
-    c=coeffs
-    @dy.mean-@fields.inject(0){|a,k| a+(c[k] * @ds_indep[k].mean)}
-  end
   
-  def coeffs
-    sc=standarized_coeffs
-    assign_names(@fields.collect{|f|
-      (sc[f]*@dy.sds).quo(@ds_indep[f].sds)
-    })
-  end
-  def standarized_coeffs
-    assign_names(@coeffs_stan)
+
+  # Standard error for constant
+  def constant_se
+    estimated_variance_covariance_matrix[0,0]
   end
 end
 end

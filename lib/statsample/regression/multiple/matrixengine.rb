@@ -1,13 +1,15 @@
 module Statsample
 module Regression
 module Multiple
-# Pure Ruby Class for Multiple Regression Analysis, based on a correlation matrix.
-# 
-# Example:
-#
-#   matrix=[[1.0, 0.5, 0.2], [0.5, 1.0, 0.7], [0.2, 0.7, 1.0]]
-#   
-#   lr=Statsample::Regression::Multiple::MatrixEngine.new(matrix,2)
+  # Pure Ruby Class for Multiple Regression Analysis, based on a covariance or correlation matrix.
+  # <b>Remember:</b> NEVER use a Covariance data if you have missing data. Use only correlation matrix on that case.
+  #
+  # 
+  # Example:
+  #
+  #   matrix=[[1.0, 0.5, 0.2], [0.5, 1.0, 0.7], [0.2, 0.7, 1.0]]
+  #   
+  #   lr=Statsample::Regression::Multiple::MatrixEngine.new(matrix,2)
 
 class MatrixEngine < BaseEngine 
   # Hash of standard deviation of predictors. 
@@ -27,15 +29,21 @@ class MatrixEngine < BaseEngine
   
   # Number of cases
   attr_writer :cases
-  
+  # Create object
+  #
   def initialize(matrix,y_var, opts=Hash.new)
     matrix.extend Statsample::CovariateMatrix
+    raise "#{y_var} variable should be on data" unless matrix.fields.include? y_var
+    
+    @matrix_cor=matrix.correlation
+    
     @y_var=y_var
     @fields=matrix.fields-[y_var]
     @n_predictors=@fields.size
     @matrix=matrix
     @matrix_x= matrix.submatrix(@fields)
-    @matrix_y = matrix.submatrix(@fields,[y_var])
+    @matrix_y = matrix.submatrix(@fields, [y_var])
+    @matrix_y_cor=@matrix_cor.submatrix(@fields, [y_var])
     @result_matrix=@matrix_x.inverse * @matrix_y
     @y_sd=Math::sqrt(@matrix.submatrix([y_var])[0,0])
     @x_sd=@matrix_x.row_size.times.inject({}) {|ac,i|
@@ -50,19 +58,22 @@ class MatrixEngine < BaseEngine
     
     @y_mean=0.0
     @name=_("Multiple reggresion of %s on %s") % [@fields.join(","), @y_var]
+    
+    
     opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
     }
     if matrix.type==:covariance
-    @coeffs=@result_matrix.column(0).to_a
-    @coeffs_stan=coeffs.collect {|k,v|
-      coeffs[k]*@x_sd[k].quo(@y_sd)
-    }
+      @coeffs=@result_matrix.column(0).to_a
+      @coeffs_stan=coeffs.collect {|k,v|
+        coeffs[k]*@x_sd[k].quo(@y_sd)
+      }
     else
-    @coeffs_stan=@result_matrix.column(0).to_a
-    @coeffs=standarized_coeffs.collect {|k,v|
-      standarized_coeffs[k]*@y_sd.quo(@x_sd[k])
-    } 
+      @coeffs_stan=@result_matrix.column(0).to_a
+      
+      @coeffs=standarized_coeffs.collect {|k,v|
+        standarized_coeffs[k]*@y_sd.quo(@x_sd[k])
+      } 
     end
 
   end
@@ -70,7 +81,12 @@ class MatrixEngine < BaseEngine
     raise "You should define the number of valid cases first" if @cases.nil?
     @cases
   end
+  # Get R^2 for the regression
+  # Equal to 
+  # * 1-(|R| / |R_x|) or
+  # * Sum(b_i*r_yi)
   def r2
+    #@n_predictors.times.inject(0) {|ac,i| ac+@coeffs_stan[i]* @matrix_y_cor[i,0]} 
     1-(@matrix.correlation.determinant.quo(@matrix_x.correlation.determinant))
   end
   def r
