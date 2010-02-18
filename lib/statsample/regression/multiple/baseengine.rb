@@ -9,6 +9,7 @@ module Statsample
         attr_accessor :name
         def initialize(ds, y_var, opts = Hash.new)
           @ds=ds
+          @cases=@ds.cases
           @y_var=y_var
           @r2=nil
           @name=_("Multiple Regression:  %s over %s") % [ ds.fields.join(",") , @y_var]
@@ -120,6 +121,11 @@ module Statsample
           }
           out
         end
+        # Estandar error of R
+        def se_r2
+          Math::sqrt((4*r2*(1-r2)**2*(df_e)**2).quo((@cases**2-1)*(@cases+3)))
+        end
+         
         # Estimated Variance-Covariance Matrix
         # Used for calculation of se of constant
         def estimated_variance_covariance_matrix
@@ -167,7 +173,8 @@ module Statsample
           cse=coeffs_se
           t=ReportBuilder::Table.new(:name=>"Beta coefficients", :header=>%w{coeff b beta se t}.collect{|field| _(field)} )
           
-          t.add_row([_("Constant"), sprintf("%0.3f", constant), "-", sprintf("%0.3f", constant_se), sprintf("%0.3f", constant_t)])
+            t.add_row([_("Constant"), sprintf("%0.3f", constant), "-", sprintf("%0.3f", constant_se), sprintf("%0.3f", constant_t)])
+          
           @fields.each do |f|
             t.add_row([f, sprintf("%0.3f", c[f]), sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
           end  

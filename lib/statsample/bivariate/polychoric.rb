@@ -48,21 +48,21 @@ module Statsample
       attr_accessor :max_iterations
       # Debug algorithm (See iterations, for example)
       attr_accessor :debug
-      # Minimizer type. Default GSL::Min::FMinimizer::BRENT
+      # Minimizer type for two step. Default "brent"
       # See http://rb-gsl.rubyforge.org/min.html for reference.  
       attr_accessor :minimizer_type_two_step
       
-      # Minimizer type. Default GSL::Min::FMinimizer::BRENT
+      # Minimizer type for joint estimate. Default "nmsimplex"
       # See http://rb-gsl.rubyforge.org/min.html for reference.  
       attr_accessor :minimizer_type_joint
       
       
       # Method of calculation of polychoric series. 
       # 
-      # :two_step:: two-step ML, based on code by Gegenfurtner(1992)
+      # :two_step:: two-step ML, based on code by Gegenfurtner(1992).
       # :polychoric_series:: polychoric series estimate, using 
-      #                      algorithm AS87 by Martinson and Hamdan (1975)
-      # :joint:              one-step ML, based on R package 'polycor' 
+      #                      algorithm AS87 by Martinson and Hamdan (1975).
+      # :joint::             one-step ML, based on R package 'polycor'
       #                      by J.Fox.
       attr_accessor :method
       # Absolute error for iteration.

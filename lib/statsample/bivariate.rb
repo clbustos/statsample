@@ -120,13 +120,16 @@ module Statsample
       # Order of rows and columns depends on Dataset#fields order
       
       def covariance_matrix(ds)
-        ds.collect_matrix do |row,col|
+        matrix=ds.collect_matrix do |row,col|
           if (ds[row].type!=:scale or ds[col].type!=:scale)
             nil
           else
-            covariance(ds[row],ds[col])
+            covariance(ds[row], ds[col])
           end
         end
+        matrix.extend CovariateMatrix
+        matrix.fields=ds.fields
+        matrix
       end
       
       # Correlation matrix.
@@ -142,8 +145,8 @@ module Statsample
             pearson(ds[row],ds[col])
           end
         end
-        cm.extend(Statsample::CorrelationMatrix)
-        cm.labels=ds.fields
+        cm.extend(Statsample::CovariateMatrix)
+        cm.fields=ds.fields
         cm
       end
       

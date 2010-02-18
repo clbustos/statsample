@@ -63,71 +63,71 @@ class RubyEngine < BaseEngine
     end
     @r2
   end
-    def r
-        Math::sqrt(r2)
+  def r
+    Math::sqrt(r2)
+  end
+  
+  def df_e
+    min_n_valid-@dep_columns.size-1
+  end
+  def fix_with_mean
+    i=0
+    @ds_indep.each do |row|
+      empty=[]
+      row.each do |k,v|
+        empty.push(k) if v.nil?
+      end
+      if empty.size==1
+        @ds_indep[empty[0]][i]=@ds[empty[0]].mean
+      end
+      i+=1
     end
-
-    def df_e
-        min_n_valid-@dep_columns.size-1
-    end
-    def fix_with_mean
-      i=0
-      @ds_indep.each do |row|
+    @ds_indep.update_valid_data
+    set_dep_columns
+  end
+  def fix_with_regression
+    i=0
+    @ds_indep.each{|row|
         empty=[]
-        row.each do |k,v|
-          empty.push(k) if v.nil?
-        end
+        row.each{|k,v|
+            empty.push(k) if v.nil?
+        }
         if empty.size==1
-          @ds_indep[empty[0]][i]=@ds[empty[0]].mean
+            field=empty[0]
+            lr=MultipleRegression.new(@ds_indep,field)
+            fields=[]
+            @ds_indep.fields.each{|f|
+                fields.push(row[f]) unless f==field
+            }
+            @ds_indep[field][i]=lr.process(fields)
         end
         i+=1
-      end
-      @ds_indep.update_valid_data
-      set_dep_columns
-    end
-    def fix_with_regression
-        i=0
-        @ds_indep.each{|row|
-            empty=[]
-            row.each{|k,v|
-                empty.push(k) if v.nil?
-            }
-            if empty.size==1
-                field=empty[0]
-                lr=MultipleRegression.new(@ds_indep,field)
-                fields=[]
-                @ds_indep.fields.each{|f|
-                    fields.push(row[f]) unless f==field
-                }
-                @ds_indep[field][i]=lr.process(fields)
-            end
-            i+=1
-        }
-        @ds_indep.update_valid_data
-        set_dep_columns
-    end
-    def obtain_y_vector
-        @matrix_y=Matrix.columns([@ds_indep.fields.collect{|f|
-                Bivariate.pearson(@dy, @ds_indep[f])
-        }])
-    end
-    def obtain_predictor_matrix
-        Bivariate::correlation_matrix(@ds_indep)
-    end
-    def constant
-        c=coeffs
-        @dy.mean-@fields.inject(0){|a,k| a+(c[k] * @ds_indep[k].mean)}
-    end
-   
-    def coeffs
-        sc=standarized_coeffs
-        assign_names(@fields.collect{|f|
-            (sc[f]*@dy.sds).quo(@ds_indep[f].sds)
-        })
-    end
-    def standarized_coeffs
-        assign_names(@coeffs_stan)
-    end
+    }
+    @ds_indep.update_valid_data
+    set_dep_columns
+  end
+  def obtain_y_vector
+    @matrix_y=Matrix.columns([@ds_indep.fields.collect{|f|
+        Bivariate.pearson(@dy, @ds_indep[f])
+    }])
+  end
+  def obtain_predictor_matrix
+    Bivariate::correlation_matrix(@ds_indep)
+  end
+  def constant
+    c=coeffs
+    @dy.mean-@fields.inject(0){|a,k| a+(c[k] * @ds_indep[k].mean)}
+  end
+  
+  def coeffs
+    sc=standarized_coeffs
+    assign_names(@fields.collect{|f|
+      (sc[f]*@dy.sds).quo(@ds_indep[f].sds)
+    })
+  end
+  def standarized_coeffs
+    assign_names(@coeffs_stan)
+  end
 end
 end
 end

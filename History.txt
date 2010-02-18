@@ -1,3 +1,6 @@
+=== 0.6.3 / 2010-02-15
+* Statsample::Bivariate::Polychoric have joint estimation.
+* Some extra documentation and bug fixs
 === 0.6.2 / 2010-02-11
 * New Statsample::Bivariate::Polychoric. For implement: X2 and G2
 * New matrix.rb, for faster development of Contingence Tables and Correlation Matrix
