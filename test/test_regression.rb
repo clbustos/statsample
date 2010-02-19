@@ -13,6 +13,29 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
 		assert_in_delta(-0.957, @reg.b,0.001)
 		assert_in_delta(4.248,@reg.standard_error,0.002)
 	end
+  def test_multiple_dependent
+    complete=Matrix[
+    [1,0.53,0.62,0.19,-0.09,0.08,0.02,-0.12,0.08],
+    [0.53,1,0.61,0.23,0.1,0.18,0.02,-0.1,0.15],
+    [0.62,0.61,1,0.03,0.1,0.12,0.03,-0.06,0.12],
+    [0.19,0.23,0.03,1,-0.02,0.02,0,-0.02,-0.02],
+    [-0.09,0.1,0.1,-0.02,1,0.05,0.06,0.18,0.02],
+    [0.08,0.18,0.12,0.02,0.05,1,0.22,-0.07,0.36],
+    [0.02,0.02,0.03,0,0.06,0.22,1,-0.01,-0.05],
+    [-0.12,-0.1,-0.06,-0.02,0.18,-0.07,-0.01,1,-0.03],
+    [0.08,0.15,0.12,-0.02,0.02,0.36,-0.05,-0.03,1]]
+    complete.extend Statsample::CovariateMatrix
+    complete.fields=%w{adhd cd odd sex age monly mwork mage poverty}
+    
+    lr=Statsample::Regression::Multiple::MultipleDependent.new(complete, %w{adhd cd odd})
+    
+    
+    assert_in_delta(0.197, lr.r2yx,0.001)
+    assert_in_delta(0.197, lr.r2yx_covariance,0.001)
+    assert_in_delta(0.07, lr.p2yx,0.001)
+    
+
+  end
   def test_multiple_regression_pairwise_2
     @a=[1,3,2,4,3,5,4,6,5,7,3,nil,3,nil,3].to_vector(:scale)
     @b=[3,3,4,4,5,5,6,6,4,4,2,2,nil,6,2].to_vector(:scale)

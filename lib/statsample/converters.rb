@@ -155,6 +155,28 @@ raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all
         }
         book.write(filename)
       end
+      # This should be fixed.
+      # If we have a Formula, should be resolver first
+
+      def preprocess_row(row, dates)
+        i=-1
+        row.collect!{|c|
+          i+=1
+          if c.is_a? Spreadsheet::Formula
+            if(c.value.is_a? Spreadsheet::Excel::Error)
+              nil
+            else
+              c.value
+            end
+          elsif dates.include? i and !c.nil? and c.is_a? Numeric
+              row.date(i)
+          else
+              c
+          end
+        }
+      end
+      private :process_row
+      
       # Returns a dataset based on a xls file
       # USE:
       #     ds = Statsample::Excel.read("test.xls")
@@ -177,27 +199,9 @@ raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all
               end
             }
             line_number+=1
-            if(line_number<=ignore_lines)
-            #puts "Skip line #{line_number}:#{row.to_s}"
-                next
-            end
-            # This should be fixed.
-            # If we have a Formula, should be resolver first
-            i=-1
-            row.collect!{|c|
-                i+=1
-                if c.is_a? Spreadsheet::Formula
-                  if(c.value.is_a? Spreadsheet::Excel::Error)
-                    nil
-                  else
-                    c.value
-                  end
-                elsif dates.include? i and !c.nil? and c.is_a? Numeric
-                    row.date(i)
-                else
-                    c
-                end
-            }
+            next if(line_number<=ignore_lines)
+            
+            preprocess_row(row,dates)
             if first_row
               fields=extract_fields(row)
               ds=Statsample::Dataset.new(fields)
@@ -210,8 +214,8 @@ raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all
               ds.add_case(rowa,false)
             end
           rescue => e
-              error="#{e.to_s}\nError on Line # #{line_number}:#{row.join(",")}"
-              raise
+            error="#{e.to_s}\nError on Line # #{line_number}:#{row.join(",")}"
+            raise
           end
         end
         convert_to_scale_and_date(ds, fields)

@@ -1,6 +1,12 @@
+=== 0.6.4 / 2010-02-19
+* Dominance Analysis and Dominance Analysis Bootstrap allows multivariate dependent analysis. 
+* Test suite for Dominance Analysis, using Azen and Budescu papers as references
+* X^2 for polychoric correlation
+
 === 0.6.3 / 2010-02-15
 * Statsample::Bivariate::Polychoric have joint estimation.
 * Some extra documentation and bug fixs
+
 === 0.6.2 / 2010-02-11
 * New Statsample::Bivariate::Polychoric. For implement: X2 and G2
 * New matrix.rb, for faster development of Contingence Tables and Correlation Matrix

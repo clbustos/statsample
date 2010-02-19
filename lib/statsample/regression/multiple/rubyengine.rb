@@ -24,7 +24,7 @@ class RubyEngine < MatrixEngine
       :x_mean=>fields_indep.inject({}) {|ac,f|  ac[f]=ds[f].mean; ac},
       :y_sd=>ds[y_var].sd,
       :x_sd=>fields_indep.inject({}) {|ac,f|  ac[f]=ds[f].sd; ac},
-      :cases=>min_n_valid(ds)
+      :cases=>Statsample::Bivariate.min_n_valid(ds)
     }
     opts=opts.merge(default)
     super(matrix, y_var, opts)
@@ -38,16 +38,7 @@ class RubyEngine < MatrixEngine
     
     set_dep_columns
   end
-  def min_n_valid(ds)
-    min=ds.cases
-    m=Bivariate::n_valid_matrix(ds)
-    for x in 0...m.row_size
-      for y in 0...m.column_size
-        min=m[x,y] if m[x,y] < min
-      end
-    end
-    min
-  end
+  
   def set_dep_columns
     @dep_columns=[]
     @ds_indep.each_vector{|k,v|

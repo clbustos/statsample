@@ -287,6 +287,21 @@ module Statsample
         }
         sum-((v1a.sum*v2a.sum) / v1a.size.to_f)
       end
+      
+      # Report the minimum number of cases valid of a covariate matrix
+      # based on a dataset
+      def min_n_valid(ds)
+        min=ds.cases
+        m=n_valid_matrix(ds)
+        for x in 0...m.row_size
+          for y in 0...m.column_size
+            min=m[x,y] if m[x,y] < min
+          end
+        end
+        min
+      end
+      
+      
     end
   end
 end

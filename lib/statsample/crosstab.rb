@@ -8,7 +8,7 @@ module Statsample
     bindtextdomain("statsample")
     attr_reader :v_rows, :v_cols
     attr_accessor :row_label, :column_label, :name, :percentage_row, :percentage_column, :percentage_total
-    def initialize(v1,v2,opts=Hash.new)
+    def initialize(v1, v2, opts=Hash.new)
     raise ArgumentError, "Both arguments should be Vectors" unless v1.is_a? Statsample::Vector and v2.is_a? Statsample::Vector
     raise ArgumentError, "Vectors should be the same size" unless v1.size==v2.size
     @v_rows, @v_cols=Statsample.only_valid(v1,v2)
@@ -190,49 +190,6 @@ module Statsample
       t_row.push("100%")
       t.add_row(t_row)
       generator.parse_element(t)
-    end
-  
-  
-    
-    def to_s
-      fq=frequencies
-      rn=rows_names
-      cn=cols_names
-      total=0
-      total_cols=cols_empty_hash
-      max_row_size = rn.inject(0) {|s,x| sl=@v_rows.labeling(x).size; sl>s ? sl : s}
-      
-      max_row_size=max_row_size<6 ? 6 : max_row_size
-      
-      max_col_size = cn.inject(0) {|s,x| sl=@v_cols.labeling(x).size; sl>s ? sl : s}
-      max_col_size = frequencies.inject(max_col_size) {|s,x| x[1].to_s.size>s ? x[1].to_s.size : s}
-      
-      out=""
-      out << " " * (max_row_size+2) << "|" << cn.collect{|c| name=@v_cols.labeling(c); " "+name+(" "*(max_col_size-name.size))+" "}.join("|") << "| Total\n"
-      linea="-" * (max_row_size+2) << "|" << ("-"*(max_col_size+2) +"|")*cn.size << "-"*7 << "\n"
-      out << linea
-      rn.each{|row|
-          total_row=0;
-          name=@v_rows.labeling(row)
-          out << " " +name  << " "*(max_row_size-name.size) << " | "
-          cn.each{|col|
-              data=fq[[row,col]].to_s
-              total_row+=fq[[row,col]]
-              total+=fq[[row,col]]                    
-              total_cols[col]+=fq[[row,col]]                    
-              out << " " << data << " "*(max_col_size-data.size) << "| "
-          }
-          out << " " << total_row.to_s
-      out << "\n"
-      }
-      out << linea
-      out << " Total " << " "*(max_row_size-5) << "| "
-      cn.each{|v|
-          data=total_cols[v].to_s
-          out << " " << data << " "*(max_col_size-data.size) << "| "
-      }
-      out << " " << total.to_s
-      out
     end
   end
 end

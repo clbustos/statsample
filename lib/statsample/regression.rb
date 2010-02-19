@@ -1,5 +1,6 @@
 require 'statsample/regression/simple'
 require 'statsample/regression/multiple'
+
 require 'statsample/regression/multiple/matrixengine'
 require 'statsample/regression/multiple/alglibengine'
 require 'statsample/regression/multiple/rubyengine'

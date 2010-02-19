@@ -42,35 +42,77 @@ module Statsample
     #  -----------------------------------------------
     # 
     module Multiple
-        # Creates an object for listwise regression. 
-        # Alglib is faster, so is prefered over GSL
-        #   lr=Statsample::Regression::Multiple.listwise(ds,'y')
-        def self.listwise(ds,y_var)
-          if HAS_ALGIB
-            AlglibEngine.new(ds,y_var)
-          elsif HAS_GSL
-            GslEngine.new(ds,y_var)
-          else
-            ds2=ds.dup_only_valid
-            RubyEngine.new(ds2,y_var)
-          end
+      # Creates an object for listwise regression. 
+      # Alglib is faster, so is prefered over GSL
+      #   lr=Statsample::Regression::Multiple.listwise(ds,'y')
+      def self.listwise(ds,y_var)
+        if HAS_ALGIB
+          AlglibEngine.new(ds,y_var)
+        elsif HAS_GSL
+          GslEngine.new(ds,y_var)
+        else
+          ds2=ds.dup_only_valid
+          RubyEngine.new(ds2,y_var)
+        end
+      end
+      
+      # Creates an object for pairwise regression
+      # For now, always retrieves a RubyEngine
+      #    lr=Statsample::Regression::Multiple.listwise(ds,'y')
+      def self.pairwise(ds,y_var)
+        RubyEngine.new(ds,y_var)
+      end
+      def self.listwise_by_exp(ds,exp)
+        raise "Not implemented yet"
+      end
+      # Obtain r2 for regressors
+      def self.r2_from_matrices(rxx,rxy)
+        matrix=(rxy.transpose*rxx.inverse*rxy)
+        matrix[0,0]
+      end
+      
+      class MultipleDependent
+        def significance
+          0.0
+        end
+        def initialize(matrix,y_var, opts=Hash.new)
+           matrix.extend Statsample::CovariateMatrix
+           @matrix=matrix
+           @fields=matrix.fields-y_var
+           @y_var=y_var
+           @q=@y_var.size
+           @matrix_cor=matrix.correlation
+           @matrix_cor_xx = @matrix_cor.submatrix(@fields)
+           @matrix_cor_yy = @matrix_cor.submatrix(y_var, y_var)
+           
+           @sxx = @matrix.submatrix(@fields)
+           @syy = @matrix.submatrix(y_var, y_var)
+           @sxy = @matrix.submatrix(@fields, y_var)
+           @syx = @sxy.t
+           
+           
         end
         
-        # Creates an object for pairwise regression
-        # For now, always retrieves a RubyEngine
-        #    lr=Statsample::Regression::Multiple.listwise(ds,'y')
-        def self.pairwise(ds,y_var)
-          RubyEngine.new(ds,y_var)
+        def r2yx
+          1- (@matrix_cor.determinant.quo(@matrix_cor_yy.determinant * @matrix_cor_xx.determinant))
         end
-        def self.listwise_by_exp(ds,exp)
-          raise "Not implemented yet"
+        # Residual covariance of Y after accountin with lineal relation with x
+        def syyx
+          @syy-@syx*@sxx.inverse*@sxy
         end
-        # Obtain r2 for regressors
-        def self.r2_from_matrices(rxx,rxy)
-          matrix=(rxy.transpose*rxx.inverse*rxy)
-          matrix[0,0]
+        def r2yx_covariance
+          1-(syyx.determinant.quo(@syy.determinant))
         end
         
+        def vxy
+          @q-(@syy.inverse*syyx).trace
+        end
+        def p2yx
+          vxy.quo(@q)
+        end
+      end
+      
+      
     end
   end
 end

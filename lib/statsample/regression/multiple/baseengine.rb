@@ -3,10 +3,18 @@ module Statsample
     module Multiple
       # Base class for Multiple Regression Engines
       class BaseEngine
+        
         include GetText
         bindtextdomain("statsample")
         # Name of analysis
         attr_accessor :name
+        
+        def self.univariate?
+          true
+        end
+        
+
+        
         def initialize(ds, y_var, opts = Hash.new)
           @ds=ds
           @cases=@ds.cases
@@ -93,7 +101,7 @@ module Statsample
         end
         # Significance of Fisher
         def significance
-          1.0-Distribution::F.cdf(f,df_r,df_e)
+          (1.0-Distribution::F.cdf(f, df_r, df_e)).abs
         end
         # Tolerance for a given variable
         # http://talkstats.com/showthread.php?t=5056
@@ -158,8 +166,8 @@ module Statsample
           c=coeffs
           generator.add_text(_("Engine: %s") % self.class)
           generator.add_text(_("Cases(listwise)=%d(%d)") % [@ds.cases, @ds_valid.cases])
-          generator.add_text("r=#{sprintf('%0.3f',r)}")
-          generator.add_text("r=#{sprintf('%0.3f',r2)}")
+          generator.add_text("R=#{sprintf('%0.3f',r)}")
+          generator.add_text("R^2=#{sprintf('%0.3f',r2)}")
           
           generator.add_text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
           
@@ -191,22 +199,6 @@ module Statsample
           a
         end
 
-        # Deprecated
-        # Sum of squares of error (manual calculation)
-        # using the predicted value minus the y_i value
-        def sse_manual
-          pr=predicted
-          cases=0
-          sse=(0...@ds.cases).inject(0) {|a,i|
-          if !@dy.data_with_nils[i].nil? and !pr[i].nil?
-            cases+=1
-            a+((pr[i]-@dy[i])**2)
-          else
-            a
-          end
-          }
-          sse*(min_n_valid-1.0).quo(cases-1)
-        end
         # Sum of squares of regression
         # using the predicted value minus y mean
         def ssr_direct

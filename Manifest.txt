@@ -13,6 +13,7 @@ demo/correlation_matrix.rb
 demo/dominance_analysis_bootstrap.rb
 demo/dominanceanalysis.rb
 demo/multiple_regression.rb
+demo/multivariate_correlation.rb
 demo/polychoric.rb
 demo/tetrachoric.rb
 lib/distribution.rb
@@ -84,6 +85,7 @@ test/test_csv.csv
 test/test_csv.rb
 test/test_dataset.rb
 test/test_distribution.rb
+test/test_dominance_analysis.rb
 test/test_factor.rb
 test/test_ggobi.rb
 test/test_gsl.rb

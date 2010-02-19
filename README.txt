@@ -11,16 +11,16 @@ A suite for basic and advanced statistics. Includes:
 * Correlations: Pearson (r), Rho, Tetrachoric, Polychoric
 * Regression: Simple, Multiple, Probit and Logit
 * Factorial Analysis: Extraction (PCA and Principal Axis) and Rotation (Varimax and relatives)
-* Dominance Analysis (Azen & Budescu)
+* Dominance Analysis, with multivariate dependent and bootstrap (Azen & Budescu)
 * Sample calculation related formulas
 
 == DETAILED FEATURES:
 
 * Factorial Analysis. Principal Component Analysis and Principal Axis extraction, with orthogonal rotations (Varimax, Equimax, Quartimax)
-* Multiple Regression. Listwise analysis optimized with use of Alglib library. Pairwise analysis is executed on pure ruby and reports same values as SPSS
+* Multiple Regression. Listwise analysis optimized with use of Alglib library. Pairwise analysis is executed on pure ruby with matrixes and reports same values as SPSS
 * Module Bivariate provides covariance and pearson, spearman, point biserial, tau a, tau b, gamma, tetrachoric and polychoric correlation correlations. Include methods to create correlation (pearson and tetrachoric) and covariance matrices
 * Regression module provides linear regression methods
-* Dominance Analysis. Based on Budescu and Azen papers, <strong>DominanceAnalysis</strong> class can report dominance analysis for a sample and <strong>DominanceAnalysisBootstrap</strong> can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/]. 
+* Dominance Analysis. Based on Budescu and Azen papers, <strong>DominanceAnalysis</strong> class can report dominance analysis for a sample, using uni or multivariate dependent variables and <strong>DominanceAnalysisBootstrap</strong> can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/]. 
 * Classes for Vector, Datasets (set of Vectors) and Multisets (multiple datasets with same fields and type of vectors), and multiple methods to manipulate them
 * Module Codification, to help to codify open questions
 * Converters to and from database and csv files, and to output Mx and GGobi files

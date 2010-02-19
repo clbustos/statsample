@@ -109,7 +109,7 @@ end
 # * Dataset: An union of vectors.
 #
 module Statsample
-  VERSION = '0.6.3'
+  VERSION = '0.6.4'
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')

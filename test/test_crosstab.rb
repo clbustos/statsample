@@ -49,7 +49,4 @@ class StatsampleCrosstabTestCase < Test::Unit::TestCase
         ct=Statsample::Crosstab.new(v1,v2)
         assert_equal(Matrix[[2.5,2.5],[2.5,2.5]],ct.matrix_expected)
     end
-    def test_to_s
-        assert_match(/man\s+|\s+woman/,@ct.to_s)
-    end
 end

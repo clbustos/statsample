@@ -4,7 +4,8 @@ module Statsample
   # for all possible subset models, to identify the relevance of one or more 
   # predictors in the prediction of criterium.
   #
-  # See Budescu(1993) and Azen & Budescu (2003) for more information.
+  #
+  # See Budescu(1993), Azen & Budescu (2003, 2006) for more information.
   #
   # Example: 
   #
@@ -53,39 +54,127 @@ module Statsample
 
   #
   # == References:
-  # * Budescu, D. V. (1993). Dominance analysis: a new approach to the problem of relative importance of predictors in multiple regression. _Psychological Bulletin, 114_, 542-551.
-  # * Azen, R. & Budescu, D.V. (2003). The dominance analysis approach for comparing predictors in multiple regression. _Psychological Methods, 8_(2), 129-148.
+  # * Budescu, D. V. (1993). Dominance analysis: a new approach to the problem of relative importance of predictors in multiple regression. <em>Psychological Bulletin, 114</em>, 542-551.
+  # * Azen, R. & Budescu, D.V. (2003). The dominance analysis approach for comparing predictors in multiple regression. <em>Psychological Methods, 8</em>(2), 129-148.
+  # * Azen, R. & Budescu, D.V. (2006). Comparing predictors in Multivariate Regression Models: An extension of Dominance Analysis. <em>Journal of Educational and Behavioral Statistics, 31</em>(2), 157-180.
   class DominanceAnalysis
     include GetText
     bindtextdomain("statsample")
-    # Class to generate the regressions. Default to Statsample::Regression::Multiple::RubyEngine
+    # Class to generate the regressions. Default to Statsample::Regression::Multiple::MatrixEngine
     attr_accessor :regression_class
     # Name of analysis
     attr_accessor :name
-    
-    # Creates a new DominanceAnalysis object
-    # Params:
-    # * ds: A Dataset object
-    # * y_var: Name of dependent variable
-    # * opts: Any other attribute of the class 
+    # Set to true if you want to build from dataset, not correlation matrix
+    attr_accessor :build_from_dataset
+    #  Array with independent variables. You could create subarrays, 
+    #  to test groups of predictors as blocks
+    attr_accessor  :predictors
+    # If you provide a matrix as input, you should set 
+    # the number of cases to define significance of R^2
+    attr_accessor  :cases
+    # Method of :regression_class used to measure association. 
     # 
-    def initialize(ds,y_var, opts=Hash.new)
-      @y_var=y_var
-      @dy=ds[@y_var]
-      @ds=ds
-      @ds_indep=ds.dup(ds.fields-[y_var])
-      @fields=@ds_indep.fields
-      @regression_class=Statsample::Regression::Multiple::RubyEngine
-      @name=_("Dominance Analysis:  %s over %s") % [ ds.fields.join(",") , @y_var]
+    # Only necessary to change if you have multivariate dependent.
+    # * :r2yx (R^2_yx), the default option, is the  option when distinction
+    #   between independent and dependents variable is arbitrary
+    # * :p2yx is the option when the distinction between independent and dependents variables is real.
+    #   
+    
+    attr_accessor  :method_association
+    
+    
+    attr_reader :dependent
+    
+    UNIVARIATE_REGRESSION_CLASS=Statsample::Regression::Multiple::MatrixEngine
+    MULTIVARIATE_REGRESSION_CLASS=Statsample::Regression::Multiple::MultipleDependent
+    
+    def self.predictor_name(variable)
+      if variable.is_a? Array
+        sprintf("(%s)", variable.join(","))
+      else
+        variable
+      end
+    end
+    # Creates a new DominanceAnalysis object
+    # Parameters:
+    # * input:    A Matrix or Dataset object
+    # * dependent: Name of dependent variable. Could be an array, if you want to
+    #             do an Multivariate Regression Analysis. If nil, set to all
+    #             fields on input, except criteria
+ 
+    def initialize(input, dependent, opts=Hash.new)
+      @build_from_dataset=false
+      if dependent.is_a? Array
+        @regression_class= MULTIVARIATE_REGRESSION_CLASS
+        @method_association=:r2yx
+      else
+        @regression_class= UNIVARIATE_REGRESSION_CLASS
+        @method_association=:r2
+        
+      end
       opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
       }
+      @dependent=dependent
+      @dependent=[@dependent] unless @dependent.is_a? Array
+      
+      @predictors ||= input.fields-@dependent
+
+      @name=_("Dominance Analysis:  %s over %s") % [ @predictors.flatten.join(",") , @dependent.join(",")] if @name.nil?
+      
+      if input.is_a? Statsample::Dataset
+        @ds=input
+        @matrix=Statsample::Bivariate.correlation_matrix(input)
+        @cases=Statsample::Bivariate.min_n_valid(input)
+      elsif input.is_a? ::Matrix
+        @ds=nil
+        @matrix=input
+      else
+        raise ArgumentError.new("You should use a Matrix or a Dataset")
+      end
+      @models=nil
+      
+    end
+    # Compute models. 
+    def compute
       create_models
       fill_models
     end
+    def models
+      if @models.nil?
+        compute
+      end
+      @models
+    end
+    
+    def models_data
+      if @models_data.nil?
+        compute
+      end
+      @models_data
+    end
+    def create_models
+      @models=[]
+      @models_data={}
+      for i in 1..@predictors.size
+        c=Statsample::Combination.new(i,@predictors.size)
+        c.each  do |data|
+          independent=data.collect {|i1| @predictors[i1] }
+          @models.push(independent)
+          if (@build_from_dataset)
+            data=@ds.dup(independent.flatten+@dependent)
+          else
+            data=@matrix.submatrix(independent.flatten+@dependent)
+          end
+          
+          modeldata=ModelData.new(independent, data, self)
+          models_data[independent.sort {|a,b| a.to_s<=>b.to_s}]=modeldata
+        end
+      end
+    end
     def fill_models
       @models.each do |m|
-        @fields.each do |f|
+        @predictors.each do |f|
           next if m.include? f
           base_model=md(m)
           comp_model=md(m+[f])
@@ -93,6 +182,8 @@ module Statsample
         end
       end
     end
+    private :create_models, :fill_models
+    
     def dominance_for_nil_model(i,j)
       if md([i]).r2>md([j]).r2
         1
@@ -107,7 +198,7 @@ module Statsample
       dm=dominance_for_nil_model(i,j)
       return 0.5 if dm==0.5
       dominances=[dm]
-      @models_data.each do |k,m|
+      models_data.each do |k,m|
         if !m.contributions[i].nil? and !m.contributions[j].nil?
           if m.contributions[i]>m.contributions[j]
               dominances.push(1)
@@ -128,7 +219,7 @@ module Statsample
       dm=dominance_for_nil_model(i,j)
       return 0.5 if dm==0.5
       dominances=[dm]
-      for k in 1...@fields.size
+      for k in 1...@predictors.size
         a=average_k(k)
         if a[i]>a[j]
             dominances.push(1)
@@ -154,7 +245,7 @@ module Statsample
       end                 
     end
     def pairs
-      @models.find_all{|m| m.size==2}
+      models.find_all{|m| m.size==2}
     end
     def total_dominance
       pairs.inject({}){|a,pair| a[pair]=total_dominance_pairwise(pair[0], pair[1])
@@ -162,20 +253,18 @@ module Statsample
       }
     end
     def conditional_dominance
-      pairs.inject({}){|a,pair|
-      a[pair]=conditional_dominance_pairwise(pair[0], pair[1])
+      pairs.inject({}){|a,pair| a[pair]=conditional_dominance_pairwise(pair[0], pair[1])
       a
       }
     end
     def general_dominance
-      pairs.inject({}){|a,pair|
-      a[pair]=general_dominance_pairwise(pair[0], pair[1])
+      pairs.inject({}){|a,pair| a[pair]=general_dominance_pairwise(pair[0], pair[1])
       a
       }
     end
     
     def md(m)
-      @models_data[m.sort]
+      models_data[m.sort {|a,b| a.to_s<=>b.to_s}]
     end
     # Get all model of size k
     def md_k(k)
@@ -195,11 +284,11 @@ module Statsample
     end
     # Hash with average for each k size model.
     def average_k(k)
-      return nil if k==@fields.size
+      return nil if k==@predictors.size
       models=md_k(k)
-      averages=@fields.inject({}) {|a,v| a[v]=[];a}
+      averages=@predictors.inject({}) {|a,v| a[v]=[];a}
       models.each do |m|
-        @fields.each do |f|
+        @predictors.each do |f|
           averages[f].push(m.contributions[f]) unless m.contributions[f].nil?
         end
       end
@@ -207,10 +296,10 @@ module Statsample
     end
     def general_averages
       if @general_averages.nil?
-        averages=@fields.inject({}) {|a,v| a[v]=[md([v]).r2];a}
-        for k in 1...@fields.size
+        averages=@predictors.inject({}) {|a,v| a[v]=[md([v]).r2];a}
+        for k in 1...@predictors.size
           ak=average_k(k)
-          @fields.each do |f|
+          @predictors.each do |f|
             averages[f].push(ak[f])
           end
         end
@@ -218,36 +307,25 @@ module Statsample
       end
       @general_averages
     end
-    def create_models
-      @models=[]
-      @models_data={}
-      for i in 1..@fields.size
-        c=Statsample::Combination.new(i,@fields.size)
-        c.each  do |data|
-          convert=data.collect {|i1| @fields[i1] }
-          @models.push(convert)
-          ds_prev=@ds.dup(convert+[@y_var])
-          modeldata=ModelData.new(convert, ds_prev, @y_var, @fields, @regression_class)
-          @models_data[convert.sort]=modeldata
-        end
-      end
-    end
+    
     def summary
       rp=ReportBuilder.new()
       rp.add(self)
       rp.to_text
     end
     def to_reportbuilder(generator)
+      compute if @models.nil?
       anchor=generator.add_toc_entry(_("DA: ")+@name)
       generator.add_html "<div class='dominance-analysis'>#{@name}<a name='#{anchor}'></a>"
       t=ReportBuilder::Table.new(:name=>_("Dominance Analysis result"))
-      t.header=["","r2",_("sign")]+@fields
-      row=[_("Model 0"),"",""]+@fields.collect{|f|
+      
+      t.header=["","r2",_("sign")]+@predictors.collect {|c| DominanceAnalysis.predictor_name(c) }
+      row=[_("Model 0"),"",""]+@predictors.collect{|f|
         sprintf("%0.3f", md([f]).r2)
       }
       t.add_row(row)
       t.add_horizontal_line
-      for i in 1..@fields.size
+      for i in 1..@predictors.size
         mk=md_k(i)
         mk.each{|m|
           t.add_row(m.add_table_row)
@@ -256,7 +334,7 @@ module Statsample
         a=average_k(i)
         if !a.nil?
             t.add_horizontal_line
-            row=[_("k=%d Average") % i,"",""] + @fields.collect{|f|
+            row=[_("k=%d Average") % i,"",""] + @predictors.collect{|f|
                 sprintf("%0.3f",a[f])
             }
             t.add_row(row)
@@ -269,7 +347,7 @@ module Statsample
       g=general_averages
       t.add_horizontal_line
       
-      row=[_("Overall averages"),"",""]+@fields.collect{|f|
+      row=[_("Overall averages"),"",""]+@predictors.collect{|f|
                 sprintf("%0.3f",g[f])
       }
       t.add_row(row)
@@ -289,26 +367,42 @@ module Statsample
     end
     class ModelData
       attr_reader :contributions
-      def initialize(name,ds,y_var,fields,r_class)
-        @name=name
-        @fields=fields
-        @contributions=@fields.inject({}){|a,v| a[v]=nil;a}
-        r_class=Regression::Multiple::RubyEngine if r_class.nil?
-        @lr=r_class.new(ds,y_var)
+      def initialize(independent, data, da)
+        @independent=independent
+        @data=data
+        @predictors=da.predictors
+        @dependent=da.dependent
+        @cases=da.cases
+        @method=da.method_association
+        @contributions=@independent.inject({}){|a,v| a[v]=nil;a}
+        
+        r_class=da.regression_class
+        
+        if @dependent.size==1
+          @lr=r_class.new(data, @dependent[0], :cases=>@cases)
+        else
+          @lr=r_class.new(data, @dependent, :cases=>@cases)
+        end
       end
-      def add_contribution(f,v)
+      def add_contribution(f, v)
         @contributions[f]=v-r2
       end
       def r2
-        @lr.r2
+        @lr.send(@method)
+      end
+      def name
+        @independent.collect {|variable|
+          DominanceAnalysis.predictor_name(variable)
+        }.join("*")
       end
       def add_table_row
         begin
-        sign=sprintf("%0.3f", @lr.significance)
+          sign=sprintf("%0.3f", @lr.significance)
         rescue RuntimeError
-            sign="???"
+          sign="???"
         end
-        [@name.join("*"), sprintf("%0.3f",r2), sign] + @fields.collect{|k|
+      
+        [name, sprintf("%0.3f",r2), sign] + @predictors.collect{|k|
           v=@contributions[k]
           if v.nil?
               "--"
@@ -318,8 +412,8 @@ module Statsample
         }
       end
       def summary
-        out=sprintf("%s: r2=%0.3f(p=%0.2f)\n",@name.join("*"),r2,@lr.significance,@lr.sst)
-        out << @fields.collect{|k|
+        out=sprintf("%s: r2=%0.3f(p=%0.2f)\n",name, r2, @lr.significance, @lr.sst)
+        out << @predictors.collect{|k|
           v=@contributions[k]
           if v.nil?
               "--"

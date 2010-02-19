@@ -29,6 +29,7 @@ class MatrixEngine < BaseEngine
   
   # Number of cases
   attr_writer :cases
+  
   # Create object
   #
   def initialize(matrix,y_var, opts=Hash.new)
@@ -86,8 +87,8 @@ class MatrixEngine < BaseEngine
   # * 1-(|R| / |R_x|) or
   # * Sum(b_i*r_yi)
   def r2
-    #@n_predictors.times.inject(0) {|ac,i| ac+@coeffs_stan[i]* @matrix_y_cor[i,0]} 
-    1-(@matrix.correlation.determinant.quo(@matrix_x.correlation.determinant))
+    @n_predictors.times.inject(0) {|ac,i| ac+@coeffs_stan[i]* @matrix_y_cor[i,0]} 
+    #1-(@matrix.correlation.determinant.quo(@matrix_x.correlation.determinant))
   end
   def r
     Math::sqrt(r2)
@@ -151,8 +152,8 @@ class MatrixEngine < BaseEngine
     c=coeffs
     generator.add_text(_("Engine: %s") % self.class)
     generator.add_text(_("Cases=%d") % [@cases])
-    generator.add_text("r=#{sprintf('%0.3f',r)}")
-    generator.add_text("r=#{sprintf('%0.3f',r2)}")
+    generator.add_text("R=#{sprintf('%0.3f',r)}")
+    generator.add_text("R^2=#{sprintf('%0.3f',r2)}")
     
     generator.add_text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
     

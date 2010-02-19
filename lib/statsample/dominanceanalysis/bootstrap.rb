@@ -37,12 +37,20 @@ module Statsample
         @ds=ds
         @y_var=y_var
         @n=ds.cases
-        @fields=ds.fields-[y_var]
-        @samples_ga=@fields.inject({}){|a,v| a[v]=[];a}
+        
         @n_samples=0
         @alpha=ALPHA
         @debug=false
-        @regression_class=Regression::Multiple::RubyEngine
+        if y_var.is_a? Array
+          @fields=ds.fields-y_var
+          @regression_class=Regression::Multiple::MultipleDependent
+          
+        else
+          @fields=ds.fields-[y_var]
+          @regression_class=Regression::Multiple::MatrixEngine
+        end
+        @samples_ga=@fields.inject({}){|a,v| a[v]=[];a}
+
         @name=_("Bootstrap dominance Analysis:  %s over %s") % [ ds.fields.join(",") , @y_var]
         opts.each{|k,v|
           self.send("#{k}=",v) if self.respond_to? k
@@ -52,10 +60,10 @@ module Statsample
       # lr_class deprecated
       alias_method :lr_class, :regression_class
       def da
-          if @da.nil?
-            @da=DominanceAnalysis.new(@ds,@y_var, :regression_class => @regression_class)
-          end
-          @da
+        if @da.nil?
+          @da=DominanceAnalysis.new(@ds,@y_var, :regression_class => @regression_class)
+        end
+        @da
       end
       # Creates n re-samples from original dataset and store result of
       # each sample on @samples_td, @samples_cd, @samples_gd, @samples_ga
@@ -69,6 +77,7 @@ module Statsample
           puts _("Bootstrap %d of %d") % [t+1, number_samples] if @debug
           ds_boot=@ds.bootstrap(n)
           da_1=DominanceAnalysis.new(ds_boot, @y_var, :regression_class => @regression_class)
+          
           da_1.total_dominance.each{|k,v|
             @samples_td[k].push(v)
           }

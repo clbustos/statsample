@@ -145,7 +145,6 @@ module Statsample
     end
     def fields_y=(v)
       raise "Size of fields != column_size" if v.size!=column_size
-
       @fields_y=v
     end
     def fields_x
@@ -204,11 +203,9 @@ module Statsample
       @name||= (type==:correlation ? "Correlation":"Covariance")+" Matrix"
       t=ReportBuilder::Table.new(:name=>@name, :header=>[""]+fields_y)
       row_size.times {|i|
-        t.add_row([fields_x[i]]+@rows[i].collect {|i| sprintf("%0.3f",i).gsub("0.",".")})
+        t.add_row([fields_x[i]]+@rows[i].collect {|i1| sprintf("%0.3f",i1).gsub("0.",".")})
       }
       generator.parse_element(t)
-      generator.add_text("Name:#{name}")
-      generator.add_text("Type:#{type}")
     end
   end
 end
