@@ -163,7 +163,7 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
     
     covariance=Statsample::Bivariate.covariance_matrix(ds)
     lr=Statsample::Regression::Multiple::MatrixEngine.new(covariance,'y', :y_mean=>@y.mean, :x_mean=>{'a'=>ds['a'].mean, 'b'=>ds['b'].mean, 'c'=>ds['c'].mean}, :cases=>@a.size)
-    model_test_matrix(lr , "covariance matrix")
+    model_test(lr , "covariance matrix")
   end
   def test_regression_rubyengine
     @a=[nil,1,3,2,4,3,5,4,6,5,7].to_vector(:scale)

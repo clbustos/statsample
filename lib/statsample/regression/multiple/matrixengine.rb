@@ -36,21 +36,37 @@ class MatrixEngine < BaseEngine
     matrix.extend Statsample::CovariateMatrix
     raise "#{y_var} variable should be on data" unless matrix.fields.include? y_var
     
-    @matrix_cor=matrix.correlation
+    
+    if matrix.type==:covariance
+      @matrix_cov=matrix
+      @matrix_cor=matrix.correlation
+      @no_covariance=false
+    else
+      @matrix_cor=matrix
+      @matrix_cov=matrix
+      @no_covariance=true
+    end
     
     @y_var=y_var
     @fields=matrix.fields-[y_var]
+    
     @n_predictors=@fields.size
-    @matrix=matrix
-    @matrix_x= matrix.submatrix(@fields)
-    @matrix_y = matrix.submatrix(@fields, [y_var])
-    @matrix_y_cor=@matrix_cor.submatrix(@fields, [y_var])
-    @result_matrix=@matrix_x.inverse * @matrix_y
-    @y_sd=Math::sqrt(@matrix.submatrix([y_var])[0,0])
-    @x_sd=@matrix_x.row_size.times.inject({}) {|ac,i|
-      ac[@matrix_x.fields[i]]=Math::sqrt(@matrix_x[i,i])
+    
+    @matrix_x= @matrix_cor.submatrix(@fields)
+    @matrix_x_cov= @matrix_cov.submatrix(@fields)
+    
+    @matrix_y = @matrix_cor.submatrix(@fields, [y_var])
+    @matrix_y_cov = @matrix_cov.submatrix(@fields, [y_var])
+    
+
+    
+    @y_sd=Math::sqrt(@matrix_cov.submatrix([y_var])[0,0])
+    
+    @x_sd=@n_predictors.times.inject({}) {|ac,i|
+      ac[@matrix_x_cov.fields[i]]=Math::sqrt(@matrix_x_cov[i,i])
       ac;
     }
+    
     @cases=nil
     @x_mean=@fields.inject({}) {|ac,f|
       ac[f]=0.0
@@ -64,13 +80,15 @@ class MatrixEngine < BaseEngine
     opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
     }
+      result_matrix=@matrix_x_cov.inverse * @matrix_y_cov
+
     if matrix.type==:covariance
-      @coeffs=@result_matrix.column(0).to_a
+      @coeffs=result_matrix.column(0).to_a
       @coeffs_stan=coeffs.collect {|k,v|
         coeffs[k]*@x_sd[k].quo(@y_sd)
       }
     else
-      @coeffs_stan=@result_matrix.column(0).to_a
+      @coeffs_stan=result_matrix.column(0).to_a
       
       @coeffs=standarized_coeffs.collect {|k,v|
         standarized_coeffs[k]*@y_sd.quo(@x_sd[k])
@@ -87,8 +105,7 @@ class MatrixEngine < BaseEngine
   # * 1-(|R| / |R_x|) or
   # * Sum(b_i*r_yi)
   def r2
-    @n_predictors.times.inject(0) {|ac,i| ac+@coeffs_stan[i]* @matrix_y_cor[i,0]} 
-    #1-(@matrix.correlation.determinant.quo(@matrix_x.correlation.determinant))
+    @n_predictors.times.inject(0) {|ac,i| ac+@coeffs_stan[i]* @matrix_y[i,0]} 
   end
   def r
     Math::sqrt(r2)
@@ -141,9 +158,32 @@ class MatrixEngine < BaseEngine
     }
     out
   end
-# Standard error for constant
+  # Standard error for constant.
+  # Recreate the estimaded variance-covariance matrix
+  # using means, standard deviation and covariance matrix
   def constant_se
-   nil
+    nil if @no_covariance
+    means=@x_mean
+    #means[@y_var]=@y_mean
+    means[:constant]=1
+    sd=@x_sd
+    #sd[@y_var]=@y_sd
+    sd[:constant]=0
+    fields=[:constant]+@matrix_cov.fields-[@y_var]
+    xt_x=Matrix.rows(fields.collect {|i|
+      fields.collect {|j|
+        if i==:constant or j==:constant
+          cov=0
+        elsif i==j
+          cov=sd[i]**2
+        else
+          cov=@matrix_cov.submatrix(i..i,j..j)[0,0]
+        end
+        cov*(@cases-1)+@cases*means[i]*means[j]
+      }
+    })
+    matrix=xt_x.inverse * mse
+    matrix.collect {|i| Math::sqrt(i) if i>0 }[0,0]
   end
   
   def to_reportbuilder(generator)

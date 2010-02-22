@@ -125,7 +125,7 @@ module Statsample
           out={}
           mse=sse.quo(df_e)
           coeffs.each {|k,v|
-            out[k]=Math::sqrt(mse/(@ds[k].sum_of_squares*tolerance(k)))
+            out[k]=Math::sqrt(mse/(@ds[k].sum_of_squares * tolerance(k)))
           }
           out
         end

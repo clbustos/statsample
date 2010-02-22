@@ -6,6 +6,23 @@ N &= \text{population size}\\
 p &= \text{proportion inside a sample}\\
 P &= \text{proportion inside a population}
 \end{align*}
+\section{Ruby::Regression::Multiple}
+
+To compute the standard error of coefficients, you obtain the estimated variance-covariance matrix of error.
+
+Let \mathbf{X} be matrix of predictors data, including a constant column; \mathbf{MSE} as mean square error; SSE as Sum of squares of errors; n the number of cases; p as number of predictors
+
+\begin{equation}
+\mathbf{MSE}=\frac{SSE}{n-p-1}
+\end{equation}
+
+\begin{equation}
+\mathbf{E}=(\mathbf{X'}\mathbf{X})^-1\mathbf{MSE}
+\end{equation}
+
+The root squares of diagonal should be standard errors
+
+
 \section{Ruby::SRS}
 Finite Poblation correction is used on standard error calculation on poblation below 10.000. Function 
 \begin{verbatim}
@@ -28,7 +45,7 @@ calculate FPC for standard deviation with
 fpc_{sd} = \sqrt{\frac{N-n} {N-1}}
 \label{fpc}
 \end{equation}
-with n  as sam and N as pop.
+with n  as sample size and N as population size.
 
 \subsection{Sample Size estimation for proportions}
 
