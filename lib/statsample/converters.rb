@@ -86,7 +86,7 @@ module Statsample
           end
         }
 =end
-raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all {|c| c.nil?}.count>0
+raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all {|c| c.nil?}.size>0
         fields=row.to_a.collect{|c| c.downcase}
         fields.recode_repeated
       end

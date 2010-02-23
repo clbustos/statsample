@@ -19,7 +19,6 @@ class StatsampleMatrixTestCase < Test::Unit::TestCase
       assert_equal(6,matrix.row_sum[0])
       assert_equal(12,matrix.column_sum[0])
       assert_equal(45,matrix.total_sum)
-      m=matrix.to_gsl
     end
     def test_covariate
       a=Matrix[[1.0, 0.3, 0.2], [0.3, 1.0, 0.5], [0.2, 0.5, 1.0]]

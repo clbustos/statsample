@@ -1,7 +1,7 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 require 'test/unit'
-require 'tmpdir'
+require 'tempfile'
 class StatsampleDatasetTestCase < Test::Unit::TestCase
   def setup
     @ds=Statsample::Dataset.new({'id' => Statsample::Vector.new([1,2,3,4,5]), 'name'=>Statsample::Vector.new(%w{Alex Claude Peter Franz George}), 'age'=>Statsample::Vector.new([20,23,25,27,5]),
@@ -13,9 +13,9 @@ class StatsampleDatasetTestCase < Test::Unit::TestCase
     assert_equal(%w{id name age city a1}, @ds.fields)
   end
   def test_saveload
-  outfile=Dir::tmpdir+"/dataset.ds"
-  @ds.save(outfile)
-  a=Statsample.load(outfile)
+    outfile=Tempfile.new("/dataset.ds")
+  @ds.save(outfile.path)
+  a=Statsample.load(outfile.path)
   assert_equal(@ds,a)
   end
   

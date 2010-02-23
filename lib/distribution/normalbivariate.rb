@@ -19,10 +19,9 @@ module Distribution
       # Probability density function for a given x, y and rho value.
       # 
       # Source: http://en.wikipedia.org/wiki/Multivariate_normal_distribution
-      def pdf(x,y, rho, sigma1=1.0, sigma2=1.0)
-        (1.quo(2 * Math::PI * sigma1*sigma2 * Math::sqrt( 1 - rho**2 ))) *
-          Math::exp(-(1.quo(2*(1-rho**2))) *
-          ((x**2/sigma1) + (y**2/sigma2) - (2*rho*x*y).quo(sigma1*sigma2)  ))
+      def pdf(x,y, rho, s1=1.0, s2=1.0)
+        1.quo(2 * Math::PI * s1 * s2 * Math::sqrt( 1 - rho**2 )) * (Math::exp(-(1.quo(2*(1-rho**2))) *
+          ((x**2.quo(s1)) + (y**2.quo(s2)) - (2*rho*x*y).quo(s1*s2))))
       end
       
       def f(x,y,aprime,bprime,rho) 
@@ -147,7 +146,8 @@ module Distribution
         r=rho
         twopi = 6.283185307179586
         
-        w=11.times.collect {[nil]*4}; x=11.times.collect {[nil]*4}
+        w=11.times.collect {[nil]*4};
+        x=11.times.collect {[nil]*4}
         
         data=[
         0.1713244923791705E+00, -0.9324695142031522E+00,

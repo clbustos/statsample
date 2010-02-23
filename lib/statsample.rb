@@ -136,6 +136,7 @@ module Statsample
   autoload(:Regression, 'statsample/regression')
   autoload(:Test, 'statsample/test')
   autoload(:Factor, 'statsample/factor')
+  autoload(:Minimization, 'statsample/minimization')
   
   def self.load(filename)
     if File.exists? filename

@@ -112,6 +112,7 @@ module Statsample
         @method_association=:r2
         
       end
+      @name=nil
       opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
       }
@@ -133,7 +134,7 @@ module Statsample
         raise ArgumentError.new("You should use a Matrix or a Dataset")
       end
       @models=nil
-      
+      @models_data=nil
     end
     # Compute models. 
     def compute
@@ -227,7 +228,7 @@ module Statsample
             dominances.push(0)
         else
           return 0.5
-            dominances.push(0.5)
+            #dominances.push(0.5)
         end                 
       end
       final=dominances.uniq

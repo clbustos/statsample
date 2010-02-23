@@ -35,8 +35,6 @@ class MatrixEngine < BaseEngine
   def initialize(matrix,y_var, opts=Hash.new)
     matrix.extend Statsample::CovariateMatrix
     raise "#{y_var} variable should be on data" unless matrix.fields.include? y_var
-    
-    
     if matrix.type==:covariance
       @matrix_cov=matrix
       @matrix_cor=matrix.correlation
@@ -158,11 +156,15 @@ class MatrixEngine < BaseEngine
     }
     out
   end
+  def constant_t
+    return nil if constant_se.nil?
+    constant.to_f/constant_se
+  end
   # Standard error for constant.
   # Recreate the estimaded variance-covariance matrix
   # using means, standard deviation and covariance matrix
   def constant_se
-    nil if @no_covariance
+    return nil if @no_covariance
     means=@x_mean
     #means[@y_var]=@y_mean
     means[:constant]=1

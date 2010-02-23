@@ -1,7 +1,7 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 require 'test/unit'
-require 'tmpdir'
+require 'tempfile'
 class TestStatsample
 end
 class TestStatsample::TestVector < Test::Unit::TestCase
@@ -12,9 +12,9 @@ class TestStatsample::TestVector < Test::Unit::TestCase
 
     end
     def test_save_load
-        outfile=Dir::tmpdir+"/vector.vec"
-        @c.save(outfile)
-        a=Statsample.load(outfile)
+        outfile=Tempfile.new("vector.vec")
+        @c.save(outfile.path)
+        a=Statsample.load(outfile.path)
         assert_equal(@c,a)
         
     end

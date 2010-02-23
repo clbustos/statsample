@@ -1,7 +1,7 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 require 'test/unit'
-require 'tmpdir'
+require 'tempfile'
 begin
 	require 'spreadsheet'
 rescue LoadError
@@ -30,9 +30,9 @@ class StatsampleExcelTestCase < Test::Unit::TestCase
         assert_equal(nil,@ds['age'][5])
     end
     def test_write
-        filename=Dir::tmpdir+"/test_write.xls"
-        Statsample::Excel.write(@ds,filename)
-        ds2=Statsample::Excel.read(filename)
+      tempfile=Tempfile.new("test_write.xls")
+        Statsample::Excel.write(@ds,tempfile.path)
+        ds2=Statsample::Excel.read(tempfile.path)
         i=0
         ds2.each_array{|row|
             assert_equal(@ds.case_as_array(i),row)

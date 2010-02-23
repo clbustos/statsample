@@ -1,6 +1,6 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
-require 'tmpdir'
+require "tempfile"
 require 'test/unit'
 
 class StatsampleCSVTestCase < Test::Unit::TestCase
@@ -33,9 +33,10 @@ class StatsampleCSVTestCase < Test::Unit::TestCase
       assert_equal(age,ds['age_2'])
     end
     def test_write
-        filename=Dir::tmpdir+"/test_write.csv"
-        Statsample::CSV.write(@ds,filename)
-        ds2=Statsample::CSV.read(filename)
+      filename=Tempfile.new("afile")
+      #  filename=Dir::tmpdir+"/test_write.csv"
+        Statsample::CSV.write(@ds, filename.path)
+        ds2=Statsample::CSV.read(filename.path)
         i=0
         ds2.each_array{|row|
             assert_equal(@ds.case_as_array(i),row)

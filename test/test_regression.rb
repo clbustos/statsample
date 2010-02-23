@@ -158,11 +158,13 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
     
     cor=Statsample::Bivariate.correlation_matrix(ds)
     lr=Statsample::Regression::Multiple::MatrixEngine.new(cor,'y', :y_mean=>@y.mean, :x_mean=>{'a'=>ds['a'].mean, 'b'=>ds['b'].mean, 'c'=>ds['c'].mean}, :cases=>@a.size, :y_sd=>@y.sd , :x_sd=>{'a' => @a.sd, 'b' => @b.sd, 'c' => @c.sd})
-    
+    assert_nil(lr.constant_se)
+    assert_nil(lr.constant_t)
     model_test_matrix(lr, "correlation matrix")
     
     covariance=Statsample::Bivariate.covariance_matrix(ds)
     lr=Statsample::Regression::Multiple::MatrixEngine.new(covariance,'y', :y_mean=>@y.mean, :x_mean=>{'a'=>ds['a'].mean, 'b'=>ds['b'].mean, 'c'=>ds['c'].mean}, :cases=>@a.size)
+    
     model_test(lr , "covariance matrix")
   end
   def test_regression_rubyengine

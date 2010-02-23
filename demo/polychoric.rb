@@ -5,9 +5,9 @@ require 'statsample'
 ct=Matrix[[58,52,1],[26,58,3],[8,12,9]]
 
 # Estimation of polychoric correlation using two-step (default)
-poly=Statsample::Bivariate::Polychoric.new(ct, :name=>"Polychoric with two-step")
-puts poly.summary
+poly=Statsample::Bivariate::Polychoric.new(ct, :name=>"Polychoric with two-step", :debug=>true)
 
+puts poly.summary
 
 # Estimation of polychoric correlation using joint method (slow)
 poly=Statsample::Bivariate::Polychoric.new(ct, :method=>:joint, :name=>"Polychoric with joint")

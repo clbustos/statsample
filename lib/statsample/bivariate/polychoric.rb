@@ -79,7 +79,7 @@ module Statsample
       
       METHOD=:two_step
       MAX_ITERATIONS=300
-      EPSILON=0.000001
+      EPSILON=1e-6
       MINIMIZER_TYPE_TWO_STEP="brent"
       MINIMIZER_TYPE_JOINT="nmsimplex"
       def new_with_vectors(v1,v2)
@@ -184,6 +184,52 @@ module Statsample
       def chi_square_df
         (@nr*@nc)-@nc-@nr
       end
+      
+      def loglike_fd_rho(alpha,beta,rho)
+        if rho.abs>0.9999
+          rho= (rho>0) ? 0.9999 : -0.9999
+        end
+         #puts "rho: #{rho}"
+        
+        loglike=0
+        pd=@nr.times.collect{ [0]*@nc}
+        pc=@nr.times.collect{ [0]*@nc}
+        @nr.times { |i|
+          @nc.times { |j|
+            if i==@nr-1 and j==@nc-1
+              pd[i][j]=1.0
+              a=100
+              b=100
+            else
+              a=(i==@nr-1) ? 100: alpha[i]
+              b=(j==@nc-1) ? 100: beta[j]
+              pd[i][j]=Distribution::NormalBivariate.cdf(a, b, rho)
+            end
+            pc[i][j] = pd[i][j]
+            pd[i][j] = pd[i][j] - pc[i-1][j] if i>0
+            pd[i][j] = pd[i][j] - pc[i][j-1] if j>0
+            pd[i][j] = pd[i][j] + pc[i-1][j-1] if (i>0 and j>0)
+            
+            pij= pd[i][j]+EPSILON
+            if i==0
+              alpha_m1=-10
+            else
+              alpha_m1=alpha[i-1]
+            end
+            
+            if j==0
+              beta_m1=-10
+            else
+              beta_m1=beta[j-1]
+            end
+            
+            loglike+= (@matrix[i,j].quo(pij))*(Distribution::NormalBivariate.pdf(a,b,rho) - Distribution::NormalBivariate.pdf(alpha_m1, b,rho) - Distribution::NormalBivariate.pdf(a, beta_m1,rho) + Distribution::NormalBivariate.pdf(alpha_m1, beta_m1,rho) )
+            
+          }
+        }
+        #puts "derivative: #{loglike}"
+        -loglike
+      end
       def loglike(alpha,beta,rho)
         if rho.abs>0.9999
           rho= (rho>0) ? 0.9999 : -0.9999
@@ -249,6 +295,8 @@ module Statsample
           ac=@sumcac[i]
         end
       end
+      
+      
       # Computation of polychoric correlation usign two-step ML estimation.
       # 
       # Two-step ML estimation "first estimates the thresholds from the one-way marginal frequencies, then estimates rho, conditional on these thresholds, via maximum likelihood" (Uebersax, 2006).
@@ -260,6 +308,31 @@ module Statsample
       # * Uebersax, J.S. (2006). The tetrachoric and polychoric correlation coefficients. Statistical Methods for Rater Agreement web site. 2006. Available at: http://john-uebersax.com/stat/tetra.htm . Accessed February, 11, 2010
       #
       def compute_two_step_mle_drasgow
+        if HAS_GSL
+          compute_two_step_mle_drasgow_gsl
+        else
+          compute_two_step_mle_drasgow_ruby
+        end
+      end
+      
+      # Depends on minimization algorithm. 
+      
+      def compute_two_step_mle_drasgow_ruby #:nodoc:
+        
+        f=proc {|rho| 
+          loglike(@alpha,@beta, rho)
+        }
+        min=Statsample::Minimization::GoldenSection.new(-0.999,0.999,f)
+        min.iterate
+        
+        @r=min.x_minimum
+        @loglike_model=-min.f_minimum
+        puts min.log if @debug
+        
+      end
+      
+      
+      def compute_two_step_mle_drasgow_gsl #:nodoc:
         
         fn1=GSL::Function.alloc {|rho| 
           loglike(@alpha,@beta, rho)

@@ -5,7 +5,9 @@ http://ruby-statsample.rubyforge.org/
 
 == FEATURES:
 
-A suite for basic and advanced statistics. Includes:
+A suite for basic and advanced statistics on Ruby. Tested on Ruby 1.8.7, Ruby 1.9 and JRuby 1.4 (Ruby 1.8.7 compatible) 
+
+Includes:
 * Descriptive statistics: frequencies, median, mean, standard error, skew, kurtosis (and many others).
 * Imports and exports datasets from and to Excel, CSV and plain text files.
 * Correlations: Pearson (r), Rho, Tetrachoric, Polychoric

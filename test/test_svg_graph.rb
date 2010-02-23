@@ -2,6 +2,7 @@ $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 require 'tmpdir'
 require 'tempfile'
+require 'tempfile'
 require 'fileutils'
 require 'test/unit'
 begin
@@ -19,12 +20,10 @@ class StatsampleSvgGraphTestCase < Test::Unit::TestCase
     rand(10)
     }.to_vector(:scale)
       h=ar.histogram([0,2,5,11])
-      file=@image_path+"/svg_histogram_only.svg"
+      file=Tempfile.new("svg_histogram_only.svg")
       graph = Statsample::Graph::SvgHistogram.new({})
       graph.histogram=h
-      File.open(file,"w") {|f|
-            f.puts(graph.burn)
-      }
+      file.puts(graph.burn)
     else
     puts "Statsample::Graph::SvgHistogram.new not tested (no ruby-gsl)"
     end
@@ -36,20 +35,20 @@ class StatsampleSvgGraphTestCase < Test::Unit::TestCase
       ar.push(rand(10))
     }
     vector=ar.to_vector
-    file=@image_path+"/svggraph_default.svg"
+    file=Tempfile.new("svggraph_default.svg").path
     vector.svggraph_frequencies(file)
-    file=@image_path+"/svggraph_Bar.svg"
+    file=Tempfile.new("svggraph_bar.svg").path
     vector.svggraph_frequencies(file,800,600,SVG::Graph::Bar,:graph_title=>'Bar')
     assert(File.exists?(file))
-    file=@image_path+"/svggraph_BarHorizontal.svg"
+    file=Tempfile.new("svggraph_bar_horizontal.svg").path
     vector.svggraph_frequencies(file,800,600,SVG::Graph::BarHorizontalNoOp,:graph_title=>'Horizontal Bar')
     assert(File.exists?(file))
-    file=@image_path+"/svggraph_Pie.svg"
+    file=Tempfile.new("svggraph_pie.svg").path
     vector.svggraph_frequencies(file,800,600,SVG::Graph::PieNoOp,:graph_title=>'Pie')
     assert(File.exists?(file))		
     vector.type=:scale
     if HAS_GSL
-      file=@image_path+"/svggraph_histogram.svg"		
+    file=Tempfile.new("svg_histogram.svg").path
       hist=vector.svggraph_histogram(5)
       File.open(file,"wb") {|fp|
               fp.write(hist.burn)

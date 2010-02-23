@@ -26,46 +26,64 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     end
   end
   def test_polychoric
-    # Should be the same results as Tetrachoric for 2x2 matrix
     
-    matrix=Matrix[[rand(100)+10,rand(100)+10],[rand(100)+10,rand(100)+10]]
-    tetra = Statsample::Bivariate::Tetrachoric.new_with_matrix(matrix)
-    poly  = Statsample::Bivariate::Polychoric.new(matrix)
-    assert_in_delta(tetra.r,poly.r,0.0001)
-    
-    # Example for Tallis(1962, cited by Drasgow, 2006)
-    
-    matrix=Matrix[[58,52,1],[26,58,3],[8,12,9]]
-    poly=Statsample::Bivariate::Polychoric.new(matrix)
-    poly.method=:two_step
-    poly.compute
-    assert_in_delta(0.420, poly.r, 0.001)
-    assert_in_delta(-0.240, poly.threshold_y[0],0.001)
-    assert_in_delta(-0.027, poly.threshold_x[0],0.001)
-    assert_in_delta(1.578, poly.threshold_y[1],0.001)
-    assert_in_delta(1.137, poly.threshold_x[1],0.001)
-    
-    
-    poly.method=:polychoric_series
-    poly.compute
-    
-    assert_in_delta(0.556, poly.r, 0.001)
-    assert_in_delta(-0.240, poly.threshold_y[0],0.001)
-    assert_in_delta(-0.027, poly.threshold_x[0],0.001)
-    assert_in_delta(1.578, poly.threshold_y[1],0.001)
-    assert_in_delta(1.137, poly.threshold_x[1],0.001)
-    
-    
-    poly.method=:joint
-    poly.compute
-    
-    
-    assert_in_delta(0.4192, poly.r, 0.0001)
-    assert_in_delta(-0.2421, poly.threshold_y[0],0.0001)
-    assert_in_delta(-0.0297, poly.threshold_x[0],0.0001)
-    assert_in_delta(1.5938, poly.threshold_y[1],0.0001)
-    assert_in_delta(1.1331, poly.threshold_x[1],0.0001)
+      matrix=Matrix[[58,52,1],[26,58,3],[8,12,9]]
+      poly=Statsample::Bivariate::Polychoric.new(matrix)
+      poly.compute_two_step_mle_drasgow_ruby
+      assert_in_delta(0.420, poly.r, 0.001)
+      assert_in_delta(-0.240, poly.threshold_y[0],0.001)
+      assert_in_delta(-0.027, poly.threshold_x[0],0.001)
+      assert_in_delta(1.578, poly.threshold_y[1],0.001)
+      assert_in_delta(1.137, poly.threshold_x[1],0.001)
+      
+      
+            poly.method=:polychoric_series
+      poly.compute
+      
+      assert_in_delta(0.556, poly.r, 0.001)
+      assert_in_delta(-0.240, poly.threshold_y[0],0.001)
+      assert_in_delta(-0.027, poly.threshold_x[0],0.001)
+      assert_in_delta(1.578, poly.threshold_y[1],0.001)
+      assert_in_delta(1.137, poly.threshold_x[1],0.001)
 
+      
+      
+       # Should be the same results as Tetrachoric for 2x2 matrix
+      matrix=Matrix[[rand(100)+1,rand(100)+1],[rand(100)+1,rand(100)+1]]
+      tetra = Statsample::Bivariate::Tetrachoric.new_with_matrix(matrix)
+      poly  = Statsample::Bivariate::Polychoric.new(matrix)
+      poly.compute_two_step_mle_drasgow_ruby
+      assert_in_delta(tetra.r,poly.r,0.0001)
+      
+      
+
+      
+    if HAS_GSL  
+
+      # Example for Tallis(1962, cited by Drasgow, 2006)
+      
+      matrix=Matrix[[58,52,1],[26,58,3],[8,12,9]]
+      poly=Statsample::Bivariate::Polychoric.new(matrix)
+      poly.compute_two_step_mle_drasgow_gsl
+      assert_in_delta(0.420, poly.r, 0.001)
+      assert_in_delta(-0.240, poly.threshold_y[0],0.001)
+      assert_in_delta(-0.027, poly.threshold_x[0],0.001)
+      assert_in_delta(1.578, poly.threshold_y[1],0.001)
+      assert_in_delta(1.137, poly.threshold_x[1],0.001)
+
+      
+      poly.method=:joint
+      poly.compute
+      
+      
+      assert_in_delta(0.4192, poly.r, 0.0001)
+      assert_in_delta(-0.2421, poly.threshold_y[0],0.0001)
+      assert_in_delta(-0.0297, poly.threshold_x[0],0.0001)
+      assert_in_delta(1.5938, poly.threshold_y[1],0.0001)
+      assert_in_delta(1.1331, poly.threshold_x[1],0.0001)
+    else
+      puts "Two-step optimized and Joint method for Polychoric  requires GSL"
+    end
   end
   def test_tetrachoric
     a,b,c,d=0,0,0,0
