@@ -37,14 +37,6 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
       assert_in_delta(1.137, poly.threshold_x[1],0.001)
       
       
-            poly.method=:polychoric_series
-      poly.compute
-      
-      assert_in_delta(0.556, poly.r, 0.001)
-      assert_in_delta(-0.240, poly.threshold_y[0],0.001)
-      assert_in_delta(-0.027, poly.threshold_x[0],0.001)
-      assert_in_delta(1.578, poly.threshold_y[1],0.001)
-      assert_in_delta(1.137, poly.threshold_x[1],0.001)
 
       
       
@@ -59,6 +51,14 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
 
       
     if HAS_GSL  
+      poly.method=:polychoric_series
+      poly.compute
+      
+      assert_in_delta(0.556, poly.r, 0.001)
+      assert_in_delta(-0.240, poly.threshold_y[0],0.001)
+      assert_in_delta(-0.027, poly.threshold_x[0],0.001)
+      assert_in_delta(1.578, poly.threshold_y[1],0.001)
+      assert_in_delta(1.137, poly.threshold_x[1],0.001)
 
       # Example for Tallis(1962, cited by Drasgow, 2006)
       
@@ -82,7 +82,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
       assert_in_delta(1.5938, poly.threshold_y[1],0.0001)
       assert_in_delta(1.1331, poly.threshold_x[1],0.0001)
     else
-      puts "Two-step optimized and Joint method for Polychoric  requires GSL"
+      puts "Two-step optimized, polychoric series and Joint method for Polychoric  requires GSL"
     end
   end
   def test_tetrachoric

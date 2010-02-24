@@ -69,10 +69,12 @@ module Statsample
       end
 
     end
+    
     # Not complete operational. Should use GoldenSection for now
     class Brent
       EPSILON=1e-6
       MAX_ITERATIONS=100
+      GOLDEN=(3 - sqrt(5)).quo(2)
       attr_reader :range, :x_minimum, :f_minimum, :log
       def initialize(lower,upper, proc)
         raise "first argument  should be lower than second" if lower>=upper
