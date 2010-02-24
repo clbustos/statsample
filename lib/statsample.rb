@@ -109,7 +109,7 @@ end
 # * Dataset: An union of vectors.
 #
 module Statsample
-  VERSION = '0.6.4'
+  VERSION = '0.6.5'
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')
@@ -136,7 +136,6 @@ module Statsample
   autoload(:Regression, 'statsample/regression')
   autoload(:Test, 'statsample/test')
   autoload(:Factor, 'statsample/factor')
-  autoload(:Minimization, 'statsample/minimization')
   
   def self.load(filename)
     if File.exists? filename

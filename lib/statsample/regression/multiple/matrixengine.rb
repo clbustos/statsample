@@ -101,7 +101,7 @@ class MatrixEngine < BaseEngine
   # Get R^2 for the regression
   # Equal to 
   # * 1-(|R| / |R_x|) or
-  # * Sum(b_i*r_yi)
+  # * Sum(b_i*r_yi) <- used
   def r2
     @n_predictors.times.inject(0) {|ac,i| ac+@coeffs_stan[i]* @matrix_y[i,0]} 
   end
@@ -113,13 +113,16 @@ class MatrixEngine < BaseEngine
     c=coeffs
     @y_mean - @fields.inject(0){|a,k| a + (c[k] * @x_mean[k])}
   end
+  # Hash of b or raw coefficients
   def coeffs
     assign_names(@coeffs)    
   end
+  # Hash of beta or standarized coefficients
+
   def standarized_coeffs
     assign_names(@coeffs_stan)
   end
-  
+  # Total sum of squares
   def sst
     @y_sd**2*(cases-1.0)
   end
@@ -134,9 +137,11 @@ class MatrixEngine < BaseEngine
   end
   
   # Tolerance for a given variable
-  # defined as (1-r2) of regression of other independent variables
+  # defined as (1-R^2) of regression of other independent variables
   # over the selected
-  # http://talkstats.com/showthread.php?t=5056
+  # Reference:
+  # 
+  # * http://talkstats.com/showthread.php?t=5056
   def tolerance(var)
     lr=Statsample::Regression::Multiple::MatrixEngine.new(@matrix_x, var)
     1-lr.r2
@@ -146,7 +151,8 @@ class MatrixEngine < BaseEngine
   # * Tolerance of the coeffients: Higher tolerances implies higher error
   # * Higher r2 implies lower error
   
-  # Reference: Cohen et al. (2003). Applied Multiple Reggression / Correlation Analysis for the Behavioral Sciences
+  # Reference:
+  # * Cohen et al. (2003). Applied Multiple Reggression / Correlation Analysis for the Behavioral Sciences
   #
   def coeffs_se
     out={}
@@ -188,7 +194,7 @@ class MatrixEngine < BaseEngine
     matrix.collect {|i| Math::sqrt(i) if i>0 }[0,0]
   end
   
-  def to_reportbuilder(generator)
+  def to_reportbuilder(generator) # :nodoc:
     anchor=generator.add_toc_entry(_("Multiple Regression: ")+@name)
     generator.add_html "<div class='multiple-regression'>#{@name}<a name='#{anchor}'></a>"
     c=coeffs

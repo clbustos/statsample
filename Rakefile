@@ -5,25 +5,11 @@
 require 'rubygems'
 require 'hoe'
 require './lib/statsample'
-begin
-	require 'hanna/rdoctask'
-rescue LoadError
-	require 'rake/rdoctask'
-end
+
 if File.exists? './local_rakefile.rb'
 	require './local_rakefile'
 end
-desc 'Generate RDoc documentation'
-Rake::RDocTask.new(:docs) do |rdoc|
-	rdoc.rdoc_files.include('*.txt').
-	exclude('Manifest.txt').
-	include('lib/**/*.rb').
-	exclude('lib/statistics2.rb')
 	
-rdoc.main="README.txt"
-rdoc.title="Statsample documentation"
-	rdoc.rdoc_dir="doc2"
-end
 desc "Ruby Lint"
 task :lint do
   executable=Config::CONFIG['RUBY_INSTALL_NAME']
@@ -52,10 +38,9 @@ Hoe.spec('statsample') do
 	self.version=Statsample::VERSION
 	self.rubyforge_name = "ruby-statsample"
 	self.developer('Claudio Bustos', 'clbustos@gmail.com')
-	self.extra_deps << ["spreadsheet","=0.6.4"] << ["svg-graph", ">=1.0.0"] << ["reportbuilder", ">=0.2.0"]
+	self.extra_deps << ["spreadsheet",">=0.6.4"] << ["svg-graph", ">=1.0.0"] << ["reportbuilder", ">=0.2.0"] << ["minimization", ">=0.1.0"]
 	self.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"
 	#  p.rdoc_pattern = /^(lib|bin|ext\/distributions)|txt$/
-	self.local_rdoc_dir="doc2"
 end
 
 

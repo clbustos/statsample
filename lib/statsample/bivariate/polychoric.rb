@@ -1,3 +1,4 @@
+require 'minimization'
 module Statsample
   module Bivariate
     # Calculate Polychoric correlation for two vectors.
@@ -322,12 +323,15 @@ module Statsample
         f=proc {|rho| 
           loglike(@alpha,@beta, rho)
         }
-        min=Statsample::Minimization::GoldenSection.new(-0.999,0.999,f)
+        @log="Minimizing using GSL Brent method\n"
+        min=Minimization::Brent.new(-0.9999,0.9999,f)
+        min.epsilon=@epsilon
+        min.expected=0
         min.iterate
-        
+        @log+=min.log
         @r=min.x_minimum
         @loglike_model=-min.f_minimum
-        puts min.log if @debug
+        puts @log if @debug
         
       end
       

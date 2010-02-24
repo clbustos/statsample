@@ -3,7 +3,7 @@
 http://ruby-statsample.rubyforge.org/
 
 
-== FEATURES:
+== DESCRIPTION:
 
 A suite for basic and advanced statistics on Ruby. Tested on Ruby 1.8.7, Ruby 1.9 and JRuby 1.4 (Ruby 1.8.7 compatible) 
 
@@ -16,7 +16,7 @@ Includes:
 * Dominance Analysis, with multivariate dependent and bootstrap (Azen & Budescu)
 * Sample calculation related formulas
 
-== DETAILED FEATURES:
+== FEATURES:
 
 * Factorial Analysis. Principal Component Analysis and Principal Axis extraction, with orthogonal rotations (Varimax, Equimax, Quartimax)
 * Multiple Regression. Listwise analysis optimized with use of Alglib library. Pairwise analysis is executed on pure ruby with matrixes and reports same values as SPSS
@@ -68,7 +68,9 @@ Includes:
 Optional: 
 
 * Plotting: gnuplot and rbgnuplot, SVG::Graph
-* Factorial analysis and polychorical correlation: gsl library and rb-gsl (http://rb-gsl.rubyforge.org/). You should install it using <tt>gem install gsl</tt>
+* Factorial analysis and polychorical correlation(joint estimate and polychoric series): gsl library and rb-gsl (http://rb-gsl.rubyforge.org/). You should install it using <tt>gem install gsl</tt>. 
+
+<b>Note</b>: Use gsl 1.12.109 or later.
 
 == DOWNLOAD
 * Gems and bugs report: http://rubyforge.org/projects/ruby-statsample/

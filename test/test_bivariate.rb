@@ -25,6 +25,20 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
       end
     end
   end
+  def test_poly_vs_tetra
+    10.times {
+      # Should be the same results as Tetrachoric for 2x2 matrix
+      matrix=Matrix[[150+rand(10),1000+rand(20)],[1000+rand(20),200+rand(20)]]
+      tetra = Statsample::Bivariate::Tetrachoric.new_with_matrix(matrix)
+      poly  = Statsample::Bivariate::Polychoric.new(matrix)
+      poly.compute_two_step_mle_drasgow_ruby
+      assert_in_delta(tetra.r,poly.r,0.0001)
+      if HAS_GSL
+        poly.compute_two_step_mle_drasgow_gsl
+        assert_in_delta(tetra.r,poly.r,0.0001)
+      end
+    }
+  end
   def test_polychoric
     
       matrix=Matrix[[58,52,1],[26,58,3],[8,12,9]]
@@ -40,12 +54,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
 
       
       
-       # Should be the same results as Tetrachoric for 2x2 matrix
-      matrix=Matrix[[rand(100)+1,rand(100)+1],[rand(100)+1,rand(100)+1]]
-      tetra = Statsample::Bivariate::Tetrachoric.new_with_matrix(matrix)
-      poly  = Statsample::Bivariate::Polychoric.new(matrix)
-      poly.compute_two_step_mle_drasgow_ruby
-      assert_in_delta(tetra.r,poly.r,0.0001)
+     
       
       
 
