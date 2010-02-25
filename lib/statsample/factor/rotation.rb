@@ -16,19 +16,36 @@ module Factor
   #   p rotation.component_transformation_matrix
   # 
   class Rotation
-    MAX_PRECISION=1e-15
+    EPSILON=1e-15
+    MAX_ITERATIONS=25
+    
     attr_reader :iterations, :rotated, :component_transformation_matrix, :h2
+    # Maximum number of iterations    
+    attr_accessor :max_iterations
+    # Maximum precision    
+    attr_accessor :epsilon
+    
+    
     def initialize(matrix, opts=Hash.new)
       @matrix=matrix
       @n=@matrix.row_size # Variables, p on original
       @m=@matrix.column_size # Factors, r on original
       @component_transformation_matrix=nil
+      @max_iterations=MAX_ITERATIONS
+      @epsilon=EPSILON
       @h2=(@matrix.collect {|c| c**2} * Matrix.column_vector([1]*@m)).column(0).to_a
+      opts.each{|k,v|
+        self.send("#{k}=",v) if self.respond_to? k
+      }
+      
+      
     end
     alias_method :communalities, :h2
     alias_method :rotated_component_matrix, :rotated
     # Start iteration of 
-    def iterate(max_i=25)
+    def iterate(max_i=nil)
+      max_i||=@max_iterations
+      @max_iterations=max_i
       t=Matrix.identity(@m)
       b=@matrix.dup
       h=Matrix.diagonal(*@h2).collect {|c| Math::sqrt(c)}
@@ -61,7 +78,7 @@ module Factor
             phi=Math::atan2(num,den) / 4.0
             # puts "#{i}-#{j}: #{phi}"
             
-            if(Math::sin(phi.abs) >= MAX_PRECISION)
+            if(Math::sin(phi.abs) >= @epsilon)
               xx_rot=( Math::cos(phi)*xx)+(Math::sin(phi)*yy)
               yy_rot=((-Math::sin(phi))*xx)+(Math::cos(phi)*yy)
               

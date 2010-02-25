@@ -22,7 +22,7 @@ module Statsample
         end
       end
     end
-    # == Polychoric correlation.
+    # = Polychoric correlation.
     #
     # The <em>polychoric</em> correlation is a measure of 
     # bivariate association arising when both observed variates
@@ -36,10 +36,33 @@ module Statsample
     # 2. Two-step estimator and 
     # 3. Polychoric series estimate. 
     # 
-    # By default, Two-step estimation are used. You can select 
-    # the estimation method with method attribute
+    # By default, two-step estimation are used. You can select 
+    # the estimation method with method attribute. Joint estimate and polychoric series requires gsl library and rb-gsl.
     #
-    # See extensive documentation on Uebersax(2002) and Drasgow(2006)    
+    # == Use
+    #
+    # You should enter a Matrix with ordered data. For example:
+    #         -------------------
+    #         | y=0 | y=1 | y=2 | 
+    #         -------------------
+    #   x = 0 |  1  |  10 | 20  |
+    #         -------------------
+    #   x = 1 |  20 |  20 | 50  |
+    #         -------------------
+    # 
+    # The code will be
+    #
+    #   matrix=Matrix[[1,10,20],[20,20,50]]
+    #   poly=Statsample::Bivariate::Polychoric.new(matrix, :method=>:joint)
+    #   puts poly.r
+    # 
+    # See extensive documentation on Uebersax(2002) and Drasgow(2006)
+    #
+    # == References 
+    # 
+    # * Uebersax, J.S. (2006). The tetrachoric and polychoric correlation coefficients. Statistical Methods for Rater Agreement web site. 2006. Available at: http://john-uebersax.com/stat/tetra.htm . Accessed February, 11, 2010
+    # * Drasgow F. (2006). Polychoric and polyserial correlations. In Kotz L, Johnson NL (Eds.), Encyclopedia of statistical sciences. Vol. 7 (pp. 69-74). New York: Wiley.
+    
     class Polychoric
       include GetText
       bindtextdomain("statsample")
@@ -86,23 +109,10 @@ module Statsample
       def new_with_vectors(v1,v2)
         Polychoric.new(Crosstab.new(v1,v2).to_matrix)
       end
-      # Calculate Polychoric correlation
-      # You should enter a Matrix with ordered data. For 
-      #         -------------------
-      #         | y=0 | y=1 | y=2 | 
-      #         -------------------
-      #   x = 0 |  1  |  10 | 20  |
-      #         -------------------
-      #   x = 1 |  20 |  20 | 50  |
-      #         -------------------
-      # 
-      # The code will be
-      #
-      #   matrix=Matrix[[1,10,20],[20,20,50]]
-      #   poly=Statsample::Bivariate::Polychoric.new(matrix, :method=>:joint)
-      #   puts poly.r
-      
-      
+      # Params:
+      # * matrix: Contingence table
+      # * opts: Any attribute
+
       def initialize(matrix, opts=Hash.new)
         @matrix=matrix
         @n=matrix.column_size

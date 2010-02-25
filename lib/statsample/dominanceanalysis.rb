@@ -1,13 +1,12 @@
 require 'statsample/dominanceanalysis/bootstrap'
 module Statsample
-  # Dominance Analysis is a procedure based on an examination of the R^2 values
+  # Dominance Analysis is a procedure based on an examination of the R<sup>2</sup> values
   # for all possible subset models, to identify the relevance of one or more 
   # predictors in the prediction of criterium.
   #
-  #
   # See Budescu(1993), Azen & Budescu (2003, 2006) for more information.
   #
-  # Example: 
+  # == Use
   #
   #  a=1000.times.collect {rand}.to_scale
   #  b=1000.times.collect {rand}.to_scale
@@ -17,7 +16,7 @@ module Statsample
   #  da=Statsample::DominanceAnalysis.new(ds,'y')
   #  puts da.summary
   # 
-  # Output:
+  # === Output:
   #
   #  Report: Report 2010-02-08 19:10:11 -0300
   #  Table: Dominance Analysis result
@@ -51,12 +50,12 @@ module Statsample
   #  | a - c | 1.0   | 1.0         | 1.0     |
   #  | b - c | 1.0   | 1.0         | 1.0     |
   #  -----------------------------------------
-
   #
   # == References:
   # * Budescu, D. V. (1993). Dominance analysis: a new approach to the problem of relative importance of predictors in multiple regression. <em>Psychological Bulletin, 114</em>, 542-551.
   # * Azen, R. & Budescu, D.V. (2003). The dominance analysis approach for comparing predictors in multiple regression. <em>Psychological Methods, 8</em>(2), 129-148.
   # * Azen, R. & Budescu, D.V. (2006). Comparing predictors in Multivariate Regression Models: An extension of Dominance Analysis. <em>Journal of Educational and Behavioral Statistics, 31</em>(2), 157-180.
+  #
   class DominanceAnalysis
     include GetText
     bindtextdomain("statsample")
@@ -366,7 +365,7 @@ module Statsample
       generator.parse_element(t)
       generator.add_html("</div>")
     end
-    class ModelData
+    class ModelData # :nodoc:
       attr_reader :contributions
       def initialize(independent, data, da)
         @independent=independent

@@ -321,6 +321,7 @@ module Statsample
     @missing_values = vals
     set_valid_data
   end
+  # Set data considered as "today" on data vectors
   def today_values=(vals)
     @today_values = vals
     set_valid_data
@@ -429,30 +430,30 @@ module Statsample
     split_data=splitted(sep)
     factors=split_data.flatten.uniq.compact
     out=factors.inject({}) {|a,x|
-        a[x]=[]
-        a
+      a[x]=[]
+      a
     }
-    split_data.each{|r|
-        if r.nil?
-            factors.each{|f|
-                out[f].push(nil)
-            }
-        else
-        factors.each{|f|
-            out[f].push(r.include?(f) ? 1:0) 
-        }
+    split_data.each do |r|
+      if r.nil?
+        factors.each do |f|
+          out[f].push(nil)
         end
-    }
+      else
+        factors.each do |f|
+          out[f].push(r.include?(f) ? 1:0) 
+        end
+      end
+    end
     out.inject({}){|s,v|
-        s[v[0]]=Vector.new(v[1],:nominal)
-        s
+      s[v[0]]=Vector.new(v[1],:nominal)
+      s
     }
   end
   def split_by_separator_freq(sep=Statsample::SPLIT_TOKEN)
-      split_by_separator(sep).inject({}) {|a,v|
-          a[v[0]]=v[1].inject {|s,x| s+x.to_i}
-          a
-      }
+    split_by_separator(sep).inject({}) {|a,v|
+      a[v[0]]=v[1].inject {|s,x| s+x.to_i}
+      a
+    }
   end
   
   # Returns an random sample of size n, with replacement,
@@ -594,30 +595,30 @@ module Statsample
           y.push(v) 
       }
       Gnuplot.open do |gp|
-          Gnuplot::Plot.new( gp ) do |plot|
-              plot.boxwidth("0.9 absolute")
-              plot.yrange("[0:#{y.max}]")
-              plot.style("fill  solid 1.00 border -1")
-              plot.set("xtics border in scale 1,0.5 nomirror rotate by -45  offset character 0, 0, 0")
-              plot.style("histogram")
-              plot.style("data histogram")
-              i=-1
-              plot.set("xtics","("+x.collect{|v| i+=1; sprintf("\"%s\" %d",v,i)}.join(",")+")")
-              plot.data << Gnuplot::DataSet.new( [y] ) do |ds|
-                  end
+        Gnuplot::Plot.new( gp ) do |plot|
+          plot.boxwidth("0.9 absolute")
+          plot.yrange("[0:#{y.max}]")
+          plot.style("fill  solid 1.00 border -1")
+          plot.set("xtics border in scale 1,0.5 nomirror rotate by -45  offset character 0, 0, 0")
+          plot.style("histogram")
+          plot.style("data histogram")
+          i=-1
+          plot.set("xtics","("+x.collect{|v| i+=1; sprintf("\"%s\" %d",v,i)}.join(",")+")")
+          plot.data << Gnuplot::DataSet.new( [y] ) do |ds|
               end
           end
-  
+        end
+
       end
   
   
     # Returns the most frequent item.
     def mode
-        frequencies.max{|a,b| a[1]<=>b[1]}[0]
+      frequencies.max{|a,b| a[1]<=>b[1]}[0]
     end
     # The numbers of item with valid data.
     def n_valid
-        @valid_data.size
+      @valid_data.size
     end
     # Returns a hash with the distribution of proportions of
     # the sample.

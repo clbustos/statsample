@@ -24,7 +24,8 @@ module Statsample
       # Parameters:
       # * n1: group 1 size
       # * n2: group 2 size 
-      # Reference: Dinneen, L., & Blakesley, B. (1973). Algorithm AS 62: A Generator for the Sampling Distribution of the Mann- Whitney U Statistic. Journal of the Royal Statistical Society, 22(2), 269-273
+      # Reference: 
+      # * Dinneen, L., & Blakesley, B. (1973). Algorithm AS 62: A Generator for the Sampling Distribution of the Mann- Whitney U Statistic. <em>Journal of the Royal Statistical Society, 22</em>(2), 269-273
       # 
       def self.u_sampling_distribution_as62(n1,n2)
 
@@ -141,8 +142,11 @@ Z: #{sprintf("%0.3f",z)} (p: #{sprintf("%0.3f",z_probability)})
         end
           out
       end
-      # Exact probability of finding values of U lower or equal to sample on U distribution. Use with caution with m*n>100000
-      # Reference: Dinneen & Blakesley (1973)
+      def to_reportbuilder(generator) # :nodoc:
+        generator.add_text(summary)
+      end
+      # Exact probability of finding values of U lower or equal to sample on U distribution. Use with caution with m*n>100000.
+      # Uses u_sampling_distribution_as62
       def exact_probability
         dist=UMannWhitney.u_sampling_distribution_as62(@n1,@n2)
         sum=0
@@ -151,7 +155,10 @@ Z: #{sprintf("%0.3f",z)} (p: #{sprintf("%0.3f",z_probability)})
         }
         sum
       end
-      # Reference: http://europe.isixsigma.com/library/content/c080806a.asp
+      # Adjunt for ties.
+      # 
+      # Reference: 
+      # * http://europe.isixsigma.com/library/content/c080806a.asp
       def adjust_for_ties(data)
         @t=data.frequencies.find_all{|k,v| v>1}.inject(0) {|a,v|
           a+(v[1]**3-v[1]).quo(12)
@@ -160,7 +167,8 @@ Z: #{sprintf("%0.3f",z)} (p: #{sprintf("%0.3f",z_probability)})
       # Z value for U, with adjust for ties.
       # For large samples, U is approximately normally distributed. 
       # In that case, you can use z to obtain probabily for U.
-      # Reference: SPSS Manual
+      # Reference: 
+      # * SPSS Manual
       def z
         mu=(@n1*@n2).quo(2)
         if(!@ties)

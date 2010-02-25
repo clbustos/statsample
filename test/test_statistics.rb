@@ -23,15 +23,7 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
     assert(!"".is_number?)
   
   end
-  def test_chi_square
-    real=Matrix[[95,95],[45,155]]
-    expected=Matrix[[68,122],[72,128]]
-    assert_nothing_raised do
-      chi=Statsample::Test.chi_square(real,expected)
-    end
-    chi=Statsample::Test.chi_square(real,expected)
-    assert_in_delta(32.53,chi,0.1)
-  end
+ 
 	
   def test_estimation_mean              
     v=([42]*23+[41]*4+[36]*1+[32]*1+[29]*1+[27]*2+[23]*1+[19]*1+[16]*2+[15]*2+[14,11,10,9,7]+ [6]*3+[5]*2+[4,3]).to_vector(:scale)
@@ -64,6 +56,8 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
     
     end
   end
+  
+  
   def test_simple_linear_regression
     a=[1,2,3,4,5,6].to_vector(:scale)
     b=[6,2,4,10,12,8].to_vector(:scale)
@@ -75,16 +69,4 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
     assert_in_delta(0.657,reg.r,0.001)
     assert_in_delta(0.432,reg.r2,0.001)
 	end
-  def test_u_mannwhitney
-    a=[1,2,3,4,5,6].to_scale
-    b=[0,5,7,9,10,11].to_scale
-    assert_equal(7.5, Statsample::Test.u_mannwhitney(a,b).u)
-    assert_equal(7.5, Statsample::Test.u_mannwhitney(b,a).u)
-    a=[1, 7,8,9,10,11].to_scale
-    b=[2,3,4,5,6,12].to_scale
-    assert_equal(11, Statsample::Test.u_mannwhitney(a,b).u)
-    
-    
-    
-  end
 end

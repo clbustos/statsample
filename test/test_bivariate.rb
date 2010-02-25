@@ -93,6 +93,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     else
       puts "Two-step optimized, polychoric series and Joint method for Polychoric  requires GSL"
     end
+    assert(poly.summary)
   end
   def test_tetrachoric
     a,b,c,d=0,0,0,0
@@ -134,7 +135,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     tc2  = Statsample::Bivariate::Tetrachoric.new_with_vectors(x,y)
     assert_equal(tc1.r,tc2.r)
     assert_equal(tc1.se,tc2.se)
-    
+    assert(tc.summary)
   end
   def test_matrix_correlation
     v1=[6,5,4,7,8,4,3,2].to_vector(:scale)

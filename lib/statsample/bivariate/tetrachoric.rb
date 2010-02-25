@@ -21,18 +21,18 @@ module Statsample
         end
       end
     end
-    #
     # Compute tetrachoric correlation.
-    # 
-    # See http://www.john-uebersax.com/stat/tetra.htm for extensive 
-    # documentation about tetrachoric correlation.
+    #
+    # The <em>tetrachoric</em> correlation is a measure of 
+    # bivariate association arising when both observed variates
+    # are  categorical variables that result from dichotomizing
+    # the two undelying continuous variables (Drasgow, 2006). 
+    # The tetrachoric correlation is a good way to measure rater agreement  (Uebersax, 2006)
     #
     # This class uses Brown (1977) algorithm. You can see FORTRAN code on http://lib.stat.cmu.edu/apstat/116
     # 
-    # == References:
-    # * Brown, MB. (1977) Algorithm AS 116: the tetrachoric correlation and its standard error. _Applied Statistics, 26_, 343-351.
     #
-    # <b>Usage</b>.
+    # == Usage 
     # With two variables x and y on a crosstab like this:
     # 
     #         -------------
@@ -43,13 +43,18 @@ module Statsample
     #   x = 1 |  c  |  d  |
     #         -------------
     #
-    # Use:
+    # The code will be
     #   tc=Statsample::Bivariate::Tetrachoric.new(a,b,c,d)
     #   tc.r # correlation
     #   tc.se # standard error
     #   tc.threshold_y # threshold for y variable
     #   tc.threshold_x # threshold for x variable
-    
+    #
+    # == References:
+    #
+    # * Brown, MB. (1977) Algorithm AS 116: the tetrachoric correlation and its standard error. <em>Applied Statistics, 26</em>, 343-351.
+    # * Drasgow F. (2006). Polychoric and polyserial correlations. In Kotz L, Johnson NL (Eds.), Encyclopedia of statistical sciences. Vol. 7 (pp. 69-74). New York: Wiley.    
+    # * Uebersax, J.S. (2006). The tetrachoric and polychoric correlation coefficients. Statistical Methods for Rater Agreement web site. 2006. Available at: http://john-uebersax.com/stat/tetra.htm . Accessed February, 11, 2010
     
     class Tetrachoric
       include GetText

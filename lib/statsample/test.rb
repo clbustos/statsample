@@ -3,6 +3,8 @@ module Statsample
   
   module Test
     autoload(:UMannWhitney, 'statsample/test/umannwhitney')
+    autoload(:Levene, 'statsample/test/levene')
+
     # Calculate chi square for two Matrix
     class << self
       def chi_square(real,expected)
