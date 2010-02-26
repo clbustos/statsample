@@ -27,18 +27,19 @@ module Factor
   # * Smith, L. (2002). A tutorial on Principal Component Analysis. Available on http://courses.eas.ualberta.ca/eas570/pca_tutorial.pdf 
   #   
   class PrincipalAxis
-    # Minimum difference between succesive iterations 
+    # Minimum difference between succesive iterations on sum of communalities
     DELTA=1e-3
-    # Max number of iterations
+    # Maximum number of iterations
     MAX_ITERATIONS=50
     include GetText
     bindtextdomain("statsample")
     # Number of factors. Set by default to the number of factors
-    # with eigen values > 1
+    # with eigen values > 1 on PCA over data
     attr_accessor :m
     
     # Name of analysis
     attr_accessor :name
+    
     # Number of iterations required to converge
     attr_reader :iterations
     # Initial eigenvalues 
@@ -57,6 +58,8 @@ module Factor
       @name=""
       @m=nil
       @initial_eigenvalues=nil
+      @initial_communalities=nil
+      @component_matrix=nil
       @delta=DELTA
       @smc=true
       @max_iterations=MAX_ITERATIONS

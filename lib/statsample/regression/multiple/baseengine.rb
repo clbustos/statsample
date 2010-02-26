@@ -110,7 +110,7 @@ module Statsample
           ds.each{|k,v|
           ds[k]=v.to_vector(:scale)
           }
-          lr=Multiple.listwise(ds.to_dataset,var)
+          lr=self.class.new(ds.to_dataset,var)
           1-lr.r2
         end
         # Tolerances for each coefficient

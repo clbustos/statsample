@@ -99,14 +99,18 @@ module Statsample
       attr_reader :r1
       # Sample 2 Rank sum
       attr_reader :r2
-      # Sample 1 U
+      # Sample 1 U (useful for demostration)
       attr_reader :u1
-      # Sample 2 U
+      # Sample 2 U (useful for demostration)
       attr_reader :u2
-      # U Value
+      # U Value 
       attr_reader :u
-      # Compensation for ties
+      # Value of compensation for ties (useful for demostration)
       attr_reader :t
+      #
+      # Create a new U Mann-Whitney test
+      # Params: Two Statsample::Vectors
+      # 
       def initialize(v1,v2)
         @n1=v1.valid_data.size
         @n2=v2.valid_data.size
@@ -129,6 +133,7 @@ module Statsample
         @u2=r2-((@n2*(@n2+1)).quo(2))
         @u=(u1<u2) ? u1 : u2
       end
+      # Report results.
       def summary
         out=<<-HEREDOC
 Mann-Whitney U
@@ -164,6 +169,9 @@ Z: #{sprintf("%0.3f",z)} (p: #{sprintf("%0.3f",z_probability)})
           a+(v[1]**3-v[1]).quo(12)
         }        
       end
+      
+      private :adjust_for_ties
+      
       # Z value for U, with adjust for ties.
       # For large samples, U is approximately normally distributed. 
       # In that case, you can use z to obtain probabily for U.

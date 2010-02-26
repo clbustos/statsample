@@ -175,7 +175,7 @@ raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all
           end
         }
       end
-      private :process_row
+      private :process_row, :preprocess_row
       
       # Returns a dataset based on a xls file
       # USE:

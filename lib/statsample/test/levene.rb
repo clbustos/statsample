@@ -38,15 +38,18 @@ module Statsample
       def f
         @w
       end
+      
       def to_reportbuilder(generator) # :nodoc:
         generator.add_text(summary)
         
       end
+      # Summary of results
       def summary
         "#{@name}
 F: #{f}
 p: #{probability}"
       end
+      
       def compute
         n=@vectors.inject(0) {|ac,v| ac+v.n_valid}
         
@@ -75,8 +78,9 @@ p: #{probability}"
         @d1=k-1
         @d2=n-k
       end
-      # Probability to get a value of the test upper or equal 
-      # to the obtained on the samples
+      private :compute
+      # Probability.
+      # With H_0 = Sum(s2)=0, probability of getting a value of the test upper or equal to the obtained on the sample
       def probability
         1-Distribution::F.cdf(f, @d1, @d2) 
       end

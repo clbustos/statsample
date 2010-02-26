@@ -1,29 +1,7 @@
 module Statsample
   module Regression
     module Binomial
-      # Create a Logit model object.
-      # ds:: Dataset
-      # y::  Name of dependent vector
-      # Use
-      #   dataset=Statsample::CSV.read("data.csv")
-      #   y="y" 
-      #   lr=Statsample::Regression::Binomial.logit(dataset,y)
-      #   
-      def self.logit(ds,y_var)
-        Logit.new(ds,y_var)                
-      end
-      # Create a Probit model object.
-      # ds:: Dataset
-      # y::  Name of dependent vector
-      # Use
-      #   dataset=Statsample::CSV.read("data.csv")
-      #   y="y" 
-      #   lr=Statsample::Regression::Binomial.probit(dataset,y)
-      #   
-      
-      def self.probit(ds,y_var)
-        Probit.new(ds,y_var)                
-      end
+
       # Base Engine for binomial regression analysis.
       # See Statsample::Regression::Binomial.logit() and
       # Statsample::Regression::Binomial.probit for fast

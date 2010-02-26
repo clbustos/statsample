@@ -92,33 +92,43 @@ module GSL
 end
 
 module Statsample
-  # Method for variance/covariance and correlation matrices
+  # Module to add method for variance/covariance and correlation matrices
+  # == Usage
+  #  matrix=Matrix[[1,2],[2,3]]
+  #  matrix.extend CovariateMatrix
+  # 
   module CovariateMatrix
+    # Gives a nice 
     def summary
       rp=ReportBuilder.new()
       rp.add(self)
       rp.to_text
     end
-    def type=(v)
-      @type=v
-    end
+    # Get type of covariate matrix. Could be :covariance or :correlation
     def type
-      if row_size.times.find {|i| self[i,i]!=1.0}
-        :covariance
+      if row_size==column_size
+        if row_size.times.find {|i| self[i,i]!=1.0}
+          :covariance
+        else
+          :correlation
+        end
       else
-        :correlation
+        @type
       end
       
+    end
+    def type=(t)
+      @type=t
     end
     def correlation
       if(type==:covariance)
       matrix=Matrix.rows(row_size.times.collect { |i|
         column_size.times.collect { |j|
-            if i==j
-              1.0
-            else
-              self[i,j].quo(Math::sqrt(self[i,i])*Math::sqrt(self[j,j]))
-            end
+          if i==j
+            1.0
+          else
+            self[i,j].quo(Math::sqrt(self[i,i])*Math::sqrt(self[j,j]))
+          end
         }
       })
       matrix.extend CovariateMatrix 

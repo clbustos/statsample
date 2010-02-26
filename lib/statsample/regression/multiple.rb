@@ -3,7 +3,6 @@ module Statsample
   module Regression
     # Module for Linear Multiple Regression Analysis.
     # 
-    # You can call Statsample::Regression::Multiple.listwise,  Statsample::Regression::Multiple.pairwise or instance directly the engines.
     # 
     #  Use:.
     #
@@ -13,7 +12,7 @@ module Statsample
     #  c=1000.times.collect {rand}.to_scale
     #  ds={'a'=>a,'b'=>b,'c'=>c}.to_dataset
     #  ds['y']=ds.collect{|row| row['a']*5+row['b']*3+row['c']*2+rand()}
-    #  lr=Statsample::Regression::Multiple.listwise(ds,'y')
+    #  lr=Statsample::Regression.multiple(ds,'y')
     #  puts lr.summary
     #  Summary for regression of a,b,c over y
     #  *************************************************************
@@ -42,29 +41,6 @@ module Statsample
     #  -----------------------------------------------
     # 
     module Multiple
-      # Creates an object for listwise regression. 
-      # Alglib is faster, so is prefered over GSL
-      #   lr=Statsample::Regression::Multiple.listwise(ds,'y')
-      def self.listwise(ds,y_var)
-        if HAS_ALGIB
-          AlglibEngine.new(ds,y_var)
-        elsif HAS_GSL
-          GslEngine.new(ds,y_var)
-        else
-          ds2=ds.dup_only_valid
-          RubyEngine.new(ds2,y_var)
-        end
-      end
-      
-      # Creates an object for pairwise regression
-      # For now, always retrieves a RubyEngine
-      #    lr=Statsample::Regression::Multiple.listwise(ds,'y')
-      def self.pairwise(ds,y_var)
-        RubyEngine.new(ds,y_var)
-      end
-      def self.listwise_by_exp(ds,exp)
-        raise "Not implemented yet"
-      end
       # Obtain r2 for regressors
       def self.r2_from_matrices(rxx,rxy)
         matrix=(rxy.transpose*rxx.inverse*rxy)

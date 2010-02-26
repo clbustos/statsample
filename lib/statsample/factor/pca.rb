@@ -3,7 +3,7 @@ module Factor
   # Principal Component Analysis (PCA) of a 
   # covariance or correlation matrix. 
   #
-  # For Factor Analysis, use Statsample::Factor::PrincipalAxis
+  # For Principal Axis Analysis, use Statsample::Factor::PrincipalAxis
   # 
   # == Usage:
   #   require 'statsample'

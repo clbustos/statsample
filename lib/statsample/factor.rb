@@ -3,7 +3,7 @@ require 'statsample/factor/principalaxis'
 require 'statsample/factor/rotation'
 
 module Statsample
-  # = Factor Analysis toolbox
+  # Factor Analysis toolbox.
   # * Classes for Extraction of factors: 
   #   * Statsample::Factor::PCA
   #   * Statsample::Factor::PrincipalAxis
