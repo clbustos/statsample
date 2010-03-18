@@ -1,7 +1,8 @@
 module Statsample
   module Regression
     module Binomial
-      # Logistic Regression
+      # Probit Regression
+      # See Statsample::Regression::Binomial::BaseEngine for documentation
       class Probit < BaseEngine
         def initialize(ds,y_var)
           model=Statsample::MLE::Probit.new

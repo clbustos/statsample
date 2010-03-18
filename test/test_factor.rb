@@ -4,7 +4,7 @@ require 'test/unit'
 class StatsampleFactorTestCase < Test::Unit::TestCase
     # Tested with SPSS and R
     def test_pca
-      if HAS_GSL
+      if Statsample.has_gsl?
         require 'gsl'
         a=[2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2.0, 1.0, 1.5, 1.1].to_scale
         b=[2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9].to_scale
@@ -40,7 +40,7 @@ class StatsampleFactorTestCase < Test::Unit::TestCase
     
     # Tested with R
     def test_principalaxis
-      if HAS_GSL
+      if Statsample.has_gsl?
         require 'gsl'
         matrix=Matrix[
         [1.0, 0.709501601093587, 0.877596585880047, 0.272219316266807],  [0.709501601093587, 1.0, 0.291633797330304, 0.871141831433844], [0.877596585880047, 0.291633797330304, 1.0, -0.213373722977167], [0.272219316266807, 0.871141831433844, -0.213373722977167, 1.0]]
@@ -71,7 +71,7 @@ class StatsampleFactorTestCase < Test::Unit::TestCase
     
     
     def test_rotation_varimax
-      if HAS_GSL
+      if Statsample.has_gsl?
         a = Matrix[ [ 0.4320,  0.8129,  0.3872]  ,
          [0.7950, -0.5416,  0.2565]  ,
          [0.5944,  0.7234, -0.3441],
@@ -84,9 +84,9 @@ class StatsampleFactorTestCase < Test::Unit::TestCase
          varimax=Statsample::Factor::Varimax.new(a)
          varimax.iterate
          _test_matrix(expected,varimax.rotated)
-       else
-         puts "Rotation not tested. Requires GSL"
-       end
+      else
+        puts "Rotation not tested. Requires GSL"
+      end
     end
     def _test_matrix(a,b)
       a.size1.times {|i|

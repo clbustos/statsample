@@ -1,4 +1,4 @@
-if HAS_GSL
+if Statsample.has_gsl?
 module Statsample
 module Regression
 module Multiple

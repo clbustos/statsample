@@ -23,7 +23,7 @@ module Statsample
     def initialize(k,n,only_ruby=false)
       @k=k
       @n=n
-      if HAS_GSL and !only_ruby
+      if Statsample.has_gsl? and !only_ruby
         @d=CombinationGsl.new(@k,@n)
       else
         @d=CombinationRuby.new(@k,@n)

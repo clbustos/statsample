@@ -18,7 +18,7 @@ class StatsampleCombinationTestCase < Test::Unit::TestCase
         assert_equal(expected,a)
     end
     def test_gsl_versus_ruby
-        if HAS_GSL
+        if Statsample.has_gsl?
         k=3
         n=10
         gsl=Statsample::Combination.new(k,n,false)

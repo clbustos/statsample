@@ -33,7 +33,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
       poly  = Statsample::Bivariate::Polychoric.new(matrix)
       poly.compute_two_step_mle_drasgow_ruby
       assert_in_delta(tetra.r,poly.r,0.0001)
-      if HAS_GSL
+      if Statsample.has_gsl?
         poly.compute_two_step_mle_drasgow_gsl
         assert_in_delta(tetra.r,poly.r,0.0001)
       end
@@ -59,7 +59,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
       
 
       
-    if HAS_GSL  
+    if Statsample.has_gsl?  
       poly.method=:polychoric_series
       poly.compute
       
@@ -175,7 +175,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     assert(Statsample::Bivariate.prop_pearson(t,n,:left)<0.05)
   end
   def test_covariance
-  if HAS_GSL
+  if Statsample.has_gsl?
     v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
     v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
     assert_in_delta(Statsample::Bivariate.covariance(v1,v2), Statsample::Bivariate.covariance_slow(v1,v2), 0.001)

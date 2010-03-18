@@ -1,20 +1,22 @@
 module Statsample
   module Regression
     module Binomial
-
       # Base Engine for binomial regression analysis.
-      # See Statsample::Regression::Binomial.logit() and
-      # Statsample::Regression::Binomial.probit for fast
-      # access methods.
+      # Use Statsample::Regression.logit and Statsample::Regression.probit 
+      # for fast access methods.
       # 
-      # Use:
-      #   dataset=Statsample::CSV.read("data.csv")
-      #   y="y" 
-      #   model=Statsample::MLE::Logit.new
-      #   lr=Statsample::Regression::Binomial::BaseEngine(dataset, y, model)
+      # == Usage: 
+      #  dataset=Statsample::CSV.read("data.csv")
+      #  y="y" 
+      #  model=Statsample::MLE::Logit.new
+      #  lr=Statsample::Regression::Binomial::BaseEngine(dataset, y, model)
     class BaseEngine
       attr_reader :log_likehood, :iterations
-      def initialize(ds,y_var,model)
+      # Parameters
+      # * ds: Dataset
+      # * y_var: Name of dependent variable
+      # * model: One of Statsample::Regression::Binomial classes
+      def initialize(ds,y_var,model) 
       @ds=ds
       @y_var=y_var
       @dy=@ds[@y_var]
@@ -41,9 +43,14 @@ module Statsample
         out.delete("_constant")
         out
       end
-      # Constant value
+      # Value of constant on regression
       def constant
         @coeffs['_constant']
+      end
+      # Constant standard error
+      def constant_se
+        i=@fields.index :_constant
+        Math::sqrt(@var_cov_matrix[i,i])
       end
       # Regression coefficients
       def coeffs
@@ -51,12 +58,8 @@ module Statsample
         c.delete("_constant")
         c
       end
-      # Constant standard error
-      def constant_se
-        i=@fields.index :_constant
-        Math::sqrt(@var_cov_matrix[i,i])
-      end
-      def assign_names(c)
+      
+      def assign_names(c) # :nodoc:
         a={}
         @fields.each_index do |i|
           a[@fields[i]]=c[i]
@@ -64,6 +67,6 @@ module Statsample
         a
       end
       end # Base Engine
-    end # Dichotomic
+    end # Binomial
   end # Regression
 end # Stasample

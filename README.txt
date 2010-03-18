@@ -10,25 +10,43 @@ A suite for basic and advanced statistics on Ruby. Tested on Ruby 1.8.7, Ruby 1.
 Includes:
 * Descriptive statistics: frequencies, median, mean, standard error, skew, kurtosis (and many others).
 * Imports and exports datasets from and to Excel, CSV and plain text files.
-* Correlations: Pearson (r), Rho, Tetrachoric, Polychoric
-* Regression: Simple, Multiple, Probit and Logit
+* Correlations: Pearson's r, Spearman's rank correlation (rho), Tetrachoric, Polychoric
+* Regression: Simple, Multiple, Probit  and Logit
 * Factorial Analysis: Extraction (PCA and Principal Axis) and Rotation (Varimax and relatives)
 * Dominance Analysis, with multivariate dependent and bootstrap (Azen & Budescu)
 * Sample calculation related formulas
 
 == FEATURES:
 
-* Factorial Analysis. Principal Component Analysis and Principal Axis extraction, with orthogonal rotations (Varimax, Equimax, Quartimax)
-* Multiple Regression. Listwise analysis optimized with use of Alglib library. Pairwise analysis is executed on pure ruby with matrixes and reports same values as SPSS
-* Module Bivariate provides covariance and pearson, spearman, point biserial, tau a, tau b, gamma, tetrachoric and polychoric correlation correlations. Include methods to create correlation (pearson and tetrachoric) and covariance matrices
-* Regression module provides linear regression methods
-* Dominance Analysis. Based on Budescu and Azen papers, <strong>DominanceAnalysis</strong> class can report dominance analysis for a sample, using uni or multivariate dependent variables and <strong>DominanceAnalysisBootstrap</strong> can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/]. 
-* Classes for Vector, Datasets (set of Vectors) and Multisets (multiple datasets with same fields and type of vectors), and multiple methods to manipulate them
-* Module Codification, to help to codify open questions
-* Converters to and from database and csv files, and to output Mx and GGobi files
-* Module Crosstab provides function to create crosstab for categorical data
+* Classes for manipulation and storage of data:
+  * Statsample::Vector: An extension of an array, with statistical methods like sum, mean and standard deviation
+  * Statsample::Dataset: a group of Statsample::Vector, analog to a excel spreadsheet or a dataframe on R. The base of almost all operations on statsample. 
+  * Statsample::Multiset: multiple datasets with same fields and type of vectors
+* Module Statsample::Bivariate provides covariance and pearson, spearman, point biserial, tau a, tau b, gamma, tetrachoric (see Bivariate::Tetrachoric) and polychoric (see Bivariate::Polychoric) correlations. Include methods to create correlation and covariance matrices
+* Multiple types of regression.
+  * Simple Regression :  Statsample::Regression::Simple
+  * Multiple Regression: Statsample::Regression::Multiple
+  * Logit Regression:    Statsample::Regression::Binomial::Logit
+  * Probit Regression:    Statsample::Regression::Binomial::Probit
+* Factorial Analysis algorithms on Statsample::Factor module.
+  * Classes for Extraction of factors: 
+    * Statsample::Factor::PCA
+    * Statsample::Factor::PrincipalAxis
+  * Classes for Rotation of factors: 
+    * Statsample::Factor::Varimax
+    * Statsample::Factor::Equimax
+    * Statsample::Factor::Quartimax
+* Dominance Analysis. Based on Budescu and Azen papers, Statsample::DominanceAnalysis class can report dominance analysis for a sample, using uni or multivariate dependent variables and DominanceAnalysisBootstrap can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/]. 
+* Module Statsample::Codification, to help to codify open questions
+* Converters to import and export data:
+  * Statsample::Database : Can create sql to create tables, read and insert data
+  * Statsample::CSV : Read and write CSV files
+  * Statsample::Excel : Read and write Excel files
+  * Statsample::Mx    : Write Mx Files
+  * Statsample::GGobi : Write Ggobi files
+* Module Statsample::Crosstab provides function to create crosstab for categorical data
 * Reliability analysis provides functions to analyze scales. Class ItemAnalysis provides statistics like mean, standard deviation for a scale, Cronbach's alpha and standarized Cronbach's alpha, and for each item: mean, correlation with total scale, mean if deleted, Cronbach's alpha is deleted. With HtmlReport, graph the histogram of the scale and the Item Characteristic Curve for each item
-* Module SRS (Simple Random Sampling) provides a lot of functions to estimate standard error for several type of samples
+* Module Statsample::SRS (Simple Random Sampling) provides a lot of functions to estimate standard error for several type of samples
 * Interfaces to gdchart, gnuplot and SVG::Graph 
 
 

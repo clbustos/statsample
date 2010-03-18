@@ -18,7 +18,7 @@ desc "Ruby Lint"
 task :lint do
   executable=Config::CONFIG['RUBY_INSTALL_NAME']
   Dir.glob("lib/**/*.rb") {|f|
-    if !system %{#{executable} -cw -W2 "#{f}"} 
+    if !system %{#{executable} -w -c "#{f}"} 
         puts "Error on: #{f}"
     end
   }

@@ -3,7 +3,7 @@ require 'statsample'
 require 'test/unit'
 class StatsampleGSLTestCase < Test::Unit::TestCase
   def test_matrix_to_gsl
-    if HAS_GSL
+    if Statsample.has_gsl?
       a=[1,2,3,4,20].to_vector(:scale)
       b=[3,2,3,4,50].to_vector(:scale)
       c=[6,2,3,4,3].to_vector(:scale)

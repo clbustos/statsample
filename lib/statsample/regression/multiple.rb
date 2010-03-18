@@ -1,8 +1,7 @@
 require 'statsample/regression/multiple/baseengine'
 module Statsample
   module Regression
-    # Module for Linear Multiple Regression Analysis.
-    # 
+    # Module for OLS Multiple Regression Analysis.
     # 
     #  Use:.
     #
@@ -52,21 +51,19 @@ module Statsample
           0.0
         end
         def initialize(matrix,y_var, opts=Hash.new)
-           matrix.extend Statsample::CovariateMatrix
-           @matrix=matrix
-           @fields=matrix.fields-y_var
-           @y_var=y_var
-           @q=@y_var.size
-           @matrix_cor=matrix.correlation
-           @matrix_cor_xx = @matrix_cor.submatrix(@fields)
-           @matrix_cor_yy = @matrix_cor.submatrix(y_var, y_var)
-           
-           @sxx = @matrix.submatrix(@fields)
-           @syy = @matrix.submatrix(y_var, y_var)
-           @sxy = @matrix.submatrix(@fields, y_var)
-           @syx = @sxy.t
-           
-           
+          matrix.extend Statsample::CovariateMatrix
+          @matrix=matrix
+          @fields=matrix.fields-y_var
+          @y_var=y_var
+          @q=@y_var.size
+          @matrix_cor=matrix.correlation
+          @matrix_cor_xx = @matrix_cor.submatrix(@fields)
+          @matrix_cor_yy = @matrix_cor.submatrix(y_var, y_var)
+          
+          @sxx = @matrix.submatrix(@fields)
+          @syy = @matrix.submatrix(y_var, y_var)
+          @sxy = @matrix.submatrix(@fields, y_var)
+          @syx = @sxy.t
         end
         
         def r2yx

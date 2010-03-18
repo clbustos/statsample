@@ -1,14 +1,14 @@
 require 'statsample/bivariate/tetrachoric'
 require 'statsample/bivariate/polychoric'
 module Statsample
-  # Diverse correlation methods 
+  # Diverse bivariate methods, including #covariance, #pearson correlation (r), #spearman ranked correlation (rho), #tetrachoric correlation and #polychoric correlation.
   module Bivariate
     class << self
       # Covariance between two vectors
       def covariance(v1,v2)
         v1a,v2a=Statsample.only_valid(v1,v2)
         return nil if v1a.size==0
-        if HAS_GSL
+        if Statsample.has_gsl?
           GSL::Stats::covariance(v1a.gsl, v2a.gsl)
         else
           covariance_slow(v1a,v2a)
@@ -31,11 +31,12 @@ module Statsample
         (0...v1a.size).each {|i| t+=((v1a[i]-m1)*(v2a[i]-m2)) }
         t.to_f / (v1a.size-1)
       end
-      # Calculate Pearson correlation coefficient between 2 vectors
+      
+      # Calculate Pearson correlation coefficient (r) between 2 vectors
       def pearson(v1,v2)
         v1a,v2a=Statsample.only_valid(v1,v2)
         return nil if v1a.size ==0
-        if HAS_GSL
+        if Statsample.has_gsl?
           GSL::Stats::correlation(v1a.gsl, v2a.gsl)
         else
           pearson_slow(v1a,v2a)
@@ -177,7 +178,7 @@ module Statsample
         Matrix.rows(rows)
       end
       
-      # Spearman ranked correlation coefficient between 2 vectors
+      # Spearman ranked correlation coefficient (rho) between 2 vectors
       def spearman(v1,v2)
         v1a,v2a=Statsample.only_valid(v1,v2)
         v1r,v2r=v1a.ranked(:scale),v2a.ranked(:scale)
@@ -195,7 +196,6 @@ module Statsample
         ((m1.mean-m0.mean).to_f / ds['c'].sdp) * Math::sqrt(m0.size*m1.size.to_f / ds.cases**2)
       end
       # Kendall Rank Correlation Coefficient.
-      #
       # Based on Hervé Adbi article
       def tau_a(v1,v2)
         v1a,v2a=Statsample.only_valid(v1,v2)

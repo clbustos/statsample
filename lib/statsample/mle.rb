@@ -1,7 +1,9 @@
 module Statsample
-  # Module for MLE calculations.
+  # Module for generic MLE calculations.
   # Use subclass of BaseMLE for specific MLE model estimation.
-  # Usage:
+  # You should visit Statsample::Regression for method to perform fast
+  # regression analysis. 
+  # == Usage:
   # 
   #   mle=Statsample::MLE::Probit.new
   #   mle.newton_raphson(x,y)

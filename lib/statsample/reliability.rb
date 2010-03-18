@@ -1,16 +1,16 @@
 module Statsample
   module Reliability
-	  class << self
+    class << self
       # Calculate Chonbach's alpha for a given dataset.
       # only uses tuples without missing data
-			def cronbach_alpha(ods)
-				ds=ods.dup_only_valid
-				n_items=ds.fields.size
-				sum_var_items=ds.vectors.inject(0) {|ac,v|
+      def cronbach_alpha(ods)
+        ds=ods.dup_only_valid
+        n_items=ds.fields.size
+        sum_var_items=ds.vectors.inject(0) {|ac,v|
           ac+v[1].variance_sample }
-				total=ds.vector_sum
-				(n_items / (n_items-1).to_f) * (1-(sum_var_items/ total.variance_sample))
-			end
+        total=ds.vector_sum
+        (n_items / (n_items-1).to_f) * (1-(sum_var_items/ total.variance_sample))
+      end
       # Calculate Chonbach's alpha for a given dataset
       # using standarized values for every vector.
       # Only uses tuples without missing data
@@ -21,8 +21,8 @@ module Statsample
         }.to_dataset
         cronbach_alpha(ds)
       end
-		end   
-		class ItemCharacteristicCurve
+    end   
+    class ItemCharacteristicCurve
       attr_reader :totals, :counts,:vector_total
       def initialize (ds, vector_total=nil)
         vector_total||=ds.vector_sum
@@ -39,13 +39,13 @@ module Statsample
           tot=@vector_total[i]
           @totals[tot]||=0
           @totals[tot]+=1
-					@ds.fields.each  do |f|
+          @ds.fields.each  do |f|
             item=row[f].to_s
             @counts[f][tot]||={}
             @counts[f][tot][item]||=0
             @counts[f][tot][item] += 1 
           end
-					i+=1
+          i+=1
         end
       end
       def curve_field(field, item)
@@ -77,7 +77,7 @@ module Statsample
           raise DatasetException.new(@ds,e), "Problem on calculate alpha" 
         end
 			end
-            # Returns a hash with structure
+      # Returns a hash with structure
 			def item_characteristic_curve
         i=0
         out={}
@@ -105,53 +105,51 @@ module Statsample
         require 'gnuplot'
         
         crd=item_characteristic_curve
-        @ds.fields.each {|f|
-            x=[]
-            y=[]
-        Gnuplot.open do |gp|
-        Gnuplot::Plot.new( gp ) do |plot|
-            crd[f].sort.each{|tot,prop|
-               x.push(tot)
-               y.push((prop*100).to_i.to_f/100)
-           }
-        plot.data << Gnuplot::DataSet.new( [x, y] ) do |ds|
-        ds.with = "linespoints"
-        ds.notitle
+        @ds.fields.each  do |f|
+          x=[]
+          y=[]
+          Gnuplot.open do |gp|
+            Gnuplot::Plot.new( gp ) do |plot|
+              crd[f].sort.each do |tot,prop|
+                x.push(tot)
+                y.push((prop*100).to_i.to_f/100)
+              end
+              plot.data << Gnuplot::DataSet.new( [x, y] ) do |ds|
+                ds.with = "linespoints"
+                ds.notitle
+              end
+
+            end
+          end
         end
-        
-        end
-        end
-        }
-        
       end
       def svggraph_item_characteristic_curve(directory, base="icc",options={})
         require 'statsample/graph/svggraph'
         crd=ItemCharacteristicCurve.new(@ds)
-        @ds.fields.each {|f|
-         factors=@ds[f].factors.sort
-         options={
-                 :height=>500,
-                 :width=>800,
-                 :key=>true
-         }.update(options)
-         graph = ::SVG::Graph::Plot.new(options)
-         factors.each{|factor|
-             factor=factor.to_s
-             dataset=[]
-                 crd.curve_field(f, factor).each{|tot,prop|
-                     dataset.push(tot)
-                     dataset.push((prop*100).to_i.to_f/100)
-                  }
-              graph.add_data({
-                      :title=>"#{factor}",
-                     :data=>dataset
-              })
-         }
-         File.open(directory+"/"+base+"_#{f}.svg","w") {|fp|
-             fp.puts(graph.burn())
-         }
+        @ds.fields.each do |f|
+        factors=@ds[f].factors.sort
+        options={
+          :height=>500,
+          :width=>800,
+          :key=>true
+        }.update(options)
+        graph = ::SVG::Graph::Plot.new(options)
+        factors.each do |factor|
+          factor=factor.to_s
+          dataset=[]
+          crd.curve_field(f, factor).each do |tot,prop|
+            dataset.push(tot)
+            dataset.push((prop*100).to_i.to_f/100)
+          end
+          graph.add_data({
+          :title=>"#{factor}",
+          :data=>dataset
+          })
+        end
+        File.open(directory+"/"+base+"_#{f}.svg","w") {|fp|
+          fp.puts(graph.burn())
         }
-         
+        end
       end
 			def item_total_correlation
 				@ds.fields.inject({}) do |a,v|
@@ -249,7 +247,6 @@ EOF
 html << "</table><hr />"
 html
 			end
-		end		
-		
+		end
 	end
 end

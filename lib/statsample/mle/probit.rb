@@ -1,7 +1,9 @@
 module Statsample
   module MLE
     # Probit MLE estimation.
-    # Usage:
+    # See Statsample::Regression for methods to generate a probit regression.    
+    #
+    # == Usage:
     # 
     #   mle=Statsample::MLE::Probit.new
     #   mle.newton_raphson(x,y)
@@ -10,7 +12,7 @@ module Statsample
     #   iterations=mle.iterations
     class Probit < BaseMLE
       # F(B'Xi)
-      if  HAS_GSL
+      if  Statsample.has_gsl?
         # F(B'Xi)
         def f(b,x)
             p_bx=(x*b)[0,0] 
@@ -67,7 +69,7 @@ module Statsample
         raise "x.columns!=p.rows" if x.column_size!=b.row_size
         n = x.row_size
         k = x.column_size
-        if HAS_GSL
+        if Statsample.has_gsl?
           sum=GSL::Matrix.zeros(k)
         else
           sum=Matrix.zero(k)
@@ -76,12 +78,12 @@ module Statsample
           xi=Matrix.rows([x.row(i).to_a])
           fbx=f(b,xi)
           val=((ff(b,xi)**2) / (fbx*(1.0-fbx)))*xi.t*xi
-          if HAS_GSL
+          if Statsample.has_gsl?
             val=val.to_gsl
           end
           sum-=val
         end
-        if HAS_GSL
+        if Statsample.has_gsl?
           sum=sum.to_matrix
         end
         sum

@@ -319,7 +319,7 @@ module Statsample
       # * Uebersax, J.S. (2006). The tetrachoric and polychoric correlation coefficients. Statistical Methods for Rater Agreement web site. 2006. Available at: http://john-uebersax.com/stat/tetra.htm . Accessed February, 11, 2010
       #
       def compute_two_step_mle_drasgow
-        if HAS_GSL
+        if Statsample.has_gsl?
           compute_two_step_mle_drasgow_gsl
         else
           compute_two_step_mle_drasgow_ruby

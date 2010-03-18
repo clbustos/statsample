@@ -2,17 +2,24 @@ $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 require 'test/unit'
 class StatsampleRegressionTestCase < Test::Unit::TestCase
-	def initialize(*args)
-		@x=[13,20,10,33,15].to_vector(:scale)
-		@y=[23,18,35,10,27	].to_vector(:scale)
-		@reg=Statsample::Regression::Simple.new_from_vectors(@x,@y)
-		super
-	end
 	def test_parameters
-		assert_in_delta(40.009, @reg.a,0.001)
-		assert_in_delta(-0.957, @reg.b,0.001)
-		assert_in_delta(4.248,@reg.standard_error,0.002)
+    @x=[13,20,10,33,15].to_vector(:scale)
+		@y=[23,18,35,10,27	].to_vector(:scale)
+		reg=Statsample::Regression::Simple.new_from_vectors(@x,@y)
+    _test_simple_regression(reg)
+    ds={'x'=>@x,'y'=>@y}.to_dataset
+		reg=Statsample::Regression::Simple.new_from_dataset(ds,'x','y')
+    _test_simple_regression(reg)
+    reg=Statsample::Regression.simple(@x,@y)
+    _test_simple_regression(reg)
+    
 	end
+  def _test_simple_regression(reg)
+    assert_in_delta(40.009, reg.a,0.001)
+		assert_in_delta(-0.957, reg.b,0.001)
+		assert_in_delta(4.248,reg.standard_error,0.002)
+  end
+   
   def test_multiple_dependent
     complete=Matrix[
     [1,0.53,0.62,0.19,-0.09,0.08,0.02,-0.12,0.08],
@@ -54,7 +61,7 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
 
 
   def test_multiple_regression_gsl
-    if HAS_GSL
+    if Statsample.has_gsl?
       @a=[1,3,2,4,3,5,4,6,5,7].to_vector(:scale)
       @b=[3,3,4,4,5,5,6,6,4,4].to_vector(:scale)
       @c=[11,22,30,40,50,65,78,79,99,100].to_vector(:scale)
@@ -78,29 +85,7 @@ class StatsampleRegressionTestCase < Test::Unit::TestCase
   end
 
 
-  def test_multiple_regression_alglib
-    if HAS_ALGIB
-      @a=[1,3,2,4,3,5,4,6,5,7].to_vector(:scale)
-      @b=[3,3,4,4,5,5,6,6,4,4].to_vector(:scale)
-      @c=[11,22,30,40,50,65,78,79,99,100].to_vector(:scale)
-      @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
-      ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
-      lr=Statsample::Regression::Multiple::AlglibEngine.new(ds,'y')
-      model_test(lr,'alglib')
-      predicted=[1.7857, 6.0989, 3.2433, 7.2908, 4.9667, 10.3428, 8.8158, 10.4717, 23.6639, 25.3198]
-      c_predicted=lr.predicted
-      predicted.each_index{|i|
-          assert_in_delta(predicted[i],c_predicted[i],0.001)
-      }
-      residuals=[1.2142, -2.0989, 1.7566, -1.29085, 2.033, -2.3428, 0.18414, -0.47177, -3.66395, 4.6801]
-      c_residuals=lr.residuals
-      residuals.each_index{|i|
-          assert_in_delta(residuals[i],c_residuals[i],0.001)
-      }
-    else
-    puts "Regression::Multiple::AlglibEngine not tested (no Alglib)"
-    end
-  end
+  
   def model_test_matrix(lr,name='undefined')
     
     stan_coeffs={'a'=>0.151,'b'=>-0.547,'c'=>0.997}

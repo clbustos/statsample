@@ -14,7 +14,8 @@ module Statsample
   #  perm=Statsample::Permutation.new([0,0,1,1])
   #  => [[0,0,1,1],[0,1,0,1],[0,1,1,0],[1,0,0,1],[1,0,1,0],[1,1,0,0]]
   #
-  # Reference: http://www.cut-the-knot.org/do_you_know/AllPerm.shtml
+  # == Reference:
+  # * http://www.cut-the-knot.org/do_you_know/AllPerm.shtml
   class Permutation
     attr_reader :permutation_number
     def initialize(v)

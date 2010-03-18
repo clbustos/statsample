@@ -88,27 +88,31 @@ rescue LoadError
     end
   end
 end
-
-begin
-  require 'rbgsl'
-  HAS_GSL=true
-rescue LoadError
-  HAS_GSL=false
-end
-begin 
-  require 'alglib'
-  HAS_ALGIB=true
-rescue LoadError
-  HAS_ALGIB=false
-end
-# ++
-# Modules for statistical analysis
-# See first: 
-# * Converter : several modules to import and export data
-# * Vector: The base class of all analysis
-# * Dataset: An union of vectors.
+# Library for statistical analysis on Ruby
+#
+# * Classes for manipulation and storage of data:
+# * Module Statsample::Bivariate provides covariance and pearson, spearman, point biserial, tau a, tau b, gamma, tetrachoric (see Bivariate::Tetrachoric) and polychoric (see Bivariate::Polychoric) correlations. Include methods to create correlation and covariance matrices
+# * Multiple types of regression on Statsample::Regression
+# * Factorial Analysis algorithms on Statsample::Factor module.
+# * Dominance Analysis. Based on Budescu and Azen papers.link[http://psycnet.apa.org/journals/met/8/2/129/]. 
+# * Module Statsample::Codification, to help to codify open questions
+# * Converters to import and export data from databases, csv and excel files.
+# * Module Statsample::Crosstab provides function to create crosstab for categorical data
+# * Reliability analysis provides functions to analyze scales.
+# * Module Statsample::SRS (Simple Random Sampling) provides a lot of functions to estimate standard error for several type of samples
+# * Interfaces to gdchart, gnuplot and SVG::Graph 
 #
 module Statsample
+  begin
+    require 'rbgsl'
+    def self.has_gsl?
+      true
+    end
+  rescue LoadError
+    def self.has_gsl?
+      false
+    end
+  end
   VERSION = '0.6.5'
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
@@ -137,16 +141,56 @@ module Statsample
   autoload(:Test, 'statsample/test')
   autoload(:Factor, 'statsample/factor')
   
-  def self.load(filename)
-    if File.exists? filename
-      o=false
-      File.open(filename,"r") {|fp| o=Marshal.load(fp) }
-      o
-    else
-      false
+  
+  
+  class << self
+    # Load a object saved on a file.
+    def load(filename)
+      if File.exists? filename
+        o=false
+        File.open(filename,"r") {|fp| o=Marshal.load(fp) }
+        o
+      else
+        false
+      end
     end
-  end
-    
+    # Create a matrix using vectors as columns.
+    # Use:
+    #
+    #   matrix=Statsample.vector_cols_matrix(v1,v2)
+    def vector_cols_matrix(*vs)
+      # test
+      size=vs[0].size
+      vs.each{|v|
+        raise ArgumentError,"Arguments should be Vector" unless v.instance_of? Statsample::Vector
+        raise ArgumentError,"Vectors size should be the same" if v.size!=size
+      }
+      Matrix.rows((0...size).to_a.collect() {|i|
+        vs.collect{|v| v[i]}
+      })
+    end
+    # Returns a duplicate of the input vectors, without missing data
+    # for any of the vectors.
+    # 
+    #  a=[1,2,3,6,7,nil,3,5].to_scale
+    #  b=[nil,nil,5,6,4,5,10,2].to_scale
+    #  c=[2,4,6,7,4,5,6,7].to_scale
+    #  a2,b2,c2=Statsample.only_valid(a,b,c)
+    #  => [#<Statsample::Scale:0xb748c8c8 @data=[3, 6, 7, 3, 5]>, 
+    #        #<Statsample::Scale:0xb748c814 @data=[5, 6, 4, 10, 2]>, 
+    #        #<Statsample::Scale:0xb748c760 @data=[6, 7, 4, 6, 7]>]
+    #
+    def only_valid(*vs)
+      i=1
+      h=vs.inject({}) {|a,v| a["v#{i}"]=v;i+=1;a}
+      ds=Statsample::Dataset.new(h).dup_only_valid
+      ds.vectors.values
+    end
+  end  
+  
+  
+  
+  
 	module Util
     # Reference: http://www.itl.nist.gov/div898/handbook/eda/section3/normprpl.htm
     def normal_order_statistic_medians(i,n)

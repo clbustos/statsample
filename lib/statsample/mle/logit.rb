@@ -1,12 +1,13 @@
 module Statsample
   module MLE
-    # Logit MLE estimation.
+    # Logit MLE estimation. 
+    # See Statsample::Regression for methods to generate a logit regression.
     # Usage:
     # 
     #   mle=Statsample::MLE::Logit.new
     #   mle.newton_raphson(x,y)
     #   beta=mle.parameters
-    #   likehood=mle.likehood(x,y,beta)
+    #   likehood=mle.likehood(x, y, beta)
     #   iterations=mle.iterations
     #         
     class Logit < BaseMLE

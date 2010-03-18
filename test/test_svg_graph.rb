@@ -15,7 +15,7 @@ class StatsampleSvgGraphTestCase < Test::Unit::TestCase
   super
   end
   def test_histogram
-    if HAS_GSL
+    if Statsample.has_gsl?
       ar=(1..1000).to_a.collect {|a|
     rand(10)
     }.to_vector(:scale)
@@ -47,7 +47,7 @@ class StatsampleSvgGraphTestCase < Test::Unit::TestCase
     vector.svggraph_frequencies(file,800,600,SVG::Graph::PieNoOp,:graph_title=>'Pie')
     assert(File.exists?(file))		
     vector.type=:scale
-    if HAS_GSL
+    if Statsample.has_gsl?
     file=Tempfile.new("svg_histogram.svg").path
       hist=vector.svggraph_histogram(5)
       File.open(file,"wb") {|fp|

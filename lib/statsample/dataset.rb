@@ -1,22 +1,23 @@
 require 'statsample/vector'
 
 class Hash
+  # Creates a Statsample::Dataset based on a Hash 
   def to_dataset(*args)
     Statsample::Dataset.new(self,*args)
   end
 end
 
 class Array
-  def prefix(s)
+  def prefix(s) # :nodoc:
     self.collect{|c| s+c.to_s }
   end
-  def suffix(s)
+  def suffix(s) # :nodoc:
     self.collect{|c| c.to_s+s }
   end
 end
 
 module Statsample
-  class DatasetException < RuntimeError
+  class DatasetException < RuntimeError # :nodoc:
     attr_reader :ds,:exp
     def initialize(ds,e)
       @ds=ds
@@ -28,15 +29,49 @@ module Statsample
       m
     end
   end
+  # Set of cases with values for one or more variables, 
+  # analog to a dataframe on R or a standard data file of SPSS.
+  # Every vector has <tt>#field</tt> name, which represent it. By default,
+  # the vectors are ordered by it field name, but you can change it 
+  # the fields order manually.
+  # The Dataset work as a Hash, with keys are field names
+  # and values are Statsample::Vector  
+  # 
+  # 
+  # ==Usage
+  # Create a empty dataset
+  #   Dataset.new()
+  # Create a dataset with three empty vectors, called <tt>v1</tt>, <tt>v2</tt> and <tt>v3</tt>
+  #   Dataset.new(%w{v1 v2 v3})
+  # Create a dataset with two vectors
+  #   Dataset.new({'v1'=>%w{1 2 3}.to_vector, 'v2'=>%w{4 5 6}.to_vector})
+  # Create a dataset with two given vectors (v1 and v2), with vectors on inverted order
+  #   Dataset.new({'v2'=>v2,'v1'=>v1},['v2','v1'])
+  #
+  # The fast way to create a dataset uses Hash#to_dataset, with
+  # field order  as arguments
+  #   v1 = [1,2,3].to_scale
+  #   v2 = [1,2,3].to_scale
+  #   ds = {'v1'=>v2, 'v2'=>v2}.to_dataset(%w{v2 v1})  
+  
   class Dataset
     include Writable
-    attr_reader :vectors, :fields, :cases, :i
+    # Hash of Statsample::Vector
+    attr_reader :vectors
+    # Ordered names of vectors
+    attr_reader :fields
+    # Number of cases
+    attr_reader :cases
+    # Location of pointer on enumerations methods (like #each)
+    attr_reader :i
+    # Deprecated: Label of vectors
     attr_accessor :labels
     
     # Generates a new dataset, using three vectors
     # - Rows
     # - Columns
     # - Values
+    #
     # For example, you have these values
     #
     #   x   y   v
@@ -88,16 +123,7 @@ module Statsample
     # order of variables. If empty, vectors keys on alfabethic order as
     # used as fields
     # [labels]  Hash to set names for fields.
-    #
-    #
-    #   Dataset.new()
-    #   Dataset.new(%w{v1 v2 v3})
-    #   Dataset.new({'v1'=>%w{1 2 3}.to_vector, 'v2'=>%w{4 5 6}.to_vector})
-    #   Dataset.new({'v2'=>v2,'v1'=>v1},['v1','v2'])
-    #
-    # The fast way to create a dataset uses Hash#to_dataset, with
-    # fields and labels as arguments
-    #   ds = {'v1'=>[1,2,3].to_vector}.to_dataset
+
     #
     def initialize(vectors={}, fields=[], labels={})
       if vectors.instance_of? Array
@@ -120,7 +146,8 @@ module Statsample
       end
       matrix
     end
-    def label(v_id)
+    # Retrieves label for a vector, giving a field name.
+    def label(v_id) 
       raise "Vector #{v} doesn't exists" unless @fields.include? v_id
       @labels[v_id].nil? ? v_id : @labels[v_id]
     end
@@ -233,12 +260,20 @@ module Statsample
       ds_boot.update_valid_data
       ds_boot
     end
-    # Fast version of add case
+    # Fast version of #add_case.
     # Can only add one case and no error check if performed
-    # You SHOULD use update_valid_data at the end of insertion cycle
+    # You SHOULD use #update_valid_data at the end of insertion cycle
     def add_case_array(v)
       v.each_index {|i| d=@vectors[@fields[i]].data; d.push(v[i])}
     end
+    # Insert a case, using:
+    # * Array: size equal to number of vectors and values in the same order as fields
+    # * Hash: keys equal to fields
+    # If uvd is false, #update_valid_data is not executed after 
+    # inserting a case. This is very useful if you want to increase the 
+    # performance on inserting many cases, 
+    # because #update_valid_data performs check on vectors and on the dataset
+    
     def add_case(v,uvd=true)
       case v
       when Array
@@ -258,14 +293,18 @@ module Statsample
         update_valid_data
       end
     end
+    # Check vectors and fields after inserting data. Use only 
+    # after  #add_case_array or #add_case with second parameter to false
     def update_valid_data
       @fields.each{|f| @vectors[f].set_valid_data}
       check_length
     end
+    # Delete a vector
     def delete_vector(name)
       @fields.delete(name)
       @vectors.delete(name)
     end
+    
     def add_vectors_by_split_recode(name,join='-',sep=Statsample::SPLIT_TOKEN)
       split=@vectors[name].split_by_separator(sep)
       i=1
@@ -294,7 +333,7 @@ module Statsample
 		def vector_sum(fields=nil)
 			a=[]
 			fields||=@fields
-			collect_with_index do |i,row|
+			collect_with_index do |row, i|
 				if(fields.find{|f| !@vectors[f].data_with_nils[i]})
 					nil
 				else
@@ -302,16 +341,17 @@ module Statsample
 				end
       end
 		end
+    # Check if #fields attribute is correct, after inserting or deleting vectors
     def check_fields(fields)
       fields||=@fields
       raise "Fields #{(fields-@fields).join(", ")} doesn't exists on dataset" if (fields-@fields).size>0
       fields
     end
+    
     # Returns a vector with the numbers of missing values for a case
-
     def vector_missing_values(fields=nil)
       fields=check_fields(fields)
-      collect_with_index do |i,row|
+      collect_with_index do |row, i|
         fields.inject(0) {|a,v|
           a+ ((@vectors[v].data_with_nils[i].nil?) ? 1: 0)
         }
@@ -319,9 +359,8 @@ module Statsample
     end
     def vector_count_characters(fields=nil)
       fields=check_fields(fields)
-      collect_with_index do |i,row|
+      collect_with_index do |row, i|
         fields.inject(0){|a,v|
-
           a+((@vectors[v].data_with_nils[i].nil?) ? 0: row[v].to_s.size)
         }
       end
@@ -353,7 +392,8 @@ module Statsample
       end
       a.to_vector(:scale)
     end
-    def check_length
+    # Check vectors for type and size.
+    def check_length # :nodoc:
       size=nil
       @vectors.each do |k,v|
         raise Exception, "Data #{v.class} is not a vector on key #{k}" if !v.is_a? Statsample::Vector
@@ -368,16 +408,19 @@ module Statsample
       end
       @cases=size
     end
-    def each_vector
-      @fields.each{|k| yield k,@vectors[k]}
+    # Retrieves each vector as [key, vector]
+    def each_vector # :yield: |key, vector|
+      @fields.each{|k| yield k, @vectors[k]}
     end
+    
     if Statsample::STATSAMPLE__.respond_to?(:case_as_hash)
       def case_as_hash(c) # :nodoc:
         Statsample::STATSAMPLE__.case_as_hash(self,c)
       end
     else
-      def case_as_hash(c)
-        _case_as_hash(c)
+      # Retrieves case i as a hash
+      def case_as_hash(i)
+        _case_as_hash(i)
       end
     end
 
@@ -386,8 +429,9 @@ module Statsample
         Statsample::STATSAMPLE__.case_as_array(self,c)
       end
     else
-      def case_as_array(c)
-        _case_as_array(c)
+      # Retrieves case i as a array, ordered on #fields order
+      def case_as_array(i)
+        _case_as_array(i)
       end
     end
     def _case_as_hash(c) # :nodoc:
@@ -396,6 +440,7 @@ module Statsample
     def _case_as_array(c) # :nodoc:
       @fields.collect {|x| @vectors[x][c]}
     end
+    
     # Returns each case as a hash
     def each
       begin
@@ -411,7 +456,7 @@ module Statsample
       end
     end
     # Returns each case as hash and index
-    def each_with_index
+    def each_with_index # :yield: |case, i|
       begin
         @i=0
         @cases.times{|i|
@@ -447,6 +492,7 @@ module Statsample
       }
       @i=nil
     end
+    # Set fields order. If you omit one or more vectors,  
     def fields=(f)
       @fields=f
       check_order
@@ -470,6 +516,8 @@ module Statsample
         raise ArgumentError, "You need a String or a Range"
       end
     end
+    # Retrieves a Statsample::Vector, based on the result
+    # of calculation performed on each case.
     def collect(type=:scale)
       data=[]
       each {|row|
@@ -477,10 +525,11 @@ module Statsample
       }
       Statsample::Vector.new(data,type)
     end
+    # Same as #collect, but giving case index as second parameter on yield.
     def collect_with_index(type=:scale)
       data=[]
       each_with_index {|row, i|
-        data.push(yield(i,row))
+        data.push(yield(row, i))
       }
       Statsample::Vector.new(data,type)
     end
@@ -504,6 +553,8 @@ module Statsample
         raise ArgumentError,"Should pass a Statsample::Vector"
       end
     end
+    # Return data as a matrix. Column are ordered by #fields and 
+    # rows by orden of insertion
     def to_matrix
       rows=[]
       self.each_array{|c|
@@ -511,7 +562,8 @@ module Statsample
       }
       Matrix.rows(rows)
     end
-    if HAS_GSL
+    
+    if Statsample.has_gsl?
       def to_matrix_gsl
       rows=[]
       self.each_array{|c|
@@ -520,15 +572,17 @@ module Statsample
       GSL::Matrix.alloc(*rows)
       end
     end
-		def to_multiset_by_split(*fields)
+		
+    def to_multiset_by_split(*fields)
 			require 'statsample/multiset'
 			if fields.size==1
 				to_multiset_by_split_one_field(fields[0])
 			else
 				to_multiset_by_split_multiple_fields(*fields)
 			end
-		end
-    # create a new dataset with all the data which the block returns true
+    end
+    
+    # Create a new dataset with all cases which the block returns true
     def filter
       ds=self.dup_empty
       each {|c|
@@ -537,6 +591,7 @@ module Statsample
       ds.update_valid_data
       ds
     end
+    
 		# creates a new vector with the data of a given field which the block returns true
 		def filter_field(field)
 			a=[]
@@ -545,6 +600,7 @@ module Statsample
 			}
 			a.to_vector(@vectors[field].type)
 		end
+    
     def to_multiset_by_split_one_field(field)
       raise ArgumentError,"Should use a correct field name" if !@fields.include? field
       factors=@vectors[field].factors
@@ -604,7 +660,7 @@ module Statsample
           text.gsub!(f,"row['#{f}']")
         end
       }
-      collect_with_index {|i,row|
+      collect_with_index {|row, i|
         invalid=false
         @fields.each{|f|
           if @vectors[f].data_with_nils[i].nil?
@@ -653,6 +709,7 @@ module Statsample
     end
     # Creates a new dataset for one to many relations
     # on a dataset, based on pattern of field names.
+    # 
     # for example, you have a survey for number of children
     # with this structure:
     #   id, name, child_name_1, child_age_1, child_name_2, child_age_2
