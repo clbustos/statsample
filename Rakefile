@@ -11,7 +11,7 @@ Hoe.spec 'reportbuilder' do
   self.rubyforge_name = 'ruby-statsample'
   self.developer('Claudio Bustos', 'clbustos_at_gmail.com')
   self.url = "http://rubyforge.org/projects/ruby-statsample/"
-  self.extra_dev_deps << ["hpricot", "~>0.8"]
+  self.extra_dev_deps << ["hpricot", "~>0.8"] << ["thechrisoshow-ruby-rtf","~>0.2"]
 end
 
 # vim: syntax=ruby

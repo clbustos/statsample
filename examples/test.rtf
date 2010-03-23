@@ -1,0 +1,103 @@
+{\rtf1\ansi\deff0\deflang2057\plain\fs24\fet1
+{\fonttbl
+{\f0\froman Times New Roman;}
+{\f1\fmodern Courier;}
+}
+{\info
+{\createim\yr2010\mo3\dy23\hr13\min11}
+}
+\paperw11907\paperh16840\margl1800\margr1800\margt1440\margb1440
+{\pard
+First Paragraph
+\par}
+{\pard\qc
+{\b\f0\fs34
+Section 1
+}
+\par}
+{\pard\qc
+{\b\f0\fs32
+Section 1.1
+}
+\par}
+{\pard
+Paragraph inside section 1.1
+\par}
+\trowd\tgraph100
+\clbrdrt\brdrw3\brdrs\clbrdrl\brdrw3\brdrs\clbrdrb\brdrw3\brdrs\clbrdrr\brdrw3\brdrs\cellx400
+\clbrdrt\brdrw3\brdrs\clbrdrl\brdrw3\brdrs\clbrdrb\brdrw3\brdrs\clbrdrr\brdrw3\brdrs\cellx1400
+\pard\intbl
+id
+\cell
+\pard\intbl
+name
+\cell
+\row
+\trowd\tgraph100
+\clbrdrt\brdrw3\brdrs\clbrdrl\brdrw3\brdrs\clbrdrb\brdrw3\brdrs\clbrdrr\brdrw3\brdrs\cellx400
+\clbrdrt\brdrw3\brdrs\clbrdrl\brdrw3\brdrs\clbrdrb\brdrw3\brdrs\clbrdrr\brdrw3\brdrs\cellx1400
+\pard\intbl
+1
+\cell
+\pard\intbl
+John
+\cell
+\row
+\trowd\tgraph100
+\clbrdrt\brdrw3\brdrs\clbrdrl\brdrw3\brdrs\clbrdrb\brdrw3\brdrs\clbrdrr\brdrw3\brdrs\cellx400
+\clbrdrt\brdrw3\brdrs\clbrdrl\brdrw3\brdrs\clbrdrb\brdrw3\brdrs\clbrdrr\brdrw3\brdrs\cellx1400
+\pard\intbl
+2
+\cell
+\pard\intbl
+Peter
+\cell
+\row
+\trowd\tgraph100
+\clbrdrt\brdrw25\brdrs\clbrdrl\brdrw3\brdrs\clbrdrb\brdrw3\brdrs\clbrdrr\brdrw3\brdrs\cellx400
+\clbrdrt\brdrw25\brdrs\clbrdrl\brdrw3\brdrs\clbrdrb\brdrw3\brdrs\clbrdrr\brdrw3\brdrs\cellx1400
+\pard\intbl
+3
+\cell
+\pard\intbl
+John
+\cell
+\row
+\trowd\tgraph100
+\clbrdrt\brdrw3\brdrs\clbrdrl\brdrw3\brdrs\clbrdrb\brdrw3\brdrs\clbrdrr\brdrw3\brdrs\cellx400
+\clbrdrt\brdrw3\brdrs\clbrdrl\brdrw3\brdrs\clbrdrb\brdrw3\brdrs\clbrdrr\brdrw3\brdrs\cellx1400
+\pard\intbl
+4
+\cell
+\pard\intbl
+Peter
+\cell
+\row
+{\pard\ql
+{\f1\fs20
+def test_generate
+{\line}
+  html=ReportBuilder.generate(:format=>:html, :name=>@title, :directory=>@tmpdir) do 
+{\line}
+    text("hola")
+{\line}
+  end
+{\line}
+  doc=Hpricot(html)
+{\line}
+  assert_equal(@title, doc.search("head/title").inner_html)
+{\line}
+  assert_equal(@title, doc.search("body/h1").inner_html)
+{\line}
+  assert_equal("hola", doc.search("body/p").inner_html)
+{\line}
+  
+{\line}
+end  
+{\line}
+}
+\par}
+{\pard
+Last paragraph
+\par}
+}

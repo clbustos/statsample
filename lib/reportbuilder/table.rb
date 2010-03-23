@@ -56,6 +56,9 @@ class ReportBuilder
     def row(row)
       @rows.push(row)
     end
+    def n_columns
+      @n_columns||=calculate_widths.size
+    end
     # Adds a horizontal rule
     #   table.add_hr
     def hr
@@ -67,9 +70,12 @@ class ReportBuilder
     def rowspan(data,n)
       Rowspan.new(data,n)
     end
+    # Count the numbers of rows without :hr
+    def n_rows_no_hr
+      @rows.inject(0) {|ac,v| ac+(v==:hr ? 0 : 1)}
+    end
     # Adds a colspan on a cell
     #   table.add_row(["a",table.colspan("b",2)])
-
     def colspan(data,n)
       Colspan.new(data,n)
     end
@@ -97,6 +103,7 @@ class ReportBuilder
           end
         }
       }
+      @max_cols
     end
     def report_building_text(generator)
       require 'reportbuilder/table/textgenerator'
@@ -108,7 +115,11 @@ class ReportBuilder
       table_generator=ReportBuilder::Table::HtmlGenerator.new(generator, self)
       table_generator.generate
     end
-
+    def report_building_rtf(generator)
+      require 'reportbuilder/table/rtfgenerator'
+      table_generator=ReportBuilder::Table::RtfGenerator.new(generator, self)
+      table_generator.generate
+    end
     def total_width # :nodoc:
       if @max_cols.size>0
         @max_cols.inject(0){|a,v| a+(v+3)}+1

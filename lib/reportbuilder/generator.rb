@@ -7,6 +7,8 @@ class ReportBuilder
     attr_reader :parse_level
     # Options for Generator. Passed by ReportBuilder class on creation
     attr_reader :options
+    # Entries for Table of Contents
+    attr_reader :toc
     def initialize(builder, options)
       @builder=builder
       @parse_level=0
@@ -112,3 +114,5 @@ end
 
 require 'reportbuilder/generator/text'
 require 'reportbuilder/generator/html'
+require 'reportbuilder/generator/rtf'
+

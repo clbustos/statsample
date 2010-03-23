@@ -4,7 +4,7 @@
 
 == DESCRIPTION:
 
-Report Abstract Interface. Creates text and html output, based on a common framework.
+Report Abstract Interface. Creates text, html and rtf output, based on a common framework.
 
 == FEATURES
 

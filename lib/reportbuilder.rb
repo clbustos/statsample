@@ -101,6 +101,18 @@ class ReportBuilder
     gen.parse
     gen.out
   end
+  # Returns a RTF output
+  def to_rtf()
+    gen = Generator::Rtf.new(self,@options)
+    gen.parse
+    gen.out
+  end  
+  # Save a rtf file
+  def save_rtf(filename)
+    gen = Generator::Rtf.new(self,@options)
+    gen.parse
+    gen.save(filename)
+  end
   # Save an html file
   def save_html(file)
     options=@options.dup

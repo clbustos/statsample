@@ -3,7 +3,6 @@ class ReportBuilder
   class Generator
     class Html < Generator
       PREFIX="html"
-      attr_reader :toc
       attr_reader :directory
       def initialize(builder, options)
         super

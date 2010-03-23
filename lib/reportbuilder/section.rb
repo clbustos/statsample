@@ -31,14 +31,18 @@ class ReportBuilder::Section
     generator.parse_cycle(self)
   end
 
-  def report_building_html(generator)
-    htag="h#{generator.parse_level+1}"
-    anchor=generator.toc_entry(name)
+  def report_building_html(g)
+    htag="h#{g.parse_level+1}"
+    anchor=g.toc_entry(name)
     generator.html "<div class='section'><#{htag}>#{name}</#{htag}><a name='#{anchor}'></a>"
-    generator.parse_cycle(self)
-    generator.html "</div>"
+    g.parse_cycle(self)
+    g.html "</div>"
   end
-
+  def report_building_rtf(g)
+    level=g.parse_level
+    g.header(level,name)
+    g.parse_cycle(self)
+  end
   def add(element)
     if element.is_a? ReportBuilder::Section
       element.parent=self
