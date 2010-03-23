@@ -47,8 +47,9 @@ class ReportBuilder
       @header=opts[:header]
       @rows=[]
       @max_cols=[]
-      
-      block.arity<1 ? self.instance_eval(&block) : block.call(self)
+      if block
+        block.arity<1 ? self.instance_eval(&block) : block.call(self)
+      end
     end
     # Adds a row
     #   table.add_row(%w{1 2})
@@ -97,19 +98,23 @@ class ReportBuilder
         }
       }
     end
-    def to_reportbuilder_text(generator)
+    def report_building_text(generator)
       require 'reportbuilder/table/textgenerator'
       table_generator=ReportBuilder::Table::TextGenerator.new( generator, self)
       table_generator.generate
     end
-    def to_reportbuilder_html(generator)
+    def report_building_html(generator)
       require 'reportbuilder/table/htmlgenerator'
       table_generator=ReportBuilder::Table::HtmlGenerator.new(generator, self)
       table_generator.generate
     end
 
     def total_width # :nodoc:
-      @max_cols.inject(0){|a,v| a+(v+3)}+1
+      if @max_cols.size>0
+        @max_cols.inject(0){|a,v| a+(v+3)}+1
+      else
+        0
+      end
     end
     ######################
     #  INTERNAL CLASSES  #

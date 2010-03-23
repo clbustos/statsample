@@ -2,12 +2,53 @@ require 'reportbuilder/table'
 require 'reportbuilder/section'
 require 'reportbuilder/generator'
 require 'reportbuilder/image'
-
+# = Report Abstract Interface.
+# Creates text and html output, based on a common framework.
+# == Use
+# 
+# 
+# * Using generic ReportBuilder#add, every object will be parsed using #report_building_FORMAT, #report_building or #to_s
+# 
+#  require "reportbuilder"    
+#  rb=ReportBuilder.new
+#  rb.add(2) #  Int#to_s used
+#  section=ReportBuilder::Section.new(:name=>"Section 1")
+#  table=ReportBuilder::Table.new(:name=>"Table", :header=>%w{id name})
+#  table.row([1,"John"])
+#  table.hr
+#  table.row([2,"Peter"])
+#  
+#  section.add(table) #  Section is a container for other methods
+#  rb.add(section) #  table have a #report_building method
+#  rb.add("Another text") #  used directly
+#  rb.name="Text output"
+#  puts rb.to_text
+#  rb.name="Html output"
+#  puts rb.to_html
+# 
+# * Using a block, you can control directly the generator
+# 
+#  require "reportbuilder"    
+#  rb=ReportBuilder.new do
+#   text("2")
+#   section(:name=>"Section 1") do
+#    table(:name=>"Table", :header=>%w{id name}) do
+#     row([1,"John"])
+#     hr
+#     row([2,"Peter"])
+#    end
+#   end
+#   preformatted("Another Text")
+#  end
+#  rb.name="Text output"
+#  puts rb.to_text
+#  rb.name="Html output"
+#  puts rb.to_html
 class ReportBuilder
   attr_reader :elements
   # Name of report
-  attr_reader :name
-  # Doesn't print a title on true
+  attr_accessor :name
+  # Doesn't print a title if set to true
   attr_accessor :no_title
   
   VERSION = '1.0.0'
@@ -39,12 +80,13 @@ class ReportBuilder
     end
   end
   # Create a new Report
-  def initialize(options=Hash.new)
+  def initialize(options=Hash.new,&block)
     options[:name]||="Report "+Time.new.to_s
     @no_title=options.delete :no_title
     @name=options.delete :name 
     @options=options
     @elements=Array.new
+    add(block) if block
   end
   # Add an element to the report.
   # If parameters is an object which respond to :to_reportbuilder,
@@ -52,18 +94,6 @@ class ReportBuilder
   # Otherwise, the element itself will be added
   def add(element)
     @elements.push(element)
-  end
-  
-  # Returns a Section
-  def section(options={})
-    Section.new(options)
-  end
-  def image(filename)
-    Image.new(filename)
-  end
-  # Returns a Table
-  def table(h=[])
-    Table.new(h)
   end
   # Returns an Html output
   def to_html()
@@ -82,7 +112,7 @@ class ReportBuilder
   # Returns a Text output
   def to_text()
     gen=Generator::Text.new(self, @options)
-    gen.parse
+    gen.parse 
     gen.out
   end
   alias_method :to_s, :to_text

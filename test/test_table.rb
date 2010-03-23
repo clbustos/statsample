@@ -38,12 +38,18 @@ class TestReportbuilderTable < Test::Unit::TestCase
     end
 
   end
+  def test_empty_table
+    text=ReportBuilder.generate(:no_title=>true,:format=>:text) do
+      table(:name=>"Table")
+    end
+    assert_match(/^Table\s+$/ , text)
+  end
   def test_table_text
 
     tg=ReportBuilder::Table::TextGenerator.new(@mock_generator,@table)
     tg.generate
         expected= <<-HEREDOC
-Table: Table Test
+Table Test
 ----------------------------------------------------
 | a | bb | ccc | dddd | eeee | fff | gggg | hh | i |
 ----------------------------------------------------

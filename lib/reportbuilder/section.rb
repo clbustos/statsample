@@ -1,16 +1,22 @@
-# Creates a Section
+# Creates a Section.
+# A section have a name and contains other elements.
+# Sections could be nested inside anothers
+
 class ReportBuilder::Section
   @@n=1
   attr_reader :parent, :elements, :name
-  def initialize(options=Hash.new)
+  def initialize(options=Hash.new, &block)
     if !options.has_key? :name
-      @name="Section #{@nn}"
-      @nn+=1
+      @name="Section #{@@n}"
+      @@n+=1
     else
       @name=options[:name]
     end
     @parent = nil
     @elements = []
+    if block
+      add(block)
+    end
   end
   def parent=(sect)
     if sect.is_a? ReportBuilder::Section
@@ -20,12 +26,12 @@ class ReportBuilder::Section
     end
   end
 
-  def to_reportbuilder_text(generator)
+  def report_building_text(generator)
     generator.text(("="*generator.parse_level)+" "+name)
     generator.parse_cycle(self)
   end
 
-  def to_reportbuilder_html(generator)
+  def report_building_html(generator)
     htag="h#{generator.parse_level+1}"
     anchor=generator.toc_entry(name)
     generator.html "<div class='section'><#{htag}>#{name}</#{htag}><a name='#{anchor}'></a>"

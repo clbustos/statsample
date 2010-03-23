@@ -5,18 +5,34 @@ require 'hpricot'
 
 class TestReportbuilderSection < Test::Unit::TestCase
   def setup
+    @name="Test Section"
     @rp=ReportBuilder.new(:name=>"Test Section")
-    s1=@rp.section(:name=>"Section 1")
+    s1=ReportBuilder::Section.new(:name=>"Section 1")
     @rp.add s1
     s1.add("Texto 1")
     s1.add(2)
-    s11=@rp.section(:name=>"Section 1.1")
+    s11=ReportBuilder::Section.new(:name=>"Section 1.1")
     s1.add s11
-    s111=@rp.section(:name=>"Section 1.1.1")
+    s111=ReportBuilder::Section.new(:name=>"Section 1.1.1")
     s11.add s111
     s1.add("Texto 1.1")
-    s2=@rp.section(:name=>"Section 2")
+    s2=ReportBuilder::Section.new(:name=>"Section 2")
     @rp.add s2
+  end
+  def test_section_generate
+    text=ReportBuilder.generate(:name=>@name,:format=>:text) {
+      section(:name=>"Section 1") {
+        text("Texto 1")
+        text("2")
+        section(:name=>"Section 1.1") {
+          section(:name=>"Section 1.1.1") {
+          }
+        }
+        text("Texto 1.1")
+      }
+      section(:name=>"Section 2")
+    }
+    assert_equal(@rp.to_text,text)
   end
   def test_section_text
     expected= <<-HERE

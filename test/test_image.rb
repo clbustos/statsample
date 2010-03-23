@@ -7,7 +7,7 @@ class TestReportbuilderImage < Test::Unit::TestCase
     @tmpdir=Dir::mktmpdir
     @rp=ReportBuilder.new(:no_name=>true, :directory=>@tmpdir)
     @datadir=File.dirname(__FILE__)+"/../data"
-    @rp.add(@rp.image(@datadir+"/sheep.jpg"))
+    @rp.add(ReportBuilder::Image.new(@datadir+"/sheep.jpg"))
   end
   def teardown
     FileUtils.remove_entry_secure @tmpdir

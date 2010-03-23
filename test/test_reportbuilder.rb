@@ -26,17 +26,33 @@ class TestReportbuilder < Test::Unit::TestCase
       end
     end
   end
-  def test_proc
-    
+  def test_using_block
+    rb=ReportBuilder.new
     a=lambda {|g|
-      g.text "texto"
+      g.text "para"
       g.preformatted "pre"
-      g.table(:header=>%w{a b}) {row([1,2]); row([1,3])}
+      g.table(:header=>%w{th1 th2}) {row([1,2]); row([1,3])}
+      g.image @image
+     
+    }
+    rb.add(a)
+    out=rb.to_text
+    ["para","pre","th1","th2"].each do |t|
+      assert_match(/#{t}/,out)
+    end
+    
+    rb=ReportBuilder.new {|g|
+      g.text "para"
+      g.preformatted "pre"
+      g.table(:header=>%w{th1 th2}) {row([1,2]); row([1,3])}
       g.image @image
     }
-    rb=ReportBuilder.new
-    rb.add(a)
-    rb.to_text
+    
+    out=rb.to_text
+
+    ["para","pre","th1","th2"].each do |t|
+      assert_match(/#{t}/,out)
+    end
   end
   def test_empty
     rp=ReportBuilder.new

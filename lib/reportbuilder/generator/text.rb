@@ -17,7 +17,7 @@ class ReportBuilder
         @out << ws << t << "\n"
       end
       def preformatted(t)
-        @out << t
+        @out << t << "\n"
       end
       def html(t)
         # Nothing printed

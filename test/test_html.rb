@@ -35,7 +35,7 @@ class TestReportbuilderHtml < Test::Unit::TestCase
   def test_include_js
       mock = ""
       eval(" class << mock
-      def to_reportbuilder_html(generator)
+        def report_building_html(generator)
       generator.js('"+@datadir+"/reportbuilder.js')
       end
       end ")
@@ -56,7 +56,7 @@ class TestReportbuilderHtml < Test::Unit::TestCase
   def test_include_css
     mock_element = ""
     eval(" class << mock_element
-    def to_reportbuilder_html(generator)
+    def report_building_html(generator)
       generator.css('"+@datadir+"/reportbuilder.css')
     end
   end ")

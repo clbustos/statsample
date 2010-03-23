@@ -1,4 +1,5 @@
-# Creates a Section
+# Creates an Image
+# 
 class ReportBuilder::Image
   @@n=1
   attr_reader :name
@@ -20,7 +21,7 @@ class ReportBuilder::Image
     @filename=filename
   end
   # Based on http://rubyquiz.com/quiz50.html
-  def to_reportbuilder_text(generator)
+  def report_building_text(generator)
     require 'RMagick'
 
 
@@ -71,7 +72,7 @@ class ReportBuilder::Image
     generator.preformatted(out)
   end
 
-  def to_reportbuilder_html(generator)
+  def report_building_html(generator)
     basedir=generator.directory+"/images"
     out=basedir+"/"+File.basename(@filename)
     if(File.exists? @filename)

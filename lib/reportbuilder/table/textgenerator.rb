@@ -6,20 +6,22 @@ class ReportBuilder
         t=@element
         t.calculate_widths
         total_width=t.total_width
-        out="Table: #{t.name}\n"
-        if t.header.size>0
-          out+=parse_hr(total_width)+"\n"
-          out+=parse_row(t,t.header)+"\n"
-          out+=parse_hr(total_width)+"\n"
-        end
-        t.rows.each do |row|
-          if row==:hr
+        out="#{t.name}\n"
+        if total_width>0
+          if t.header.size>0
             out+=parse_hr(total_width)+"\n"
-          else
-            out+=parse_row(t,row)+"\n"
+            out+=parse_row(t,t.header)+"\n"
+            out+=parse_hr(total_width)+"\n"
           end
+          t.rows.each do |row|
+            if row==:hr
+              out+=parse_hr(total_width)+"\n"
+            else
+              out+=parse_row(t,row)+"\n"
+            end
+          end
+          out+=parse_hr(total_width)+"\n"
         end
-        out+=parse_hr(total_width)+"\n"
         @generator.text(out)
       end
       # Parse a row
