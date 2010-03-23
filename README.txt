@@ -16,7 +16,10 @@ Report Abstract Interface. Creates text, html and rtf output, based on a common 
 == SYNOPSIS:
 
 * Using generic ReportBuilder#add, every object will be parsed 
-  using #report_building_FORMAT, #report_building or #to_s
+  using methods
+  * report_building_FORMAT
+  * report_building or
+  * to_s
 
     require "reportbuilder"    
     rb=ReportBuilder.new
@@ -27,6 +30,7 @@ Report Abstract Interface. Creates text, html and rtf output, based on a common 
     rb.add("Another text") # used directly
     rb.name="Text output"
     puts rb.to_text
+    rb.save_rtf("test.rtf") # You could save files, too
 
 * Using a block, you can control directly the generator
 

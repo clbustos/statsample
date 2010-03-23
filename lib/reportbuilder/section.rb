@@ -34,7 +34,7 @@ class ReportBuilder::Section
   def report_building_html(g)
     htag="h#{g.parse_level+1}"
     anchor=g.toc_entry(name)
-    generator.html "<div class='section'><#{htag}>#{name}</#{htag}><a name='#{anchor}'></a>"
+    g.html "<div class='section'><#{htag}>#{name}</#{htag}><a name='#{anchor}'></a>"
     g.parse_cycle(self)
     g.html "</div>"
   end

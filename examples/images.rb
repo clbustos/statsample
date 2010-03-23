@@ -5,4 +5,4 @@ rb=ReportBuilder.new do
 end
 rb.name="Text output"
 puts rb.to_text
-
+puts rb.to_rtf

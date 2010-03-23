@@ -50,8 +50,7 @@ class ReportBuilder
   attr_accessor :name
   # Doesn't print a title if set to true
   attr_accessor :no_title
-  
-  VERSION = '1.0.0'
+  VERSION = '1.1.0'
   # Generates and optionally save the report on one function
   def self.generate(options=Hash.new, &block)
     options[:filename]||=nil
@@ -64,10 +63,10 @@ class ReportBuilder
     file=options.delete(:filename)
     format=options.delete(:format).to_s
     format[0]=format[0,1].upcase
-    
-    
     rb=ReportBuilder.new(options)
+    
     rb.add(block)
+    
     generator=Generator.const_get(format.to_sym).new(rb, options)
     generator.parse
     out=generator.out

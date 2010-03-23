@@ -1,5 +1,7 @@
 $:.unshift(File.dirname(__FILE__)+"/../lib")
 require "reportbuilder"    
+
+
 rb=ReportBuilder.new do
   text("First Paragraph")
   section(:name=>"Section 1") do

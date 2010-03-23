@@ -1,10 +1,16 @@
+gem 'clbustos-rtf'
 require 'rtf'
+
 class ReportBuilder
   class Generator
+    # Rtf Generator.
+    # Based on ruby-rtf (http://ruby-rtf.rubyforge.org/)
+    # 
     class Rtf < Generator
       PREFIX="rtf"
+      # RTF::Document object.
+      # See http://ruby-rtf.rubyforge.org/ for documentation
       attr_accessor :rtf
-      attr_reader :options
       include RTF
       def initialize(builder, options)
         super
@@ -62,6 +68,10 @@ class ReportBuilder
           end
         end
         
+      end
+      def image(filename)
+        raise "Not implemented on RTF::Document. Use gem install thecrisoshow-ruby-rtf for support" unless @rtf.respond_to? :image
+        @rtf.image(filename)
       end
       def out
         @rtf.to_rtf

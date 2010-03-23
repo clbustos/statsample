@@ -63,7 +63,7 @@ class TestReportbuilder < Test::Unit::TestCase
     assert_equal("hola\n",rp.to_s)
   end
   def test_generate
-    res=ReportBuilder.generate(:format=>:text,:name=>"Test") do
+    res=ReportBuilder.generate(:format=>:text,:name=>"Test") do 
       text("hola")
     end
     assert_match(/^Test\nhola$/,res)
@@ -71,7 +71,7 @@ class TestReportbuilder < Test::Unit::TestCase
     html=ReportBuilder.generate(:name=>"Test", :format=>:html) do
       text("hola")
     end
-    ReportBuilder.generate(:name=>"Test", :filename=>html_file,:format=>:html) do
+    ReportBuilder.generate(:name=>"Test", :filename=>html_file.path,:format=>:html) do
       text("hola")
     end
     

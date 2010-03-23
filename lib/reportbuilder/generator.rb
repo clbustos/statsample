@@ -51,7 +51,7 @@ class ReportBuilder
     def parse_element(element)
       method=("report_building_" + self.class::PREFIX).intern
       if element.is_a? Proc
-        element.arity==0 ? instance_eval(&element) : element.call(self)
+        element.arity<1 ? instance_eval(&element) : element.call(self)
       elsif element.respond_to? method
         element.send(method, self)
       elsif element.respond_to? :report_building
