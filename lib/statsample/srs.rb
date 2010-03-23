@@ -4,9 +4,12 @@ module Statsample
 		class << self
       ########################
       #
-      # Proportion estimation
+      # :SECTION: Proportion estimation
       #
+      # Function for estimation of proportions
       ########################
+      
+      #
       # Finite population correction (over variance)
       # Source: Cochran(1972)
       def fpc_var(sam,pop)
@@ -81,15 +84,17 @@ module Statsample
       end                                       
       # Standard deviation for sample distribution of a proportion.
       # Estimated proportion, sample without replacement.
-      # Source: Cochran, 1972, Técnicas de muestreo
+      # Reference: 
+      # * Cochran, 1972, Técnicas de muestreo
       def proportion_sd_ep_wor(p, sam,pop)
           fsc=(pop-sam).quo((sam-1)*pop)
           Math::sqrt(fsc*p*(1-p))
       end
       
-       # Total estimation sd based on sample. 
+      # Total estimation sd based on sample. 
       # Known proportion, sample without replacement
-      # Source: Cochran(1972)
+      # Reference: 
+      # * Cochran(1972)
       def proportion_total_sd_kp_wor(prop, sam, pop)
           pob * proportion_sd_kp_wor(p, sam, pop)
       end
@@ -103,7 +108,7 @@ module Statsample
       
       ########################
       #
-      # Mean stimation
+      # :SECTION:  Mean stimation
       #
       ########################
 

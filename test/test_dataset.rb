@@ -13,7 +13,7 @@ class StatsampleDatasetTestCase < Test::Unit::TestCase
     assert_equal(%w{id name age city a1}, @ds.fields)
   end
   def test_saveload
-    outfile=Tempfile.new("/dataset.ds")
+    outfile=Tempfile.new("dataset.ds")
   @ds.save(outfile.path)
   a=Statsample.load(outfile.path)
   assert_equal(@ds,a)

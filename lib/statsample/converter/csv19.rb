@@ -1,10 +1,10 @@
 module Statsample
   class CSV < SpreadsheetBase
-	  class << self
-        # Returns a Dataset  based on a csv file
-        #
-        # USE:
-        #     ds=Statsample::CSV.read("test_csv.csv")
+    class << self
+      # Returns a Dataset  based on a csv file
+      #
+      # USE:
+      #     ds=Statsample::CSV.read("test_csv.csv")
       def read(filename, empty=[''],ignore_lines=0,fs=nil,rs=nil)
         require 'csv'
         first_row=true
@@ -36,17 +36,17 @@ module Statsample
         ds.update_valid_data
         ds
       end
-        # Save a Dataset on a csv file
-        #
-        # USE:
-        #     Statsample::CSV.write(ds,"test_csv.csv")            
+      # Save a Dataset on a csv file
+      #
+      # USE:
+      #     Statsample::CSV.write(ds,"test_csv.csv")
       def write(dataset,filename, convert_comma=false,*opts)
-        require 'csv'            
+        require 'csv'
         writer=::CSV.open(filename,'w',*opts)
         writer << dataset.fields
         dataset.each_array do|row|
           if(convert_comma)
-              row.collect!{|v| v.to_s.gsub(".",",")}
+            row.collect!{|v| v.to_s.gsub(".",",")}
           end
           writer << row
         end

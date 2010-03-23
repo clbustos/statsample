@@ -5,7 +5,7 @@ module Statsample
       tc=Tetrachoric.new_with_vectors(v1,v2)
       tc.r
     end
-    
+
     # Tetrachoric correlation matrix.
     # Order of rows and columns depends on Dataset#fields order
     def self.tetrachoric_correlation_matrix(ds)
@@ -23,18 +23,18 @@ module Statsample
     end
     # Compute tetrachoric correlation.
     #
-    # The <em>tetrachoric</em> correlation is a measure of 
+    # The <em>tetrachoric</em> correlation is a measure of
     # bivariate association arising when both observed variates
     # are  categorical variables that result from dichotomizing
-    # the two undelying continuous variables (Drasgow, 2006). 
+    # the two undelying continuous variables (Drasgow, 2006).
     # The tetrachoric correlation is a good way to measure rater agreement  (Uebersax, 2006)
     #
     # This class uses Brown (1977) algorithm. You can see FORTRAN code on http://lib.stat.cmu.edu/apstat/116
-    # 
     #
-    # == Usage 
+    #
+    # == Usage
     # With two variables x and y on a crosstab like this:
-    # 
+    #
     #         -------------
     #         | y=0 | y=1 |
     #         -------------
@@ -53,15 +53,15 @@ module Statsample
     # == References:
     #
     # * Brown, MB. (1977) Algorithm AS 116: the tetrachoric correlation and its standard error. <em>Applied Statistics, 26</em>, 343-351.
-    # * Drasgow F. (2006). Polychoric and polyserial correlations. In Kotz L, Johnson NL (Eds.), Encyclopedia of statistical sciences. Vol. 7 (pp. 69-74). New York: Wiley.    
+    # * Drasgow F. (2006). Polychoric and polyserial correlations. In Kotz L, Johnson NL (Eds.), Encyclopedia of statistical sciences. Vol. 7 (pp. 69-74). New York: Wiley.
     # * Uebersax, J.S. (2006). The tetrachoric and polychoric correlation coefficients. Statistical Methods for Rater Agreement web site. 2006. Available at: http://john-uebersax.com/stat/tetra.htm . Accessed February, 11, 2010
-    
+
     class Tetrachoric
       include GetText
       bindtextdomain("statsample")
       attr_reader :r
       attr_accessor :name
-      
+
       TWOPI=Math::PI*2
       SQT2PI= 2.50662827
       RLIMIT = 0.9999
@@ -118,7 +118,7 @@ module Statsample
         rp.add(self)
         rp.to_text
       end
-      
+
       def to_reportbuilder(generator) # :nodoc:
         section=ReportBuilder::Section.new(:name=>@name)
         t=ReportBuilder::Table.new(:name=>_("Contingence Table"),:header=>["","Y=0","Y=1", "T"])
@@ -134,211 +134,211 @@ module Statsample
         section.add(_("Threshold Y: %0.3f ") % [threshold_y] )
         generator.parse_element(section)
       end
-      
-      # Creates a new tetrachoric object for analysis 
+
+      # Creates a new tetrachoric object for analysis
       def initialize(a,b,c,d)
         @a,@b,@c,@d=a,b,c,d
         @name=_("Tetrachoric correlation")
         #
         #       CHECK IF ANY CELL FREQUENCY IS NEGATIVE
         #
-        raise "All frequencies should be positive" if  (@a < 0 or @b < 0 or @c < 0  or @d < 0)        
+        raise "All frequencies should be positive" if  (@a < 0 or @b < 0 or @c < 0  or @d < 0)
         compute
       end
       # Compute the tetrachoric correlation.
       # Called on object creation.
       #
       def compute
-      
-      #
-      # INITIALIZATION
-      #
-      @r = 0
-      sdzero = 0
-      @sdr = 0
-      @itype = 0
-      @ifault = 0
-      
-      #
-      #       CHECK IF ANY FREQUENCY IS 0.0 AND SET kdelta
-      #
-      @kdelta = 1
-      delta  = 0
-      @kdelta  = 2 if (@a == 0 or @d == 0) 
-      @kdelta += 2 if (@b == 0 or @c == 0) 
-      #
-      #        kdelta=4 MEANS TABLE HAS 0.0 ROW OR COLUMN, RUN IS TERMINATED
-      #
 
-      raise "Rows and columns should have more than 0 items" if @kdelta==4
+        #
+        # INITIALIZATION
+        #
+        @r = 0
+        sdzero = 0
+        @sdr = 0
+        @itype = 0
+        @ifault = 0
 
-      #      GOTO (4, 1, 2 , 92), kdelta
-      #
-      #        delta IS 0.0, 0.5 OR -0.5 ACCORDING TO WHICH CELL IS 0.0
-      #
-      
-      if(@kdelta==2)
-        # 1
-        delta=0.5
-        @r=-1 if (@a==0 and @d==0)
-      elsif(@kdelta==3)
-        # 2
-        delta=-0.5
-        @r=1 if (@b==0 and @c==0)
-      end
-      # 4
-      if @r!=0
-        @itype=3
-      end
+        #
+        #       CHECK IF ANY FREQUENCY IS 0.0 AND SET kdelta
+        #
+        @kdelta = 1
+        delta  = 0
+        @kdelta  = 2 if (@a == 0 or @d == 0)
+        @kdelta += 2 if (@b == 0 or @c == 0)
+        #
+        #        kdelta=4 MEANS TABLE HAS 0.0 ROW OR COLUMN, RUN IS TERMINATED
+        #
 
-      #
-      #        STORE FREQUENCIES IN  AA, BB, CC AND DD
-      #
-      @aa = @a + delta
-      @bb = @b - delta
-      @cc = @c - delta
-      @dd = @d + delta
-      @tot = @aa+@bb+@cc+@dd
-      #
-      #        CHECK IF CORRELATION IS NEGATIVE, 0.0, POSITIVE
-      #        IF (AA * DD - BB * CC) 7, 5, 6
+        raise "Rows and columns should have more than 0 items" if @kdelta==4
 
-      corr_dir=@aa * @dd - @bb * @cc
-      if(corr_dir < 0)
-      # 7
-        @probaa = @bb.quo(@tot)
-        @probac = (@bb + @dd).quo(@tot)
-        @ksign = 2
-        # ->  8
-      else
-        if (corr_dir==0)
-          # 5
-          @itype=4
+        #      GOTO (4, 1, 2 , 92), kdelta
+        #
+        #        delta IS 0.0, 0.5 OR -0.5 ACCORDING TO WHICH CELL IS 0.0
+        #
+
+        if(@kdelta==2)
+          # 1
+          delta=0.5
+          @r=-1 if (@a==0 and @d==0)
+        elsif(@kdelta==3)
+          # 2
+          delta=-0.5
+          @r=1 if (@b==0 and @c==0)
         end
-        # 6
+        # 4
+        if @r!=0
+          @itype=3
+        end
+
         #
-        #        COMPUTE PROBABILITIES OF QUADRANT AND OF MARGINALS
-        #        PROBAA AND PROBAC CHOSEN SO THAT CORRELATION IS POSITIVE.
-        #        KSIGN INDICATES WHETHER QUADRANTS HAVE BEEN SWITCHED
+        #        STORE FREQUENCIES IN  AA, BB, CC AND DD
         #
-        
-        @probaa = @aa.quo(@tot)
-        @probac = (@aa+@cc).quo(@tot)
-        @ksign=1
-      end
-      # 8
-      
-      @probab = (@aa+@bb).quo(@tot)
-          
-      #
-      #        COMPUTE NORMAL DEVIATES FOR THE MARGINAL FREQUENCIES
-      #        SINCE NO MARGINAL CAN BE 0.0, IE IS NOT CHECKED
-      #
-      @zac = Distribution::Normal.p_value(@probac)
-      @zab = Distribution::Normal.p_value(@probab)
-      @ss = Math::exp(-0.5 * (@zac ** 2 + @zab ** 2)).quo(TWOPI)
-      #
-      #        WHEN R IS 0.0, 1.0 OR -1.0, TRANSFER TO COMPUTE SDZERO
-      #
-      if (@r != 0 or @itype > 0) 
-        compute_sdzero
-        return true
-      end
-      #
-      #        WHEN MARGINALS ARE EQUAL, COSINE EVALUATION IS USED
-      #
-      if (@a == @b and @b == @c) 
-        calculate_cosine
-        return true
-      end
-      #
-      #        INITIAL ESTIMATE OF CORRELATION IS YULES Y
-      #
-      @rr = ((Math::sqrt(@aa * @dd) - Math::sqrt(@bb * @cc)) ** 2)  / (@aa * @dd - @bb * @cc).abs
-      @iter = 0
-      begin
+        @aa = @a + delta
+        @bb = @b - delta
+        @cc = @c - delta
+        @dd = @d + delta
+        @tot = @aa+@bb+@cc+@dd
         #
-        #        IF RR EXCEEDS RCUT, GAUSSIAN QUADRATURE IS USED
+        #        CHECK IF CORRELATION IS NEGATIVE, 0.0, POSITIVE
+        #        IF (AA * DD - BB * CC) 7, 5, 6
+
+        corr_dir=@aa * @dd - @bb * @cc
+        if(corr_dir < 0)
+          # 7
+          @probaa = @bb.quo(@tot)
+          @probac = (@bb + @dd).quo(@tot)
+          @ksign = 2
+          # ->  8
+        else
+          if (corr_dir==0)
+            # 5
+            @itype=4
+          end
+          # 6
+          #
+          #        COMPUTE PROBABILITIES OF QUADRANT AND OF MARGINALS
+          #        PROBAA AND PROBAC CHOSEN SO THAT CORRELATION IS POSITIVE.
+          #        KSIGN INDICATES WHETHER QUADRANTS HAVE BEEN SWITCHED
+          #
+
+          @probaa = @aa.quo(@tot)
+          @probac = (@aa+@cc).quo(@tot)
+          @ksign=1
+        end
+        # 8
+
+        @probab = (@aa+@bb).quo(@tot)
+
         #
-        #10
-        if @rr>RCUT
-          gaussian_quadrature 
+        #        COMPUTE NORMAL DEVIATES FOR THE MARGINAL FREQUENCIES
+        #        SINCE NO MARGINAL CAN BE 0.0, IE IS NOT CHECKED
+        #
+        @zac = Distribution::Normal.p_value(@probac)
+        @zab = Distribution::Normal.p_value(@probab)
+        @ss = Math::exp(-0.5 * (@zac ** 2 + @zab ** 2)).quo(TWOPI)
+        #
+        #        WHEN R IS 0.0, 1.0 OR -1.0, TRANSFER TO COMPUTE SDZERO
+        #
+        if (@r != 0 or @itype > 0)
+          compute_sdzero
           return true
         end
         #
-        #        TETRACHORIC SERIES IS COMPUTED
+        #        WHEN MARGINALS ARE EQUAL, COSINE EVALUATION IS USED
         #
-        #        INITIALIZATION
+        if (@a == @b and @b == @c)
+          calculate_cosine
+          return true
+        end
         #
-        va=1.0
-        vb=@zac.to_f
-        wa=1.0
-        wb=@zab.to_f
-        term = 1.0
-        iterm = 0.0
-        @sum = @probab * @probac
-        deriv = 0.0
-        sr = @ss
-        #15
+        #        INITIAL ESTIMATE OF CORRELATION IS YULES Y
+        #
+        @rr = ((Math::sqrt(@aa * @dd) - Math::sqrt(@bb * @cc)) ** 2)  / (@aa * @dd - @bb * @cc).abs
+        @iter = 0
         begin
-          if(sr.abs<=CONST)
-            #
-            #        RESCALE TERMS TO AVOID OVERFLOWS AND UNDERFLOWS
-            #
-            sr = sr  / CONST
-            va = va * CHALF
-            vb = vb * CHALF
-            wa = wa * CHALF
-            wb = wb * CHALF
+          #
+          #        IF RR EXCEEDS RCUT, GAUSSIAN QUADRATURE IS USED
+          #
+          #10
+          if @rr>RCUT
+            gaussian_quadrature
+            return true
           end
           #
-          #        FORM SUM AND DERIVATIVE OF SERIES
+          #        TETRACHORIC SERIES IS COMPUTED
           #
-          #  20 
-          dr = sr * va * wa
-          sr = sr * @rr / term
-          cof = sr * va * wa
+          #        INITIALIZATION
           #
-          #        ITERM COUNTS NO. OF CONSECUTIVE TERMS  <  CONV
+          va=1.0
+          vb=@zac.to_f
+          wa=1.0
+          wb=@zab.to_f
+          term = 1.0
+          iterm = 0.0
+          @sum = @probab * @probac
+          deriv = 0.0
+          sr = @ss
+          #15
+          begin
+            if(sr.abs<=CONST)
+              #
+              #        RESCALE TERMS TO AVOID OVERFLOWS AND UNDERFLOWS
+              #
+              sr = sr  / CONST
+              va = va * CHALF
+              vb = vb * CHALF
+              wa = wa * CHALF
+              wb = wb * CHALF
+            end
+            #
+            #        FORM SUM AND DERIVATIVE OF SERIES
+            #
+            #  20
+            dr = sr * va * wa
+            sr = sr * @rr / term
+            cof = sr * va * wa
+            #
+            #        ITERM COUNTS NO. OF CONSECUTIVE TERMS  <  CONV
+            #
+            iterm+=  1
+            iterm=0 if (cof.abs > CONV)
+            @sum = @sum + cof
+            deriv += dr
+            vaa = va
+            waa = wa
+            va = vb
+            wa = wb
+            vb = @zac * va - term * vaa
+            wb = @zab * wa - term * waa
+            term += 1
+          end while (iterm < 2 or term < 6)
           #
-          iterm+=  1
-          iterm=0 if (cof.abs > CONV)
-          @sum = @sum + cof
-          deriv += dr
-          vaa = va
-          waa = wa
-          va = vb
-          wa = wb
-          vb = @zac * va - term * vaa
-          wb = @zab * wa - term * waa
-          term += 1
-        end while (iterm < 2 or term < 6)
-        #
-        #        CHECK IF ITERATION CONVERGED
-        #
-        if((@sum-@probaa).abs <= CITER)
-          @itype=term
-          calculate_sdr
-          return true
-        end
-        #
-        #        CALCULATE NEXT ESTIMATE OF CORRELATION
-        #
-        #25
-        @iter += 1
-        #
-        #        IF TOO MANY ITERATlONS, RUN IS TERMINATED
-        #
-        delta = (@sum - @probaa) /  deriv
-        @rrprev = @rr
-        @rr = @rr - delta
-        @rr += 0.5 * delta if(@iter == 1) 
-        @rr= RLIMIT if (@rr > RLIMIT)
-        @rr =0 if (@rr  <  0.0)
-      end while @iter < NITER
-      raise "Too many iteration"
-    #  GOTO 10
-    end
+          #        CHECK IF ITERATION CONVERGED
+          #
+          if((@sum-@probaa).abs <= CITER)
+            @itype=term
+            calculate_sdr
+            return true
+          end
+          #
+          #        CALCULATE NEXT ESTIMATE OF CORRELATION
+          #
+          #25
+          @iter += 1
+          #
+          #        IF TOO MANY ITERATlONS, RUN IS TERMINATED
+          #
+          delta = (@sum - @probaa) /  deriv
+          @rrprev = @rr
+          @rr = @rr - delta
+          @rr += 0.5 * delta if(@iter == 1)
+          @rr= RLIMIT if (@rr > RLIMIT)
+          @rr =0 if (@rr  <  0.0)
+        end while @iter < NITER
+        raise "Too many iteration"
+        #  GOTO 10
+      end
       # GAUSSIAN QUADRATURE
       # 40
       def gaussian_quadrature
@@ -347,8 +347,8 @@ module Statsample
           @sum=@probab*@probac
           @rrprev=0
         end
-        
-        # 41 
+
+        # 41
         sumprv = @probab - @sum
         @prob = @bb.quo(@tot)
         @prob = @aa.quo(@tot) if (@ksign == 2)
@@ -358,7 +358,7 @@ module Statsample
         #  COMPUTATION OF INTEGRAL (SUM) BY QUADRATURE
         #
         # 42
-        
+
         begin
           rrsq = Math::sqrt(1 - @rr ** 2)
           amid = 0.5 * (UPLIM + @zac)
@@ -367,8 +367,8 @@ module Statsample
           (1..16).each do |iquad|
             xla = amid + X[iquad] * xlen
             xlb = amid - X[iquad] * xlen
-            
-            
+
+
             #
             #       TO AVOID UNDERFLOWS, TEMPA AND TEMPB ARE USED
             #
@@ -377,7 +377,7 @@ module Statsample
               @sum = @sum + W[iquad] * Math::exp(-0.5  * xla ** 2) * Distribution::Normal.cdf(tempa)
             end
             tempb = (@zab - @rr * xlb) / rrsq
-            
+
             if (tempb >= -6.0)
               @sum = @sum + W[iquad] * Math::exp(-0.5 * xlb ** 2) * Distribution::Normal.cdf(tempb)
             end
@@ -385,29 +385,29 @@ module Statsample
           @sum=@sum*xlen / SQT2PI
           #
           # CHECK IF ITERATION HAS CONVERGED
-          # 
-          if ((@prob - @sum).abs <= CITER) 
+          #
+          if ((@prob - @sum).abs <= CITER)
             calculate_sdr
             return true
           end
           # ESTIMATE CORRELATION FOR NEXT ITERATION BY LINEAR INTERPOLATION
-          
+
           rrest = ((@prob -  @sum) * @rrprev - (@prob - sumprv) * @rr) / (sumprv - @sum)
-          rrest = RLIMIT if (rrest > RLIMIT) 
-          rrest = 0 if (rrest < 0) 
+          rrest = RLIMIT if (rrest > RLIMIT)
+          rrest = 0 if (rrest < 0)
           @rrprev = @rr
           @rr = rrest
           sumprv = @sum
           #
           #        if estimate has same value on two iterations, stop iteration
           #
-          if @rr == @rrprev 
+          if @rr == @rrprev
             calculate_sdr
             return true
           end
-          
-          
-        end while @iter < NITER 
+
+
+        end while @iter < NITER
         raise "Too many iterations"
         # ir a 42
       end
@@ -419,16 +419,16 @@ module Statsample
         @itype = 2
         calculate_sdr
       end
-      
-      
+
+
       def calculate_sdr # :nodoc:
         #
         # COMPUTE SDR
         #
         @r = @rr
-        rrsq = Math::sqrt(1.0 - @r ** 2) 
+        rrsq = Math::sqrt(1.0 - @r ** 2)
         @itype = -@itype if (@kdelta > 1)
-        if (@ksign != 1) 
+        if (@ksign != 1)
           @r = -@r
           @zac = -@zac
         end
@@ -436,13 +436,13 @@ module Statsample
         pdf = Math::exp(-0.5 * (@zac ** 2 - 2 * @r * @zac * @zab + @zab ** 2)  / rrsq ** 2) / (TWOPI * rrsq)
         @pac = Distribution::Normal.cdf((@zac - @r * @zab) / rrsq) - 0.5
         @pab = Distribution::Normal.cdf((@zab - @r * @zac) / rrsq) - 0.5
-        
+
         @sdr = ((@aa+@dd) * (@bb + @cc)).quo(4) + @pab ** 2 * (@aa + @cc) * (@bb + @dd) + @pac ** 2 * (@aa + @bb) * (@cc + @dd) + 2.0 * @pab * @pac * (@aa * @dd - @bb * @cc) - @pab * (@aa * @bb - @cc * @dd) - @pac * (@aa * @cc - @bb * @dd)
         @sdr=0 if (@sdr<0)
         @sdr= Math::sqrt(@sdr) / (@tot * pdf * Math::sqrt(@tot))
         compute_sdzero
       end
-      
+
       # 85
       #
       #        COMPUTE SDZERO

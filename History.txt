@@ -1,4 +1,16 @@
+=== 0.6.6 / 2010-03-22
+* Set ReportBuilder dependency to '0.2.~' version, because future API break
+* Removed Alglib dependency
+* Standarization of documentation on almost every file
+* New Statsample::Test::Levene, to test equality of variances
+* Constant HAS_GSL replaced by Statsample.has_gsl?
+* PCA and Principal Axis test based on R and SPSS results
+* Bug fix on test_dataset.rb / test_saveload
+* Added Rakefile
+* Demos for levene, Principal Axis
+
 === 0.6.5 / 2010-02-24
+
 * Bug fix on test: Use tempfile instead of tempdir
 * Multiple Regression: Calculation of constant standard error , using covariance matrix.
 * Calculation of R^2_yx and P^2_yx for Regresion on Multiple Dependents variables

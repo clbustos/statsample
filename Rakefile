@@ -42,7 +42,7 @@ h=Hoe.spec('statsample') do
 	self.version=Statsample::VERSION
 	self.rubyforge_name = "ruby-statsample"
 	self.developer('Claudio Bustos', 'clbustos@gmail.com')
-	self.extra_deps << ["spreadsheet",">=0.6.4"] << ["svg-graph", ">=1.0.0"] << ["reportbuilder", ">=0.2.0"] << ["minimization", ">=0.1.0"]
+	self.extra_deps << ["spreadsheet","~>0.6"] << ["svg-graph", "~>1.0"] << ["reportbuilder", "~>0.2"] << ["minimization", "~>0.1"]
 	self.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"
 	self.need_rdoc=false
 end
@@ -74,7 +74,7 @@ end
 
 desc 'publicar a rdocs con analytics'
 task :publicar_docs => [:clean, :docs] do
-  system %{ruby1.9 agregar_adsense_a_doc.rb}
+  ruby %{agregar_adsense_a_doc.rb}
   path = File.expand_path("~/.rubyforge/user-config.yml")
   config = YAML.load(File.read(path))
   host = "#{config["username"]}@rubyforge.org"

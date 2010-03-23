@@ -23,8 +23,8 @@ $:.unshift(File.expand_path(File.dirname(__FILE__)+"/../ext"))
 
 require 'matrix'
 require 'distribution'
+gem 'reportbuilder','~>0.2'
 require 'reportbuilder'
-
 class Numeric
   def square ; self * self ; end
 end
@@ -113,7 +113,7 @@ module Statsample
       false
     end
   end
-  VERSION = '0.6.5'
+  VERSION = '0.6.6'
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')

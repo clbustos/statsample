@@ -3,9 +3,9 @@ require 'statsample'
 require 'test/unit'
 class StatsampleStatisicsTestCase < Test::Unit::TestCase
 
-	def initialize(*args)
-		super
-	end
+  def initialize(*args)
+    super
+  end
   def test_recode_repeated
     a=%w{a b c c d d d e}
     exp=["a","b","c_1","c_2","d_1","d_2","d_3","e"]
@@ -21,11 +21,11 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
     assert(!"1212-1212-1".is_number?)
     assert(!"a10".is_number?)
     assert(!"".is_number?)
-  
+
   end
- 
-	
-  def test_estimation_mean              
+
+
+  def test_estimation_mean
     v=([42]*23+[41]*4+[36]*1+[32]*1+[29]*1+[27]*2+[23]*1+[19]*1+[16]*2+[15]*2+[14,11,10,9,7]+ [6]*3+[5]*2+[4,3]).to_vector(:scale)
     assert_equal(50,v.size)
     assert_equal(1471,v.sum())
@@ -37,7 +37,7 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
     sam=200
     prop=0.19
     assert_in_delta(81.8, Statsample::SRS.proportion_total_sd_ep_wor(prop, sam, pop), 0.1)
-    
+
     # confidence limits
     pop=500
     sam=100
@@ -49,15 +49,15 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
   end
   def test_ml
     if(true)
-    real=[1,1,1,1].to_vector(:scale)
-    
-    pred=[0.0001,0.0001,0.0001,0.0001].to_vector(:scale)
-    # puts  Statsample::Bivariate.maximum_likehood_dichotomic(pred,real)
-    
+      real=[1,1,1,1].to_vector(:scale)
+
+      pred=[0.0001,0.0001,0.0001,0.0001].to_vector(:scale)
+      # puts  Statsample::Bivariate.maximum_likehood_dichotomic(pred,real)
+
     end
   end
-  
-  
+
+
   def test_simple_linear_regression
     a=[1,2,3,4,5,6].to_vector(:scale)
     b=[6,2,4,10,12,8].to_vector(:scale)
@@ -68,5 +68,5 @@ class StatsampleStatisicsTestCase < Test::Unit::TestCase
     assert_in_delta(1.314,reg.b,0.001)
     assert_in_delta(0.657,reg.r,0.001)
     assert_in_delta(0.432,reg.r2,0.001)
-	end
+  end
 end

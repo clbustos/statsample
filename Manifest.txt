@@ -2,6 +2,7 @@ History.txt
 LICENSE.txt
 Manifest.txt
 README.txt
+Rakefile
 bin/statsample
 data/crime.txt
 data/locale/es/LC_MESSAGES/statsample.mo

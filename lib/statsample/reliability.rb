@@ -7,21 +7,21 @@ module Statsample
         ds=ods.dup_only_valid
         n_items=ds.fields.size
         sum_var_items=ds.vectors.inject(0) {|ac,v|
-          ac+v[1].variance_sample }
+        ac+v[1].variance_sample }
         total=ds.vector_sum
         (n_items / (n_items-1).to_f) * (1-(sum_var_items/ total.variance_sample))
       end
       # Calculate Chonbach's alpha for a given dataset
       # using standarized values for every vector.
       # Only uses tuples without missing data
-      
+
       def cronbach_alpha_standarized(ods)
         ds=ods.dup_only_valid.fields.inject({}){|a,f|
           a[f]=ods[f].vector_standarized; a
         }.to_dataset
         cronbach_alpha(ds)
       end
-    end   
+    end
     class ItemCharacteristicCurve
       attr_reader :totals, :counts,:vector_total
       def initialize (ds, vector_total=nil)
@@ -43,7 +43,7 @@ module Statsample
             item=row[f].to_s
             @counts[f][tot]||={}
             @counts[f][tot][item]||=0
-            @counts[f][tot][item] += 1 
+            @counts[f][tot][item] += 1
           end
           i+=1
         end
@@ -52,15 +52,15 @@ module Statsample
         out={}
         item=item.to_s
         @totals.each{|value,n|
-            count_value= @counts[field][value][item].nil? ? 0 : @counts[field][value][item] 
-            out[value]=count_value.to_f/n.to_f
+          count_value= @counts[field][value][item].nil? ? 0 : @counts[field][value][item]
+          out[value]=count_value.to_f/n.to_f
         }
         out
       end
     end
-		class ItemAnalysis
+    class ItemAnalysis
       attr_reader :mean, :sd,:valid_n, :alpha , :alpha_standarized
-			def initialize(ds)
+      def initialize(ds)
         @ds=ds.dup_only_valid
         @total=@ds.vector_sum
         @item_mean=@ds.vector_mean.mean
@@ -74,11 +74,11 @@ module Statsample
           @alpha = Statsample::Reliability.cronbach_alpha(ds)
           @alpha_standarized = Statsample::Reliability.cronbach_alpha_standarized(ds)
         rescue => e
-          raise DatasetException.new(@ds,e), "Problem on calculate alpha" 
+          raise DatasetException.new(@ds,e), "Problem on calculate alpha"
         end
-			end
+      end
       # Returns a hash with structure
-			def item_characteristic_curve
+      def item_characteristic_curve
         i=0
         out={}
         total={}
@@ -89,7 +89,7 @@ module Statsample
             total[f]||={}
             out[f][tot]||= 0
             total[f][tot]||=0
-            out[f][tot]+= row[f] 
+            out[f][tot]+= row[f]
             total[f][tot]+=1
           end
           i+=1
@@ -100,10 +100,10 @@ module Statsample
           end
         end
         out
-			end
+      end
       def gnuplot_item_characteristic_curve(directory, base="crd",options={})
         require 'gnuplot'
-        
+
         crd=item_characteristic_curve
         @ds.fields.each  do |f|
           x=[]
@@ -127,50 +127,50 @@ module Statsample
         require 'statsample/graph/svggraph'
         crd=ItemCharacteristicCurve.new(@ds)
         @ds.fields.each do |f|
-        factors=@ds[f].factors.sort
-        options={
-          :height=>500,
-          :width=>800,
-          :key=>true
-        }.update(options)
-        graph = ::SVG::Graph::Plot.new(options)
-        factors.each do |factor|
-          factor=factor.to_s
-          dataset=[]
-          crd.curve_field(f, factor).each do |tot,prop|
-            dataset.push(tot)
-            dataset.push((prop*100).to_i.to_f/100)
+          factors=@ds[f].factors.sort
+          options={
+            :height=>500,
+            :width=>800,
+            :key=>true
+          }.update(options)
+          graph = ::SVG::Graph::Plot.new(options)
+          factors.each do |factor|
+            factor=factor.to_s
+            dataset=[]
+            crd.curve_field(f, factor).each do |tot,prop|
+              dataset.push(tot)
+              dataset.push((prop*100).to_i.to_f/100)
+            end
+            graph.add_data({
+              :title=>"#{factor}",
+              :data=>dataset
+            })
           end
-          graph.add_data({
-          :title=>"#{factor}",
-          :data=>dataset
-          })
-        end
-        File.open(directory+"/"+base+"_#{f}.svg","w") {|fp|
-          fp.puts(graph.burn())
-        }
+          File.open(directory+"/"+base+"_#{f}.svg","w") {|fp|
+            fp.puts(graph.burn())
+          }
         end
       end
-			def item_total_correlation
-				@ds.fields.inject({}) do |a,v|
-					vector=@ds[v].dup
-					ds2=@ds.dup
-					ds2.delete_vector(v)
-					total=ds2.vector_sum
-					a[v]=Statsample::Bivariate.pearson(vector,total)
-					a
+      def item_total_correlation
+        @ds.fields.inject({}) do |a,v|
+          vector=@ds[v].dup
+          ds2=@ds.dup
+          ds2.delete_vector(v)
+          total=ds2.vector_sum
+          a[v]=Statsample::Bivariate.pearson(vector,total)
+          a
         end
-			end
-			def item_statistics
-				@ds.fields.inject({}) do |a,v|
-					a[v]={:mean=>@ds[v].mean,:sds=>@ds[v].sds}
-					a
-				end
-			end
+      end
+      def item_statistics
+        @ds.fields.inject({}) do |a,v|
+          a[v]={:mean=>@ds[v].mean,:sds=>@ds[v].sds}
+          a
+        end
+      end
       # Returns a dataset with cases ordered by score
       # and variables ordered by difficulty
-      
-			def item_difficulty_analysis
+
+      def item_difficulty_analysis
         dif={}
         @ds.fields.each{|f| dif[f]=@ds[f].mean }
         dif_sort=dif.sort{|a,b| -(a[1]<=>b[1])}
@@ -188,20 +188,20 @@ module Statsample
         ds_new.update_valid_data
         ds_new
       end
-			def stats_if_deleted
-				@ds.fields.inject({}) do |a,v|
-					ds2=@ds.dup
-					ds2.delete_vector(v)
-					total=ds2.vector_sum
-					a[v]={}
-					a[v][:mean]=total.mean
-					a[v][:sds]=total.sds
-					a[v][:variance_sample]=total.variance_sample
-					a[v][:alpha]=Statsample::Reliability.cronbach_alpha(ds2)
-					a
+      def stats_if_deleted
+        @ds.fields.inject({}) do |a,v|
+          ds2=@ds.dup
+          ds2.delete_vector(v)
+          total=ds2.vector_sum
+          a[v]={}
+          a[v][:mean]=total.mean
+          a[v][:sds]=total.sds
+          a[v][:variance_sample]=total.variance_sample
+          a[v][:alpha]=Statsample::Reliability.cronbach_alpha(ds2)
+          a
         end
-			end
-			def html_summary
+      end
+      def html_summary
 				html = <<EOF
 <p><strong>Summary for scale:</strong></p>
 <ul>
@@ -227,26 +227,26 @@ Correl.</th><th>Alpha if
 deleted</th></thead>
 EOF
 
-itc=item_total_correlation
-sid=stats_if_deleted
-is=item_statistics
-@ds.fields.each {|f|
-	html << <<EOF
-<tr>
-	<td>#{f}</td>
-    <td>#{sprintf("%0.5f",is[f][:mean])}</td>
-    <td>#{sprintf("%0.5f",is[f][:sds])}</td>
-	<td>#{sprintf("%0.5f",sid[f][:mean])}</td>
-	<td>#{sprintf("%0.5f",sid[f][:variance_sample])}</td>
-	<td>#{sprintf("%0.5f",sid[f][:sds])}</td>
-	<td>#{sprintf("%0.5f",itc[f])}</td>
-	<td>#{sprintf("%0.5f",sid[f][:alpha])}</td>
-</tr>
+        itc=item_total_correlation
+        sid=stats_if_deleted
+        is=item_statistics
+        @ds.fields.each {|f|
+          html << <<EOF
+          <tr>
+          <td>#{f}</td>
+          <td>#{sprintf("%0.5f",is[f][:mean])}</td>
+          <td>#{sprintf("%0.5f",is[f][:sds])}</td>
+          <td>#{sprintf("%0.5f",sid[f][:mean])}</td>
+          <td>#{sprintf("%0.5f",sid[f][:variance_sample])}</td>
+          <td>#{sprintf("%0.5f",sid[f][:sds])}</td>
+          <td>#{sprintf("%0.5f",itc[f])}</td>
+          <td>#{sprintf("%0.5f",sid[f][:alpha])}</td>
+          </tr>
 EOF
-}
-html << "</table><hr />"
-html
-			end
-		end
-	end
+        }
+        html << "</table><hr />"
+        html
+      end
+    end
+  end
 end
