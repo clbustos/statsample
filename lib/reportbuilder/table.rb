@@ -2,11 +2,11 @@ class ReportBuilder
   # Creates a table.
   # Use:
   #   table=ReportBuilder::Table.new(:header =>["id","city","name","code1","code2"])
-  #   table.add_row([1, Table.rowspan("New York",3), "Ringo", Table.colspan("no code",2),nil])
-  #   table.add_row([2, nil,"John", "ab-1","ab-2"])
-  #   table.add_row([3, nil,"Paul", "ab-3"])
-  #   table.add_hr
-  #   table.add_row([4, "London","George", Table.colspan("ab-4",2),nil])
+  #   table.row([1, Table.rowspan("New York",3), "Ringo", Table.colspan("no code",2),nil])
+  #   table.row([2, nil,"John", "ab-1","ab-2"])
+  #   table.row([3, nil,"Paul", "ab-3"])
+  #   table.hr
+  #   table.row([4, "London","George", Table.colspan("ab-4",2),nil])
   #   puts table
   #     ==>
   #   -----------------------------------------
@@ -20,7 +20,7 @@ class ReportBuilder
   #   -----------------------------------------
   class Table
     @@n=1 # :nodoc:
-    
+
     DEFAULT_OPTIONS={
       :header =>  [],
       :name   =>   nil
@@ -35,7 +35,7 @@ class ReportBuilder
     # Options: :name, :header
     # Use:
     #   table=ReportBuilder::Table.new(:header =>["var1","var2"])
-    def initialize(opts=Hash.new)
+    def initialize(opts=Hash.new, &block)
       raise ArgumentError,"opts should be a Hash" if !opts.is_a? Hash
       opts=DEFAULT_OPTIONS.merge opts
       if opts[:name].nil?
@@ -47,18 +47,20 @@ class ReportBuilder
       @header=opts[:header]
       @rows=[]
       @max_cols=[]
+      
+      block.arity<1 ? self.instance_eval(&block) : block.call(self)
     end
     # Adds a row
     #   table.add_row(%w{1 2})
-    def add_row(row)
+    def row(row)
       @rows.push(row)
     end
     # Adds a horizontal rule
     #   table.add_hr
-    def add_hr
+    def hr
       @rows.push(:hr)
     end
-    alias_method  :add_horizontal_line, :add_hr
+    alias_method  :horizontal_line, :hr
     # Adds a rowspan on a cell
     #   table.add_row(["a",table.rowspan("b",2)])
     def rowspan(data,n)
@@ -66,34 +68,34 @@ class ReportBuilder
     end
     # Adds a colspan on a cell
     #   table.add_row(["a",table.colspan("b",2)])
-    
+
     def colspan(data,n)
       Colspan.new(data,n)
     end
     def calculate_widths # :nodoc:
-    @max_cols=[]
-    rows_cal=[header]+@rows
-    rows_cal.each{|row|
-      next if row==:hr
-      row.each_index{|i|
+      @max_cols=[]
+      rows_cal=[header]+@rows
+      rows_cal.each{|row|
+        next if row==:hr
+        row.each_index{|i|
           if row[i].nil?
-              next
+            next
           elsif row[i].is_a? Colspan
-              size_total=row[i].data.to_s.size
-              size_per_column=(size_total / row[i].cols)+1
-              for mi in i...i+row[i].cols
-                  @max_cols[mi] = size_per_column if @max_cols[mi].nil? or @max_cols[mi]<size_per_column
-              end
+            size_total=row[i].data.to_s.size
+            size_per_column=(size_total / row[i].cols)+1
+            for mi in i...i+row[i].cols
+              @max_cols[mi] = size_per_column if @max_cols[mi].nil? or @max_cols[mi]<size_per_column
+            end
           elsif row[i].is_a? Rowspan
-              size=row[i].data.to_s.size
-              @max_cols[i]= size if @max_cols[i].nil? or @max_cols[i] < size
+            size=row[i].data.to_s.size
+            @max_cols[i]= size if @max_cols[i].nil? or @max_cols[i] < size
           else
-              
-              size=row[i].to_s.size
-              @max_cols[i]= size if @max_cols[i].nil? or @max_cols[i] < size
+
+            size=row[i].to_s.size
+            @max_cols[i]= size if @max_cols[i].nil? or @max_cols[i] < size
           end
+        }
       }
-    }
     end
     def to_reportbuilder_text(generator)
       require 'reportbuilder/table/textgenerator'
@@ -109,29 +111,29 @@ class ReportBuilder
     def total_width # :nodoc:
       @max_cols.inject(0){|a,v| a+(v+3)}+1
     end
-######################
-#  INTERNAL CLASSES  #
-######################
-  
+    ######################
+    #  INTERNAL CLASSES  #
+    ######################
+
     class Rowspan # :nodoc:
       attr_accessor :data, :rows
       def initialize(data,rows)
-          @data=data
-          @rows=rows
+        @data=data
+        @rows=rows
       end
       def to_s
-          @data.to_s
+        @data.to_s
       end
     end
-    
+
     class Colspan # :nodoc:
       attr_accessor :data, :cols
       def initialize(data,cols)
-          @data=data
-          @cols=cols
+        @data=data
+        @cols=cols
       end
       def to_s
-          @data.to_s
+        @data.to_s
       end
     end
   end

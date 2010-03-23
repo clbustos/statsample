@@ -1,40 +1,49 @@
 require "test/unit"
 $:.unshift(File.dirname(__FILE__)+"/../lib")
 require "reportbuilder"
-require "reportbuilder/table/htmlgenerator"
-require "reportbuilder/table/textgenerator"
+require 'reportbuilder/table/htmlgenerator'
+require 'reportbuilder/table/textgenerator'
+require 'hpricot'
 
 class TestReportbuilderTable < Test::Unit::TestCase
   def setup
     super
-    table=ReportBuilder::Table.new(:header=>%w{a bb ccc dddd eeee fff gggg hh i})
-    table.add_row(["a","b","c","d","e","f","g","h","i"])
-    table.add_row([table.colspan("a",2),nil,"c",table.rowspan("d",2),"e","f","g","h","i"])
-    table.add_row([table.colspan("a",3),nil,nil,nil,"e","f","g","h","i"])
-    table.add_row([table.colspan("a",4),nil,nil,nil,"e","f","g","h","i"])
-    table.add_row([table.colspan("a",5),nil,nil,nil,nil,table.colspan("f",3),nil,nil,"i"])
-    table.add_row([table.colspan("a",6),nil,nil,nil,nil,nil,"g","h","i"])
-    @table=table
-    
-    @mock_generator = ""
-    class << @mock_generator
-      def add_raw(t)
-        replace(t)
-      end
-      def add_text(t)
-        replace(t)
-      end
-      def add_table_entry(t)
-        "MOCK"
-      end
+    @name="Table Test"
+    @header=%w{a bb ccc dddd eeee fff gggg hh i}
+    table=ReportBuilder::Table.new(:name=>"Table Test", :header=>@header) do
+      row(["a","b","c","d","e","f","g","h","i"])
+      row([colspan("a",2),nil,"c",rowspan("d",2),"e","f","g","h","i"])
+      row([colspan("a",3),nil,nil,nil,"e","f","g","h","i"])
+      row([colspan("a",4),nil,nil,nil,"e","f","g","h","i"])
+      row([colspan("a",5),nil,nil,nil,nil,colspan("f",3),nil,nil,"i"])
+      row([colspan("a",6),nil,nil,nil,nil,nil,"g","h","i"])
     end
     
+    @table=table
+
+    @mock_generator = ""
+    class << @mock_generator
+      def preformatted(t)
+        replace(t)
+      end
+      def text(t)
+        replace(t)
+      end
+      def table_entry(t)
+        "MOCK"
+      end
+      def html(t)
+        replace(t)
+      end
+    end
+
   end
   def test_table_text
-    
+
     tg=ReportBuilder::Table::TextGenerator.new(@mock_generator,@table)
     tg.generate
-        expected= <<HEREDOC
+        expected= <<-HEREDOC
+Table: Table Test
 ----------------------------------------------------
 | a | bb | ccc | dddd | eeee | fff | gggg | hh | i |
 ----------------------------------------------------
@@ -47,14 +56,15 @@ class TestReportbuilderTable < Test::Unit::TestCase
 ----------------------------------------------------
 HEREDOC
 
-assert_equal(expected,@mock_generator)
+    assert_equal(expected,@mock_generator)
 
   end
   def test_table_html
-        
+
     tg=ReportBuilder::Table::HtmlGenerator.new(@mock_generator,@table)
     tg.generate
-        expected= <<HEREDOC
+    
+    expected= <<HEREDOC
 <a name='MOCK'> </a>
 <table>
     <thead>
@@ -82,6 +92,22 @@ assert_equal(expected,@mock_generator)
     </table>
 HEREDOC
 
-assert_equal(expected.gsub(/\s/m,""), @mock_generator.gsub(/\s/m,""))
+    doc=Hpricot(@mock_generator)
+    
+    assert(doc.search("a[@name='MOCK']")!="")
+    assert(doc.search("table"!=""))
+    assert_equal(@header, doc.search("table/thead/th").map {|m| m.inner_html} )
+    [[2,%w{a}],
+    [3,%w{a f}],
+    [4,%w{a}],
+    [5,%w{a}],
+    [6,%w{a}],
+    
+    ].each do |m,exp|
+      real=doc.search("table/tbody/tr/td[@colspan='#{m}']").map {|x| x.inner_html}
+      assert_equal(exp, real, "On table/tbody/tr/td[@colspan='#{m}']"
+        )
+    end
+
   end
 end

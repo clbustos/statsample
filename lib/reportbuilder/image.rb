@@ -22,10 +22,10 @@ class ReportBuilder::Image
   # Based on http://rubyquiz.com/quiz50.html
   def to_reportbuilder_text(generator)
     require 'RMagick'
-    
-    
+
+
     img = Magick::Image.read(@filename).first
-    
+
     # Resize too-large images. The resulting image is going to be
     # about twice the size of the input, so if the original image is too
     # large we need to make it smaller so the ASCII version won't be too
@@ -38,7 +38,7 @@ class ReportBuilder::Image
     img.change_geometry('320x320>') do |cols, rows|
       img.resize!(cols, rows) if cols != img.columns || rows != img.rows
     end
-    
+
     # Compute the image size in ASCII "pixels" and resize the image to have
     # those dimensions. The resulting image does not have the same aspect
     # ratio as the original, but since our "pixels" are twice as tall as
@@ -46,10 +46,10 @@ class ReportBuilder::Image
     pr = img.rows / @options[:font_rows]
     pc = img.columns / @options[:font_cols]
     img.resize!(pc, pr)
-    
+
     img = img.quantize(@options[:chars].size, Magick::GRAYColorspace)
     img = img.normalize
-    
+
     out=""
     # Draw the image surrounded by a border. The `view' method is slow but
     # it makes it easy to address individual pixels. In grayscale images,
@@ -62,17 +62,24 @@ class ReportBuilder::Image
       pr.times do |i|
         out+= '|'
         pc.times do |j|
-          out+= @options[:chars][view[i][j].red / (2**16/@options[:chars].size)] 
+          out+= @options[:chars][view[i][j].red / (2**16/@options[:chars].size)]
         end
         out+= '|'+"\n"
       end
     end
     out+= border
-    generator.add_raw(out)
+    generator.preformatted(out)
   end
-  
+
   def to_reportbuilder_html(generator)
-    src=generator.add_image(@filename)
-    generator.add_raw("<img src='#{src}' alt='#{@options[:alt]}' />")
+    basedir=generator.directory+"/images"
+    out=basedir+"/"+File.basename(@filename)
+    if(File.exists? @filename)
+      if !File.exists? out
+        FileUtils.mkdir_p basedir
+        FileUtils.cp @filename, out
+      end
+    end
+    generator.html("<img src='images/#{File.basename(@filename)}' alt='#{@options[:alt]}' />")
   end
 end

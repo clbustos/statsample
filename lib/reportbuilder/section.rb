@@ -19,20 +19,20 @@ class ReportBuilder::Section
       raise ArgumentError("Parent should be a Section")
     end
   end
-  
+
   def to_reportbuilder_text(generator)
-    generator.add_text(("="*generator.parse_level)+" "+name)
+    generator.text(("="*generator.parse_level)+" "+name)
     generator.parse_cycle(self)
   end
-  
+
   def to_reportbuilder_html(generator)
     htag="h#{generator.parse_level+1}"
-    anchor=generator.add_toc_entry(name)
-    generator.add_html "<div class='section'><#{htag}>#{name}</#{htag}><a name='#{anchor}'></a>"
+    anchor=generator.toc_entry(name)
+    generator.html "<div class='section'><#{htag}>#{name}</#{htag}><a name='#{anchor}'></a>"
     generator.parse_cycle(self)
-    generator.add_html "</div>"
+    generator.html "</div>"
   end
-  
+
   def add(element)
     if element.is_a? ReportBuilder::Section
       element.parent=self

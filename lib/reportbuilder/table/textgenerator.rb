@@ -1,14 +1,14 @@
 class ReportBuilder
   class Table
     class TextGenerator < ElementGenerator
-        
+
       def generate()
         t=@element
         t.calculate_widths
         total_width=t.total_width
         out="Table: #{t.name}\n"
         if t.header.size>0
-          out+=parse_hr(total_width)+"\n"                
+          out+=parse_hr(total_width)+"\n"
           out+=parse_row(t,t.header)+"\n"
           out+=parse_hr(total_width)+"\n"
         end
@@ -20,7 +20,7 @@ class ReportBuilder
           end
         end
         out+=parse_hr(total_width)+"\n"
-        @generator.add_text(out)
+        @generator.text(out)
       end
       # Parse a row
       def parse_row(t,row)
@@ -48,6 +48,6 @@ class ReportBuilder
       def parse_hr(l)
         "-"*l
       end
-      end
     end
+  end
 end

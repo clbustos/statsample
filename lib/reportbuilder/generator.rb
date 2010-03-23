@@ -1,11 +1,13 @@
 class ReportBuilder
   # Abstract class for generators.
-  #   A generator is a class which control the output for a builder.
-  # On parse_cycle()....
+  # A generator is a class which control the output for a ReportBuilder object
+  #
+  
   #
   class Generator
     attr_reader :parse_level
     # builder is a ReportBuilder object
+    attr_reader :options
     def initialize(builder, options)
       @builder=builder
       @parse_level=0
@@ -16,8 +18,18 @@ class ReportBuilder
       @list_tables=[]
 
     end
-    def default_options
-      {}
+    def parse
+      parse_cycle(@builder)
+    end
+    
+    def save(filename)
+      File.open(filename, "wb") do |fp|
+        fp.write(out)
+      end
+    end
+    
+    def default_options # :nodoc:
+      Hash.new
     end
     # parse each element of the parameters
     def parse_cycle(container)
@@ -27,38 +39,47 @@ class ReportBuilder
       end
       @parse_level-=1
     end
-    
+    # Parse one element
     def parse_element(element)
       method=("to_reportbuilder_" + self.class::PREFIX).intern
-      if element.respond_to? method
+      if element.is_a? Proc
+        element.arity==0 ? instance_eval(&element) : element.call(self)
+      elsif element.respond_to? method
         element.send(method, self)
       elsif element.respond_to? :to_reportbuilder
         element.send(:to_reportbuilder, self)
       else
-        add_text(element.to_s)
+        text(element.to_s)
       end
     end
-    
-    def add_text(t)
-      raise "Implement this"
+    def table(opt=Hash.new, &block)
+      parse_element(ReportBuilder::Table.new(opt,&block))
     end
-    def add_html(t)
-      raise "Implement this"
-    end
-    def add_preformatted(t)
-      raise "Implement this"
+    def image(filename,opt=Hash.new)
+      parse_element(ReportBuilder::Image.new(filename,opt))
     end
     
-    def add_toc_entry(name)
+    def text(t)
+      raise "Implement this"
+    end
+    def html(t)
+      raise "Implement this"
+    end
+    def preformatted(t)
+      raise "Implement this"
+    end
+    # Add a TOC (Table of Contents) Entry
+    # Return the name of anchor
+    def toc_entry(name)
       anchor="toc_#{@entry_n}"
       @entry_n+=1
       @toc.push([anchor, name, parse_level])
       anchor
     end
-    
-    # Add an entry for a table
+
+    # Add an entry for  table index.
     # Returns the name of the anchor
-    def add_table_entry(name)
+    def table_entry(name)
       anchor="table_#{@table_n}"
       @table_n+=1
       @list_tables.push([anchor,name])

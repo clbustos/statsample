@@ -5,15 +5,45 @@ require 'reportbuilder/image'
 
 class ReportBuilder
   attr_reader :elements
+  # Name of report
   attr_reader :name
-  attr_reader :dir
-  VERSION = '0.2.0'
+  # Doesn't print a title on true
+  attr_accessor :no_title
+  
+  VERSION = '1.0.0'
+  # Generates and optionally save the report on one function
+  def self.generate(options=Hash.new, &block)
+    options[:filename]||=nil
+    options[:format]||="text"
+    
+    if options[:filename] and options[:filename]=~/\.(\w+?)$/
+      options[:format]=$1
+      options[:format]="text" if options[:format]=="txt"
+    end
+    file=options.delete(:filename)
+    format=options.delete(:format).to_s
+    format[0]=format[0,1].upcase
+    
+    
+    rb=ReportBuilder.new(options)
+    rb.add(block)
+    generator=Generator.const_get(format.to_sym).new(rb, options)
+    generator.parse
+    out=generator.out
+    unless file.nil?
+      File.open(file,"wb") do |fp|
+        fp.write out
+      end
+    else
+      out
+    end
+  end
   # Create a new Report
-  def initialize(name=nil,dir=nil)
-    name||="Report "+Time.new.to_s
-    dir||=Dir.pwd
-    @dir=dir
-    @name=name
+  def initialize(options=Hash.new)
+    options[:name]||="Report "+Time.new.to_s
+    @no_title=options.delete :no_title
+    @name=options.delete :name 
+    @options=options
     @elements=Array.new
   end
   # Add an element to the report.
@@ -21,8 +51,9 @@ class ReportBuilder
   # this method will called.
   # Otherwise, the element itself will be added
   def add(element)
-      @elements.push(element)
+    @elements.push(element)
   end
+  
   # Returns a Section
   def section(options={})
     Section.new(options)
@@ -32,24 +63,25 @@ class ReportBuilder
   end
   # Returns a Table
   def table(h=[])
-      Table.new(h)
+    Table.new(h)
   end
   # Returns an Html output
-  def to_html(options={})
-    gen = Generator::Html.new(self,options)
+  def to_html()
+    gen = Generator::Html.new(self,@options)
     gen.parse
     gen.out
   end
-  def save_html(file, options={})
-    gen=Generator::Html.new(self,options)
+  # Save an html file
+  def save_html(file)
+    options=@options.dup
+    options[:directory]=File.dirname(file)
+    gen=Generator::Html.new(self, options)
     gen.parse
-    File.open(@dir+"/"+file,"wb") {|fp|
-      fp.write(gen.out)
-    }
+    gen.save(file)
   end
   # Returns a Text output
-  def to_text(options={})
-    gen=Generator::Text.new(self, options)
+  def to_text()
+    gen=Generator::Text.new(self, @options)
     gen.parse
     gen.out
   end

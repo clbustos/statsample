@@ -9,18 +9,17 @@ class ReportBuilder
         @out=""
       end
       def parse
-        @out="#{@builder.name}\n"
+        @out="#{@builder.name}\n" unless @builder.no_title
         parse_cycle(@builder)
-        @out << "\n"
       end
-      def add_text(t)
-        ws=" "*parse_level*2
+      def text(t)
+        ws=" "*((parse_level-1)*2)
         @out << ws << t << "\n"
       end
-      def add_preformatted(t)
+      def preformatted(t)
         @out << t
       end
-      def add_html(t)
+      def html(t)
         # Nothing printed
       end
     end

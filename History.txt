@@ -1,3 +1,5 @@
+=== 0.3.0 / 2009-03-22
+* Change of interface. Deleted "add_" before methods
 === 1.0.0 / 2009-08-12
 
 * 1 major enhancement
