@@ -1,11 +1,12 @@
-require "test/unit"
+require "minitest/unit"
 $:.unshift(File.dirname(__FILE__)+"/../lib")
 require "reportbuilder"
 require 'reportbuilder/table/htmlgenerator'
 require 'reportbuilder/table/textgenerator'
-require 'hpricot'
+require 'nokogiri'
 
-class TestReportbuilderTable < Test::Unit::TestCase
+MiniTest::Unit.autorun
+class TestReportbuilderTable < MiniTest::Unit::TestCase
   def setup
     super
     @name="Table Test"
@@ -98,11 +99,12 @@ HEREDOC
     </table>
 HEREDOC
 
-    doc=Hpricot(@mock_generator)
+    doc=Nokogiri::HTML(@mock_generator).at_xpath("/html")
     
-    assert(doc.search("a[@name='MOCK']")!="")
-    assert(doc.search("table"!=""))
-    assert_equal(@header, doc.search("table/thead/th").map {|m| m.inner_html} )
+    assert(doc.at_xpath("a[@name='MOCK']")!="")
+    assert(doc.at_xpath("table")!="")
+    
+    assert_equal(@header, doc.xpath("//table/thead/th").map {|m| m.content} )
     [[2,%w{a}],
     [3,%w{a f}],
     [4,%w{a}],
@@ -110,7 +112,7 @@ HEREDOC
     [6,%w{a}],
     
     ].each do |m,exp|
-      real=doc.search("table/tbody/tr/td[@colspan='#{m}']").map {|x| x.inner_html}
+      real=doc.xpath("//table/tbody/tr/td[@colspan='#{m}']").map {|x| x.inner_html}
       assert_equal(exp, real, "On table/tbody/tr/td[@colspan='#{m}']"
         )
     end

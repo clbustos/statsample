@@ -1,12 +1,23 @@
-require "test/unit"
+require "minitest/unit"
 $:.unshift(File.dirname(__FILE__)+"/../lib")
 require "reportbuilder"
-require 'hpricot'
 require 'tempfile'
-class TestReportbuilder < Test::Unit::TestCase
+MiniTest::Unit.autorun
+class TestReportbuilder < MiniTest::Unit::TestCase
   def setup
     @datadir=File.dirname(__FILE__)+"/../data"
     @image=@datadir+"/sheep.jpg"
+  end
+  def assert_nothing_raised(msg=nil)
+    msg||="Nothing should be raised, but raised %s"
+    begin
+      yield
+      not_raised=true
+    rescue Exception => e
+      not_raised=false
+      msg=sprintf(msg,e)
+    end
+    assert(not_raised,msg)
   end
   # adding basic object
   def test_basic_generators

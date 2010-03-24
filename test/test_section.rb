@@ -1,9 +1,9 @@
-require "test/unit"
+require "minitest/unit"
 $:.unshift(File.dirname(__FILE__)+"/../lib")
 require "reportbuilder"
-require 'hpricot'
-
-class TestReportbuilderSection < Test::Unit::TestCase
+require 'nokogiri'
+MiniTest::Unit.autorun
+class TestReportbuilderSection < MiniTest::Unit::TestCase
   def setup
     @name="Test Section"
     @rp=ReportBuilder.new(:name=>"Test Section")
@@ -50,20 +50,21 @@ Test Section
   def test_section_html
     real=@rp.to_html
     #puts real
-    doc = Hpricot(real)
+    base = Nokogiri::HTML(real)
     # Sanity
-    assert_equal("Test Section", doc.search("head/title").inner_html)
+    doc=base.at_xpath("/html")
+    assert_equal("Test Section", doc.at_xpath("head/title").content)
     # Test toc
-    base_ul=doc.search("/html/body/div[@id='toc']")
-    assert(base_ul!="")
-    #puts base_ul
+    base_ul=doc.at_xpath("/html/body/div[@id='toc']/ul")
+    assert(base_ul,"Toc have something")
     [
     ["li/a[@href='#toc_1']","Section 1"],
-    ["li/a[@href='#toc_2']","Section 1.1"],
-    ["li/a[@href='#toc_3']","Section 1.1.1"],
+    ["ul/li/a[@href='#toc_2']","Section 1.1"],
+    ["ul/ul/li/a[@href='#toc_3']","Section 1.1.1"],
     ["li/a[@href='#toc_4']","Section 2"]].each do |path, expected|
-      inner=base_ul.search(path).inner_html
-      assert_equal(expected, inner, "On #{path}")
+      assert(inner=base_ul.at_xpath(path),"#{path} should return something")
+      content=inner.content
+      assert_equal(expected, content, "On #{path}")
     end
     
     [
@@ -71,8 +72,8 @@ Test Section
     ["div[class='section']/h3",["Section 1.1"]],
     ["div[class='section']/h4",["Section 1.1.1"]]
     ].each do |path, expected|
-    base_ul.search(path).each do |el|
-      assert_equal(expected, el.inner_html, "On #{path} #{el}")
+    base_ul.xpath(path).each do |el|
+      assert_equal(expected, el.content, "On #{path} #{el}")
     end
     end
   end

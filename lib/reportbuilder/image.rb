@@ -71,7 +71,10 @@ class ReportBuilder::Image
     out+= border
     generator.preformatted(out)
   end
-
+  def report_building_rtf(generator)
+    raise "Not implemented on RTF::Document. Use gem install thecrisoshow-ruby-rtf for support" unless generator.rtf.respond_to? :image
+    generator.rtf.image(@filename)
+  end
   def report_building_html(generator)
     basedir=generator.directory+"/images"
     out=basedir+"/"+File.basename(@filename)

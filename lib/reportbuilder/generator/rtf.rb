@@ -32,8 +32,7 @@ class ReportBuilder
           ps=ParagraphStyle.new
           ps.justification = ParagraphStyle::CENTER_JUSTIFY
           h[k]={:cs=>cs, :ps=>ps}
-        }
-        
+        }        
       end
       def default_options
         
@@ -54,7 +53,9 @@ class ReportBuilder
       def header(level,t)
         @rtf.paragraph(@header_styles[level][:ps]) do |n1|
           n1.apply(@header_styles[level][:cs]) do |n2|
+            n2.line_break
             n2 << t
+            n2.line_break
           end
         end
       end
@@ -69,16 +70,16 @@ class ReportBuilder
         end
         
       end
-      def image(filename)
-        raise "Not implemented on RTF::Document. Use gem install thecrisoshow-ruby-rtf for support" unless @rtf.respond_to? :image
-        @rtf.image(filename)
-      end
+     
       def out
         @rtf.to_rtf
       end
       def save(filename)
         File.open(filename,'wb')  {|file| file.write(@rtf.to_rtf)
         }
+      end
+      def html(t)
+        # Nothing
       end
     end
   end

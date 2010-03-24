@@ -1,11 +1,12 @@
-require "test/unit"
+require "minitest/unit"
 $:.unshift(File.dirname(__FILE__)+"/../lib")
 require "reportbuilder"
 require 'fileutils'
 require 'tmpdir'
-require 'hpricot'
+require 'nokogiri'
 require 'tempfile'
-class TestReportbuilderHtml < Test::Unit::TestCase
+MiniTest::Unit.autorun
+class TestReportbuilderHtml < MiniTest::Unit::TestCase
   def setup
     @tmpdir=Dir::mktmpdir
     @title="Test #{rand(100)}"
@@ -16,20 +17,20 @@ class TestReportbuilderHtml < Test::Unit::TestCase
     FileUtils.remove_entry_secure @tmpdir
   end
   def test_empty_document
-    doc=Hpricot(@rp.to_html)
-    assert_equal(@title, doc.search("head/title").inner_html)
-    assert_equal(@title, doc.search("body/h1").inner_html)
-    assert_match(/^\s+$/, doc.search("body").inner_html.gsub(/<h1>.+<\/h1>/,""))
+    doc=Nokogiri::HTML(@rp.to_html)
+    assert_equal(@title, doc.at_xpath("/html/head/title").content)
+    assert_equal(@title, doc.at_xpath("/html/body/h1").content)
+    assert_match("", doc.at_xpath("/html/body").to_s.gsub(/<h1>.+<\/h1>|<\/?body>/,""))
     
   end
   def test_generate
     html=ReportBuilder.generate(:format=>:html, :name=>@title, :directory=>@tmpdir) do 
       text("hola")
     end
-    doc=Hpricot(html)
-    assert_equal(@title, doc.search("head/title").inner_html)
-    assert_equal(@title, doc.search("body/h1").inner_html)
-    assert_equal("hola", doc.search("body/p").inner_html)
+    doc=Nokogiri::HTML(html)
+    assert_equal(@title, doc.at_xpath("/html/head/title").inner_html)
+    assert_equal(@title, doc.at_xpath("/html/body/h1").inner_html)
+    assert_equal("hola", doc.at_xpath("/html/body/p").inner_html)
     
   end
   def test_include_js

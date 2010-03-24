@@ -1,6 +1,10 @@
-=== 1.1.0 / 2009-03-23
+=== 1.1.1 / 2010-03-24
+* Test suite replaces Test::Unit for Test::MiniUnit and Hpricot for Nokogiri
+* Resolved problems with images on rtf
+* Mode documentation
+=== 1.1.0 / 2010-03-23
 * Added rtf support
-=== 1.0.0 / 2009-03-22
+=== 1.0.0 / 2010-03-22
 Change of API:
  * Deleted "add_" before methods
  * Massive use of block after functions, to allow easy creation of reports

@@ -5,6 +5,11 @@ class ReportBuilder
       def generate()
         @t=@element
         @rtf=@generator.rtf
+        
+        # Title
+        
+        @generator.header(6,@t.name)
+        
         max_cols=@t.calculate_widths
         n_rows=@t.n_rows_no_hr+(@t.header.size>0 ? 1: 0)
         args=[n_rows, @t.n_columns]+max_cols.map{|m| m*@generator.options[:font_size]*10}

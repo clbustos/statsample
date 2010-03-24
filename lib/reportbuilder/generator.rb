@@ -1,7 +1,8 @@
 class ReportBuilder
   # Abstract class for generators.
   # A generator is a class which control the output for a ReportBuilder object
-  #
+  # Every object which have a #report_building() method could be
+  # parsed with #parse_element method.
   class Generator
     # Level of heading. See ReportBuilder::Section for using it.
     attr_reader :parse_level

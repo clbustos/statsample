@@ -1,8 +1,9 @@
 $:.unshift(File.dirname(__FILE__)+"/../lib")
-require 'test/unit'
+require 'minitest/unit'
 require 'tmpdir'
 require "reportbuilder"
-class TestReportbuilderImage < Test::Unit::TestCase
+MiniTest::Unit.autorun
+class TestReportbuilderImage < MiniTest::Unit::TestCase
   def setup
     @tmpdir=Dir::mktmpdir
     @rp=ReportBuilder.new(:no_name=>true, :directory=>@tmpdir)
@@ -39,5 +40,7 @@ Test
   def test_image_html
     assert_match(/img src='images\/sheep.jpg'/, @rp.to_html)
   end
-
+  def test_image_rtf
+    assert_match(/\\pict\\picw128\\pich112\\bliptag2403101\\jpegblip/, @rp.to_rtf)
+  end
 end

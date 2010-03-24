@@ -50,7 +50,7 @@ class ReportBuilder
   attr_accessor :name
   # Doesn't print a title if set to true
   attr_accessor :no_title
-  VERSION = '1.1.0'
+  VERSION = '1.1.1'
   # Generates and optionally save the report on one function
   def self.generate(options=Hash.new, &block)
     options[:filename]||=nil
@@ -102,7 +102,7 @@ class ReportBuilder
   end
   # Returns a RTF output
   def to_rtf()
-    gen = Generator::Rtf.new(self,@options)
+    gen = Generator::Rtf.new(self, @options)
     gen.parse
     gen.out
   end  
