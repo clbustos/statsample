@@ -24,14 +24,16 @@ module Statsample
         sum
       end
       
-      def covariance_slow(v1a,v2a) # :nodoc:
-        t=0
-        m1=v1a.mean
-        m2=v1a.mean
-        (0...v1a.size).each {|i| t+=((v1a[i]-m1)*(v2a[i]-m2)) }
-        t.to_f / (v1a.size-1)
+      def covariance_slow(v1,v2) # :nodoc:
+        v1a,v2a=Statsample.only_valid(v1,v2)
+        sum_of_squares(v1a,v2a) / (v1a.size-1)
       end
-      
+      def sum_of_squares(v1,v2)
+        v1a,v2a=Statsample.only_valid(v1,v2)        
+        m1=v1a.mean
+        m2=v2a.mean
+        (v1a.size).times.inject(0) {|ac,i| ac+(v1a[i]-m1)*(v2a[i]-m2)}
+      end
       # Calculate Pearson correlation coefficient (r) between 2 vectors
       def pearson(v1,v2)
         v1a,v2a=Statsample.only_valid(v1,v2)
@@ -42,12 +44,18 @@ module Statsample
           pearson_slow(v1a,v2a)
         end
       end
-      def pearson_slow(v1a,v2a) # :nodoc:
-        v1s,v2s=v1a.vector_standarized_pop,v2a.vector_standarized_pop
+      def pearson_slow(v1,v2) # :nodoc:
+        v1a,v2a=Statsample.only_valid(v1,v2)
+        # Calculate sum of squares
+        ss=sum_of_squares(v1a,v2a)
+        ss.quo(Math::sqrt(v1a.sum_of_squares) * Math::sqrt(v2a.sum_of_squares))
+=begin        
+        v1s,v2s=v1a.vector_standarized,v2a.vector_standarized
         t=0
         siz=v1s.size
         (0...v1s.size).each {|i| t+=(v1s[i]*v2s[i]) }
-        t.to_f/v2s.size
+        t.quo(v2s.size-1)
+=end
       end
       # Retrieves the value for t test for a pearson correlation
       # between two vectors to test the null hipothesis of r=0
@@ -279,6 +287,7 @@ module Statsample
         }
         a
       end
+=begin      
       def sum_of_codeviated(v1,v2)
         v1a,v2a=Statsample.only_valid(v1,v2)
         sum=0
@@ -287,7 +296,7 @@ module Statsample
         }
         sum-((v1a.sum*v2a.sum) / v1a.size.to_f)
       end
-      
+=end
       # Report the minimum number of cases valid of a covariate matrix
       # based on a dataset
       def min_n_valid(ds)

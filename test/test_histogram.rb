@@ -1,9 +1,8 @@
-$:.unshift(File.dirname(__FILE__)+'/../lib/')
-require 'statsample'
-require 'tmpdir'
-require 'test/unit'
+require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleHistogramTestCase < Test::Unit::TestCase
+
+
+class StatsampleHistogramTestCase < MiniTest::Unit::TestCase
   def test_control
     h = Statsample::Histogram.alloc(4)
     assert_equal([0.0]*4, h.bin)

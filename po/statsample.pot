@@ -6,8 +6,8 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: statsample 0.6.2\n"
-"POT-Creation-Date: 2010-02-11 18:44-0300\n"
+"Project-Id-Version: statsample 0.6.8\n"
+"POT-Creation-Date: 2010-03-25 17:55-0300\n"
 "PO-Revision-Date: 2009-08-04 15:36-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,135 +16,155 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: lib/statsample/regression/multiple/baseengine.rb:14
+#: lib/statsample/regression/multiple/baseengine.rb:23
 msgid "Multiple Regression:  %s over %s"
 msgstr ""
 
-#: lib/statsample/regression/multiple/baseengine.rb:150
+#: lib/statsample/regression/multiple/baseengine.rb:164
+#: lib/statsample/regression/multiple/matrixengine.rb:198
 msgid "Multiple Regression: "
 msgstr ""
 
-#: lib/statsample/regression/multiple/baseengine.rb:153
+#: lib/statsample/regression/multiple/baseengine.rb:167
+#: lib/statsample/regression/multiple/matrixengine.rb:201
 msgid "Engine: %s"
 msgstr ""
 
-#: lib/statsample/regression/multiple/baseengine.rb:154
+#: lib/statsample/regression/multiple/baseengine.rb:168
 msgid "Cases(listwise)=%d(%d)"
 msgstr ""
 
-#: lib/statsample/regression/multiple/baseengine.rb:158
+#: lib/statsample/regression/multiple/baseengine.rb:172
+#: lib/statsample/regression/multiple/matrixengine.rb:206
 msgid "Equation"
 msgstr ""
 
-#: lib/statsample/regression/multiple/baseengine.rb:161
+#: lib/statsample/regression/multiple/baseengine.rb:175
+#: lib/statsample/regression/multiple/matrixengine.rb:209
 msgid "Regression"
 msgstr ""
 
-#: lib/statsample/regression/multiple/baseengine.rb:162
+#: lib/statsample/regression/multiple/baseengine.rb:176
+#: lib/statsample/regression/multiple/matrixengine.rb:210
 msgid "Error"
 msgstr ""
 
-#: lib/statsample/regression/multiple/baseengine.rb:164
+#: lib/statsample/regression/multiple/baseengine.rb:178
+#: lib/statsample/regression/multiple/matrixengine.rb:212
 #: lib/statsample/crosstab.rb:108 lib/statsample/crosstab.rb:123
 #: lib/statsample/crosstab.rb:159 lib/statsample/crosstab.rb:181
-#: lib/statsample/dominanceanalysis.rb:281
+#: lib/statsample/dominanceanalysis.rb:361
 msgid "Total"
 msgstr ""
 
-#: lib/statsample/regression/multiple/baseengine.rb:170
+#: lib/statsample/regression/multiple/baseengine.rb:184
+#: lib/statsample/regression/multiple/matrixengine.rb:219
+#: lib/statsample/regression/multiple/matrixengine.rb:221
 msgid "Constant"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:42
+#: lib/statsample/regression/multiple/matrixengine.rb:75
+msgid "Multiple reggresion of %s on %s"
+msgstr ""
+
+#: lib/statsample/regression/multiple/matrixengine.rb:202
+msgid "Cases=%d"
+msgstr ""
+
+#: lib/statsample/dominanceanalysis/bootstrap.rb:117
 msgid "Bootstrap dominance Analysis:  %s over %s"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:65
+#: lib/statsample/dominanceanalysis/bootstrap.rb:140
 msgid "Bootstrap %d of %d"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:106
+#: lib/statsample/dominanceanalysis/bootstrap.rb:183
 msgid "DAB: "
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:109
+#: lib/statsample/dominanceanalysis/bootstrap.rb:186
 msgid "Sample size: %d\n"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:111
+#: lib/statsample/dominanceanalysis/bootstrap.rb:188
 msgid "Linear Regression Engine: %s"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:113
+#: lib/statsample/dominanceanalysis/bootstrap.rb:190
 msgid "pairs"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:113
+#: lib/statsample/dominanceanalysis/bootstrap.rb:190
 msgid "SE(Dij)"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:113
+#: lib/statsample/dominanceanalysis/bootstrap.rb:190
 msgid "Reproducibility"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:114
+#: lib/statsample/dominanceanalysis/bootstrap.rb:191
 msgid "Complete dominance"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:122
+#: lib/statsample/dominanceanalysis/bootstrap.rb:199
 msgid "Conditional dominance"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:131
+#: lib/statsample/dominanceanalysis/bootstrap.rb:208
 msgid "General Dominance"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:140
+#: lib/statsample/dominanceanalysis/bootstrap.rb:217
 msgid "General averages"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:140
+#: lib/statsample/dominanceanalysis/bootstrap.rb:217
 msgid "var"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:140
+#: lib/statsample/dominanceanalysis/bootstrap.rb:217
 msgid "mean"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:140
+#: lib/statsample/dominanceanalysis/bootstrap.rb:217
 msgid "se"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:140
+#: lib/statsample/dominanceanalysis/bootstrap.rb:217
 msgid "p.5"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:140
+#: lib/statsample/dominanceanalysis/bootstrap.rb:217
 msgid "p.95"
 msgstr ""
 
-#: lib/statsample/bivariate/polychoric.rb:560
-#: lib/statsample/bivariate/tetrachoric.rb:118
+#: lib/statsample/bivariate/polychoric.rb:750
+#: lib/statsample/bivariate/tetrachoric.rb:124
 msgid "Contingence Table"
 msgstr ""
 
-#: lib/statsample/bivariate/polychoric.rb:569
+#: lib/statsample/bivariate/polychoric.rb:759
 msgid "Thresholds"
 msgstr ""
 
-#: lib/statsample/bivariate/tetrachoric.rb:126
+#: lib/statsample/bivariate/polychoric.rb:767
+msgid "Test of bivariate normality: X2 = %0.3f, df = %d, p= %0.5f"
+msgstr ""
+
+#: lib/statsample/bivariate/tetrachoric.rb:132
 msgid "SE: %0.3f"
 msgstr ""
 
-#: lib/statsample/bivariate/tetrachoric.rb:127
+#: lib/statsample/bivariate/tetrachoric.rb:133
 msgid "Threshold X: %0.3f "
 msgstr ""
 
-#: lib/statsample/bivariate/tetrachoric.rb:128
+#: lib/statsample/bivariate/tetrachoric.rb:134
 msgid "Threshold Y: %0.3f "
 msgstr ""
 
-#: lib/statsample/bivariate/tetrachoric.rb:134
+#: lib/statsample/bivariate/tetrachoric.rb:141
 msgid "Tetrachoric correlation"
 msgstr ""
 
@@ -152,31 +172,31 @@ msgstr ""
 msgid "Histogram %s"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:99
+#: lib/statsample/factor/pca.rb:128
 msgid "PCA: "
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:100
+#: lib/statsample/factor/pca.rb:129
 msgid "PCA"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:103 lib/statsample/factor/principalaxis.rb:106
+#: lib/statsample/factor/pca.rb:132 lib/statsample/factor/principalaxis.rb:182
 msgid "Communalities"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:109 lib/statsample/factor/principalaxis.rb:112
+#: lib/statsample/factor/pca.rb:138 lib/statsample/factor/principalaxis.rb:188
 msgid "Eigenvalues"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:115 lib/statsample/factor/principalaxis.rb:118
+#: lib/statsample/factor/pca.rb:144 lib/statsample/factor/principalaxis.rb:194
 msgid "Component Matrix"
 msgstr ""
 
-#: lib/statsample/factor/principalaxis.rb:97
+#: lib/statsample/factor/principalaxis.rb:176
 msgid "Factor Analysis: "
 msgstr ""
 
-#: lib/statsample/factor/principalaxis.rb:98
+#: lib/statsample/factor/principalaxis.rb:177
 msgid "Factor Analysis"
 msgstr ""
 
@@ -216,50 +236,50 @@ msgstr ""
 msgid "% Total"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:79
+#: lib/statsample/dominanceanalysis.rb:123
 msgid "Dominance Analysis:  %s over %s"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:241
+#: lib/statsample/dominanceanalysis.rb:319
 msgid "DA: "
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:243
-msgid "Dominance Analysis result"
-msgstr ""
-
-#: lib/statsample/dominanceanalysis.rb:244
+#: lib/statsample/dominanceanalysis.rb:322
 msgid "sign"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:245
+#: lib/statsample/dominanceanalysis.rb:323
+msgid "Dominance Analysis result"
+msgstr ""
+
+#: lib/statsample/dominanceanalysis.rb:325
 msgid "Model 0"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:259
+#: lib/statsample/dominanceanalysis.rb:340
 msgid "k=%d Average"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:272
+#: lib/statsample/dominanceanalysis.rb:352
 msgid "Overall averages"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:281
+#: lib/statsample/dominanceanalysis.rb:361
 msgid "Pairwise dominance"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:281
+#: lib/statsample/dominanceanalysis.rb:361
 msgid "Pairs"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:281
+#: lib/statsample/dominanceanalysis.rb:361
 msgid "Conditional"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:281
+#: lib/statsample/dominanceanalysis.rb:361
 msgid "General"
 msgstr ""
 
-#: lib/statsample/converters.rb:317
+#: lib/statsample/converters.rb:321
 msgid ")}"
 msgstr ""

@@ -1,7 +1,7 @@
-$:.unshift(File.dirname(__FILE__)+'/../lib/')
-require 'statsample'
-require 'test/unit'
-class StatsampleGSLTestCase < Test::Unit::TestCase
+require(File.dirname(__FILE__)+'/test_helpers.rb')
+
+
+class StatsampleGSLTestCase < MiniTest::Unit::TestCase
   def test_matrix_to_gsl
     if Statsample.has_gsl?
       a=[1,2,3,4,20].to_vector(:scale)

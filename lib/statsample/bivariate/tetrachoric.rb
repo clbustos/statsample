@@ -114,18 +114,18 @@ module Statsample
       end
       # Summary of the analysis
       def summary
-        rp=ReportBuilder.new()
+        rp=ReportBuilder.new(:name=>@name)
         rp.add(self)
         rp.to_text
       end
 
-      def to_reportbuilder(generator) # :nodoc:
+      def report_building(generator) # :nodoc:
         section=ReportBuilder::Section.new(:name=>@name)
         t=ReportBuilder::Table.new(:name=>_("Contingence Table"),:header=>["","Y=0","Y=1", "T"])
-        t.add_row(["X=0", @a,@b,@a+@b])
-        t.add_row(["X=1", @c,@d,@c+@d])
-        t.add_hr
-        t.add_row(["T", @a+@c,@b+@d,@a+@b+@c+@d])
+        t.row(["X=0", @a,@b,@a+@b])
+        t.row(["X=1", @c,@d,@c+@d])
+        t.hr
+        t.row(["T", @a+@c,@b+@d,@a+@b+@c+@d])
         section.add(t)
         #generator.parse_element(t)
         section.add(sprintf("r: %0.3f",r))

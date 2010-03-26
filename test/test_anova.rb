@@ -1,15 +1,13 @@
-$:.unshift(File.dirname(__FILE__)+'/../lib/')
-require 'statsample'
-require 'test/unit'
+require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleAnovaTestCase < Test::Unit::TestCase
-	def initialize(*args)
+class StatsampleAnovaTestCase < MiniTest::Unit::TestCase
+  def initialize(*args)
     @v1=[3,3,2,3,6].to_vector(:scale)
     @v2=[7,6,5,6,7].to_vector(:scale)
     @v3=[9,8,9,7,8].to_vector(:scale)
     @anova=Statsample::Anova::OneWay.new([@v1,@v2,@v3])
-		super
-	end
+    super
+  end
   def test_basic
     assert_in_delta(72.933, @anova.sst,0.001)
     assert_in_delta(14.8,@anova.sswg,0.001)
@@ -21,7 +19,7 @@ class StatsampleAnovaTestCase < Test::Unit::TestCase
     assert_in_delta(23.568,@anova.f,0.001)
     anova2=Statsample::Anova::OneWay.new([@v1,@v1,@v1,@v1,@v2])
     assert_in_delta(3.960, anova2.f,0.001)
-		assert(@anova.significance<0.01)
-		assert_in_delta(0.016, anova2.significance,0.001)
+    assert(@anova.significance<0.01)
+    assert_in_delta(0.016, anova2.significance,0.001)
   end
 end

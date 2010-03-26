@@ -1,21 +1,17 @@
-$:.unshift(File.dirname(__FILE__)+'/../lib/')
-require 'statsample'
-require 'tempfile'
-require 'tmpdir'
-require 'test/unit'
+require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleCodificationTestCase < Test::Unit::TestCase
+class StatsampleCodificationTestCase < MiniTest::Unit::TestCase
 
   def initialize(*args)
     v1=%w{run walk,run walking running sleep sleeping,dreaming sleep,dream}.to_vector
     @dict={'run'=>'r','walk'=>'w','walking'=>'w','running'=>'r','sleep'=>'s', 'sleeping'=>'s', 'dream'=>'d', 'dreaming'=>'d'}
     @ds={"v1"=>v1}.to_dataset
-  super
+    super
   end
   def test_create_hash
     expected_keys_v1=%w{run walk walking running sleep sleeping dream dreaming}.sort
     hash=Statsample::Codification.create_hash(@ds,['v1'])
-    assert_equal(['v1'],hash.keys)                 
+    assert_equal(['v1'],hash.keys)
     assert_equal(expected_keys_v1,hash['v1'].keys.sort)
     assert_equal(expected_keys_v1,hash['v1'].values.sort)
   end
@@ -32,11 +28,11 @@ class StatsampleCodificationTestCase < Test::Unit::TestCase
     hash=Statsample::Codification.excel_to_recoded_hash(filename)
     assert_equal(keys.data, hash['v1'].keys.sort)
     assert_equal(keys.data, hash['v1'].values.sort)
-    
+
   end
   def test_create_yaml
     assert_raise  ArgumentError do
-        Statsample::Codification.create_yaml(@ds,[])
+      Statsample::Codification.create_yaml(@ds,[])
     end
     expected_keys_v1=%w{run walk walking running sleep sleeping dream dreaming}.sort
     yaml_hash=Statsample::Codification.create_yaml(@ds,['v1'])
@@ -73,8 +69,8 @@ class StatsampleCodificationTestCase < Test::Unit::TestCase
     e['s']=[0,0,0,0,1,1,1].to_vector
     e['d']=[0,0,0,0,0,1,1].to_vector
     e.each{|k,expected|
-        assert_equal(expected,@ds['v1_'+k],"Error on key #{k}")
-  
+      assert_equal(expected,@ds['v1_'+k],"Error on key #{k}")
+
     }
   end
 

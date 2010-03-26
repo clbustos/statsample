@@ -1,27 +1,36 @@
+
+
 module Statsample
   class CSV < SpreadsheetBase
+    if RUBY_VERSION<"1.9"
+      require 'fastercsv'
+      CSV_klass=::FasterCSV  
+    else
+      require 'csv'
+      CSV_klass=::CSV  
+    end    
     class << self
       # Returns a Dataset  based on a csv file
       #
       # USE:
       #     ds=Statsample::CSV.read("test_csv.csv")
-      def read(filename, empty=[''],ignore_lines=0,fs=nil,rs=nil)
-        require 'csv'
+      def read(filename, empty=[''],ignore_lines=0,fs=nil,rs=nil)        
         first_row=true
         fields=[]
         fields_data={}
         ds=nil
         line_number=0
-        
-        ::CSV.open(filename,'r',fs,rs) do |row|
+        opts={}
+        opts[:col_sep]=fs unless fs.nil?
+        opts[:row_sep]=rs unless rs.nil?
+        csv=CSV_klass.open(filename,'r',opts)
+        csv.each do |row|
           line_number+=1
           if(line_number<=ignore_lines)
             #puts "Skip line"
             next
           end
-          row.collect!{|c|
-          c.to_s
-          }
+          row.collect!{|c| c.to_s }
           if first_row
             fields=extract_fields(row)
             ds=Statsample::Dataset.new(fields)
@@ -38,12 +47,12 @@ module Statsample
       # Save a Dataset on a csv file
       #
       # USE:
-      #     Statsample::CSV.write(ds,"test_csv.csv")            
+      #     Statsample::CSV.write(ds,"test_csv.csv")
       def write(dataset,filename, convert_comma=false,*opts)
-        require 'csv'            
-        writer=::CSV.open(filename,'w',*opts)
+        
+        writer=CSV_klass.open(filename,'w',*opts)
         writer << dataset.fields
-        dataset.each_array do |row|
+        dataset.each_array do|row|
           if(convert_comma)
             row.collect!{|v| v.to_s.gsub(".",",")}
           end

@@ -351,9 +351,5 @@ out
 	end
 end
 
-if RUBY_VERSION<"1.9"
-    require 'statsample/converter/csv18.rb'
-else
-    require 'statsample/converter/csv19.rb'
-end
+require 'statsample/converter/csv.rb'
 

@@ -154,7 +154,7 @@ module Statsample
     # Creates a copy of the given dataset, deleting all the cases with
     # missing data on one of the vectors
     def dup_only_valid
-      if @vectors.find{|field,vector| vector.has_missing_data?}
+      if @vectors.any?{|field,vector| vector.has_missing_data?}
         ds=dup_empty
         each_array { |c|
           ds.add_case_array(c) unless @fields.find{|f| @vectors[f].data_with_nils[@i].nil? }

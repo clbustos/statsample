@@ -1,13 +1,16 @@
-$:.unshift(File.dirname(__FILE__)+'/../lib/')
+require(File.dirname(__FILE__)+'/test_helpers.rb')
+
 require 'distribution'
-require 'test/unit'
+
 begin
-    require 'rbgsl'
-    NOT_GSL=false
+  require 'rbgsl'
+  NOT_GSL=false
 rescue LoadError
-    NOT_GSL=true
+  NOT_GSL=true
 end
-class DistributionTestCase < Test::Unit::TestCase
+
+
+class DistributionTestCase < MiniTest::Unit::TestCase
   def test_chi
     if !NOT_GSL
       [2,3,4,5].each{|k|
@@ -25,7 +28,7 @@ class DistributionTestCase < Test::Unit::TestCase
           area=Distribution::T.cdf(t,n)
           assert_in_delta(area, GSL::Cdf.tdist_P(t,n),0.0001)
           assert_in_delta(Distribution::T.p_value(area,n), GSL::Cdf.tdist_Pinv(area,n),0.0001)
-          
+
         }
       }
     end
@@ -44,33 +47,33 @@ class DistributionTestCase < Test::Unit::TestCase
     if !NOT_GSL
       [0.2,0.4,0.6,0.8,0.9, 0.99,0.999,0.999999].each {|rho|
         assert_equal(GSL::Ran::bivariate_gaussian_pdf(0, 0, 1,1,rho), Distribution::NormalBivariate.pdf(0,0, rho , 1,1))
-       
+
       }
     end
-    
+
     [-3,-2,-1,0,1,1.5].each {|x|
       assert_in_delta(Distribution::NormalBivariate.cdf_hull(x,x,0.5), Distribution::NormalBivariate.cdf_genz(x,x,0.5), 0.001)
       assert_in_delta(Distribution::NormalBivariate.cdf_genz(x,x,0.5), Distribution::NormalBivariate.cdf_jantaravareerat(x,x,0.5), 0.001)
     }
-    
+
     assert_in_delta(0.686, Distribution::NormalBivariate.cdf(2,0.5,0.5), 0.001)
     assert_in_delta(0.498, Distribution::NormalBivariate.cdf(2,0.0,0.5), 0.001)
     assert_in_delta(0.671, Distribution::NormalBivariate.cdf(1.5,0.5,0.5), 0.001)
-    
+
     assert_in_delta(Distribution::Normal.cdf(0), Distribution::NormalBivariate.cdf(10,0,0.9), 0.001)
   end
   def test_f
     if !NOT_GSL
-        [0.1,0.5,1,2,10,20,30].each{|f|
-            [2,5,10].each{|n2|
-            [2,5,10].each{|n1|
-                area=Distribution::F.cdf(f,n1,n2)
-                assert_in_delta(area, GSL::Cdf.fdist_P(f,n1,n2),0.0001)
-                assert_in_delta(Distribution::F.p_value(area,n1,n2), GSL::Cdf.fdist_Pinv(area,n1,n2),0.0001)
-                
-            }
-            }
+      [0.1,0.5,1,2,10,20,30].each{|f|
+        [2,5,10].each{|n2|
+          [2,5,10].each{|n1|
+            area=Distribution::F.cdf(f,n1,n2)
+            assert_in_delta(area, GSL::Cdf.fdist_P(f,n1,n2),0.0001)
+            assert_in_delta(Distribution::F.p_value(area,n1,n2), GSL::Cdf.fdist_Pinv(area,n1,n2),0.0001)
+
+          }
         }
+      }
     end
   end
 

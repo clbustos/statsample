@@ -1,7 +1,6 @@
-$:.unshift(File.dirname(__FILE__)+'/../lib/')
-require 'statsample'
-require 'test/unit'
-class StatsampleStatisicsTestCase < Test::Unit::TestCase
+require(File.dirname(__FILE__)+'/test_helpers.rb')
+
+class StatsampleStatisicsTestCase < MiniTest::Unit::TestCase
 
   def initialize(*args)
     super

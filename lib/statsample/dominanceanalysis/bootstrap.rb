@@ -178,39 +178,39 @@ module Statsample
       def t
         Distribution::T.p_value(1-((1-@alpha) / 2), @n_samples - 1)
       end
-      def to_reportbuilder(generator) # :nodoc:
+      def report_building(generator) # :nodoc:
         raise "You should bootstrap first" if @n_samples==0
-        anchor=generator.add_toc_entry(_("DAB: ")+@name)
-        generator.add_html "<div class='dominance-analysis-bootstrap'>#{@name}<a name='#{anchor}'></a>"
+        anchor=generator.toc_entry(_("DAB: ")+@name)
+        generator.html "<div class='dominance-analysis-bootstrap'>#{@name}<a name='#{anchor}'></a>"
         
-        generator.add_text _("Sample size: %d\n") % @n_samples
-        generator.add_text "t: #{t}\n"
-        generator.add_text _("Linear Regression Engine: %s") % @regression_class.name
+        generator.text _("Sample size: %d\n") % @n_samples
+        generator.text "t: #{t}\n"
+        generator.text _("Linear Regression Engine: %s") % @regression_class.name
         
         table=ReportBuilder::Table.new(:name=>"Bootstrap report", :header => [_("pairs"), "sD","Dij", _("SE(Dij)"), "Pij", "Pji", "Pno", _("Reproducibility")])
-        table.add_row([_("Complete dominance")])
-        table.add_horizontal_line
+        table.row([_("Complete dominance")])
+        table.hr
         @pairs.each{|pair|
           std=@samples_td[pair].to_vector(:scale)
           ttd=da.total_dominance_pairwise(pair[0],pair[1])
-          table.add_row(summary_pairs(pair,std,ttd))
+          table.row(summary_pairs(pair,std,ttd))
         }
-        table.add_horizontal_line
-        table.add_row([_("Conditional dominance")])
-        table.add_horizontal_line
+        table.hr
+        table.row([_("Conditional dominance")])
+        table.hr
         @pairs.each{|pair|
           std=@samples_cd[pair].to_vector(:scale)
           ttd=da.conditional_dominance_pairwise(pair[0],pair[1])
-          table.add_row(summary_pairs(pair,std,ttd))
+          table.row(summary_pairs(pair,std,ttd))
         
         }
-        table.add_horizontal_line
-        table.add_row([_("General Dominance")])
-        table.add_horizontal_line
+        table.hr
+        table.row([_("General Dominance")])
+        table.hr
         @pairs.each{|pair|
           std=@samples_gd[pair].to_vector(:scale)
           ttd=da.general_dominance_pairwise(pair[0],pair[1])
-          table.add_row(summary_pairs(pair,std,ttd))
+          table.row(summary_pairs(pair,std,ttd))
         }
         generator.parse_element(table)
         
@@ -219,12 +219,12 @@ module Statsample
         @fields.each{|f|
           v=@samples_ga[f].to_vector(:scale)
           row=[@ds.label(f), sprintf("%0.3f",v.mean), sprintf("%0.3f",v.sd), sprintf("%0.3f",v.percentil(5)),sprintf("%0.3f",v.percentil(95))]
-          table.add_row(row)
+          table.row(row)
         
         }
         
         generator.parse_element(table)
-        generator.add_html("</div>")
+        generator.html("</div>")
       end
       def summary_pairs(pair,std,ttd)
           freqs=std.proportions

@@ -1,65 +1,54 @@
-$:.unshift(File.dirname(__FILE__)+'/../lib/')
-require 'statsample'
-require 'tmpdir'
-require 'tempfile'
-require 'tempfile'
-require 'fileutils'
-require 'test/unit'
-begin
-	require 'statsample/graph/svggraph'
-class StatsampleSvgGraphTestCase < Test::Unit::TestCase
+require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-  def initialize(*args)
-      @image_path=Dir::tmpdir+"/images"
-      FileUtils.mkdir(@image_path) if !File.exists? @image_path 
-  super
+class StatsampleSvgGraphTestCase < MiniTest::Unit::TestCase
+
+  def setup
+    @image_path=Dir::tmpdir+"/images"
+    FileUtils.mkdir(@image_path) if !File.exists? @image_path
   end
   def test_histogram
     if Statsample.has_gsl?
       ar=(1..1000).to_a.collect {|a|
-    rand(10)
-    }.to_vector(:scale)
+        rand(10)
+      }.to_vector(:scale)
       h=ar.histogram([0,2,5,11])
       file=Tempfile.new("svg_histogram_only.svg")
       graph = Statsample::Graph::SvgHistogram.new({})
       graph.histogram=h
       file.puts(graph.burn)
     else
-    puts "Statsample::Graph::SvgHistogram.new not tested (no ruby-gsl)"
+      puts "Statsample::Graph::SvgHistogram.new not tested (no ruby-gsl)"
+    end
+  end
+  def assert_svg(msg=nil)
+    msg||="%s isn't a svg file"
+    Tempfile.open("svg") do |fp|
+      yield fp
+      fp.close
+      fp.open
+      assert_match(/DOCTYPE svg/, fp.gets(nil), sprintf(msg,fp.path))
     end
   end
   def test_vector
-    file=@image_path+"/gdchart_bar.jpg"
     ar=[]
     (1..1000).each {|a|
       ar.push(rand(10))
     }
     vector=ar.to_vector
-    file=Tempfile.new("svggraph_default.svg").path
-    vector.svggraph_frequencies(file)
-    file=Tempfile.new("svggraph_bar.svg").path
-    vector.svggraph_frequencies(file,800,600,SVG::Graph::Bar,:graph_title=>'Bar')
-    assert(File.exists?(file))
-    file=Tempfile.new("svggraph_bar_horizontal.svg").path
-    vector.svggraph_frequencies(file,800,600,SVG::Graph::BarHorizontalNoOp,:graph_title=>'Horizontal Bar')
-    assert(File.exists?(file))
-    file=Tempfile.new("svggraph_pie.svg").path
-    vector.svggraph_frequencies(file,800,600,SVG::Graph::PieNoOp,:graph_title=>'Pie')
-    assert(File.exists?(file))		
+    assert_svg {|file| vector.svggraph_frequencies(file)}
+    assert_svg {|file| vector.svggraph_frequencies(file, 800, 600, SVG::Graph::Bar, :graph_title=>'Bar') }
+    assert_svg {|file| vector.svggraph_frequencies(file, 800, 600, SVG::Graph::BarHorizontalNoOp, :graph_title=>'Horizontal Bar') }
+    assert_svg {|file| vector.svggraph_frequencies(file,800,600, SVG::Graph::PieNoOp, :graph_title=>'Pie') }
     vector.type=:scale
     if Statsample.has_gsl?
-    file=Tempfile.new("svg_histogram.svg").path
+      file=Tempfile.new("svg_histogram.svg").path
       hist=vector.svggraph_histogram(5)
       File.open(file,"wb") {|fp|
-              fp.write(hist.burn)
+        fp.write(hist.burn)
       }
       assert(File.exists?(file))
-      else
+    else
       puts "Statsample::Vector#svggraph_histogram.new not tested (no ruby-gsl)"
-  
     end
   end
-end
-rescue LoadError
-	puts "You should install SVG::Graph"
 end

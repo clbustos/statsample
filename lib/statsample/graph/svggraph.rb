@@ -3,7 +3,6 @@ require 'SVG/Graph/BarHorizontal'
 require 'SVG/Graph/Pie'
 require 'SVG/Graph/Line'
 require 'SVG/Graph/Plot'
-require 'statsample/graph/svghistogram'
 
 module Statsample
   class Vector
@@ -22,11 +21,16 @@ module Statsample
       :data => data1,
       :title => "Frequencies"
       )
-
-      File.open(file,"w") {|f|
-        f.puts(graph.burn)
-      }
+      if file.respond_to? :write
+        file.write(graph.burn)
+      else
+        File.open(file.to_s,"wb") {|f|
+          f.puts(graph.burn)
+        }
+      end
+      
     end
+    
     def svggraph_histogram(bins, options={})
       check_type :scale
       options={:graph_title=>"Histogram", :show_graph_title=>true,:show_normal=>true, :mean=>self.mean, :sigma=>sdp }.merge! options
@@ -94,18 +98,18 @@ module SVG #:nodoc:
     class BarNoOp < Bar # :nodoc:
       def get_css; SVG::Graph.get_css_standard; end
     end
-    class BarHorizontalNoOp < BarHorizontal
+    class BarHorizontalNoOp < BarHorizontal # :nodoc:
       def get_css; SVG::Graph.get_css_standard; end
     end
 
-    class LineNoOp < Line
+    class LineNoOp < Line # :nodoc:
       def get_css; SVG::Graph.get_css_standard; end
 
     end
-    class PlotNoOp < Plot
+    class PlotNoOp < Plot # :nodoc:
       def get_css; SVG::Graph.get_css_standard; end
     end
-    class PieNoOp < Pie
+    class PieNoOp < Pie # :nodoc:
       def get_css; SVG::Graph.get_css_standard; end
 
     end
@@ -178,6 +182,3 @@ module SVG #:nodoc:
     end
   end
 end
-
-require 'statsample/graph/svgscatterplot'
-require 'statsample/graph/svgboxplot'

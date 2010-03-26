@@ -92,12 +92,7 @@ module Statsample
     raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal) or (t==:date)
     end
     private :check_type
-    
-    # Return a vector usign the standarized values for data
-    # with sd with denominator N
-    def vector_standarized_pop
-      vector_standarized(true)
-    end
+
     # Return a vector usign the standarized values for data
     # with sd with denominator n-1
     

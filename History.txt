@@ -1,6 +1,16 @@
+=== 0.7.0 / 2010-03-25
+* Ported to ReportBuilder 1.x series
+* Implementation of ruby based covariance and correlation changed to a clearer code
+* Statsample::Vector#svggraph_frequencies accepts IO
+* Some test ported to Miniunit
+* CSV on Ruby1.8 uses FasterCSV
+
+=== 0.6.7 / 2010-03-23
+* Bug fix: dependency on ReportBuilder should be set to "~>0.2.0", not "0.2"
 === 0.6.6 / 2010-03-22
 * Set ReportBuilder dependency to '0.2.~' version, because future API break
 * Removed Alglib dependency
+* Factor::PrincipalAxis and Factor::PCA reworked
 * Standarization of documentation on almost every file
 * New Statsample::Test::Levene, to test equality of variances
 * Constant HAS_GSL replaced by Statsample.has_gsl?

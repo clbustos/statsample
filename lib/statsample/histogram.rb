@@ -88,11 +88,11 @@ module Statsample
         raise "Range size should be bin+1" if range.size!=@bin.size+1
         @range=range
       end
-      def to_reportbuilder_text(generator)
-        anchor=generator.add_toc_entry(_("Histogram %s") % [@name])
+      def report_building_text(generator)
+        anchor=generator.toc_entry(_("Histogram %s") % [@name])
         range.each_with_index do |r,i|
           next if i==@bin.size
-          generator.add_text(sprintf("%4.2f : %d", r, @bin[i]))
+          generator.text(sprintf("%4.2f : %d", r, @bin[i]))
         end
       end
     end

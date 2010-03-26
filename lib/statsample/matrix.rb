@@ -209,11 +209,11 @@ module Statsample
       matrix.type=type
       matrix
     end
-    def to_reportbuilder(generator)
+    def report_building(generator)
       @name||= (type==:correlation ? "Correlation":"Covariance")+" Matrix"
       t=ReportBuilder::Table.new(:name=>@name, :header=>[""]+fields_y)
       row_size.times {|i|
-        t.add_row([fields_x[i]]+@rows[i].collect {|i1| sprintf("%0.3f",i1).gsub("0.",".")})
+        t.row([fields_x[i]]+@rows[i].collect {|i1| sprintf("%0.3f",i1).gsub("0.",".")})
       }
       generator.parse_element(t)
     end

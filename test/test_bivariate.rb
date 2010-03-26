@@ -1,19 +1,45 @@
-$:.unshift(File.dirname(__FILE__)+'/../lib/')
-require 'statsample'
-require 'test/unit'
-class StatsampleBivariateTestCase < Test::Unit::TestCase
-  def test_sum_of_codeviated
+require(File.dirname(__FILE__)+'/test_helpers.rb')
+
+class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
+  def test_sum_of_squares
     v1=[1,2,3,4,5,6].to_vector(:scale)
     v2=[6,2,4,10,12,8].to_vector(:scale)
-    assert_equal(23.0, Statsample::Bivariate.sum_of_codeviated(v1,v2))
+    assert_equal(23.0, Statsample::Bivariate.sum_of_squares(v1,v2))
+  end
+  def test_covariance
+    if Statsample.has_gsl?
+      v1=1000.times.collect {|a| rand()}.to_scale
+      v2=1000.times.collect {|a| rand()}.to_scale
+      assert_in_delta(Statsample::Bivariate.covariance(v1,v2), Statsample::Bivariate.covariance_slow(v1,v2), 0.001)
+    else
+      puts "Bivariate::covariance not tested (needs GSL)"
+    end
+
+  end
+
+  def test_gsl_pearson
+    if Statsample.has_gsl?
+      v1=100.times.collect {|a| rand()}.to_scale
+      v2=100.times.collect {|a| rand()}.to_scale
+
+      assert_in_delta(GSL::Stats::correlation(v1.gsl, v2.gsl), Statsample::Bivariate.pearson_slow(v1,v2), 1e-10)
+    else
+      puts "Not tested gsl versus ruby correlation (needs GSL)"
+    end
   end
   def test_pearson
     v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
     v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
     assert_in_delta(0.525,Statsample::Bivariate.pearson(v1,v2), 0.001)
+    assert_in_delta(0.525,Statsample::Bivariate.pearson_slow(v1,v2), 0.001)
+
     v3=[6,2,  1000,1000,5,4,7,8,4,3,2,nil].to_vector(:scale)
     v4=[2,nil,nil,nil,  3,7,8,6,4,3,2,500].to_vector(:scale)
     assert_in_delta(0.525,Statsample::Bivariate.pearson(v3,v4),0.001)
+    # Test ruby method
+    v3a,v4a=Statsample.only_valid v3, v4
+    assert_in_delta(0.525, Statsample::Bivariate.pearson_slow(v3a,v4a),0.001)
+
   end
   def test_tetrachoric_matrix
     ds=Statsample::PlainText.read(File.dirname(__FILE__)+"/../data/tetmat_test.txt", %w{a b c d e})
@@ -26,7 +52,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     end
   end
   def test_poly_vs_tetra
-    10.times {
+    5.times {
       # Should be the same results as Tetrachoric for 2x2 matrix
       matrix=Matrix[[150+rand(10),1000+rand(20)],[1000+rand(20),200+rand(20)]]
       tetra = Statsample::Bivariate::Tetrachoric.new_with_matrix(matrix)
@@ -40,29 +66,19 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     }
   end
   def test_polychoric
-    
-      matrix=Matrix[[58,52,1],[26,58,3],[8,12,9]]
-      poly=Statsample::Bivariate::Polychoric.new(matrix)
-      poly.compute_two_step_mle_drasgow_ruby
-      assert_in_delta(0.420, poly.r, 0.001)
-      assert_in_delta(-0.240, poly.threshold_y[0],0.001)
-      assert_in_delta(-0.027, poly.threshold_x[0],0.001)
-      assert_in_delta(1.578, poly.threshold_y[1],0.001)
-      assert_in_delta(1.137, poly.threshold_x[1],0.001)
-      
-      
 
-      
-      
-     
-      
-      
-
-      
-    if Statsample.has_gsl?  
+    matrix=Matrix[[58,52,1],[26,58,3],[8,12,9]]
+    poly=Statsample::Bivariate::Polychoric.new(matrix)
+    poly.compute_two_step_mle_drasgow_ruby
+    assert_in_delta(0.420, poly.r, 0.001)
+    assert_in_delta(-0.240, poly.threshold_y[0],0.001)
+    assert_in_delta(-0.027, poly.threshold_x[0],0.001)
+    assert_in_delta(1.578, poly.threshold_y[1],0.001)
+    assert_in_delta(1.137, poly.threshold_x[1],0.001)
+    if Statsample.has_gsl?
       poly.method=:polychoric_series
       poly.compute
-      
+
       assert_in_delta(0.556, poly.r, 0.001)
       assert_in_delta(-0.240, poly.threshold_y[0],0.001)
       assert_in_delta(-0.027, poly.threshold_x[0],0.001)
@@ -70,7 +86,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
       assert_in_delta(1.137, poly.threshold_x[1],0.001)
 
       # Example for Tallis(1962, cited by Drasgow, 2006)
-      
+
       matrix=Matrix[[58,52,1],[26,58,3],[8,12,9]]
       poly=Statsample::Bivariate::Polychoric.new(matrix)
       poly.compute_two_step_mle_drasgow_gsl
@@ -80,11 +96,11 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
       assert_in_delta(1.578, poly.threshold_y[1],0.001)
       assert_in_delta(1.137, poly.threshold_x[1],0.001)
 
-      
+
       poly.method=:joint
       poly.compute
-      
-      
+
+
       assert_in_delta(0.4192, poly.r, 0.0001)
       assert_in_delta(-0.2421, poly.threshold_y[0],0.0001)
       assert_in_delta(-0.0297, poly.threshold_x[0],0.0001)
@@ -95,17 +111,18 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     end
     assert(poly.summary)
   end
+
   def test_tetrachoric
     a,b,c,d=0,0,0,0
-    assert_raise RuntimeError do
+    assert_raises RuntimeError do
       tc  = Statsample::Bivariate::Tetrachoric.new(a,b,c,d)
     end
     a,b,c,d=10,10,0,0
-    assert_raise RuntimeError do
+    assert_raises RuntimeError do
       tc  = Statsample::Bivariate::Tetrachoric.new(a,b,c,d)
     end
     a,b,c,d=10,0,10,0
-    assert_raise RuntimeError do
+    assert_raises RuntimeError do
       tc  = Statsample::Bivariate::Tetrachoric.new(a,b,c,d)
     end
     a,b,c,d=10,0,0,10
@@ -116,7 +133,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     tc  = Statsample::Bivariate::Tetrachoric.new(a,b,c,d)
     assert_equal(-1,tc.r)
     assert_equal(0,tc.se)
-    
+
     a,b,c,d = 30,40,70,20
     tc  = Statsample::Bivariate::Tetrachoric.new(a,b,c,d)
     assert_in_delta(-0.53980,tc.r,0.0001)
@@ -143,9 +160,9 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     v3=[6,2,  1000,1000,5,4,7,8].to_vector(:scale)
     v4=[2,nil,nil,nil,  3,7,8,6].to_vector(:scale)
     ds={'v1'=>v1,'v2'=>v2,'v3'=>v3,'v4'=>v4}.to_dataset
-    c=Proc.new {|n1,n2|Statsample::Bivariate.pearson(n1,n2)} 
+    c=Proc.new {|n1,n2|Statsample::Bivariate.pearson(n1,n2)}
     expected=Matrix[ [c.call(v1,v1),c.call(v1,v2),c.call(v1,v3),c.call(v1,v4)], [c.call(v2,v1),c.call(v2,v2),c.call(v2,v3),c.call(v2,v4)], [c.call(v3,v1),c.call(v3,v2),c.call(v3,v3),c.call(v3,v4)],
-    [c.call(v4,v1),c.call(v4,v2),c.call(v4,v3),c.call(v4,v4)]
+      [c.call(v4,v1),c.call(v4,v2),c.call(v4,v3),c.call(v4,v4)]
     ]
     obt=Statsample::Bivariate.correlation_matrix(ds)
     for i in 0...expected.row_size
@@ -174,25 +191,17 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     assert(Statsample::Bivariate.prop_pearson(t,n,:right)>0.05)
     assert(Statsample::Bivariate.prop_pearson(t,n,:left)<0.05)
   end
-  def test_covariance
-  if Statsample.has_gsl?
-    v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
-    v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
-    assert_in_delta(Statsample::Bivariate.covariance(v1,v2), Statsample::Bivariate.covariance_slow(v1,v2), 0.001)
-    
-  end
-  end
-  
+
   def test_spearman
     v1=[86,97,99,100,101,103,106,110,112,113].to_vector(:scale)
     v2=[0,20,28,27,50,29,7,17,6,12].to_vector(:scale)
     assert_in_delta(-0.175758,Statsample::Bivariate.spearman(v1,v2),0.0001)
-      
+
   end
   def test_point_biserial
     c=[1,3,5,6,7,100,200,300,400,300].to_vector(:scale)
     d=[1,1,1,1,1,0,0,0,0,0].to_vector(:scale)
-    assert_raise TypeError do
+    assert_raises TypeError do
       Statsample::Bivariate.point_biserial(c,d)
     end
     assert_in_delta(Statsample::Bivariate.point_biserial(d,c), Statsample::Bivariate.pearson(d,c), 0.0001)
@@ -211,7 +220,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
     assert_in_delta(0.636,Statsample::Bivariate.gamma(m),0.001)
     m2=Matrix[[15,12,6,5],[12,8,10,8],[4,6,9,10]]
     assert_in_delta(0.349,Statsample::Bivariate.gamma(m2),0.001)
-  
-  
+
+
   end
 end

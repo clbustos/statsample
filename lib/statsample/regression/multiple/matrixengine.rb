@@ -194,38 +194,38 @@ class MatrixEngine < BaseEngine
     matrix.collect {|i| Math::sqrt(i) if i>0 }[0,0]
   end
   
-  def to_reportbuilder(generator) # :nodoc:
-    anchor=generator.add_toc_entry(_("Multiple Regression: ")+@name)
-    generator.add_html "<div class='multiple-regression'>#{@name}<a name='#{anchor}'></a>"
+  def report_building(generator) # :nodoc:
+    anchor=generator.toc_entry(_("Multiple Regression: ")+@name)
+    generator.html "<div class='multiple-regression'>#{@name}<a name='#{anchor}'></a>"
     c=coeffs
-    generator.add_text(_("Engine: %s") % self.class)
-    generator.add_text(_("Cases=%d") % [@cases])
-    generator.add_text("R=#{sprintf('%0.3f',r)}")
-    generator.add_text("R^2=#{sprintf('%0.3f',r2)}")
+    generator.text(_("Engine: %s") % self.class)
+    generator.text(_("Cases=%d") % [@cases])
+    generator.text("R=#{sprintf('%0.3f',r)}")
+    generator.text("R^2=#{sprintf('%0.3f',r2)}")
     
-    generator.add_text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
+    generator.text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
     
     t=ReportBuilder::Table.new(:name=>"ANOVA", :header=>%w{source ss df ms f s})
-    t.add_row([_("Regression"), sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
-    t.add_row([_("Error"), sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse)])
+    t.row([_("Regression"), sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
+    t.row([_("Error"), sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse)])
   
-    t.add_row([_("Total"), sprintf("%0.3f",sst), df_r+df_e])
+    t.row([_("Total"), sprintf("%0.3f",sst), df_r+df_e])
     generator.parse_element(t)
     sc=standarized_coeffs
     cse=coeffs_se
     t=ReportBuilder::Table.new(:name=>"Beta coefficients", :header=>%w{coeff b beta se t}.collect{|field| _(field)} )
     
     if (constant_se.nil?)
-      t.add_row([_("Constant"), sprintf("%0.3f", constant),"--","?","?"])
+      t.row([_("Constant"), sprintf("%0.3f", constant),"--","?","?"])
     else
-      t.add_row([_("Constant"), sprintf("%0.3f", constant), "-", sprintf("%0.3f", constant_se), sprintf("%0.3f", constant_t)])
+      t.row([_("Constant"), sprintf("%0.3f", constant), "-", sprintf("%0.3f", constant_se), sprintf("%0.3f", constant_t)])
     end
     
     @fields.each do |f|
-      t.add_row([f, sprintf("%0.3f", c[f]), sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
+      t.row([f, sprintf("%0.3f", c[f]), sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
     end  
     generator.parse_element(t)
-    generator.add_html("</div>")
+    generator.html("</div>")
   end
   
   

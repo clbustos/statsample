@@ -93,17 +93,17 @@ module Statsample
     def cols_empty_hash
       cols_names.inject({}) {|a,x| a[x]=0;a}
     end
-    def to_reportbuilder(generator)
-      anchor=generator.add_toc_entry(_("Crosstab: ")+name)
-      generator.add_html "<div class='crosstab'>"+_("Crosstab")+" #{@name}<a name='#{anchor}'></a>"
+    def report_building(generator)
+      anchor=generator.toc_entry(_("Crosstab: ")+name)
+      generator.html "<div class='crosstab'>"+_("Crosstab")+" #{@name}<a name='#{anchor}'></a>"
       fq=frequencies
       rn=rows_names
       cn=cols_names
       total=0
       total_cols=cols_empty_hash
-      generator.add_text "Chi Square: #{chi_square}"
-      generator.add_text(_("Rows: %s") % @row_label) unless @row_label.nil?
-      generator.add_text(_("Columns: %s") % @column_label) unless @column_label.nil?
+      generator.text "Chi Square: #{chi_square}"
+      generator.text(_("Rows: %s") % @row_label) unless @row_label.nil?
+      generator.text(_("Columns: %s") % @column_label) unless @column_label.nil?
       
       t=ReportBuilder::Table.new(:name=>@name+" - "+_("Raw"), :header=>[""]+cols_names.collect {|c| @v_cols.labeling(c)}+[_("Total")])
       rn.each do |row|
@@ -117,15 +117,15 @@ module Statsample
           t_row.push(data)
         end
         t_row.push(total_row)
-        t.add_row(t_row)
+        t.row(t_row)
       end
-      t.add_horizontal_line
+      t.hr
       t_row=[_("Total")]
       cn.each do |v|
         t_row.push(total_cols[v])
       end
       t_row.push(total)
-      t.add_row(t_row)
+      t.row(t_row)
       generator.parse_element(t)
       
       if(@percentage_row)
@@ -138,7 +138,7 @@ module Statsample
       table_percentage(generator,:total)
       end
       
-      generator.add_html("</div>")
+      generator.html("</div>")
     end
       
     
@@ -174,10 +174,10 @@ module Statsample
             when :total   then  @cases
           end              
           t_row.push(sprintf("%0.2f%%", rt[row]*100.0/total))
-          t.add_row(t_row)
+          t.row(t_row)
         end
         
-        t.add_horizontal_line
+        t.hr
         t_row=[_("Total")]
         cn.each{|col|
           total=case type
@@ -188,7 +188,7 @@ module Statsample
           t_row.push(sprintf("%0.2f%%", ct[col]*100.0/total))
         }
       t_row.push("100%")
-      t.add_row(t_row)
+      t.row(t_row)
       generator.parse_element(t)
     end
   end

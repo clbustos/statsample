@@ -744,24 +744,24 @@ module Statsample
         rp.to_text
       end
       
-      def to_reportbuilder(generator) # :nodoc: 
+      def report_building(generator) # :nodoc: 
         compute if @r.nil?
         section=ReportBuilder::Section.new(:name=>@name)
         t=ReportBuilder::Table.new(:name=>_("Contingence Table"),:header=>[""]+(@n.times.collect {|i| "Y=#{i}"})+["Total"])
         @m.times do |i|
-          t.add_row(["X = #{i}"]+(@n.times.collect {|j| @matrix[i,j]}) + [@sumr[i]])
+          t.row(["X = #{i}"]+(@n.times.collect {|j| @matrix[i,j]}) + [@sumr[i]])
         end
-        t.add_hr
-        t.add_row(["T"]+(@n.times.collect {|j| @sumc[j]})+[@total])
+        t.hr
+        t.row(["T"]+(@n.times.collect {|j| @sumc[j]})+[@total])
         section.add(t)
         #generator.parse_element(t)
         section.add(sprintf("r: %0.4f",r))
         t=ReportBuilder::Table.new(:name=>_("Thresholds"), :header=>["","Value"])
         threshold_x.each_with_index {|val,i|
-          t.add_row(["Threshold X #{i}", sprintf("%0.4f", val)])
+          t.row(["Threshold X #{i}", sprintf("%0.4f", val)])
         }
         threshold_y.each_with_index {|val,i|
-          t.add_row(["Threshold Y #{i}", sprintf("%0.4f", val)])
+          t.row(["Threshold Y #{i}", sprintf("%0.4f", val)])
         }
         section.add(t)
         section.add(_("Test of bivariate normality: X2 = %0.3f, df = %d, p= %0.5f" % [ chi_square, chi_square_df, 1-Distribution::ChiSquare.cdf(chi_square, chi_square_df)])) 

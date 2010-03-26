@@ -39,8 +39,8 @@ module Statsample
         @w
       end
       
-      def to_reportbuilder(generator) # :nodoc:
-        generator.add_text(summary)
+      def report_building(generator) # :nodoc:
+        generator.text(summary)
         
       end
       # Summary of results

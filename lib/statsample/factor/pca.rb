@@ -124,20 +124,20 @@ module Factor
       rp.add(self)
       rp.to_text
     end
-    def to_reportbuilder(generator) # :nodoc:
-      anchor=generator.add_toc_entry(_("PCA: ")+name)
-      generator.add_html "<div class='pca'>"+_("PCA")+" #{@name}<a name='#{anchor}'></a>"
+    def report_building(generator) # :nodoc:
+      anchor=generator.toc_entry(_("PCA: ")+name)
+      generator.html "<div class='pca'>"+_("PCA")+" #{@name}<a name='#{anchor}'></a>"
 
-      generator.add_text "Number of factors: #{m}"
+      generator.text "Number of factors: #{m}"
       t=ReportBuilder::Table.new(:name=>_("Communalities"), :header=>["Variable","Initial","Extraction"])
       communalities(m).each_with_index {|com,i|
-        t.add_row([i, 1.0, sprintf("%0.3f", com)])
+        t.row([i, 1.0, sprintf("%0.3f", com)])
       }
       generator.parse_element(t)
       
       t=ReportBuilder::Table.new(:name=>_("Eigenvalues"), :header=>["Variable","Value"])
       eigenvalues.each_with_index {|eigenvalue,i|
-        t.add_row([i, sprintf("%0.3f",eigenvalue)])
+        t.row([i, sprintf("%0.3f",eigenvalue)])
       }
       generator.parse_element(t)
       
@@ -145,11 +145,11 @@ module Factor
       
       i=0
       component_matrix(m).to_a.each do |row|
-        t.add_row([i]+row.collect {|c| sprintf("%0.3f",c)})
+        t.row([i]+row.collect {|c| sprintf("%0.3f",c)})
         i+=1
       end
       generator.parse_element(t)
-      generator.add_html("</div>")
+      generator.html("</div>")
     end
     private :calculate_eigenpairs, :create_centered_ds
   end

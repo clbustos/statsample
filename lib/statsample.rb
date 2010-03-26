@@ -18,12 +18,11 @@
 #
 
 
-$:.unshift(File.dirname(__FILE__))
-$:.unshift(File.expand_path(File.dirname(__FILE__)+"/../ext"))
+#$:.unshift(File.dirname(__FILE__))
 
 require 'matrix'
 require 'distribution'
-gem 'reportbuilder','~>0.2'
+gem 'reportbuilder','~>1.0'
 require 'reportbuilder'
 class Numeric
   def square ; self * self ; end
@@ -113,7 +112,7 @@ module Statsample
       false
     end
   end
-  VERSION = '0.6.6'
+  VERSION = '0.7.0'
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')
@@ -140,7 +139,7 @@ module Statsample
   autoload(:Regression, 'statsample/regression')
   autoload(:Test, 'statsample/test')
   autoload(:Factor, 'statsample/factor')
-  
+  autoload(:Graph, 'statsample/graph')
   
   
   class << self

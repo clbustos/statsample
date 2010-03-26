@@ -147,8 +147,8 @@ Z: #{sprintf("%0.3f",z)} (p: #{sprintf("%0.3f",z_probability)})
         end
           out
       end
-      def to_reportbuilder(generator) # :nodoc:
-        generator.add_text(summary)
+      def report_building(generator) # :nodoc:
+        generator.text(summary)
       end
       # Exact probability of finding values of U lower or equal to sample on U distribution. Use with caution with m*n>100000.
       # Uses u_sampling_distribution_as62

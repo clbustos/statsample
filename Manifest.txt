@@ -34,8 +34,7 @@ lib/statsample/bivariate/polychoric.rb
 lib/statsample/bivariate/tetrachoric.rb
 lib/statsample/codification.rb
 lib/statsample/combination.rb
-lib/statsample/converter/csv18.rb
-lib/statsample/converter/csv19.rb
+lib/statsample/converter/csv.rb
 lib/statsample/converter/spss.rb
 lib/statsample/converters.rb
 lib/statsample/crosstab.rb

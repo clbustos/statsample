@@ -1,9 +1,7 @@
-$:.unshift(File.dirname(__FILE__)+'/../lib/')
-require 'statsample'
-require "tempfile"
-require 'test/unit'
+require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleStatisticalTestCase < Test::Unit::TestCase
+
+class StatsampleTestTestCase < MiniTest::Unit::TestCase
   def test_chi_square
     real=Matrix[[95,95],[45,155]]
     expected=Matrix[[68,122],[72,128]]
@@ -22,12 +20,12 @@ class StatsampleStatisticalTestCase < Test::Unit::TestCase
     b=[2,3,4,5,6,12].to_scale
     assert_equal(11, Statsample::Test.u_mannwhitney(a,b).u)
   end
-  
-  
+
+
   def test_levene
-    
+
     a=[1,2,3,4,5,6,7,8,100,10].to_scale
-    b=[30,40,50,60,70,80,90,100,110,120].to_scale    
+    b=[30,40,50,60,70,80,90,100,110,120].to_scale
     levene=Statsample::Test::Levene.new([a,b])
     assert_in_delta(0.778, levene.f, 0.001)
     assert_in_delta(0.389, levene.probability, 0.001)

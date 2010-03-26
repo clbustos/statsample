@@ -313,44 +313,46 @@ module Statsample
       rp.add(self)
       rp.to_text
     end
-    def to_reportbuilder(generator)
+    def report_building(generator)
       compute if @models.nil?
-      anchor=generator.add_toc_entry(_("DA: ")+@name)
-      generator.add_html "<div class='dominance-analysis'>#{@name}<a name='#{anchor}'></a>"
-      t=ReportBuilder::Table.new(:name=>_("Dominance Analysis result"))
       
-      t.header=["","r2",_("sign")]+@predictors.collect {|c| DominanceAnalysis.predictor_name(c) }
+      anchor=generator.toc_entry(_("DA: ")+@name)
+      
+      generator.html "<div class='dominance-analysis'>#{@name}<a name='#{anchor}'></a>"
+      header=["","r2",_("sign")]+@predictors.collect {|c| DominanceAnalysis.predictor_name(c) }
+      t=ReportBuilder::Table.new(:name=>_("Dominance Analysis result"),:header=>header)
+      
       row=[_("Model 0"),"",""]+@predictors.collect{|f|
         sprintf("%0.3f", md([f]).r2)
       }
-      t.add_row(row)
-      t.add_horizontal_line
+      
+      t.row(row)
+      t.hr
       for i in 1..@predictors.size
         mk=md_k(i)
         mk.each{|m|
-          t.add_row(m.add_table_row)
+          t.row(m.add_table_row)
         }
         # Report averages
         a=average_k(i)
         if !a.nil?
-            t.add_horizontal_line
+            t.hr
             row=[_("k=%d Average") % i,"",""] + @predictors.collect{|f|
                 sprintf("%0.3f",a[f])
             }
-            t.add_row(row)
-            t.add_horizontal_line
+            t.row(row)
+            t.hr
             
         end
-        
       end
       
       g=general_averages
-      t.add_horizontal_line
+      t.hr
       
       row=[_("Overall averages"),"",""]+@predictors.collect{|f|
                 sprintf("%0.3f",g[f])
       }
-      t.add_row(row)
+      t.row(row)
       generator.parse_element(t)
       
       td=total_dominance
@@ -360,10 +362,10 @@ module Statsample
       pairs.each{|p|
         name=p.join(" - ")
         row=[name, sprintf("%0.1f",td[p]), sprintf("%0.1f",cd[p]), sprintf("%0.1f",gd[p])]
-        t.add_row(row)
+        t.row(row)
       }
       generator.parse_element(t)
-      generator.add_html("</div>")
+      generator.html("</div>")
     end
     class ModelData # :nodoc:
       attr_reader :contributions
