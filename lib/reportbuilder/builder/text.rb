@@ -1,13 +1,17 @@
 class ReportBuilder
-  class Generator
-    class Text < Generator
-      PREFIX="text"
+  class Builder
+    class Text < Builder
       attr_reader :toc
       attr_reader :out
       def initialize(builder, options)
         super
         @out=""
       end
+      
+      def self.code
+        %w{text txt}
+      end
+      
       def parse
         @out="#{@builder.name}\n" unless @builder.no_title
         parse_cycle(@builder)

@@ -1,13 +1,11 @@
-gem 'clbustos-rtf'
 require 'rtf'
-
+require 'pp'
 class ReportBuilder
-  class Generator
-    # Rtf Generator.
+  class Builder
+    # Rtf Builder.
     # Based on ruby-rtf (http://ruby-rtf.rubyforge.org/)
     # 
-    class Rtf < Generator
-      PREFIX="rtf"
+    class Rtf < Builder
       # RTF::Document object.
       # See http://ruby-rtf.rubyforge.org/ for documentation
       attr_accessor :rtf
@@ -34,6 +32,12 @@ class ReportBuilder
           h[k]={:cs=>cs, :ps=>ps}
         }        
       end
+      
+      def self.code
+        %w{rtf}
+      end
+
+      
       def default_options
         
         {

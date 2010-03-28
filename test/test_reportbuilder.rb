@@ -64,6 +64,8 @@ class TestReportbuilder < MiniTest::Unit::TestCase
     ["para","pre","th1","th2"].each do |t|
       assert_match(/#{t}/,out)
     end
+    
+    
   end
   def test_empty
     rp=ReportBuilder.new
@@ -73,11 +75,32 @@ class TestReportbuilder < MiniTest::Unit::TestCase
     rp.add("hola")
     assert_equal("hola\n",rp.to_s)
   end
+  def test_incorrect_format
+    assert_raises ReportBuilder::FormatNotFound do 
+    ReportBuilder::generate(:format=>:fish) do 
+        text "This is silly"
+      end
+    end
+  end
+  def test_formats
+    require 'pp'
+    assert_equal(ReportBuilder.builder_for(:txt), ReportBuilder::Builder::Text)
+    assert_equal(ReportBuilder.builder_for("txt"), ReportBuilder::Builder::Text)
+    assert_equal(ReportBuilder.builder_for("html"), ReportBuilder::Builder::Html)
+    
+  end
+  
   def test_generate
-    res=ReportBuilder.generate(:format=>:text,:name=>"Test") do 
+    txt_file=Tempfile.new("test.txt")
+    ReportBuilder.generate(:name=>"Test", :filename=>txt_file.path) do
       text("hola")
     end
-    assert_match(/^Test\nhola$/,res)
+    
+    text=ReportBuilder.generate(:format=>:text,:name=>"Test") do 
+      text("hola")
+    end
+    assert_match(/^Test\nhola$/,text)
+    assert_equal(text, File.read(txt_file.path))
     html_file=Tempfile.new("test.html")
     html=ReportBuilder.generate(:name=>"Test", :format=>:html) do
       text("hola")

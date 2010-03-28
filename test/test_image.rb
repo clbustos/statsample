@@ -41,6 +41,6 @@ Test
     assert_match(/img src='images\/sheep.jpg'/, @rp.to_html)
   end
   def test_image_rtf
-    assert_match(/\\pict\\picw128\\pich112\\bliptag2403101\\jpegblip/, @rp.to_rtf)
+    assert_match(/\\pict\\picw128\\pich112\\bliptag\d+\\jpegblip/, @rp.to_rtf)
   end
 end

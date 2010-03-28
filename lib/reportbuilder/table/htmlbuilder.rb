@@ -1,9 +1,9 @@
 class ReportBuilder
   class Table
-    class HtmlGenerator < ElementGenerator
+    class HtmlBuilder < ElementBuilder
       def generate()
         t=@element
-        anchor=@generator.table_entry(t.name)
+        anchor=@builder.table_entry(t.name)
         out="<a name='#{anchor}'></a><table><caption>#{t.name}</caption>"
         @rowspans=[]
         if t.header.size>0
@@ -21,27 +21,31 @@ class ReportBuilder
           end
         }
         out+="</tbody>\n</table>\n"
-        @generator.html(out)
+        @builder.html(out)
       end
       def parse_row(t,row,tag="td")
         row_ary=[]
-        colspan_i=0
+        real_i=0
         row.each_index do |i|
-          if !@rowspans[i].nil? and @rowspans[i]>0
-            @rowspans[i]-=1
-          elsif colspan_i>0
-            colspan_i-=1
-          elsif row[i].is_a? Table::Colspan
+          extra=1 
+          while !@rowspans[real_i].nil? and @rowspans[real_i]>0
+            @rowspans[real_i]-=1
+            row_ary << ""
+            real_i+=1
+          end
+          
+          if row[i].is_a? Table::Colspan
             row_ary.push(sprintf("<%s colspan=\"%d\">%s</%s>",tag, row[i].cols, row[i].data,tag))
-            colspan_i=row[i].cols-1
           elsif row[i].nil?
             row_ary.push("<#{tag}></#{tag}>")
           elsif row[i].is_a? Table::Rowspan
             row_ary.push(sprintf("<%s rowspan=\"%d\">%s</%s>", tag, row[i].rows, row[i].data, tag))
-            @rowspans[i]=row[i].rows-1
+            @rowspans[real_i]=row[i].rows-1
           else
             row_ary.push("<#{tag}>#{row[i]}</#{tag}>")
           end
+          real_i+=extra
+          
         end
         row_ary.join("")
       end

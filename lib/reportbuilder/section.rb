@@ -26,9 +26,9 @@ class ReportBuilder::Section
     end
   end
 
-  def report_building_text(generator)
-    generator.text(("="*generator.parse_level)+" "+name)
-    generator.parse_cycle(self)
+  def report_building_text(builder)
+    builder.text(("="*builder.parse_level)+" "+name)
+    builder.parse_cycle(self)
   end
 
   def report_building_html(g)

@@ -1,15 +1,27 @@
 class ReportBuilder
-  # Abstract class for generators.
-  # A generator is a class which control the output for a ReportBuilder object
+  # Abstract Builder.
+  # A builder is a class which control the output for a ReportBuilder object
   # Every object which have a #report_building() method could be
   # parsed with #parse_element method.
-  class Generator
+  class Builder
     # Level of heading. See ReportBuilder::Section for using it.
     attr_reader :parse_level
-    # Options for Generator. Passed by ReportBuilder class on creation
+    # Options for Builder. Passed by ReportBuilder class on creation
     attr_reader :options
     # Entries for Table of Contents
     attr_reader :toc
+    # Array of string with format names for the Builder.
+    # For example, Html builder returns %w{html htm} and 
+    # Text builde returns %w{text txt}
+    def self.code
+#      raise "Implement this"
+    end
+    def self.inherited_classes
+      @@inherited_classes||=Array.new
+    end
+    def self.inherited(subclass)
+      inherited_classes << subclass
+    end
     def initialize(builder, options)
       @builder=builder
       @parse_level=0
@@ -24,7 +36,7 @@ class ReportBuilder
     def parse
       parse_cycle(@builder)
     end
-    # Save the output of generator to a file
+    # Save the output of builder to a file
     def save(filename)
       File.open(filename, "wb") do |fp|
         fp.write(out)
@@ -35,7 +47,7 @@ class ReportBuilder
       Hash.new
     end
     
-    # Parse each element of the container
+    # Parse each #elements of the container
     def parse_cycle(container)
       @parse_level+=1
       container.elements.each do |element|
@@ -46,14 +58,15 @@ class ReportBuilder
     
     # Parse one object, using this workflow
     # * If is a block, evaluate it
-    # * Use #report_building_FORMAT
+    # * Use #report_building_CODE, where CODE is one of the codes defined by #code
     # * Use #report_building
     # * Use #to_s
     def parse_element(element)
-      method=("report_building_" + self.class::PREFIX).intern
+      methods=self.class.code.map {|m| ("report_building_"+m).intern}
+      
       if element.is_a? Proc
         element.arity<1 ? instance_eval(&element) : element.call(self)
-      elsif element.respond_to? method
+      elsif method=methods.find {|m| element.respond_to? m}
         element.send(method, self)
       elsif element.respond_to? :report_building
         element.send(:report_building, self)
@@ -78,7 +91,7 @@ class ReportBuilder
     def text(t)
       raise "Implement this"
     end
-    # Add html code. Only parsed with generator which understand html 
+    # Add html code. Only parsed with builder which understand html 
     def html(t)
       raise "Implement this"
     end
@@ -105,15 +118,15 @@ class ReportBuilder
     end
   end
   
-  class ElementGenerator
-    def initialize(generator,element)
+  class ElementBuilder
+    def initialize(builder,element)
       @element=element
-      @generator=generator
+      @builder=builder
     end
   end
 end
 
-require 'reportbuilder/generator/text'
-require 'reportbuilder/generator/html'
-require 'reportbuilder/generator/rtf'
+require 'reportbuilder/builder/text'
+require 'reportbuilder/builder/html'
+require 'reportbuilder/builder/rtf'
 

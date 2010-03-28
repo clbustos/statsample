@@ -1,8 +1,6 @@
 require "minitest/unit"
 $:.unshift(File.dirname(__FILE__)+"/../lib")
 require "reportbuilder"
-require 'reportbuilder/table/htmlgenerator'
-require 'reportbuilder/table/textgenerator'
 require 'nokogiri'
 
 MiniTest::Unit.autorun
@@ -11,13 +9,13 @@ class TestReportbuilderTable < MiniTest::Unit::TestCase
     super
     @name="Table Test"
     @header=%w{a bb ccc dddd eeee fff gggg hh i}
-    table=ReportBuilder::Table.new(:name=>"Table Test", :header=>@header) do
+    table=ReportBuilder::Table.new(:name=>@name, :header=>@header) do
       row(["a","b","c","d","e","f","g","h","i"])
-      row([colspan("a",2),nil,"c",rowspan("d",2),"e","f","g","h","i"])
-      row([colspan("a",3),nil,nil,nil,"e","f","g","h","i"])
-      row([colspan("a",4),nil,nil,nil,"e","f","g","h","i"])
-      row([colspan("a",5),nil,nil,nil,nil,colspan("f",3),nil,nil,"i"])
-      row([colspan("a",6),nil,nil,nil,nil,nil,"g","h","i"])
+      row([colspan("a",2),"c",'d',rowspan("e",2),rowspan("f",2),"g",rowspan("h",3),"i"])
+      row([colspan("a",3),'d', "g","i"])
+      row([colspan("a",4),"e","f","g","i"])
+      row([colspan("a",5),colspan("f",3),"i"])
+      row([colspan("a",6),"g","h","i"])
     end
     
     @table=table
@@ -25,16 +23,25 @@ class TestReportbuilderTable < MiniTest::Unit::TestCase
     @mock_generator = ""
     class << @mock_generator
       def preformatted(t)
-        replace(t)
+        @first_pre||=true
+        self << "\n" unless @first_pre
+        self << t
+        @first=false
       end
       def text(t)
-        replace(t)
+        @first_text||=:true
+        self << "\n" unless @first_text==:true
+        self << t
+        @first_text=:false
       end
       def table_entry(t)
         "MOCK"
       end
       def html(t)
-        replace(t)
+        @first_html||=true
+        self << "\n" unless @first_html
+        self << t
+        @first=false
       end
     end
 
@@ -45,75 +52,69 @@ class TestReportbuilderTable < MiniTest::Unit::TestCase
     end
     assert_match(/^Table\s+$/ , text)
   end
+  
+  def test_rtf
+    rb=ReportBuilder.new
+    rb.add(@table)
+    rb.save_rtf("test.rtf")
+    
+    
+  end
   def test_table_text
-
-    tg=ReportBuilder::Table::TextGenerator.new(@mock_generator,@table)
+    tg=ReportBuilder::Table::TextBuilder.new(@mock_generator, @table)
     tg.generate
-        expected= <<-HEREDOC
+    expected= <<-HEREDOC
 Table Test
-----------------------------------------------------
++---+----+-----+------+------+-----+------+----+---+
 | a | bb | ccc | dddd | eeee | fff | gggg | hh | i |
-----------------------------------------------------
++---+----+-----+------+------+-----+------+----+---+
 | a | b  | c   | d    | e    | f   | g    | h  | i |
 | a      | c   | d    | e    | f   | g    | h  | i |
-| a            |      | e    | f   | g    | h  | i |
-| a                   | e    | f   | g    | h  | i |
+| a            | d    |      |     | g    |    | i |
+| a                   | e    | f   | g    |    | i |
 | a                          | f               | i |
 | a                                | g    | h  | i |
-----------------------------------------------------
++---+----+-----+------+------+-----+------+----+---+
 HEREDOC
-
-    assert_equal(expected,@mock_generator)
-
+#puts expected
+#puts @mock_generator
+    assert_equal(expected, @mock_generator)
   end
   def test_table_html
 
-    tg=ReportBuilder::Table::HtmlGenerator.new(@mock_generator,@table)
+    tg=ReportBuilder::Table::HtmlBuilder.new(@mock_generator,@table)
     tg.generate
-    
-    expected= <<HEREDOC
-<a name='MOCK'> </a>
-<table>
-    <thead>
-    <th>a</th><th>bb</th><th>ccc</th>
-    <th>dddd</th><th>eeee</th>
-    <th>fff</th><th>gggg</th><th>hh</th><th>i</th>
-    </thead>
-    <tbody>
-    <tr><td>a</td><td>b</td><td>c</td><td>d</td><td>e</td>
-    <td>f</td><td>g</td><td>h</td><td>i</td></tr>
-    
-    <tr><td colspan="2">a</td><td>c</td><td rowspan="2">d</td><td>e</td>
-    <td>f</td><td>g</td><td>h</td><td>i</td></tr>
-    
-    <tr><td colspan="3">a</td><td>e</td>
-    <td>f</td><td>g</td><td>h</td><td>i</td></tr>
-    
-    <tr><td colspan="4">a</td><td>e</td>
-    <td>f</td><td>g</td><td>h</td><td>i</td></tr>
-    
-    <tr><td colspan="5">a</td><td colspan="3">f</td><td>i</td></tr>
-    
-    <tr><td colspan="6">a</td><td>g</td><td>h</td><td>i</td></tr>
-    </tbody>
-    </table>
-HEREDOC
-
     doc=Nokogiri::HTML(@mock_generator).at_xpath("/html")
     
     assert(doc.at_xpath("a[@name='MOCK']")!="")
     assert(doc.at_xpath("table")!="")
     
     assert_equal(@header, doc.xpath("//table/thead/th").map {|m| m.content} )
-    [[2,%w{a}],
-    [3,%w{a f}],
-    [4,%w{a}],
-    [5,%w{a}],
-    [6,%w{a}],
+    expected_contents=[
+    %w{a b c d e f g h i},
+    %w{a c d e f g h i},
+    %w{a d g i},
+    %w{a e f g i},
+    %w{a f i},
+    %w{a g h i}
+    ]
+    real_contents=doc.xpath("//table/tbody/tr").map do |tr|
+      tds=tr.xpath("td").map {|m| m.content}
+      
+    end
+    assert_equal(expected_contents, real_contents) 
     
-    ].each do |m,exp|
-      real=doc.xpath("//table/tbody/tr/td[@colspan='#{m}']").map {|x| x.inner_html}
-      assert_equal(exp, real, "On table/tbody/tr/td[@colspan='#{m}']"
+    [
+    ['colspan',2,%w{a}],
+    ['colspan',3,%w{a f}],
+    ['colspan',4,%w{a}],
+    ['colspan',5,%w{a}],
+    ['colspan',6,%w{a}],
+    ['rowspan',2,%w{e f}],
+    ['rowspan',3,%w{h}],    
+    ].each do |attr,m,exp|
+      real=doc.xpath("//table/tbody/tr/td[@#{attr}='#{m}']").map {|x| x.content}.sort
+      assert_equal(exp, real, "On table/tbody/tr/td[@#{attr}='#{m}']"
         )
     end
 

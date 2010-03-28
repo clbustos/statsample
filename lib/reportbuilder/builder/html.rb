@@ -1,8 +1,7 @@
 require 'fileutils'
 class ReportBuilder
-  class Generator
-    class Html < Generator
-      PREFIX="html"
+  class Builder
+    class Html < Builder
       attr_reader :directory
       def initialize(builder, options)
         super
@@ -11,6 +10,11 @@ class ReportBuilder
         @headers=[]
         @footers=[]
       end
+      
+      def self.code
+        %w{html htm}
+      end
+      
       def default_options
         {:directory => Dir.pwd}
       end

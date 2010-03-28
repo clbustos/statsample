@@ -1,3 +1,4 @@
+
 class ReportBuilder
   # Creates a table.
   # Use:
@@ -52,6 +53,7 @@ class ReportBuilder
       end
     end
     # Adds a row
+    # <b>Usage:</b>
     #   table.add_row(%w{1 2})
     def row(row)
       @rows.push(row)
@@ -105,20 +107,20 @@ class ReportBuilder
       }
       @max_cols
     end
-    def report_building_text(generator)
-      require 'reportbuilder/table/textgenerator'
-      table_generator=ReportBuilder::Table::TextGenerator.new( generator, self)
-      table_generator.generate
+    def report_building_text(builder)
+      require 'reportbuilder/table/textbuilder'
+      table_builder=ReportBuilder::Table::TextBuilder.new( builder, self)
+      table_builder.generate
     end
-    def report_building_html(generator)
-      require 'reportbuilder/table/htmlgenerator'
-      table_generator=ReportBuilder::Table::HtmlGenerator.new(generator, self)
-      table_generator.generate
+    def report_building_html(builder)
+      require 'reportbuilder/table/htmlbuilder'
+      table_builder=ReportBuilder::Table::HtmlBuilder.new(builder, self)
+      table_builder.generate
     end
-    def report_building_rtf(generator)
-      require 'reportbuilder/table/rtfgenerator'
-      table_generator=ReportBuilder::Table::RtfGenerator.new(generator, self)
-      table_generator.generate
+    def report_building_rtf(builder)
+      require 'reportbuilder/table/rtfbuilder'
+      table_builder=ReportBuilder::Table::RtfBuilder.new(builder, self)
+      table_builder.generate
     end
     def total_width # :nodoc:
       if @max_cols.size>0
@@ -127,6 +129,9 @@ class ReportBuilder
         0
       end
     end
+    
+
+
     ######################
     #  INTERNAL CLASSES  #
     ######################
@@ -154,4 +159,7 @@ class ReportBuilder
     end
   end
 end
+require 'reportbuilder/table/htmlbuilder'
+require 'reportbuilder/table/textbuilder'
+require 'reportbuilder/table/rtfbuilder'
 

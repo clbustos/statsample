@@ -1,7 +1,16 @@
+=== 1.2.0 / 2010-03-28
+*ReporBuilder::Table 
+  * Colspans works as expected on Html and Text. On Rtf the cells doesn't merge, because ruby-rtf doesn't support it.
+  * Better tests for Html and Text.
+* Classes related to Generator renamed to Builder, because these correspond to Builder pattern
+* Flexible codes for formats. You could use :text or :txt as :format for ReportBuilder#generate. See ReportBuilder::Builder.code for more information
+
 === 1.1.1 / 2010-03-24
 * Test suite replaces Test::Unit for Test::MiniUnit and Hpricot for Nokogiri
-* Resolved problems with images on rtf
-* Mode documentation
+* Bug fix: rtf generator doesn't accept a ReportBuilder::Image object
+* Improved output for rtf on tables and headers of sections
+* More documentation
+
 === 1.1.0 / 2010-03-23
 * Added rtf support
 === 1.0.0 / 2010-03-22

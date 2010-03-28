@@ -21,7 +21,7 @@ class ReportBuilder::Image
     @filename=filename
   end
   # Based on http://rubyquiz.com/quiz50.html
-  def report_building_text(generator)
+  def report_building_text(builder)
     require 'RMagick'
 
 
@@ -69,14 +69,14 @@ class ReportBuilder::Image
       end
     end
     out+= border
-    generator.preformatted(out)
+    builder.preformatted(out)
   end
-  def report_building_rtf(generator)
-    raise "Not implemented on RTF::Document. Use gem install thecrisoshow-ruby-rtf for support" unless generator.rtf.respond_to? :image
-    generator.rtf.image(@filename)
+  def report_building_rtf(builder)
+    raise "Not implemented on RTF::Document. Use gem install thecrisoshow-ruby-rtf for support" unless builder.rtf.respond_to? :image
+    builder.rtf.image(@filename)
   end
-  def report_building_html(generator)
-    basedir=generator.directory+"/images"
+  def report_building_html(builder)
+    basedir=builder.directory+"/images"
     out=basedir+"/"+File.basename(@filename)
     if(File.exists? @filename)
       if !File.exists? out
@@ -84,6 +84,6 @@ class ReportBuilder::Image
         FileUtils.cp @filename, out
       end
     end
-    generator.html("<img src='images/#{File.basename(@filename)}' alt='#{@options[:alt]}' />")
+    builder.html("<img src='images/#{File.basename(@filename)}' alt='#{@options[:alt]}' />")
   end
 end

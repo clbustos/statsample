@@ -1,9 +1,11 @@
+require 'reportbuilder/builder'
 require 'reportbuilder/table'
 require 'reportbuilder/section'
-require 'reportbuilder/generator'
 require 'reportbuilder/image'
+
 # = Report Abstract Interface.
-# Creates text and html output, based on a common framework.
+# Creates text, html and rtf output, based on a common framework.
+#
 # == Use
 # 
 # 
@@ -26,7 +28,7 @@ require 'reportbuilder/image'
 #  rb.name="Html output"
 #  puts rb.to_html
 # 
-# * Using a block, you can control directly the generator
+# * Using a block, you can control directly the builder
 # 
 #  require "reportbuilder"    
 #  rb=ReportBuilder.new do
@@ -50,7 +52,15 @@ class ReportBuilder
   attr_accessor :name
   # Doesn't print a title if set to true
   attr_accessor :no_title
-  VERSION = '1.1.1'
+  # ReportBuilder version
+  VERSION = '1.2.0'
+  
+  FormatNotFound=Class.new(Exception)
+  # Available formats
+  def self.builder_for(format)
+    format=format.to_s.downcase
+    Builder.inherited_classes.find {|m| m.code.include? format} 
+  end
   # Generates and optionally save the report on one function
   def self.generate(options=Hash.new, &block)
     options[:filename]||=nil
@@ -58,18 +68,18 @@ class ReportBuilder
     
     if options[:filename] and options[:filename]=~/\.(\w+?)$/
       options[:format]=$1
-      options[:format]="text" if options[:format]=="txt"
     end
     file=options.delete(:filename)
-    format=options.delete(:format).to_s
-    format[0]=format[0,1].upcase
+    format=options.delete(:format)
     rb=ReportBuilder.new(options)
-    
     rb.add(block)
-    
-    generator=Generator.const_get(format.to_sym).new(rb, options)
-    generator.parse
-    out=generator.out
+    begin
+      builder=builder_for(format).new(rb, options)
+    rescue NameError  => e
+      raise FormatNotFound.new(e)
+    end
+    builder.parse
+    out=builder.out
     unless file.nil?
       File.open(file,"wb") do |fp|
         fp.write out
@@ -96,19 +106,19 @@ class ReportBuilder
   end
   # Returns an Html output
   def to_html()
-    gen = Generator::Html.new(self,@options)
+    gen = Builder::Html.new(self,@options)
     gen.parse
     gen.out
   end
   # Returns a RTF output
   def to_rtf()
-    gen = Generator::Rtf.new(self, @options)
+    gen = Builder::Rtf.new(self, @options)
     gen.parse
     gen.out
   end  
   # Save a rtf file
   def save_rtf(filename)
-    gen = Generator::Rtf.new(self,@options)
+    gen = Builder::Rtf.new(self,@options)
     gen.parse
     gen.save(filename)
   end
@@ -116,13 +126,13 @@ class ReportBuilder
   def save_html(file)
     options=@options.dup
     options[:directory]=File.dirname(file)
-    gen=Generator::Html.new(self, options)
+    gen=Builder::Html.new(self, options)
     gen.parse
     gen.save(file)
   end
   # Returns a Text output
   def to_text()
-    gen=Generator::Text.new(self, @options)
+    gen=Builder::Text.new(self, @options)
     gen.parse 
     gen.out
   end
