@@ -1,3 +1,7 @@
+=== 1.2.1 / 2010-03-29
+* ReportBuilder#add returns self, to create chain of adds
+* Changes on documentation, replacing Generator for Builder
+
 === 1.2.0 / 2010-03-28
 *ReporBuilder::Table 
   * Colspans works as expected on Html and Text. On Rtf the cells doesn't merge, because ruby-rtf doesn't support it.

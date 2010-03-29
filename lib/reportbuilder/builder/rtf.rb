@@ -3,13 +3,21 @@ require 'pp'
 class ReportBuilder
   class Builder
     # Rtf Builder.
-    # Based on ruby-rtf (http://ruby-rtf.rubyforge.org/)
+    # Based on ruby-rtf (http://ruby-rtf.rubyforge.org/).
     # 
     class Rtf < Builder
       # RTF::Document object.
       # See http://ruby-rtf.rubyforge.org/ for documentation
       attr_accessor :rtf
       include RTF
+      # Creates a new Rtf object
+      # Params:
+      # * <tt>builder</tt>: A ReportBuilder::Builder object or other with same interface
+      # * <tt>options</tt>: Hash of options.
+      #   * <tt>:font</tt>: Font family. Default to "Times New Roman"
+      #   * <tt>:font_size</tt>: Font size. Default to 20
+      #   * <tt>:table_border_width</tt>
+      #   * <tt>:table_hr_width</tt>
       def initialize(builder, options)
         super
         @font=Font.new(Font::ROMAN, @options[:font])
@@ -47,6 +55,7 @@ class ReportBuilder
           :table_hr_width=>25
         }
       end
+      # Add a paragraph of text.
       def text(*args,&block)
         if args.size==1 and args[0].is_a? String and !block
           @rtf.paragraph << args[0]
@@ -54,6 +63,7 @@ class ReportBuilder
           @rtf.paragraph(*args,&block)
         end
       end
+      # Add a header of level <tt>level</tt> with text <tt>t</tt>
       def header(level,t)
         @rtf.paragraph(@header_styles[level][:ps]) do |n1|
           n1.apply(@header_styles[level][:cs]) do |n2|
@@ -63,6 +73,7 @@ class ReportBuilder
           end
         end
       end
+      # Add preformatted text. By default, uses Courier
       def preformatted(t)
         @rtf.paragraph(@pre_par) do |n1|
           n1.apply(@pre_char) do |n2|
@@ -74,14 +85,16 @@ class ReportBuilder
         end
         
       end
-     
+      # Returns rtf code for report
       def out
         @rtf.to_rtf
       end
+      # Save rtf file
       def save(filename)
         File.open(filename,'wb')  {|file| file.write(@rtf.to_rtf)
         }
       end
+      # Do nothing on this builder 
       def html(t)
         # Nothing
       end

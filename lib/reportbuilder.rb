@@ -53,7 +53,7 @@ class ReportBuilder
   # Doesn't print a title if set to true
   attr_accessor :no_title
   # ReportBuilder version
-  VERSION = '1.2.0'
+  VERSION = '1.2.1'
   
   FormatNotFound=Class.new(Exception)
   # Available formats
@@ -103,6 +103,7 @@ class ReportBuilder
   # Otherwise, the element itself will be added
   def add(element)
     @elements.push(element)
+    self
   end
   # Returns an Html output
   def to_html()

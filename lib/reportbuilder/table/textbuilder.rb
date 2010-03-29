@@ -1,6 +1,10 @@
 require 'text-table'
 class ReportBuilder
   class Table
+    # Text Builder for ReportBuilder::Table objects.
+    # 
+    # Uses Aaron Tinio's text-table gem[http://github.com/aptinio/text-table]
+    
     class TextBuilder < ElementBuilder
       def generate()
         
