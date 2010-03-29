@@ -313,59 +313,58 @@ module Statsample
       rp.add(self)
       rp.to_text
     end
-    def report_building(generator)
+    def report_building(g)
       compute if @models.nil?
       
-      anchor=generator.toc_entry(_("DA: ")+@name)
-      
-      generator.html "<div class='dominance-analysis'>#{@name}<a name='#{anchor}'></a>"
-      header=["","r2",_("sign")]+@predictors.collect {|c| DominanceAnalysis.predictor_name(c) }
-      t=ReportBuilder::Table.new(:name=>_("Dominance Analysis result"),:header=>header)
-      
-      row=[_("Model 0"),"",""]+@predictors.collect{|f|
-        sprintf("%0.3f", md([f]).r2)
-      }
-      
-      t.row(row)
-      t.hr
-      for i in 1..@predictors.size
-        mk=md_k(i)
-        mk.each{|m|
-          t.row(m.add_table_row)
-        }
-        # Report averages
-        a=average_k(i)
-        if !a.nil?
-            t.hr
-            row=[_("k=%d Average") % i,"",""] + @predictors.collect{|f|
-                sprintf("%0.3f",a[f])
+      g.section(:name=>@name) do |generator|
+        header=["","r2",_("sign")]+@predictors.collect {|c| DominanceAnalysis.predictor_name(c) }
+        
+        generator.table(:name=>_("Dominance Analysis result"), :header=>header) do |t|
+          
+          row=[_("Model 0"),"",""]+@predictors.collect{|f|
+            sprintf("%0.3f", md([f]).r2)
+          }
+          
+          t.row(row)
+          t.hr
+          for i in 1..@predictors.size
+            mk=md_k(i)
+            mk.each{|m|
+              t.row(m.add_table_row)
             }
+            # Report averages
+            a=average_k(i)
+            if !a.nil?
+                t.hr
+                row=[_("k=%d Average") % i,"",""] + @predictors.collect{|f|
+                    sprintf("%0.3f",a[f])
+                }
+                t.row(row)
+                t.hr
+                
+            end
+          end
+          
+          g=general_averages
+          t.hr
+          
+          row=[_("Overall averages"),"",""]+@predictors.collect{|f|
+                    sprintf("%0.3f",g[f])
+          }
+          t.row(row)
+        end        
+        
+        td=total_dominance
+        cd=conditional_dominance
+        gd=general_dominance
+        generator.table(:name=>_("Pairwise dominance"), :header=>[_("Pairs"),_("Total"),_("Conditional"),_("General")]) do |t|
+          pairs.each{|p|
+            name=p.join(" - ")
+            row=[name, sprintf("%0.1f",td[p]), sprintf("%0.1f",cd[p]), sprintf("%0.1f",gd[p])]
             t.row(row)
-            t.hr
-            
+          }
         end
       end
-      
-      g=general_averages
-      t.hr
-      
-      row=[_("Overall averages"),"",""]+@predictors.collect{|f|
-                sprintf("%0.3f",g[f])
-      }
-      t.row(row)
-      generator.parse_element(t)
-      
-      td=total_dominance
-      cd=conditional_dominance
-      gd=general_dominance
-      t=ReportBuilder::Table.new(:name=>_("Pairwise dominance"), :header=>[_("Pairs"),_("Total"),_("Conditional"),_("General")])
-      pairs.each{|p|
-        name=p.join(" - ")
-        row=[name, sprintf("%0.1f",td[p]), sprintf("%0.1f",cd[p]), sprintf("%0.1f",gd[p])]
-        t.row(row)
-      }
-      generator.parse_element(t)
-      generator.html("</div>")
     end
     class ModelData # :nodoc:
       attr_reader :contributions

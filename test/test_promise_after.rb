@@ -4,7 +4,7 @@ require(File.dirname(__FILE__)+'/test_helpers.rb')
 class StatsamplePromiseAfterTestCase < MiniTest::Unit::TestCase
   class ExpensiveClass
     extend Statsample::PromiseAfter
-    attr_reader :a, :dirty
+    attr_reader  :dirty
     def initialize
       @a=nil
       @b=nil

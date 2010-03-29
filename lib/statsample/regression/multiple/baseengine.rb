@@ -172,9 +172,9 @@ module Statsample
             
             g.table(:name=>"ANOVA", :header=>%w{source ss df ms f s}) do |t|
               t.row([_("Regression"), sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
-              t.row([_("Error"), sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse)])
+              t.row([_("Error"), sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse),"",""])
       
-              t.row([_("Total"), sprintf("%0.3f",sst), df_r+df_e])
+              t.row([_("Total"), sprintf("%0.3f",sst), df_r+df_e,"","",""])
             end
             sc=standarized_coeffs
             cse=coeffs_se

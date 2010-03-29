@@ -18,7 +18,17 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
     assert_in_delta(-0.957, reg.b,0.001)
     assert_in_delta(4.248,reg.standard_error,0.002)
   end
-
+  def test_summaries
+    a=100.times.map{rand(100)}.to_scale
+    b=100.times.map{rand(100)}.to_scale
+    y=100.times.map{rand(100)}.to_scale
+    ds={'a'=>a,'b'=>b,'y'=>y}.to_dataset
+    lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y')
+    assert(lr.summary.size>0)
+    
+    
+    
+  end
   def test_multiple_dependent
     complete=Matrix[
       [1,0.53,0.62,0.19,-0.09,0.08,0.02,-0.12,0.08],
@@ -40,8 +50,8 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
     assert_in_delta(0.197, lr.r2yx_covariance,0.001)
     assert_in_delta(0.07, lr.p2yx,0.001)
 
-
   end
+  
   def test_multiple_regression_pairwise_2
     @a=[1,3,2,4,3,5,4,6,5,7,3,nil,3,nil,3].to_vector(:scale)
     @b=[3,3,4,4,5,5,6,6,4,4,2,2,nil,6,2].to_vector(:scale)
@@ -67,6 +77,7 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
       @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
       ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
       lr=Statsample::Regression::Multiple::GslEngine.new(ds,'y')
+      assert(lr.summary.size>0)
       model_test(lr,'gsl')
       predicted=[1.7857, 6.0989, 3.2433, 7.2908, 4.9667, 10.3428, 8.8158, 10.4717, 23.6639, 25.3198]
       c_predicted=lr.predicted
@@ -148,6 +159,7 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
 
     covariance=Statsample::Bivariate.covariance_matrix(ds)
     lr=Statsample::Regression::Multiple::MatrixEngine.new(covariance,'y', :y_mean=>@y.mean, :x_mean=>{'a'=>ds['a'].mean, 'b'=>ds['b'].mean, 'c'=>ds['c'].mean}, :cases=>@a.size)
+    assert(lr.summary.size>0)
 
     model_test(lr , "covariance matrix")
   end
