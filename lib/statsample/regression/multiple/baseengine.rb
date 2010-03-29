@@ -160,34 +160,31 @@ module Statsample
           rp.add(self)
           rp.to_text
         end
-        def report_building(generator)
-          anchor=generator.toc_entry(_("Multiple Regression: ")+@name)
-          generator.html "<div class='multiple-regression'>#{@name}<a name='#{anchor}'></a>"
-          c=coeffs
-          generator.text(_("Engine: %s") % self.class)
-          generator.text(_("Cases(listwise)=%d(%d)") % [@ds.cases, @ds_valid.cases])
-          generator.text("R=#{sprintf('%0.3f',r)}")
-          generator.text("R^2=#{sprintf('%0.3f',r2)}")
-          
-          generator.text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
-          
-          t=ReportBuilder::Table.new(:name=>"ANOVA", :header=>%w{source ss df ms f s})
-          t.row([_("Regression"), sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
-          t.row([_("Error"), sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse)])
-  
-          t.row([_("Total"), sprintf("%0.3f",sst), df_r+df_e])
-          generator.parse_element(t)
-          sc=standarized_coeffs
-          cse=coeffs_se
-          t=ReportBuilder::Table.new(:name=>"Beta coefficients", :header=>%w{coeff b beta se t}.collect{|field| _(field)} )
-          
-            t.row([_("Constant"), sprintf("%0.3f", constant), "-", sprintf("%0.3f", constant_se), sprintf("%0.3f", constant_t)])
-          
-          @fields.each do |f|
-            t.row([f, sprintf("%0.3f", c[f]), sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
-          end  
-          generator.parse_element(t)
-          generator.html("</div>")
+        def report_building(b)
+          b.section(:name=>_("Multiple Regression: ")+@name) do |g|
+            c=coeffs
+            g.text(_("Engine: %s") % self.class)
+            g.text(_("Cases(listwise)=%d(%d)") % [@ds.cases, @ds_valid.cases])
+            g.text("R=#{sprintf('%0.3f',r)}")
+            g.text("R^2=#{sprintf('%0.3f',r2)}")
+            
+            g.text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
+            
+            g.table(:name=>"ANOVA", :header=>%w{source ss df ms f s}) do |t|
+              t.row([_("Regression"), sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
+              t.row([_("Error"), sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse)])
+      
+              t.row([_("Total"), sprintf("%0.3f",sst), df_r+df_e])
+            end
+            sc=standarized_coeffs
+            cse=coeffs_se
+            g.table(:name=>"Beta coefficients", :header=>%w{coeff b beta se t}.collect{|field| _(field)} ) do |t|
+              t.row([_("Constant"), sprintf("%0.3f", constant), "-", sprintf("%0.3f", constant_se), sprintf("%0.3f", constant_t)])
+              @fields.each do |f|
+                t.row([f, sprintf("%0.3f", c[f]), sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
+              end  
+            end
+          end
         end
         
         

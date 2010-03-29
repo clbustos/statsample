@@ -3,7 +3,7 @@ $:.unshift(File.dirname(__FILE__)+'/../lib/')
 
 require 'statsample'
 require 'benchmark'
-samples=10000
+samples=1000
 a=samples.times.collect {rand}.to_scale
 b=samples.times.collect {rand}.to_scale
 c=samples.times.collect {rand}.to_scale
@@ -15,7 +15,7 @@ ds['y']=ds.collect{|row| row['a']*5+row['b']*3+row['c']*2+row['d']*1+rand()}
 Benchmark.bm(7) do |x|
 
 
-rb=ReportBuilder.new("Multiple Regression Engines")
+rb=ReportBuilder.new(:name=>"Multiple Regression Engines")
 
 if Statsample.has_gsl?
   x.report("GSL:") {
@@ -29,6 +29,8 @@ end
   lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y',:name=>"Multiple Regression using RubyEngine")
   rb.add(lr.summary)
   }
-
   puts rb.to_text
 end
+
+
+

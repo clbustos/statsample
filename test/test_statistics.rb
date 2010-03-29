@@ -5,6 +5,15 @@ class StatsampleStatisicsTestCase < MiniTest::Unit::TestCase
   def initialize(*args)
     super
   end
+  def test_p_using_cdf
+    assert_equal(0.25, Statsample::Test.p_using_cdf(0.25, tails=:left))
+    assert_equal(0.75, Statsample::Test.p_using_cdf(0.25, tails=:right))
+    assert_equal(0.50, Statsample::Test.p_using_cdf(0.25, tails=:both))
+    assert_equal(1, Statsample::Test.p_using_cdf(0.50, tails=:both))
+    assert_equal(0.05, Statsample::Test.p_using_cdf(0.025, tails=:both))
+    assert_in_delta(0.05, Statsample::Test.p_using_cdf(0.975, tails=:both),0.0001)
+    
+  end
   def test_recode_repeated
     a=%w{a b c c d d d e}
     exp=["a","b","c_1","c_2","d_1","d_2","d_3","e"]
@@ -22,8 +31,6 @@ class StatsampleStatisicsTestCase < MiniTest::Unit::TestCase
     assert(!"".is_number?)
 
   end
-
-
   def test_estimation_mean
     v=([42]*23+[41]*4+[36]*1+[32]*1+[29]*1+[27]*2+[23]*1+[19]*1+[16]*2+[15]*2+[14,11,10,9,7]+ [6]*3+[5]*2+[4,3]).to_vector(:scale)
     assert_equal(50,v.size)

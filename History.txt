@@ -1,3 +1,10 @@
+=== 0.8.0 / 2010-03-29
+* New Statsample::Test::T module, with classes and methods to do Student's t tests for one and two samples. 
+* Statsample::PromiseAfter module to set a number of variables without explicitly call the compute or iterate method
+* All tests ported to MiniUnit
+* Directory 'demo' renamed to 'examples'
+* Bug fix on report_building on Statsample::Regression::Multiple classes
+
 === 0.7.0 / 2010-03-25
 * Ported to ReportBuilder 1.x series
 * Implementation of ruby based covariance and correlation changed to a clearer code

@@ -171,10 +171,9 @@ module Statsample
       end
       # Summary of analysis
       def summary
-        rp=ReportBuilder.new()
-        rp.add(self)
-        rp.to_text
+        rp=ReportBuilder.new().add(self).to_text
       end
+      
       def t
         Distribution::T.p_value(1-((1-@alpha) / 2), @n_samples - 1)
       end

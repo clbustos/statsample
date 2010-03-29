@@ -88,4 +88,12 @@ task :publicar_docs => [:clean, :docs] do
   sh %{rsync #{h.rsync_args} #{local_dir}/ #{host}:#{remote_dir}}
 end
     
+task :release => [:tag] do 
+end
+
+task :tag do	
+  sh %(svn commit -m "Version bump: #{Statsample::VERSION}")
+	sh %(svn cp https://ruby-statsample.googlecode.com/svn/reportbuilder/trunk https://ruby-statsample.googlecode.com/svn/statsample/tags/v#{Statsample::VERSION} -m "ReportBuilder #{Statsample::VERSION} tagged")
+end
+
 # vim: syntax=Ruby

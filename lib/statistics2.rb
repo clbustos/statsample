@@ -229,7 +229,7 @@ module Statistics2  # :nodoc:
       s *= (i - 1) * c2 / i
       i += 2
     end
-    if df & 1 != 0
+    if df.is_a? Float or df & 1 != 0
       0.5+(p*Math.sqrt(c2)+Math.atan(t/Math.sqrt(df)))/Math::PI
     else
       (1.0 + p) / 2.0

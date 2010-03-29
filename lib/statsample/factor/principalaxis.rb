@@ -90,8 +90,6 @@ module Factor
       @component_matrix
     end
     # Iterate to find the factors
-    # Parameters
-    # * m: Number of factors
     def iterate(m=nil)
       @clean=false
       m||=@m

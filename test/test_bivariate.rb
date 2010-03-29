@@ -51,6 +51,11 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
       end
     end
   end
+  def test_polychoric_summary
+      matrix=Matrix[[150+rand(2),150+rand(2)],[150+rand(2),150+rand(2)],[200,300]]
+      poly  = Statsample::Bivariate::Polychoric.new(matrix)
+      assert(poly.summary.size>0)
+  end
   def test_poly_vs_tetra
     5.times {
       # Should be the same results as Tetrachoric for 2x2 matrix

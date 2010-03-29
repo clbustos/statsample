@@ -65,6 +65,7 @@ module Statsample
     
     class Polychoric
       include GetText
+      extend Statsample::PromiseAfter
       bindtextdomain("statsample")
       # Name of the analysis
       attr_accessor :name
@@ -135,28 +136,16 @@ module Statsample
         compute_basic_parameters
       end
       # Returns the polychoric correlation
-      def r
-        if @r.nil?
-          compute
-        end
-        @r
-      end
+      attr_reader :r
       # Returns the rows thresholds
+      attr_reader :alpha
+      # Returns the columns thresholds
+      attr_reader :beta
       
-      def threshold_x
-        if @alpha.nil?
-          compute
-        end
-        @alpha
-      end
-      # Returns the column thresholds
+      promise_after :compute, :r, :alpha, :beta
       
-      def threshold_y
-        if @beta.nil?
-          compute
-        end
-        @beta
-      end
+      alias :threshold_x :alpha
+      alias :threshold_y :beta
       
       
       # Start the computation of polychoric correlation
@@ -739,22 +728,20 @@ module Statsample
       end
       
       def summary
-        rp=ReportBuilder.new()
-        rp.add(self)
-        rp.to_text
+        rp=ReportBuilder.new(:no_title=>true).add(self).to_text
       end
+     
       
       def report_building(generator) # :nodoc: 
-        compute if @r.nil?
+        #compute if r.nil?
         section=ReportBuilder::Section.new(:name=>@name)
-        t=ReportBuilder::Table.new(:name=>_("Contingence Table"),:header=>[""]+(@n.times.collect {|i| "Y=#{i}"})+["Total"])
+        t=ReportBuilder::Table.new(:name=>_("Contingence Table"), :header=>[""]+(@n.times.collect {|i| "Y=#{i}"})+["Total"])
         @m.times do |i|
           t.row(["X = #{i}"]+(@n.times.collect {|j| @matrix[i,j]}) + [@sumr[i]])
         end
         t.hr
         t.row(["T"]+(@n.times.collect {|j| @sumc[j]})+[@total])
         section.add(t)
-        #generator.parse_element(t)
         section.add(sprintf("r: %0.4f",r))
         t=ReportBuilder::Table.new(:name=>_("Thresholds"), :header=>["","Value"])
         threshold_x.each_with_index {|val,i|

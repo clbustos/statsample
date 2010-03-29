@@ -23,11 +23,21 @@ class StatsampleTestTestCase < MiniTest::Unit::TestCase
 
 
   def test_levene
-
     a=[1,2,3,4,5,6,7,8,100,10].to_scale
     b=[30,40,50,60,70,80,90,100,110,120].to_scale
     levene=Statsample::Test::Levene.new([a,b])
+    assert_levene(levene)
+  end
+  def test_levene_dataset
+    a=[1,2,3,4,5,6,7,8,100,10].to_scale
+    b=[30,40,50,60,70,80,90,100,110,120].to_scale
+    ds={'a'=>a,'b'=>b}.to_dataset
+    levene=Statsample::Test::Levene.new(ds)
+    assert_levene(levene)
+  end
+  def assert_levene(levene)
     assert_in_delta(0.778, levene.f, 0.001)
     assert_in_delta(0.389, levene.probability, 0.001)
   end
+ 
 end

@@ -44,8 +44,11 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
       matrix=Matrix[
       [1.0, 0.709501601093587, 0.877596585880047, 0.272219316266807],  [0.709501601093587, 1.0, 0.291633797330304, 0.871141831433844], [0.877596585880047, 0.291633797330304, 1.0, -0.213373722977167], [0.272219316266807, 0.871141831433844, -0.213373722977167, 1.0]]
       fa=Statsample::Factor::PrincipalAxis.new(matrix,:m=>1)
+      
       cm=Matrix[[0.923],[0.912],[0.507],[0.483]].to_gsl
+      
       _test_matrix(cm,fa.component_matrix)
+      
       h2=[0.852,0.832,0.257,0.233]
       h2.each_with_index{|ev,i|
         assert_in_delta(ev,fa.communalities[i],0.001)
@@ -81,7 +84,9 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
         [0.0826106, 0.435975, -0.893379],
       [0.939901, -0.0965213, -0.309596]].to_gsl
       varimax=Statsample::Factor::Varimax.new(a)
-      varimax.iterate
+      refute(varimax.rotated.nil?,"Rotated shouldn't be empty")
+      refute(varimax.component_transformation_matrix.nil?, "Component matrix shouldn't be empty")
+      refute(varimax.h2.nil?,"H2 shouldn't be empty")
       _test_matrix(expected,varimax.rotated)
     else
       puts "Rotation not tested. Requires GSL"

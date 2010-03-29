@@ -27,7 +27,11 @@ module Statsample
       attr_accessor :name
       # Input could be an array of vectors or a dataset
       def initialize(input, opts=Hash.new())
-        @vectors=input
+        if input.is_a? Statsample::Dataset
+          @vectors=input.vectors.values
+        else
+          @vectors=input
+        end
         @name="Levene Test"
         opts.each{|k,v|
           self.send("#{k}=",v) if self.respond_to? k
@@ -39,15 +43,15 @@ module Statsample
         @w
       end
       
-      def report_building(generator) # :nodoc:
-        generator.text(summary)
-        
+      def report_building(g) # :nodoc:
+        g.text @name
+        g.text "F: #{"%0.4f" % f}"
+        g.text "p: #{"%0.4f" % probability}"
+
       end
       # Summary of results
       def summary
-        "#{@name}
-F: #{f}
-p: #{probability}"
+        ReportBuilder.new(:no_title=>true).add(self).to_text
       end
       
       def compute

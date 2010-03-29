@@ -114,9 +114,7 @@ module Statsample
       end
       # Summary of the analysis
       def summary
-        rp=ReportBuilder.new(:name=>@name)
-        rp.add(self)
-        rp.to_text
+        ReportBuilder.new(:name=>@name).add(self).to_text
       end
 
       def report_building(generator) # :nodoc:

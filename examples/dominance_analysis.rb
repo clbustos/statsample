@@ -10,7 +10,7 @@ d=sample.times.collect {rand}.to_scale
 
 ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
 ds['y']=ds.collect{|row| row['a']*5+row['b']*3+row['c']*2+row['d']+rand()}
-rb=ReportBuilder.new(:name=>"Dominance Analysis")
+rb=ReportBuilder.new("Dominance Analysis")
 
 cm=Statsample::Bivariate.correlation_matrix(ds)
 rb.add(cm)
@@ -25,4 +25,3 @@ rb.add(da)
 
 
 puts rb.to_text
-rb.save_rtf("dominance_analysis.rtf")

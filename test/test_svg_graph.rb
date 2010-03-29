@@ -1,5 +1,5 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
-
+require('statsample/graph')
 class StatsampleSvgGraphTestCase < MiniTest::Unit::TestCase
 
   def setup
