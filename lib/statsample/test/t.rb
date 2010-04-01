@@ -58,7 +58,7 @@ module Statsample
       class OneSample
         include Math
         include Statsample::Test
-        extend Statsample::PromiseAfter
+        include DirtyMemoize
         # Options
         attr_accessor :opts
         # Name of test
@@ -73,6 +73,10 @@ module Statsample
         attr_reader :probability
         # Tails for probability (:both, :left or :right)
         attr_accessor :tails 
+        
+        dirty_writer :u, :tails
+        dirty_memoize :t, :probability
+        
         def initialize(vector, opts=Hash.new)
           @vector=vector
           default={:u=>0, :name=>"One Sample T Test", :tails=>:both}
@@ -83,8 +87,7 @@ module Statsample
           @df= @vector.n_valid-1
           @t=nil
         end        
-
-        promise_after :compute, :t, :probability
+       
         
         # Set t and probability for given u
         def compute
@@ -102,7 +105,6 @@ module Statsample
             s.text "Population mean:#{u}"
             s.text "Tails: #{tails}"
             s.text sprintf("t = %0.4f, p=%0.4f, d.f=%d", t, probability, df)
-
           }
         end
       end
@@ -117,7 +119,7 @@ module Statsample
       class TwoSamplesIndependent
         include Math
         include Statsample::Test
-        extend Statsample::PromiseAfter
+        include DirtyMemoize
         # Options
         attr_accessor :opts
         # Name of test
@@ -137,6 +139,10 @@ module Statsample
         # Tails for probability (:both, :left or :right)
         attr_accessor :tails 
         # Create the object
+        
+        dirty_writer :tails
+        dirty_memoize :t_equal_variance, :t_not_equal_variance, :probability_equal_variance, :probability_not_equal_variance, :df_equal_variance, :df_not_equal_variance
+        
         def initialize(v1, v2, opts=Hash.new)
           @v1=v1
           @v2=v2
@@ -145,8 +151,8 @@ module Statsample
           @name=@opts[:name]
           @tails=@opts[:tails]          
         end        
-
-        promise_after :compute, :t_equal_variance, :t_not_equal_variance, :probability_equal_variance, :probability_not_equal_variance, :df_equal_variance, :df_not_equal_variance
+        
+        
         
         # Set t and probability for given u
         def compute

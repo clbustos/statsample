@@ -42,7 +42,7 @@ h=Hoe.spec('statsample') do
 	self.version=Statsample::VERSION
 	self.rubyforge_name = "ruby-statsample"
 	self.developer('Claudio Bustos', 'clbustos@gmail.com')
-	self.extra_deps << ["spreadsheet","~>0.6.0"] << ["svg-graph", "~>1.0"] << ["reportbuilder", "~>1.0"] << ["minimization", "~>0.1.0"] << ["fastercsv"]
+	self.extra_deps << ["spreadsheet","~>0.6.0"] << ["svg-graph", "~>1.0"] << ["reportbuilder", "~>1.0"] << ["minimization", "~>0.1.0"] << ["fastercsv"] << ["dirty-memoize", "~>0.0"]
 	self.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"
 	self.need_rdoc=false
 end

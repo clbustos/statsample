@@ -103,7 +103,6 @@ test/test_matrix.rb
 test/test_mle.rb
 test/test_multiset.rb
 test/test_permutation.rb
-test/test_promise_after.rb
 test/test_regression.rb
 test/test_reliability.rb
 test/test_resample.rb

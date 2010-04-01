@@ -18,14 +18,15 @@ module Factor
   class Rotation
     EPSILON=1e-15
     MAX_ITERATIONS=25
-    extend Statsample::PromiseAfter
+    include DirtyMemoize
     attr_reader :iterations, :rotated, :component_transformation_matrix, :h2
     # Maximum number of iterations    
     attr_accessor :max_iterations
     # Maximum precision    
     attr_accessor :epsilon
     
-    promise_after :iterate, :iterations, :rotated, :component_transformation_matrix, :h2
+    dirty_writer :max_iterations, :epsilon
+    dirty_memoize :iterations, :rotated, :component_transformation_matrix, :h2
     
     def initialize(matrix, opts=Hash.new)
       @matrix=matrix
@@ -42,6 +43,9 @@ module Factor
     end
     alias_method :communalities, :h2
     alias_method :rotated_component_matrix, :rotated
+    def compute
+      iterate
+    end
     # Start iteration 
     def iterate
       t=Matrix.identity(@m)
@@ -52,7 +56,7 @@ module Factor
       @not_converged=true
       @iterations=0
       while @not_converged
-        break if iterations>@max_iterations
+        break if @iterations>@max_iterations
         @iterations+=1
         #puts "Iteration #{iterations}"
         num_pairs=@m*(@m-1).quo(2)

@@ -65,7 +65,7 @@ module Statsample
     
     class Polychoric
       include GetText
-      extend Statsample::PromiseAfter
+      include DirtyMemoize
       bindtextdomain("statsample")
       # Name of the analysis
       attr_accessor :name
@@ -142,7 +142,8 @@ module Statsample
       # Returns the columns thresholds
       attr_reader :beta
       
-      promise_after :compute, :r, :alpha, :beta
+      dirty_writer :max_iterations, :epsilon, :minimizer_type_two_step, :minimizer_type_joint, :method
+      dirty_memoize :r, :alpha, :beta
       
       alias :threshold_x :alpha
       alias :threshold_y :beta
@@ -733,7 +734,7 @@ module Statsample
      
       
       def report_building(generator) # :nodoc: 
-        #compute if r.nil?
+        compute if dirty?
         section=ReportBuilder::Section.new(:name=>@name)
         t=ReportBuilder::Table.new(:name=>_("Contingence Table"), :header=>[""]+(@n.times.collect {|i| "Y=#{i}"})+["Total"])
         @m.times do |i|

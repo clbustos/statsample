@@ -21,6 +21,7 @@
 #$:.unshift(File.dirname(__FILE__))
 require 'matrix'
 require 'distribution'
+require 'dirty-memoize'
 gem 'reportbuilder','~>1.0'
 require 'reportbuilder'
 class Numeric
@@ -111,7 +112,7 @@ module Statsample
       false
     end
   end
-  VERSION = '0.8.1'
+  VERSION = '0.8.2'
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')
@@ -204,55 +205,6 @@ module Statsample
     end
 	end
   
-  module PromiseAfter
-    # Like memoizable module (http://promise.rubyforge.org/Promise.html)
-    # but this applies to set a lot or variables with one expensive method
-    # with a direct calling of dependent methods.
-    # If one of the dependent methods returns nil or false, the main method 
-    # is called.
-    #
-    # Use when
-    # 1. You have one expensive operation which set many internal variables
-    # 2. This expensive operations depends on values which can set
-    #    anytime BEFORE calculation of main function
-    # 
-    # I use for classes which requires a iteration to set several variables,
-    # hiding to user the need to explicitily call the iterate method.
-    # 
-    # Example:
-    #  class ExpensiveCalculation
-    #   include PromiseAfter
-    #   attr_accessor :y, :z
-    #   def initialize(y=nil,z=nil)
-    #     @y=y
-    #     @z=z
-    #   def compute
-    #     @a=@y*1000+@z*1000
-    #   end
-    #   def a
-    #      @a.nil? nil : "This is the value: #{@a}"
-    #   end
-    #   promise_after :compute, :a, :b
-    #  end
-    #  puts ExpensiveCalculation.new(1,2).a
-    
-    def promise_after(function, *syms)
-      syms.each do |sym|
-        # You should doc the method!
-        raise NoMethodError, "Method `#{sym}' doesn't exists! Create it first " unless method_defined? sym
-        alias_method((sym.to_s+"_without_promise_after").intern, sym)
-        define_method(sym) {
-          #sym_to_iv="@#{sym.to_s.gsub(":","")}".intern
-          #if !instance_variable_defined?(sym_to_iv) or instance_variable_get(sym_to_iv).nil?
-          if(!send(sym.to_s+"_without_promise_after"))
-            send(function)
-          end
-          send(sym.to_s+"_without_promise_after")
-        }
-
-      end
-    end
-  end
   
   
   module Writable
