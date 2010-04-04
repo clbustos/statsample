@@ -5,7 +5,7 @@ module Statsample
     autoload(:UMannWhitney, 'statsample/test/umannwhitney')
     autoload(:Levene, 'statsample/test/levene')
     autoload(:T, 'statsample/test/t')
-    
+    autoload(:F, 'statsample/test/f')
     # Returns probability of getting a value lower or higher
     # than sample, using cdf and number of tails.
     # * For one tail left, return the cdf

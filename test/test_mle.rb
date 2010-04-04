@@ -48,7 +48,7 @@ class StatsampleMLETestCase < MiniTest::Unit::TestCase
     #p coeffs_nr
     ds=@ds_indep.dup
     ds.add_vector('y',y)
-    lr=Statsample::Regression.multiple(ds,'y')
+    lr=Statsample::Regression.multiple(ds, 'y')
     lr_constant = lr.constant
     lr_coeffs   = lr.coeffs
     assert_in_delta(coeffs_nr[0,0], lr_constant,0.0000001)

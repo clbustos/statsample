@@ -75,6 +75,7 @@ lib/statsample/reliability.rb
 lib/statsample/resample.rb
 lib/statsample/srs.rb
 lib/statsample/test.rb
+lib/statsample/test/f.rb
 lib/statsample/test/levene.rb
 lib/statsample/test/t.rb
 lib/statsample/test/umannwhitney.rb
@@ -111,6 +112,7 @@ test/test_statistics.rb
 test/test_stest.rb
 test/test_stratified.rb
 test/test_svg_graph.rb
+test/test_test_f.rb
 test/test_test_t.rb
 test/test_umannwhitney.rb
 test/test_vector.rb

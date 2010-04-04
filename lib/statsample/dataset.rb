@@ -3,7 +3,7 @@ require 'statsample/vector'
 class Hash
   # Creates a Statsample::Dataset based on a Hash 
   def to_dataset(*args)
-    Statsample::Dataset.new(self,*args)
+    Statsample::Dataset.new(self, *args)
   end
 end
 

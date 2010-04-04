@@ -12,9 +12,6 @@ module Statsample
         def self.univariate?
           true
         end
-        
-
-        
         def initialize(ds, y_var, opts = Hash.new)
           @ds=ds
           @cases=@ds.cases
@@ -25,17 +22,20 @@ module Statsample
             self.send("#{k}=",v) if self.respond_to? k
           }
         end
-
+        # Calculate F Test
+        def f_test
+          @f_test||=Statsample::Test::F.new(ssr, sse, df_r, df_e, :name_numerator=>_("Regression"), :name_denominator=>_("Error"), :name=>"ANOVA")
+        end
         # Retrieves a vector with predicted values for y
         def predicted
           (0...@ds.cases).collect { |i|
-          invalid=false
-          vect=@dep_columns.collect {|v| invalid=true if v[i].nil?; v[i]}
-          if invalid
-            nil
-          else
-            process(vect)
-          end
+            invalid=false
+            vect=@dep_columns.collect {|v| invalid=true if v[i].nil?; v[i]}
+            if invalid
+              nil
+            else
+              process(vect)
+            end
           }.to_vector(:scale)
         end
         # Retrieves a vector with standarized values for y
@@ -97,11 +97,11 @@ module Statsample
         end
         # Fisher for Anova
         def f
-          (ssr.quo(df_r)).quo(sse.quo(df_e))
+          f_test.f
         end
-        # Significance of Fisher
-        def significance
-          (1.0-Distribution::F.cdf(f, df_r, df_e)).abs
+        # p-value of Fisher
+        def probability
+          f_test.probability
         end
         # Tolerance for a given variable
         # http://talkstats.com/showthread.php?t=5056
@@ -129,7 +129,7 @@ module Statsample
           }
           out
         end
-        # Estandar error of R
+        # Estandar error of R^2
         def se_r2
           Math::sqrt((4*r2*(1-r2)**2*(df_e)**2).quo((@cases**2-1)*(@cases+3)))
         end
@@ -161,7 +161,7 @@ module Statsample
           rp.to_text
         end
         def report_building(b)
-          b.section(:name=>_("Multiple Regression: ")+@name) do |g|
+          b.section(:name=>@name) do |g|
             c=coeffs
             g.text(_("Engine: %s") % self.class)
             g.text(_("Cases(listwise)=%d(%d)") % [@ds.cases, @ds_valid.cases])
@@ -170,12 +170,7 @@ module Statsample
             
             g.text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
             
-            g.table(:name=>"ANOVA", :header=>%w{source ss df ms f s}) do |t|
-              t.row([_("Regression"), sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
-              t.row([_("Error"), sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse),"",""])
-      
-              t.row([_("Total"), sprintf("%0.3f",sst), df_r+df_e,"","",""])
-            end
+            g.parse_element(f_test)
             sc=standarized_coeffs
             cse=coeffs_se
             g.table(:name=>"Beta coefficients", :header=>%w{coeff b beta se t}.collect{|field| _(field)} ) do |t|

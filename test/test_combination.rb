@@ -1,9 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
 class StatsampleCombinationTestCase < MiniTest::Unit::TestCase
-  def initialize(*args)
-    super
-  end
   def test_basic
     k=3
     n=5
@@ -34,7 +31,7 @@ class StatsampleCombinationTestCase < MiniTest::Unit::TestCase
 
       assert_equal(rb_array,gsl_array)
     else
-      puts "Not CombinationRuby vs CombinationGSL (no gsl)"
+      skip "Not CombinationRuby vs CombinationGSL (no gsl)"
     end
   end
 end

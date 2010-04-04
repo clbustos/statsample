@@ -33,7 +33,7 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
       _test_matrix(expected_fm_2,pca.feature_vector(2))
       assert(pca.summary)
     else
-      puts "PCA not tested. Requires GSL"
+      skip "PCA not tested. Requires GSL"
     end
   end
 
@@ -67,7 +67,7 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
       assert(fa.summary)
 
     else
-      puts "Principal Axis not tested. Requires GSL"
+      skip "Principal Axis not tested. Requires GSL"
     end
   end
 
@@ -89,7 +89,7 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
       refute(varimax.h2.nil?,"H2 shouldn't be empty")
       _test_matrix(expected,varimax.rotated)
     else
-      puts "Rotation not tested. Requires GSL"
+      skip "Rotation not tested. Requires GSL"
     end
   end
   def _test_matrix(a,b)

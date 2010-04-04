@@ -1,4 +1,4 @@
-require 'statsample/dominanceanalysis/bootstrap'
+
 module Statsample
   # Dominance Analysis is a procedure based on an examination of the R<sup>2</sup> values
   # for all possible subset models, to identify the relevance of one or more 
@@ -428,3 +428,5 @@ module Statsample
     end # end ModelData
   end # end Dominance Analysis
 end
+
+require 'statsample/dominanceanalysis/bootstrap'

@@ -8,31 +8,31 @@ module Statsample
     #   anova=Statsample::Anova::OneWay.new([v1,v2,v3])
     #   anova.f
     #   => 0.0243902439024391
-    #   anova.significance
+    #   anova.probability
     #   => 0.975953044203438
     #   anova.sst 
     #   => 32.9333333333333
     #
-    class OneWay
-      def initialize(vectors)
+    class OneWay < Statsample::Test::F
+      def initialize(vectors,opts=Hash.new)
         @vectors=vectors
-      end
-      # Total sum
-      def sum
-        @vectors.inject(0){|a,v| a+v.sum}
+        opts_default={:name=>_("Anova One-Way"), :name_numerator=>"Between Groups", :name_denominator=>"Within Groups"}
+        super(ssbg,sswg, df_bg, df_wg)
       end
       # Total mean
       def mean
+        sum=@vectors.inject(0){|a,v| a+v.sum}
         sum.quo(n)
       end
+      
       # Total sum of squares
       def sst
-        m=mean.to_f
-        @vectors.inject(0) {|total,vector| total+vector.sum_of_squares(m) }
+        m=mean
+        @vectors.inject(0) {|total,vector| total+vector.ss(m) }
       end
       # Sum of squares within groups
       def sswg
-        @vectors.inject(0) {|total,vector| total+vector.sum_of_squares }
+        @sswg||=@vectors.inject(0) {|total,vector| total+vector.ss }
       end
       # Sum of squares between groups
       def ssbg
@@ -43,29 +43,20 @@ module Statsample
       end
       # Degrees of freedom within groups
       def df_wg
-          @vectors.inject(0) {|a,v| a+(v.size-1)}
+        @dk_wg||=n-k
+      end
+      def k
+        @k||=@vectors.size
       end
       # Degrees of freedom between groups 
       def df_bg
-          @vectors.size-1
-      end
-      # Total Degrees of freedom
-      def df_total
-          n-1
+          k-1
       end
       # Total number of cases
       def n
           @vectors.inject(0){|a,v| a+v.size}
       end
-      # Fisher
-      def f
-          k=@vectors.size
-          (ssbg*(n-k)) / (sswg*(k-1))
-      end
-      # Significance of Fisher
-      def significance
-          1.0-Distribution::F.cdf(f,df_bg,df_wg)
-      end
+      
     end
   end
 end

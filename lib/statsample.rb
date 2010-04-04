@@ -112,7 +112,7 @@ module Statsample
       false
     end
   end
-  VERSION = '0.8.2'
+  VERSION = '0.9.0'
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')

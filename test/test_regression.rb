@@ -90,7 +90,7 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
         assert_in_delta(residuals[i],c_residuals[i],0.001)
       }
     else
-      puts "Regression::Multiple::GslEngine not tested (no Gsl)"
+      skip "Regression::Multiple::GslEngine not tested (no Gsl)"
     end
   end
 
@@ -115,7 +115,7 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
     assert_in_delta(0.913,lr.r2,0.001)
 
     assert_in_delta(20.908, lr.f,0.001)
-    assert_in_delta(0.001, lr.significance, 0.001)
+    assert_in_delta(0.001, lr.probability, 0.001)
     assert_in_delta(0.226,lr.tolerance("a"),0.001)
 
     coeffs_se={"a"=>1.171,"b"=>1.129,"c"=>0.072}

@@ -3,8 +3,20 @@ require 'statsample'
 require 'minitest/unit'
 require 'tempfile'
 require 'tmpdir'
+require 'shoulda'
+module MiniTest
+  class Unit
+    class TestCase
+      include Shoulda::InstanceMethods
+      extend Shoulda::ClassMethods
+      include Shoulda::Assertions
+      
+    end
+  end
+end
 
 module MiniTest::Assertions
+  
   alias :assert_raise :assert_raises unless method_defined? :assert_raise
   alias :assert_not_equal :refute_equal unless method_defined? :assert_not_equal
   alias :assert_not_same :refute_same unless method_defined? :assert_not_same

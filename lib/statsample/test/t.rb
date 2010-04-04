@@ -55,6 +55,15 @@ module Statsample
       #   a=1000.times.map {rand(100)}.to_scale
       #   t_1=Statsample::Test::T::OneSample.new(a, {:u=>50})
       #   t_1.summary
+      #
+      # === Output
+      #
+      #  = One Sample T Test
+      #  Sample mean: 48.954
+      #  Population mean:50
+      #  Tails: both
+      #  t = -1.1573, p=0.2474, d.f=999
+
       class OneSample
         include Math
         include Statsample::Test
@@ -76,7 +85,11 @@ module Statsample
         
         dirty_writer :u, :tails
         dirty_memoize :t, :probability
-        
+        # Create a One Sample T Test
+        # Options:
+        # * :u = Mean to compare. Default= 0
+        # * :name = Name of the analysis
+        # * :tails = Tail for probability. Could be :both, :left, :right
         def initialize(vector, opts=Hash.new)
           @vector=vector
           default={:u=>0, :name=>"One Sample T Test", :tails=>:both}
@@ -113,9 +126,30 @@ module Statsample
       # == Usage
       #   a=1000.times.map {rand(100)}.to_scale
       #   b=1000.times.map {rand(100)}.to_scale
-      #   t_2=Statsample::Test::T::OneSample.new(a,b)
+      #   t_2=Statsample::Test::T::TwoSamplesIndependent.new(a,b)
       #   t_2.summary
-      
+      # === Output
+      #  = Two Sample T Test
+      #  Mean and standard deviation
+      #  +----------+---------+---------+------+
+      #  | Variable |    m    |   sd    |  n   |
+      #  +----------+---------+---------+------+
+      #  | 1        | 49.3310 | 29.3042 | 1000 |
+      #  | 2        | 47.8180 | 28.8640 | 1000 |
+      #  +----------+---------+---------+------+
+      #  
+      #  == Levene Test
+      #   Levene Test
+      #   F: 0.3596
+      #   p: 0.5488
+      #   T statistics
+      #   +--------------------+--------+-----------+----------------+
+      #   |        Type        |   t    |    df     | p (both tails) |
+      #   +--------------------+--------+-----------+----------------+
+      #   | Equal variance     | 1.1632 | 1998      | 0.2449         |
+      #   | Non equal variance | 1.1632 | 1997.5424 | 0.1362         |
+      #   +--------------------+--------+-----------+----------------+
+
       class TwoSamplesIndependent
         include Math
         include Statsample::Test
@@ -142,18 +176,20 @@ module Statsample
         
         dirty_writer :tails
         dirty_memoize :t_equal_variance, :t_not_equal_variance, :probability_equal_variance, :probability_not_equal_variance, :df_equal_variance, :df_not_equal_variance
-        
+
+        # Create a Two Independent T Test
+        # Options:
+        # * :name = Name of the analysis
+        # * :tails = Tail for probability. Could be :both, :left, :right        
         def initialize(v1, v2, opts=Hash.new)
           @v1=v1
           @v2=v2
-          default={:u=>0, :name=>"Two Sample T Test", :paired_samples=>false, :tails=>:both}
+          default={:u=>0, :name=>"Two Sample T Test",  :tails=>:both}
           @opts=default.merge(opts)
           @name=@opts[:name]
           @tails=@opts[:tails]          
         end        
-        
-        
-        
+       
         # Set t and probability for given u
         def compute
           @t_equal_variance= T.two_sample_independent(@v1.mean, @v2.mean, @v1.sd, @v2.sd, @v1.n_valid, @v2.n_valid,true)

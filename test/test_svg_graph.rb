@@ -17,7 +17,7 @@ class StatsampleSvgGraphTestCase < MiniTest::Unit::TestCase
       graph.histogram=h
       file.puts(graph.burn)
     else
-      puts "Statsample::Graph::SvgHistogram.new not tested (no ruby-gsl)"
+      skip "Statsample::Graph::SvgHistogram.new not tested (no ruby-gsl)"
     end
   end
   def assert_svg(msg=nil)
@@ -48,7 +48,7 @@ class StatsampleSvgGraphTestCase < MiniTest::Unit::TestCase
       }
       assert(File.exists?(file))
     else
-      puts "Statsample::Vector#svggraph_histogram.new not tested (no ruby-gsl)"
+      skip "Statsample::Vector#svggraph_histogram.new not tested (no ruby-gsl)"
     end
   end
 end

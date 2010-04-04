@@ -2,6 +2,10 @@ module Statsample
 module Regression
 module Multiple
   # Pure Ruby Class for Multiple Regression Analysis, based on a covariance or correlation matrix.
+  #
+  # Use Statsample::Regression::Multiple::RubyEngine if you have a 
+  # Dataset, to avoid setting all details.
+  # 
   # <b>Remember:</b> NEVER use a Covariance data if you have missing data. Use only correlation matrix on that case.
   #
   # 
@@ -15,16 +19,13 @@ class MatrixEngine < BaseEngine
   # Hash of standard deviation of predictors. 
   # Only useful for Correlation Matrix, because by default is set to 1
   attr_accessor :x_sd
-  # Standard deviation of criteria. 
+  # Standard deviation of criterion
   # Only useful for Correlation Matrix, because by default is set to 1
-  
   attr_accessor :y_sd
   # Hash of mean for predictors. By default, set to 0
-  # 
   attr_accessor :x_mean
   
   # Mean for criteria. By default, set to 0
-  # 
   attr_accessor :y_mean
   
   # Number of cases
@@ -92,23 +93,25 @@ class MatrixEngine < BaseEngine
         standarized_coeffs[k]*@y_sd.quo(@x_sd[k])
       } 
     end
-
   end
   def cases
     raise "You should define the number of valid cases first" if @cases.nil?
     @cases
   end
   # Get R^2 for the regression
+  # For fixed models is the coefficient of determination.
+  # On random models, is the 'squared-multiple correlation'
   # Equal to 
   # * 1-(|R| / |R_x|) or
   # * Sum(b_i*r_yi) <- used
   def r2
     @n_predictors.times.inject(0) {|ac,i| ac+@coeffs_stan[i]* @matrix_y[i,0]} 
   end
+  # Multiple correlation, on random models.
   def r
     Math::sqrt(r2)
   end
-  
+  # Value of constant
   def constant
     c=coeffs
     @y_mean - @fields.inject(0){|a,k| a + (c[k] * @x_mean[k])}
@@ -135,12 +138,10 @@ class MatrixEngine < BaseEngine
   def df_e
     cases-@n_predictors-1
   end
-  
   # Tolerance for a given variable
   # defined as (1-R^2) of regression of other independent variables
   # over the selected
   # Reference:
-  # 
   # * http://talkstats.com/showthread.php?t=5056
   def tolerance(var)
     lr=Statsample::Regression::Multiple::MatrixEngine.new(@matrix_x, var)
@@ -150,8 +151,7 @@ class MatrixEngine < BaseEngine
   # Standard error of a coefficients depends on
   # * Tolerance of the coeffients: Higher tolerances implies higher error
   # * Higher r2 implies lower error
-  
-  # Reference:
+  # == Reference:
   # * Cohen et al. (2003). Applied Multiple Reggression / Correlation Analysis for the Behavioral Sciences
   #
   def coeffs_se
@@ -162,13 +162,15 @@ class MatrixEngine < BaseEngine
     }
     out
   end
+  # t value for constant
   def constant_t
     return nil if constant_se.nil?
     constant.to_f/constant_se
   end
   # Standard error for constant.
-  # Recreate the estimaded variance-covariance matrix
-  # using means, standard deviation and covariance matrix
+  # This method recreates the estimaded variance-covariance matrix
+  # using means, standard deviation and covariance matrix.
+  # So, needs the covariance matrix.
   def constant_se
     return nil if @no_covariance
     means=@x_mean
@@ -178,6 +180,7 @@ class MatrixEngine < BaseEngine
     #sd[@y_var]=@y_sd
     sd[:constant]=0
     fields=[:constant]+@matrix_cov.fields-[@y_var]
+    # Recreate X'X using the variance-covariance matrix
     xt_x=Matrix.rows(fields.collect {|i|
       fields.collect {|j|
         if i==:constant or j==:constant
@@ -203,13 +206,11 @@ class MatrixEngine < BaseEngine
       g.text("R^2=#{sprintf('%0.3f',r2)}")
       
       g.text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
+
+      g.parse_element(f_test)
+
       
-      g.table(:name=>"ANOVA", :header=>%w{source ss df ms f s}) do |t|
-        t.row([_("Regression"), sprintf("%0.3f",ssr), df_r, sprintf("%0.3f",msr), sprintf("%0.3f",f), sprintf("%0.3f", significance)])
-        t.row([_("Error"), sprintf("%0.3f",sse), df_e, sprintf("%0.3f",mse),"",""])
       
-        t.row([_("Total"), sprintf("%0.3f",sst), df_r+df_e,"","",""])
-      end
       sc=standarized_coeffs
       cse=coeffs_se
       g.table(:name=>"Beta coefficients", :header=>%w{coeff b beta se t}.collect{|field| _(field)} ) do |t|

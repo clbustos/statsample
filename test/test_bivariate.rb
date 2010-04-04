@@ -12,7 +12,7 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
       v2=1000.times.collect {|a| rand()}.to_scale
       assert_in_delta(Statsample::Bivariate.covariance(v1,v2), Statsample::Bivariate.covariance_slow(v1,v2), 0.001)
     else
-      puts "Bivariate::covariance not tested (needs GSL)"
+      skip "Bivariate::covariance not tested (needs GSL)"
     end
 
   end
@@ -24,7 +24,7 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
 
       assert_in_delta(GSL::Stats::correlation(v1.gsl, v2.gsl), Statsample::Bivariate.pearson_slow(v1,v2), 1e-10)
     else
-      puts "Not tested gsl versus ruby correlation (needs GSL)"
+      skip "Not tested gsl versus ruby correlation (needs GSL)"
     end
   end
   def test_pearson
@@ -67,6 +67,8 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
       if Statsample.has_gsl?
         poly.compute_two_step_mle_drasgow_gsl
         assert_in_delta(tetra.r,poly.r,0.0001)
+      else
+        skip "compute_two_step_mle_drasgow_gsl not tested (requires GSL)"
       end
     }
   end
@@ -112,7 +114,7 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
       assert_in_delta(1.5938, poly.threshold_y[1],0.0001)
       assert_in_delta(1.1331, poly.threshold_x[1],0.0001)
     else
-      puts "Two-step optimized, polychoric series and Joint method for Polychoric  requires GSL"
+      skip "Two-step optimized, polychoric series and Joint method for Polychoric  requires GSL"
     end
     assert(poly.summary)
   end

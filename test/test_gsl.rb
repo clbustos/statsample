@@ -14,6 +14,8 @@ class StatsampleGSLTestCase < MiniTest::Unit::TestCase
       matrix=gsl.to_matrix
       assert_equal(5,matrix.row_size)
       assert_equal(3,matrix.column_size)
+    else
+      skip("Needs GSL extension")
     end
   end
 end

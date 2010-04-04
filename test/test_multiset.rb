@@ -2,9 +2,6 @@ require(File.dirname(__FILE__)+'/test_helpers.rb')
 
 
 class StatsampleMultisetTestCase < MiniTest::Unit::TestCase
-  def initialize(*args)
-    super
-  end
   def test_creation
     v1a=[1,2,3,4,5].to_vector
     v2b=[11,21,31,41,51].to_vector

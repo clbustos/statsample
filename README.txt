@@ -5,13 +5,13 @@ http://ruby-statsample.rubyforge.org/
 
 == DESCRIPTION:
 
-A suite for basic and advanced statistics on Ruby. Tested on Ruby 1.8.7, Ruby 1.9 and JRuby 1.4 (Ruby 1.8.7 compatible) 
+A suite for basic and advanced statistics on Ruby. Tested on Ruby 1.8.7, 1.9.1, 1.9.2 (April, 2010) and JRuby 1.4 (Ruby 1.8.7 compatible) 
 
 Includes:
 * Descriptive statistics: frequencies, median, mean, standard error, skew, kurtosis (and many others).
 * Imports and exports datasets from and to Excel, CSV and plain text files.
 * Correlations: Pearson's r, Spearman's rank correlation (rho), Tetrachoric, Polychoric
-* Tests: T, Levene, U-Mannwhitney, One-Way Anova
+* Tests: F (Anona One-Way), T, Levene, U-Mannwhitney.
 * Regression: Simple, Multiple, Probit  and Logit
 * Factorial Analysis: Extraction (PCA and Principal Axis) and Rotation (Varimax and relatives)
 * Dominance Analysis, with multivariate dependent and bootstrap (Azen & Budescu)
