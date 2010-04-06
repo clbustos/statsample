@@ -10,7 +10,7 @@ rescue LoadError
 end
 
 
-class DistributionTestCase < MiniTest::Unit::TestCase
+class DistributionTestCase < Test::Unit::TestCase
   def test_chi
     if !NOT_GSL
       [2,3,4,5].each{|k|

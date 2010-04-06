@@ -1,113 +1,176 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleTestVector < MiniTest::Unit::TestCase
-
+class StatsampleTestVector < Test::Unit::TestCase
   def setup
     @c = Statsample::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :nominal)
+    @c.name="Test Vector"
     @c.missing_values=[-99]
+  end
+  def assert_counting_tokens(b)
+    assert_equal([1,1,0,1,0,nil],b['a'].to_a)
+    assert_equal([0,1,0,0,0,nil],b['b'].to_a)
+    assert_equal([0,0,1,0,0,nil],b['c'].to_a)
+    assert_equal([0,0,1,1,0,nil],b['d'].to_a)
+    assert_equal([0,0,0,0,1,nil],b[10].to_a)
+  end
+  context Statsample::Vector do
+    setup do 
+      @c = Statsample::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :nominal)
+      @c.name="Test Vector"
+      @c.missing_values=[-99]
+    end
+    context "using matrix operations" do
+      setup do
+        @a=[1,2,3,4,5].to_scale
+      end
+      should "to_matrix returns a matrix with 1 row" do 
+        mh=Matrix[[1,2,3,4,5]]
+        assert_equal(mh,@a.to_matrix)
+      end
+      should "to_matrix(:vertical) returns a matrix with 1 column" do 
+        mv=Matrix.columns([[1,2,3,4,5]])
+        assert_equal(mv,@a.to_matrix(:vertical))
+      end
+      should "returns valid submatrixes" do
+        # 3*4 + 2*5 = 22
+        a=[3,2].to_vector(:scale)
+        b=[4,5].to_vector(:scale)
+        assert_equal(22,(a.to_matrix*b.to_matrix(:vertical))[0,0])
+      end
+    end
+    context "when initializing" do
+      setup do 
+        @data=(10.times.map{rand(100)})+[nil]
+        @original=Statsample::Vector.new(@data, :scale)
+      end
+      should "be the same usign #to_vector" do
+        lazy1=@data.to_vector(:scale)
+        assert_equal(@original,lazy1)
+      end
+      should "be the same using #to_scale" do
+        lazy2=@data.to_scale
+        assert_equal(@original,lazy2)
+        assert_equal(:scale,lazy2.type)
+        assert_equal(@data.find_all{|v| !v.nil?},lazy2.valid_data)
+      end
+    end
+    
+    context "#split_by_separator" do
+     
+      setup do
+        @a = Statsample::Vector.new(["a","a,b","c,d","a,d",10,nil],:nominal)
+        @b=@a.split_by_separator(",")
+      end
+      should "returns a Hash" do
+        assert_kind_of(Hash, @b)
+      end
+      should "return a Hash with keys with different values of @a" do
+        expected=['a','b','c','d',10]
+        assert_equal(expected, @b.keys)
+      end
+      
+      should "returns a Hash, which values are Statsample::Vector" do
+        @b.each_key {|k| assert_instance_of(Statsample::Vector, @b[k])}
+      end
+      should "hash values are n times the tokens appears" do
+        assert_counting_tokens(@b)
+      end
+      should "#split_by_separator_freq returns the number of ocurrences of tokens" do 
+        assert_equal({'a'=>3,'b'=>1,'c'=>1,'d'=>2,10=>1}, @a.split_by_separator_freq())
+      end
+      should "using a different separator give the same values" do
+        a = Statsample::Vector.new(["a","a*b","c*d","a*d",10,nil],:nominal)
+        b=a.split_by_separator("*")
+        assert_counting_tokens(b)
+      end
+    end
 
-  end
-  def test_save_load
-    outfile=Tempfile.new("vector.vec")
-    @c.save(outfile.path)
-    a=Statsample.load(outfile.path)
-    assert_equal(@c,a)
-
-  end
-  def test_lazy_methods
-    data=[1,2,3,4,5,nil]
-    correct=Statsample::Vector.new(data,:scale)
-    lazy1=data.to_vector(:scale)
-    lazy2=data.to_scale
-    assert_equal(correct,lazy1)
-    assert_equal(correct,lazy2)
-    assert_equal(:scale,lazy2.type)
-    assert_equal([1,2,3,4,5],lazy2.valid_data)
-  end
-  def test_enumerable
-    val=@c.collect {|v| v}
-    assert_equal(val,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99])
-  end
-  def test_recode
-    a=@c.recode{|v| @c.is_valid?(v) ? 0 : 1 }
-    exp=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1].to_vector
-    assert_equal(exp,a)
-    exp.recode!{|v| v==0 ? 1:0}
-    exp2=(([1]*15)+([0]*3)).to_vector
-    assert_equal(exp2,exp)
-  end
-  def test_product
-    a=[1,2,3,4,5].to_vector(:scale)
-    assert_equal(120,a.product)
-  end
-  def test_matrix
-    a=[1,2,3,4,5].to_vector(:scale)
-    mh=Matrix[[1,2,3,4,5]]
-    mv=Matrix.columns([[1,2,3,4,5]])
-    assert_equal(mh,a.to_matrix)
-    assert_equal(mv,a.to_matrix(:vertical))
-    # 3*4 + 2*5 = 22
-    a=[3,2].to_vector(:scale)
-    b=[4,5].to_vector(:scale)
-    assert_equal(22,(a.to_matrix*b.to_matrix(:vertical))[0,0])
-  end
-  def test_missing_values
-    @c.missing_values=[10]
-    assert_equal([-99,-99,1,2,3,4,5,5,5,5,5,6,6,7,8,9], @c.valid_data.sort)
-    assert_equal([5,5,5,5,5,6,6,7,8,9,nil,1,2,3,4,nil,-99,-99], @c.data_with_nils)
-    @c.missing_values=[-99]
-    assert_equal(@c.valid_data.sort,[1,2,3,4,5,5,5,5,5,6,6,7,8,9,10])
-    assert_equal(@c.data_with_nils,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,nil,nil])
-    @c.missing_values=[]
-    assert_equal(@c.valid_data.sort,[-99,-99,1,2,3,4,5,5,5,5,5,6,6,7,8,9,10])
-    assert_equal(@c.data_with_nils,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99])
-
-  end
-  def test_has_missing_data
-    a=[1,2,3,nil].to_vector
-    assert(a.has_missing_data?)
-    a=[1,2,3,4,10].to_vector
-    assert(!a.has_missing_data?)
-    a.missing_values=[10]
-    assert(a.has_missing_data?)
-  end
-  def test_labeled
-    @c.labels={5=>'FIVE'}
-    assert_equal(["FIVE","FIVE","FIVE","FIVE","FIVE",6,6,7,8,9,10,1,2,3,4,nil,-99, -99],@c.vector_labeled.to_a)
+    
+    should "have a name" do
+      @c.name=="Test Vector"
+    end
+    should "without explicit name, returns vector with succesive numbers" do
+      a=10.times.map{rand(100)}.to_scale
+      b=10.times.map{rand(100)}.to_scale
+      assert_match(/Vector \d+/, a.name)
+      a.name=~/Vector (\d+)/
+      next_number=$1.to_i+1
+      assert_equal("Vector #{next_number}",b.name)
+    end
+    should "save to a file and load the same Vector" do 
+      outfile=Tempfile.new("vector.vec")
+      @c.save(outfile.path)
+      a=Statsample.load(outfile.path)
+      assert_equal(@c,a)  
+    end
+    should "#collect returns an array" do
+      val=@c.collect {|v| v}
+      assert_equal(val,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99])
+    end
+    
+    should "#recode returns a recoded array" do
+      a=@c.recode{|v| @c.is_valid?(v) ? 0 : 1 }
+      exp=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1].to_vector
+      assert_equal(exp,a)
+      exp.recode!{|v| v==0 ? 1:0}
+      exp2=(([1]*15)+([0]*3)).to_vector
+      assert_equal(exp2,exp)
+    end
+    should "#product returns the * of all values" do
+      a=[1,2,3,4,5].to_vector(:scale)
+      assert_equal(120,a.product)
+    end
+    
+    should "missing values" do 
+      @c.missing_values=[10]
+      assert_equal([-99,-99,1,2,3,4,5,5,5,5,5,6,6,7,8,9], @c.valid_data.sort)
+      assert_equal([5,5,5,5,5,6,6,7,8,9,nil,1,2,3,4,nil,-99,-99], @c.data_with_nils)
+      @c.missing_values=[-99]
+      assert_equal(@c.valid_data.sort,[1,2,3,4,5,5,5,5,5,6,6,7,8,9,10])
+      assert_equal(@c.data_with_nils,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,nil,nil])
+      @c.missing_values=[]
+      assert_equal(@c.valid_data.sort,[-99,-99,1,2,3,4,5,5,5,5,5,6,6,7,8,9,10])
+      assert_equal(@c.data_with_nils,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99])
+      
+    end
+    should "has_missing_values" do 
+      a=[1,2,3,nil].to_vector
+      assert(a.has_missing_data?)
+      a=[1,2,3,4,10].to_vector
+      assert(!a.has_missing_data?)
+      a.missing_values=[10]
+      assert(a.has_missing_data?)
+    end
+    should "label correctly fields" do 
+      @c.labels={5=>'FIVE'}
+      assert_equal(["FIVE","FIVE","FIVE","FIVE","FIVE",6,6,7,8,9,10,1,2,3,4,nil,-99, -99],@c.vector_labeled.to_a)
+    end
+    should "verify" do 
+      h=@c.verify{|d| !d.nil? and d>0}
+      e={15=>nil,16=>-99,17=>-99}
+      assert_equal(e,h)
+    end
+    should "have a summary with name on it" do
+      
+      assert_match(/#{@c.name}/, @c.summary)
+    end
+    should "have output dependent of #type" do
+      @c.type=:nominal
+      assert_match(/Distribution/, @c.summary())
+      @c.type=:ordinal
+      assert_match(/median/, @c.summary())
+      @c.type=:scale
+      assert_match(/mean/, @c.summary())
+    end
+    
+    
   end
   def test_split
     a = Statsample::Vector.new(["a","a,b","c,d","a,d","d",10,nil],:nominal)
     assert_equal([%w{a},%w{a b},%w{c d},%w{a d},%w{d},[10],nil], a.splitted)
   end
-  def test_verify
-    h=@c.verify{|d| !d.nil? and d>0}
-    e={15=>nil,16=>-99,17=>-99}
-    assert_equal(e,h)
-  end
-  def test_split_by_separator
-    a = Statsample::Vector.new(["a","a,b","c,d","a,d",10,nil],:nominal)
-    b=a.split_by_separator(",")
-    assert_kind_of(Hash, b)
-    assert_instance_of(Statsample::Vector,b['a'])
-    assert_instance_of(Statsample::Vector,b['b'])
-    assert_instance_of(Statsample::Vector,b['c'])
-    assert_instance_of(Statsample::Vector,b['d'])
-    assert_instance_of(Statsample::Vector,b[10])
-    assert_equal([1,1,0,1,0,nil],b['a'].to_a)
-    assert_equal([0,1,0,0,0,nil],b['b'].to_a)
-    assert_equal([0,0,1,0,0,nil],b['c'].to_a)
-    assert_equal([0,0,1,1,0,nil],b['d'].to_a)
-    assert_equal([0,0,0,0,1,nil],b[10].to_a)
-    assert_equal({'a'=>3,'b'=>1,'c'=>1,'d'=>2,10=>1}, a.split_by_separator_freq())
 
-    a = Statsample::Vector.new(["a","a*b","c*d","a*d",10,nil],:nominal)
-    b=a.split_by_separator("*")
-    assert_equal([1,1,0,1,0,nil],b['a'].to_a)
-    assert_equal([0,1,0,0,0,nil],b['b'].to_a)
-    assert_equal([0,0,1,0,0,nil],b['c'].to_a)
-    assert_equal([0,0,1,1,0,nil],b['d'].to_a)
-    assert_equal([0,0,0,0,1,nil],b[10].to_a)
-  end
+
   def test_types
     @c.type=:nominal
     assert_raise NoMethodError do
@@ -175,14 +238,7 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     assert_equal(0,vs.mean)
     assert_equal(1,vs.sds)
   end
-  def test_summary
-    @c.type=:nominal
-    assert_match(/Distribution/, @c.summary())
-    @c.type=:ordinal
-    assert_match(/median/, @c.summary())
-    @c.type=:scale
-    assert_match(/mean/, @c.summary())
-  end
+
   def test_add
     a=Statsample::Vector.new([1,2,3,4,5], :scale)
     b=Statsample::Vector.new([11,12,13,14,15], :scale)

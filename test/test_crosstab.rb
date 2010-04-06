@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleCrosstabTestCase < MiniTest::Unit::TestCase
+class StatsampleCrosstabTestCase < Test::Unit::TestCase
 
   def initialize(*args)
     @v1=%w{black blonde black black red black brown black blonde black red black blonde}.to_vector

@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleFactorTestCase < MiniTest::Unit::TestCase
+class StatsampleFactorTestCase < Test::Unit::TestCase
   # Tested with SPSS and R
   def test_pca
     if Statsample.has_gsl?
@@ -84,9 +84,9 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
         [0.0826106, 0.435975, -0.893379],
       [0.939901, -0.0965213, -0.309596]].to_gsl
       varimax=Statsample::Factor::Varimax.new(a)
-      refute(varimax.rotated.nil?,"Rotated shouldn't be empty")
-      refute(varimax.component_transformation_matrix.nil?, "Component matrix shouldn't be empty")
-      refute(varimax.h2.nil?,"H2 shouldn't be empty")
+      assert(!varimax.rotated.nil?, "Rotated shouldn't be empty")
+      assert(!varimax.component_transformation_matrix.nil?, "Component matrix shouldn't be empty")
+      assert(!varimax.h2.nil?,"H2 shouldn't be empty")
       _test_matrix(expected,varimax.rotated)
     else
       skip "Rotation not tested. Requires GSL"

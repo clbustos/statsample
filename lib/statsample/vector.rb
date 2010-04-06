@@ -24,12 +24,7 @@ module Statsample
   class Vector
     include Enumerable
     include Writable
-    # DEFAULT OPTIONS
-    DEFAULT_OPTIONS={
-      :missing_values=>[],
-      :today_values=>['NOW','TODAY', :NOW, :TODAY],
-      :labels=>{}
-    }
+    
     # Level of measurement. Could be :nominal, :ordinal or :scale
     attr_reader :type
     # Original data. 
@@ -50,23 +45,39 @@ module Statsample
     attr_reader :gsl
     # Change label for specific values
     attr_accessor :labels
+    # Name of vector. Should be used for output by many classes
+    attr_accessor :name
+    
     #
     # Creates a new Vector object.
-    # [data]            Array of data.
-    # [type]            Level of meausurement. See Vector#type
-    # [opts]            Options
-    #   [:missing_values]  Array of missing values. See Vector#missing_values
-    #   [:today_values] Array of 'today' values. See Vector#today_values
-    #   [:labels]          Labels for data values
+    # * <tt>data</tt> Array of data.
+    # * <tt>type</tt> Level of meausurement. See Vector#type
+    # * <tt>opts</tt> Hash of options
+    #   * <tt>:missing_values</tt>  Array of missing values. See Vector#missing_values
+    #   * <tt>:today_values</tt> Array of 'today' values. See Vector#today_values
+    #   * <tt>:labels</tt> Labels for data values
+    #   * <tt>:name</tt> Name of vector
     #
     def initialize(data=[], type=:nominal, opts=Hash.new)
       raise "Data should be an array" unless data.is_a? Array
       @data=data
       @type=type
-      opts=DEFAULT_OPTIONS.merge(opts)
-      @missing_values=opts[:missing_values]
-      @labels=opts[:labels]
-      @today_values=opts[:today_values]
+      opts_default={
+        :missing_values=>[],
+        :today_values=>['NOW','TODAY', :NOW, :TODAY],
+        :labels=>{},
+        :name=>nil
+      }
+      @opts=opts_default.merge(opts)
+      if  @opts[:name].nil?
+        @@n_table||=0
+        @@n_table+=1
+        @opts[:name]="Vector #{@@n_table}"
+      end
+      @missing_values=@opts[:missing_values]
+      @labels=@opts[:labels]
+      @today_values=@opts[:today_values]
+      @name=@opts[:name]
       @valid_data=[]
       @data_with_nils=[]
       @date_data_with_nils=[]
@@ -80,12 +91,12 @@ module Statsample
     # Note: data, missing_values and labels are duplicated, so
     # changes on original vector doesn't propages to copies.
     def dup
-    Vector.new(@data.dup,@type, :missing_values => @missing_values.dup, :labels => @labels.dup)
+      Vector.new(@data.dup,@type, :missing_values => @missing_values.dup, :labels => @labels.dup, :name=>@name.dup)
     end
     # Returns an empty duplicate of the vector. Maintains the type,
     # missing values and labels.
     def dup_empty
-    Vector.new([],@type, :missing_values => @missing_values.dup, :labels => @labels.dup)
+      Vector.new([],@type, :missing_values => @missing_values.dup, :labels => @labels.dup, :name=>@name.dup)
     end
     # Raises an exception if type of vector is inferior to t type
     def check_type(t)
@@ -128,8 +139,8 @@ module Statsample
     # Vector equality.
     # Two vector will be the same if their data, missing values, type, labels are equals
     def ==(v2)
-    raise TypeError,"Argument should be a Vector" unless v2.instance_of? Statsample::Vector
-    @data==v2.data and @missing_values==v2.missing_values and @type==v2.type and @labels=v2.labels
+      raise TypeError,"Argument should be a Vector" unless v2.instance_of? Statsample::Vector
+      @data==v2.data and @missing_values==v2.missing_values and @type==v2.type and @labels==v2.labels
     end
     
     def _dump(i) # :nodoc:
@@ -189,8 +200,8 @@ module Statsample
     # Vector.set_valid_data at the end of your insertion cycle
     #
     def add(v,update_valid=true)
-    @data.push(v)
-    set_valid_data if update_valid
+      @data.push(v)
+      set_valid_data if update_valid
     end
     # Update valid_data, missing_data, data_with_nils and gsl
     # at the end of an insertion.
@@ -208,14 +219,14 @@ module Statsample
     #   v.valid_data
     #   => [2,3]
     def set_valid_data
-    @valid_data.clear
-    @missing_data.clear
-    @data_with_nils.clear
-    @date_data_with_nils.clear
-    @gsl=nil
-    set_valid_data_intern
-    set_scale_data if(@type==:scale)
-    set_date_data if(@type==:date)
+      @valid_data.clear
+      @missing_data.clear
+      @data_with_nils.clear
+      @date_data_with_nils.clear
+      @gsl=nil
+      set_valid_data_intern
+      set_scale_data if(@type==:scale)
+      set_date_data if(@type==:date)
     end
     
     if Statsample::STATSAMPLE__.respond_to?(:set_valid_data_intern)
@@ -597,24 +608,26 @@ module Statsample
     def proportion(v=1)
         frequencies[v].quo(@valid_data.size)
     end
-    def summary(out="")
-      out << sprintf("n valid:%d\n",n_valid)
-      out <<  sprintf("factors:%s\n",factors.join(","))
-      out <<  "mode:"+mode.to_s+"\n"
-      out <<  "Distribution:\n"
-      frequencies.sort.each{|k,v|
-        key=labels.has_key?(k) ? labels[k]:k
-        out <<  sprintf("%s : %s (%0.2f%%)\n",key,v, (v.quo(n_valid))*100)
-      }
-      if(@type==:ordinal)
-        out << "median:"+median.to_s+"\n"
+    def summary
+      ReportBuilder.new(:to_title=>true).add(self).to_text
+    end
+    def report_building(b)
+      b.section(:name=>name) do |s|
+        s.text sprintf("n valid:%d",n_valid)
+        s.text  sprintf("factors:%s",factors.join(","))
+        s.text   "mode:"+mode.to_s
+        s.table(:name=>"Distribution") do |t|
+          frequencies.sort.each do |k,v|
+            key=labels.has_key?(k) ? labels[k]:k
+            t.row [key,v, ("%0.2f%%" % (v.quo(n_valid)*100))]
+          end
+        end
+        s.text "median:"+median.to_s if(@type==:ordinal)
+        if(@type==:scale)
+          s.text "mean:"+mean.to_s
+          s.text "sd:"+sd.to_s
+        end
       end
-      if(@type==:scale)
-        out << "mean:"+mean.to_s+"\n"
-        out << "sd:"+sd.to_s+"\n"
-        
-      end
-      out
     end
       
       # Variance of p, according to poblation size

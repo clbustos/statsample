@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
+class StatsampleRegressionTestCase < Test::Unit::TestCase
   def test_parameters
     @x=[13,20,10,33,15].to_vector(:scale)
     @y=[23,18,35,10,27	].to_vector(:scale)

@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
+class StatsampleBivariateTestCase < Test::Unit::TestCase
   def test_sum_of_squares
     v1=[1,2,3,4,5,6].to_vector(:scale)
     v2=[6,2,4,10,12,8].to_vector(:scale)

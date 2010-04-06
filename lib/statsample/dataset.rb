@@ -64,8 +64,6 @@ module Statsample
     attr_reader :cases
     # Location of pointer on enumerations methods (like #each)
     attr_reader :i
-    # Deprecated: Label of vectors
-    attr_accessor :labels
     
     # Generates a new dataset, using three vectors
     # - Rows
@@ -122,10 +120,9 @@ module Statsample
     # [fields]  Array of names for vectors. Is only used for set the
     # order of variables. If empty, vectors keys on alfabethic order as
     # used as fields
-    # [labels]  Hash to set names for fields.
 
     #
-    def initialize(vectors={}, fields=[], labels={})
+    def initialize(vectors={}, fields=[])
       if vectors.instance_of? Array
         @fields=vectors.dup
         @vectors=vectors.inject({}){|a,x| a[x]=Statsample::Vector.new(); a}
@@ -137,7 +134,6 @@ module Statsample
         check_length
       end
       @i=nil
-      @labels=labels
     end
     def to_gsl_matrix
       matrix=GSL::Matrix.alloc(cases,@vectors.size)
@@ -146,11 +142,7 @@ module Statsample
       end
       matrix
     end
-    # Retrieves label for a vector, giving a field name.
-    def label(v_id) 
-      raise "Vector #{v} doesn't exists" unless @fields.include? v_id
-      @labels[v_id].nil? ? v_id : @labels[v_id]
-    end
+
     # Creates a copy of the given dataset, deleting all the cases with
     # missing data on one of the vectors
     def dup_only_valid
@@ -180,14 +172,12 @@ module Statsample
       fields_to_include=@fields if fields_to_include.size==0
       vectors={}
       fields=[]
-      new_labels={}
       fields_to_include.each{|f|
         raise "Vector #{f} doesn't exists" unless @vectors.has_key? f
         vectors[f]=@vectors[f].dup
-        new_labels[f]=@labels[f]
         fields.push(f)
       }
-      Dataset.new(vectors,fields,new_labels)
+      Dataset.new(vectors,fields)
     end
     # Creates a copy of the given dataset, without data on vectors
     def dup_empty
@@ -195,7 +185,7 @@ module Statsample
         a[v[0]]=v[1].dup_empty
         a
       }
-      Dataset.new(vectors,@fields.dup,@labels.dup)
+      Dataset.new(vectors,@fields.dup)
     end
     # Merge vectors from two datasets
     # In case of name collition, the vectors names are changed to 
@@ -233,7 +223,7 @@ module Statsample
       }
       Matrix.rows(rows)
     end
-    # We have the same datasets if the labels and vectors are the same
+    # We have the same datasets if vectors and fields are the same
     def ==(d2)
       @vectors==d2.vectors and @fields==d2.fields
     end
@@ -305,12 +295,12 @@ module Statsample
       @vectors.delete(name)
     end
     
-    def add_vectors_by_split_recode(name,join='-',sep=Statsample::SPLIT_TOKEN)
-      split=@vectors[name].split_by_separator(sep)
+    def add_vectors_by_split_recode(name_,join='-',sep=Statsample::SPLIT_TOKEN)
+      split=@vectors[name_].split_by_separator(sep)
       i=1
       split.each{|k,v|
-        new_field=name+join+i.to_s
-        @labels[new_field]=name+":"+k
+        new_field=name_+join+i.to_s
+        v.name=name_+":"+k
         add_vector(new_field,v)
         i+=1
       }
@@ -702,7 +692,7 @@ module Statsample
       vr
     end
     def to_s
-      "#<"+self.class.to_s+":"+self.object_id.to_s+" @fields=["+@fields.join(",")+"] labels="+@labels.inspect+" cases="+@vectors[@fields[0]].size.to_s
+      "#<"+self.class.to_s+":"+self.object_id.to_s+" @fields=["+@fields.join(",")+"] cases="+@vectors[@fields[0]].size.to_s
     end
     def inspect
       self.to_s

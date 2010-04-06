@@ -107,14 +107,15 @@ module Statsample
       attr_reader :u
       # Value of compensation for ties (useful for demostration)
       attr_reader :t
+      # Name of test
+      attr_accessor :name
       #
       # Create a new U Mann-Whitney test
       # Params: Two Statsample::Vectors
       # 
-      def initialize(v1,v2)
+      def initialize(v1,v2, opts=Hash.new)
         @n1=v1.valid_data.size
         @n2=v2.valid_data.size
-
         data=(v1.valid_data+v2.valid_data).to_scale
         groups=(([0]*@n1)+([1]*@n2)).to_vector
         ds={'g'=>groups, 'data'=>data}.to_dataset
@@ -132,11 +133,17 @@ module Statsample
         @u1=r1-((@n1*(@n1+1)).quo(2))
         @u2=r2-((@n2*(@n2+1)).quo(2))
         @u=(u1<u2) ? u1 : u2
+        opts_default={:name=>"Mann-Whitney's U"}
+        @opts=opts_default.merge(opts)
+        opts_default.keys.each {|k|
+          send("#{k}=", @opts[k])
+        }
+          
       end
       # Report results.
       def summary
         out=<<-HEREDOC
-Mann-Whitney U
+@name
 Sum of ranks v1: #{@r1.to_f}
 Sum of ranks v1: #{@r2.to_f}
 U Value: #{@u.to_f}
@@ -152,7 +159,7 @@ Z: #{sprintf("%0.3f",z)} (p: #{sprintf("%0.3f",z_probability)})
       end
       # Exact probability of finding values of U lower or equal to sample on U distribution. Use with caution with m*n>100000.
       # Uses u_sampling_distribution_as62
-      def exact_probability
+      def probability_exact
         dist=UMannWhitney.u_sampling_distribution_as62(@n1,@n2)
         sum=0
         (0..@u.to_i).each {|i|
@@ -190,9 +197,9 @@ Z: #{sprintf("%0.3f",z)} (p: #{sprintf("%0.3f",z_probability)})
         (@u-mu).quo(ou)
       end
       # Assuming H_0, the proportion of cdf with values of U lower
-      # than the sample. 
+      # than the sample, using normal approximation.
       # Use with more than 30 cases per group.
-      def z_probability
+      def probability_z
         (1-Distribution::Normal.cdf(z.abs()))*2
       end
     end

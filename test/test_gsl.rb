@@ -1,7 +1,7 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
 
-class StatsampleGSLTestCase < MiniTest::Unit::TestCase
+class StatsampleGSLTestCase < Test::Unit::TestCase
   def test_matrix_to_gsl
     if Statsample.has_gsl?
       a=[1,2,3,4,20].to_vector(:scale)

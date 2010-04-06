@@ -31,7 +31,7 @@ module Statsample
           end
           num.quo(den)
         end
-         # Degrees of freedom for equal variance
+        # Degrees of freedom for equal variance on t test
         def df_equal_variance(n1,n2)
           n1+n2-2
         end
@@ -67,7 +67,6 @@ module Statsample
       class OneSample
         include Math
         include Statsample::Test
-        include DirtyMemoize
         # Options
         attr_accessor :opts
         # Name of test
@@ -76,15 +75,9 @@ module Statsample
         attr_accessor :u
         # Degress of freedom
         attr_reader :df
-        # Value of t
-        attr_reader :t
-        # Probability
-        attr_reader :probability
         # Tails for probability (:both, :left or :right)
         attr_accessor :tails 
         
-        dirty_writer :u, :tails
-        dirty_memoize :t, :probability
         # Create a One Sample T Test
         # Options:
         # * :u = Mean to compare. Default= 0
@@ -100,14 +93,14 @@ module Statsample
           @df= @vector.n_valid-1
           @t=nil
         end        
-       
-        
-        # Set t and probability for given u
-        def compute
-          @t  = T.one_sample(@vector.mean, @u, @vector.sd, @vector.n_valid)
-          @probability = p_using_cdf(Distribution::T.cdf(@t, @df), tails)
+        def t
+          T.one_sample(@vector.mean, @u, @vector.sd, @vector.n_valid)
         end
-        # Presents summary of analysis
+        
+        def probability
+          p_using_cdf(Distribution::T.cdf(t, @df), tails)
+        end
+        # Summary of analysis
         # 
         def summary
           ReportBuilder.new(:no_title=>true).add(self).to_text

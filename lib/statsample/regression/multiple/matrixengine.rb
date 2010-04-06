@@ -207,7 +207,7 @@ class MatrixEngine < BaseEngine
       
       g.text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
 
-      g.parse_element(f_test)
+      g.parse_element(anova)
 
       
       

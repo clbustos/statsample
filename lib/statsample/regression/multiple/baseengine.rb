@@ -23,8 +23,8 @@ module Statsample
           }
         end
         # Calculate F Test
-        def f_test
-          @f_test||=Statsample::Test::F.new(ssr, sse, df_r, df_e, :name_numerator=>_("Regression"), :name_denominator=>_("Error"), :name=>"ANOVA")
+        def anova
+          @anova||=Statsample::Anova::OneWay.new(:ss_num=>ssr, :ss_den=>sse, :df_num=>df_r, :df_den=>df_e, :name_numerator=>_("Regression"), :name_denominator=>_("Error"), :name=>"ANOVA")
         end
         # Retrieves a vector with predicted values for y
         def predicted
@@ -97,11 +97,11 @@ module Statsample
         end
         # Fisher for Anova
         def f
-          f_test.f
+          anova.f
         end
         # p-value of Fisher
         def probability
-          f_test.probability
+          anova.probability
         end
         # Tolerance for a given variable
         # http://talkstats.com/showthread.php?t=5056
@@ -170,7 +170,7 @@ module Statsample
             
             g.text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
             
-            g.parse_element(f_test)
+            g.parse_element(anova)
             sc=standarized_coeffs
             cse=coeffs_se
             g.table(:name=>"Beta coefficients", :header=>%w{coeff b beta se t}.collect{|field| _(field)} ) do |t|

@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
+class StatsampleDatasetTestCase < Test::Unit::TestCase
   def setup
     @ds=Statsample::Dataset.new({'id' => Statsample::Vector.new([1,2,3,4,5]), 'name'=>Statsample::Vector.new(%w{Alex Claude Peter Franz George}), 'age'=>Statsample::Vector.new([20,23,25,27,5]),
       'city'=>Statsample::Vector.new(['New York','London','London','Paris','Tome']),
@@ -192,7 +192,9 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     assert_equal([1,0,1,nil,1],@ds.col('a1_1').to_a)
     assert_equal([1,1,0,nil,1],@ds.col('a1_2').to_a)
     assert_equal([0,1,0,nil,1],@ds.col('a1_3').to_a)
-    assert_equal({'a1_1'=>'a1:a', 'a1_2'=>'a1:b', 'a1_3'=>'a1:c'},@ds.labels)
+    {'a1_1'=>'a1:a', 'a1_2'=>'a1:b', 'a1_3'=>'a1:c'}.each do |k,v|
+      assert_equal(v, @ds[k].name)
+    end
   end
   def test_split_by_separator
     @ds.add_vectors_by_split("a1","_")

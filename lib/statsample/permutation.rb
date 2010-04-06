@@ -50,7 +50,7 @@ module Statsample
     end
     def reset
       @iterations=0
-      @data=@original.dup
+      @data=@original.to_a.dup
     end
     def each
       reset
@@ -58,6 +58,7 @@ module Statsample
         yield next_value
       end
     end
+    # Returns permutations
     def permutations
       a=Array.new
       each {|c| a.push(c)}

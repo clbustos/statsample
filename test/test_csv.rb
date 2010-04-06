@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleCSVTestCase < MiniTest::Unit::TestCase
+class StatsampleCSVTestCase < Test::Unit::TestCase
   def setup
     @ds=Statsample::CSV.read(File.dirname(__FILE__)+"/test_csv.csv")
   end

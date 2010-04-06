@@ -2,7 +2,7 @@ require(File.dirname(__FILE__)+'/test_helpers.rb')
 
 
 
-class StatsampleHistogramTestCase < MiniTest::Unit::TestCase
+class StatsampleHistogramTestCase < Test::Unit::TestCase
   def test_control
     h = Statsample::Histogram.alloc(4)
     assert_equal([0.0]*4, h.bin)

@@ -1,6 +1,63 @@
 module Statsample
   module Anova
-    # One Way Anova
+    # = Generic Anova one-way.
+    # You could enter the sum of squares or the mean squares. You
+    # should enter the degrees of freedom for numerator and denominator.
+    # To enter sum of squares:
+    # == Usage
+    #  anova=Statsample::Anova::OneWay(:ss_num=>10,:ss_den=>20, :df_num=>2, :df_den=>10, @name=>"ANOVA for....")
+    class OneWay
+      include GetText
+       bindtextdomain("statsample")
+      attr_reader :df_num, :df_den, :ss_num, :ss_den, :ms_num, :ms_den, :ms_total, :df_total, :ss_total
+      # Name of ANOVA Analisus
+      attr_accessor :name
+      attr_accessor :name_denominator
+      attr_accessor :name_numerator
+      def initialize(opts=Hash.new)
+        # First see if sum of squares or mean squares are entered
+        raise ArgumentError, "You should set d.f." unless (opts.has_key? :df_num and opts.has_key? :df_den)
+        @df_num=opts.delete :df_num
+        @df_den=opts.delete :df_den
+        @df_total=@df_num+@df_den
+        if(opts.has_key? :ss_num and opts.has_key? :ss_den)
+          @ss_num = opts.delete :ss_num
+          @ss_den =opts.delete :ss_den
+          @ms_num =@ss_num.quo(@df_num)
+          @ms_den =@ss_den.quo(@df_den) 
+        elsif (opts.has_key? :ms_num and opts.has_key? :ms_den)
+          @ms_num =opts.delete :ms_num
+          @ms_den =opts.delete :ms_den
+          @ss_num =@ms_num * @df_num
+          @ss_den =@ss_den * @df_den
+        end
+        @ss_total=@ss_num+@ss_den
+        @ms_total=@ms_num+@ms_den
+        opts_default={:name=>"ANOVA", :name_denominator=>"Explained variance", :name_numerator=>"Unexplained variance"}
+        @opts=opts_default.merge(opts)
+        opts_default.keys.each {|k|
+          send("#{k}=", @opts[k])
+        }
+        @f_object=Statsample::Test::F.new(@ms_num,@ms_den,@df_num,@df_den)
+      end
+      def f
+        @f_object.f
+      end
+      def probability
+        @f_object.probability
+      end
+      def report_building(builder)
+        builder.section(:name=>@name) do |b|
+          b.table(:name=>_("%s Table") % @name, :header=>%w{source ss ms df f p}.map {|v| _(v)}) do |t|
+            t.row([@name_numerator, sprintf("%0.3f",@ss_num),  sprintf("%0.3f",@ms_num), @df_num,  sprintf("%0.3f",f), sprintf("%0.3f", probability)])
+            t.row([@name_denominator, sprintf("%0.3f",@ss_den), sprintf("%0.3f",@ms_den), @df_den, "", ""])
+            t.row([_("Total"), sprintf("%0.3f",@ss_total), sprintf("%0.3f",@ms_total), @df_total,"",""])
+          end
+        end
+      end
+
+    end
+    # One Way Anova with vectors
     # Example:
     #   v1=[2,3,4,5,6].to_scale
     #   v2=[3,3,4,5,6].to_scale
@@ -13,22 +70,25 @@ module Statsample
     #   anova.sst 
     #   => 32.9333333333333
     #
-    class OneWay < Statsample::Test::F
-      def initialize(vectors,opts=Hash.new)
-        @vectors=vectors
+    class OneWayWithVectors < OneWay
+       
+      def initialize(*args)
+        if args[0].is_a? Array
+          @vectors=args.shift
+        else
+          @vectors=args.find_all {|v| v.is_a? Statsample::Vector}
+          opts=args.find {|v| v.is_a? Hash}
+        end
+        opts||=Hash.new
         opts_default={:name=>_("Anova One-Way"), :name_numerator=>"Between Groups", :name_denominator=>"Within Groups"}
-        super(ssbg,sswg, df_bg, df_wg)
+        @opts=opts_default.merge(opts).merge(:ss_num=>ssbg, :ss_den=>sswg, :df_num=>df_bg, :df_den=>df_wg)
+        super(@opts)
       end
+      alias  :sst :ss_total 
       # Total mean
-      def mean
+      def total_mean
         sum=@vectors.inject(0){|a,v| a+v.sum}
         sum.quo(n)
-      end
-      
-      # Total sum of squares
-      def sst
-        m=mean
-        @vectors.inject(0) {|total,vector| total+vector.ss(m) }
       end
       # Sum of squares within groups
       def sswg
@@ -36,7 +96,7 @@ module Statsample
       end
       # Sum of squares between groups
       def ssbg
-        m=mean
+        m=total_mean
         @vectors.inject(0) do |total,vector|
           total + (vector.mean-m).square * vector.size 
         end

@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleDominanceAnalysisTestCase < MiniTest::Unit::TestCase
+class StatsampleDominanceAnalysisTestCase < Test::Unit::TestCase
   def aatest_dominance_univariate
     # Example from Budescu (1993)
     m=Matrix[[1, 0.683, 0.154, 0.460, 0.618],[0.683, 1, -0.050, 0.297, 0.461], [0.154, -0.050, 1, 0.006, 0.262],[0.460, 0.297, 0.006, 1, 0.507],[0.618, 0.461, 0.262, 0.507, 1]]

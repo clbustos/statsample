@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleExcelTestCase < MiniTest::Unit::TestCase
+class StatsampleExcelTestCase < Test::Unit::TestCase
   context "Excel reader" do
     setup do 
       @ds=Statsample::Excel.read(File.dirname(__FILE__)+"/test_xls.xls")

@@ -39,7 +39,6 @@ task :makemo do
 end
 
 h=Hoe.spec('statsample') do 
-	self.testlib=:minitest unless RUBY_VERSION<="1.9"
   self.version=Statsample::VERSION
 	self.rubyforge_name = "ruby-statsample"
 	self.developer('Claudio Bustos', 'clbustos@gmail.com')
