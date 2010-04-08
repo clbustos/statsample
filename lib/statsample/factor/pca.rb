@@ -41,7 +41,7 @@ module Factor
       if matrix.respond_to? :to_gsl
         matrix=matrix.to_gsl
       end
-      @name=""
+      @name=_("Principal Component Analysis")
       @matrix=matrix
       @n_variables=@matrix.size1
       @m=nil
@@ -51,7 +51,7 @@ module Factor
       calculate_eigenpairs
       if @m.nil?
         # Set number of factors with eigenvalues > 1
-        @m=@eigenpairs.find_all {|v| v[0]>=1.0}.size
+        @m=@eigenpairs.find_all {|ev,ec| ev>=1.0}.size
       end
 
     end
@@ -120,36 +120,31 @@ module Factor
       @eigenpairs=@eigenpairs.sort.reverse
     end
     def summary
-      rp=ReportBuilder.new()
-      rp.add(self)
-      rp.to_text
+      ReportBuilder.new(:no_title=>true).add(self).to_text
     end
-    def report_building(generator) # :nodoc:
-      anchor=generator.toc_entry(_("PCA: ")+name)
-      generator.html "<div class='pca'>"+_("PCA")+" #{@name}<a name='#{anchor}'></a>"
-
+    def report_building(builder) # :nodoc:
+      builder.section(:name=>@name) do |generator|
       generator.text "Number of factors: #{m}"
-      t=ReportBuilder::Table.new(:name=>_("Communalities"), :header=>["Variable","Initial","Extraction"])
-      communalities(m).each_with_index {|com,i|
-        t.row([i, 1.0, sprintf("%0.3f", com)])
-      }
-      generator.parse_element(t)
-      
-      t=ReportBuilder::Table.new(:name=>_("Eigenvalues"), :header=>["Variable","Value"])
-      eigenvalues.each_with_index {|eigenvalue,i|
-        t.row([i, sprintf("%0.3f",eigenvalue)])
-      }
-      generator.parse_element(t)
-      
-      t=ReportBuilder::Table.new(:name=>_("Component Matrix"), :header=>["Variable"]+m.times.collect {|c| c+1})
-      
-      i=0
-      component_matrix(m).to_a.each do |row|
-        t.row([i]+row.collect {|c| sprintf("%0.3f",c)})
-        i+=1
+      generator.table(:name=>_("Communalities"), :header=>["Variable","Initial","Extraction"]) do |t|
+        communalities(m).each_with_index {|com,i|
+          t.row([i, 1.0, sprintf("%0.3f", com)])
+        }
+      end      
+      generator.table(:name=>_("Eigenvalues"), :header=>["Variable","Value"]) do |t|
+        eigenvalues.each_with_index {|eigenvalue,i|
+          t.row([i, sprintf("%0.3f",eigenvalue)])
+        }
       end
-      generator.parse_element(t)
-      generator.html("</div>")
+      
+      generator.table(:name=>_("Component Matrix"), :header=>["Variable"]+m.times.collect {|c| c+1}) do |t|
+        
+        i=0
+        component_matrix(m).to_a.each do |row|
+          t.row([i]+row.collect {|c| sprintf("%0.3f",c)})
+          i+=1
+        end
+      end
+      end
     end
     private :calculate_eigenpairs, :create_centered_ds
   end

@@ -134,6 +134,7 @@ module Statsample
       end
       @models=nil
       @models_data=nil
+      @general_averages=nil
     end
     # Compute models. 
     def compute

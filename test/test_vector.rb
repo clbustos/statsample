@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleTestVector < Test::Unit::TestCase
+class StatsampleTestVector < MiniTest::Unit::TestCase
   def setup
     @c = Statsample::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :nominal)
     @c.name="Test Vector"

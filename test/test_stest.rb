@@ -1,7 +1,7 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
 
-class StatsampleTestTestCase < Test::Unit::TestCase
+class StatsampleTestTestCase < MiniTest::Unit::TestCase
   def test_chi_square
     real=Matrix[[95,95],[45,155]]
     expected=Matrix[[68,122],[72,128]]

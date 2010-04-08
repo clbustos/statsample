@@ -120,7 +120,7 @@ module Distribution
         sum
       end
       # Normal cumulative distribution function (cdf) for a given x, y and rho.
-      # Based on Fortran code by Alan Genz
+      # Ported from Fortran code by Alan Genz
       #
       # Original documentation
       #    DOUBLE PRECISION FUNCTION BVND( DH, DK, R )

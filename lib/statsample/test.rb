@@ -8,11 +8,12 @@ module Statsample
     autoload(:F, 'statsample/test/f')
     # Returns probability of getting a value lower or higher
     # than sample, using cdf and number of tails.
-    # * For one tail left, return the cdf
-    # * For one tail right, return 1-cdf
-    # * For two tails, returns 2*right_tail(cdf.abs)
+    # 
+    # * <tt>:left</tt> : For one tail left, return the cdf
+    # * <tt>:right</tt> : For one tail right, return 1-cdf
+    # * <tt>:both</tt> : For both tails, returns 2*right_tail(cdf.abs)
     def p_using_cdf(cdf, tails=:both)
-      tails=:both if tails==2
+      tails=:both if tails==2 or tails==:two
       tails=:right if tails==1 or tails==:positive
       tails=:left if tails==:negative
       case tails
@@ -40,8 +41,11 @@ module Statsample
         }
         sum
       end
-      def u_mannwhitney(v1p,v2p)
-        Statsample::Test::UMannWhitney.new(v1p,v2p)
+      # Shorthand for Statsample::Test::UMannWhitney.new
+      # 
+      # * <tt>v1</tt> and <tt>v2</tt> should be Statsample::Vector.
+      def u_mannwhitney(v1, v2)
+        Statsample::Test::UMannWhitney.new(v1,v2)
       end
       # Shorthand for Statsample::Test::T::OneSample.new
       def t_one_sample(vector, opts=Hash.new)

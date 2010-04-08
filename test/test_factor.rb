@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleFactorTestCase < Test::Unit::TestCase
+class StatsampleFactorTestCase < MiniTest::Unit::TestCase
   # Tested with SPSS and R
   def test_pca
     if Statsample.has_gsl?

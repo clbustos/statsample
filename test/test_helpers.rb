@@ -1,7 +1,7 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 
 require 'statsample'
-require 'test/unit'
+require 'minitest/unit'
 require 'tempfile'
 require 'tmpdir'
 require 'shoulda'
@@ -12,13 +12,11 @@ module MiniTest
       include Shoulda::InstanceMethods
       extend Shoulda::ClassMethods
       include Shoulda::Assertions
-      
+
     end
   end
-end
-=begin
-  module MiniTest::Assertions
-    
+
+  module Assertions
     alias :assert_raise :assert_raises unless method_defined? :assert_raise
     alias :assert_not_equal :refute_equal unless method_defined? :assert_not_equal
     alias :assert_not_same :refute_same unless method_defined? :assert_not_same
@@ -36,5 +34,5 @@ end
       end
     end
   end
-=end
-#MiniTest::Unit.autorun
+end
+MiniTest::Unit.autorun

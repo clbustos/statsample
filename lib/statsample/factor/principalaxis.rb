@@ -27,6 +27,7 @@ module Factor
   # * Smith, L. (2002). A tutorial on Principal Component Analysis. Available on http://courses.eas.ualberta.ca/eas570/pca_tutorial.pdf 
   #   
   class PrincipalAxis
+    include DirtyMemoize
     # Minimum difference between succesive iterations on sum of communalities
     DELTA=1e-3
     # Maximum number of iterations
@@ -51,7 +52,9 @@ module Factor
     # Maximum number of iterations
     attr_accessor :max_iterations
     # Eigenvalues of factor analysis
-    attr_accessor :eigenvalues
+    attr_reader :eigenvalues
+    
+    
     
     def initialize(matrix, opts=Hash.new)
       @matrix=matrix
@@ -124,7 +127,7 @@ module Factor
       end
       @component_matrix=pca.component_matrix(m)
     end
-    
+    alias :compute :iterate 
     
     def initial_communalities
       if @initial_communalities.nil?
@@ -200,7 +203,9 @@ module Factor
       generator.html("</div>")
     end
     
-    
+    dirty_writer :max_iterations, :epsilon, :smc
+    dirty_memoize :eigenvalues, :iterations, :initial_eigenvalues
+
   end
   
 end

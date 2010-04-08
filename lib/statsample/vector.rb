@@ -438,13 +438,13 @@ module Statsample
     # In all the trails, every item have the same probability
     # of been selected.
     def sample_with_replacement(sample=1)
-    if(@type!=:scale or !Statsample.has_gsl?)
-      vds=@valid_data.size
-      (0...sample).collect{ @valid_data[rand(vds)] }
-    else
-      r = GSL::Rng.alloc(GSL::Rng::MT19937,rand(10000))
-      r.sample(@gsl, sample).to_a
-    end
+      if(@type!=:scale or !Statsample.has_gsl?)
+        vds=@valid_data.size
+        (0...sample).collect{ @valid_data[rand(vds)] }
+      else
+        r = GSL::Rng.alloc(GSL::Rng::MT19937,rand(10000))
+        r.sample(@gsl, sample).to_a
+      end
     end
     # Returns an random sample of size n, without replacement,
     # only with valid data.
@@ -830,8 +830,7 @@ module Statsample
           @gsl.mean
       end				
       def variance_sample(m=nil) # :nodoc:
-      check_type :scale
-          
+          check_type :scale
           m||=mean
           @gsl.variance_m
       end
@@ -894,7 +893,7 @@ module Statsample
     alias_method :sdp, :standard_deviation_population
     alias_method :sds, :standard_deviation_sample
     alias_method :cov, :coefficient_of_variation
-    alias_method :variance, :variance_sample
+    alias_method :variance, :variance_sample    
     alias_method :sd, :standard_deviation_sample
     alias_method :ss, :sum_of_squares
   end

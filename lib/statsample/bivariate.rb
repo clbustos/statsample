@@ -129,13 +129,20 @@ module Statsample
       # Order of rows and columns depends on Dataset#fields order
       
       def covariance_matrix(ds)
+        cache={}
         matrix=ds.collect_matrix do |row,col|
           if (ds[row].type!=:scale or ds[col].type!=:scale)
             nil
           elsif row==col
             ds[row].variance
           else
-            covariance(ds[row], ds[col])
+            if cache[[col,row]].nil?
+              cov=covariance(ds[row],ds[col])
+              cache[[row,col]]=cov
+              cov
+            else
+               cache[[col,row]]
+            end
           end
         end
         matrix.extend CovariateMatrix
@@ -147,13 +154,20 @@ module Statsample
       # Order of rows and columns depends on Dataset#fields order
       
       def correlation_matrix(ds)
+        cache={}
         cm=ds.collect_matrix do |row,col|
           if row==col
             1.0
           elsif (ds[row].type!=:scale or ds[col].type!=:scale)
             nil
           else
-            pearson(ds[row],ds[col])
+            if cache[[col,row]].nil?
+              r=pearson(ds[row],ds[col])
+              cache[[row,col]]=r
+              r
+            else
+              cache[[col,row]]
+            end 
           end
         end
         cm.extend(Statsample::CovariateMatrix)

@@ -1,7 +1,7 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
 
-class StatsamplePermutationTestCase < Test::Unit::TestCase
+class StatsamplePermutationTestCase < MiniTest::Unit::TestCase
   context Statsample::Permutation do
     should "initialize with number" do
       per1=Statsample::Permutation.new(2)

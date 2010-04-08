@@ -1,7 +1,7 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
 
-class StatsampleMatrixTestCase < Test::Unit::TestCase
+class StatsampleMatrixTestCase < MiniTest::Unit::TestCase
   context(Matrix) do
     setup do 
       @matrix=Matrix[[1,2,3],[4,5,6],[7,8,9]]

@@ -206,11 +206,8 @@ class MatrixEngine < BaseEngine
       g.text("R^2=#{sprintf('%0.3f',r2)}")
       
       g.text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
-
       g.parse_element(anova)
 
-      
-      
       sc=standarized_coeffs
       cse=coeffs_se
       g.table(:name=>"Beta coefficients", :header=>%w{coeff b beta se t}.collect{|field| _(field)} ) do |t|

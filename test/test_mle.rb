@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleMLETestCase < Test::Unit::TestCase
+class StatsampleMLETestCase < MiniTest::Unit::TestCase
   def setup
     @file_binomial=File.dirname(__FILE__)+'/../data/test_binomial.csv'
     @crime=File.dirname(__FILE__)+'/../data/crime.txt'

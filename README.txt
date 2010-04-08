@@ -5,18 +5,19 @@ http://ruby-statsample.rubyforge.org/
 
 == DESCRIPTION:
 
-A suite for basic and advanced statistics on Ruby. Tested on Ruby 1.8.7, 1.9.1, 1.9.2 (April, 2010) and JRuby 1.4 (Ruby 1.8.7 compatible) 
+A suite for basic and advanced statistics on Ruby. Tested on Ruby 1.8.7, 1.9.1, 1.9.2 (April, 2010) and JRuby 1.4 (Ruby 1.8.7 compatible).
 
-Includes:
+Include:
 * Descriptive statistics: frequencies, median, mean, standard error, skew, kurtosis (and many others).
 * Imports and exports datasets from and to Excel, CSV and plain text files.
-* Correlations: Pearson's r, Spearman's rank correlation (rho), Tetrachoric, Polychoric
-* Tests: F (Anona One-Way), T, Levene, U-Mannwhitney.
-* Regression: Simple, Multiple, Probit  and Logit
-* Factorial Analysis: Extraction (PCA and Principal Axis) and Rotation (Varimax and relatives)
+* Correlations: Pearson's r, Spearman's rank correlation (rho), Tetrachoric, Polychoric.
+* Anova: generic and vector-based One-way ANOVA
+* Tests: F, T, Levene, U-Mannwhitney.
+* Regression: Simple, Multiple (OLS), Probit  and Logit
+* Factorial Analysis: Extraction (PCA and Principal Axis) and Rotation (Varimax, Equimax, Quartimax)
 * Dominance Analysis, with multivariate dependent and bootstrap (Azen & Budescu)
 * Sample calculation related formulas
-* Creates reports on text, html and rtf, using ReportBuilder
+* Creates reports on text, html and rtf, using ReportBuilder gem
 
 == FEATURES:
 
@@ -24,6 +25,7 @@ Includes:
   * Statsample::Vector: An extension of an array, with statistical methods like sum, mean and standard deviation
   * Statsample::Dataset: a group of Statsample::Vector, analog to a excel spreadsheet or a dataframe on R. The base of almost all operations on statsample. 
   * Statsample::Multiset: multiple datasets with same fields and type of vectors
+* Anova module provides generic Statsample::Anova::OneWay and vector based Statsample::Anova::OneWayWithVectors
 * Module Statsample::Bivariate provides covariance and pearson, spearman, point biserial, tau a, tau b, gamma, tetrachoric (see Bivariate::Tetrachoric) and polychoric (see Bivariate::Polychoric) correlations. Include methods to create correlation and covariance matrices
 * Multiple types of regression.
   * Simple Regression :  Statsample::Regression::Simple
@@ -53,6 +55,7 @@ Includes:
   * Statsample::Test::Levene
   * Statsample::Test::UMannWhitney
   * Statsample::Test::T
+  * Statsample::Test::F  
 * Interfaces to gdchart, gnuplot and SVG::Graph 
 
 

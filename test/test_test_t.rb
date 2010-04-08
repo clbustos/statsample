@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleTestTTestCase < Test::Unit::TestCase
+class StatsampleTestTTestCase < MiniTest::Unit::TestCase
   include Statsample::Test
   include Math
   context T do 

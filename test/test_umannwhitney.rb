@@ -1,7 +1,7 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
 
-class StatsampleUMannWhitneyTestCase < Test::Unit::TestCase
+class StatsampleUMannWhitneyTestCase < MiniTest::Unit::TestCase
   include Statsample::Test
   context Statsample::Test::UMannWhitney do
     setup do

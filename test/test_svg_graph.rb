@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 require('statsample/graph')
-class StatsampleSvgGraphTestCase < Test::Unit::TestCase
+class StatsampleSvgGraphTestCase < MiniTest::Unit::TestCase
 
   def setup
     @image_path=Dir::tmpdir+"/images"

@@ -1,7 +1,7 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
 
-class StatsampleResampleTestCase < Test::Unit::TestCase
+class StatsampleResampleTestCase < MiniTest::Unit::TestCase
   def initialize(*args)
     super
   end

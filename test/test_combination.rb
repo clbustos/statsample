@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleCombinationTestCase < Test::Unit::TestCase
+class StatsampleCombinationTestCase < MiniTest::Unit::TestCase
   def test_basic
     k=3
     n=5

@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleTestFTestCase < Test::Unit::TestCase
+class StatsampleTestFTestCase < MiniTest::Unit::TestCase
   context(Statsample::Test::F) do 
     setup do
       @ssb=84

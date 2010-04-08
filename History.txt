@@ -1,6 +1,5 @@
 === 0.9.0 / 2010-04-04
 * New Statsample::Test::F. Anova::OneWay subclasses it and Regression classes uses it.
-
 === 0.8.2 / 2010-04-01
 * Statsample::PromiseAfter replaced by external package DirtyMemoize [http://rubygems.org/gems/dirty-memoize]
 === 0.8.1 / 2010-03-29

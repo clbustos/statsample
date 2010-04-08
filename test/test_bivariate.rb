@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleBivariateTestCase < Test::Unit::TestCase
+class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
   def test_sum_of_squares
     v1=[1,2,3,4,5,6].to_vector(:scale)
     v2=[6,2,4,10,12,8].to_vector(:scale)
@@ -8,8 +8,8 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
   end
   def test_covariance
     if Statsample.has_gsl?
-      v1=1000.times.collect {|a| rand()}.to_scale
-      v2=1000.times.collect {|a| rand()}.to_scale
+      v1=20.times.collect {|a| rand()}.to_scale
+      v2=20.times.collect {|a| rand()}.to_scale
       assert_in_delta(Statsample::Bivariate.covariance(v1,v2), Statsample::Bivariate.covariance_slow(v1,v2), 0.001)
     else
       skip "Bivariate::covariance not tested (needs GSL)"
@@ -19,8 +19,8 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
 
   def test_gsl_pearson
     if Statsample.has_gsl?
-      v1=100.times.collect {|a| rand()}.to_scale
-      v2=100.times.collect {|a| rand()}.to_scale
+      v1=20.times.collect {|a| rand()}.to_scale
+      v2=20.times.collect {|a| rand()}.to_scale
 
       assert_in_delta(GSL::Stats::correlation(v1.gsl, v2.gsl), Statsample::Bivariate.pearson_slow(v1,v2), 1e-10)
     else
@@ -51,13 +51,8 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
       end
     end
   end
-  def test_polychoric_summary
-      matrix=Matrix[[150+rand(2),150+rand(2)],[150+rand(2),150+rand(2)],[200,300]]
-      poly  = Statsample::Bivariate::Polychoric.new(matrix)
-      assert(poly.summary.size>0)
-  end
   def test_poly_vs_tetra
-    5.times {
+    2.times {
       # Should be the same results as Tetrachoric for 2x2 matrix
       matrix=Matrix[[150+rand(10),1000+rand(20)],[1000+rand(20),200+rand(20)]]
       tetra = Statsample::Bivariate::Tetrachoric.new_with_matrix(matrix)
@@ -71,52 +66,6 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
         skip "compute_two_step_mle_drasgow_gsl not tested (requires GSL)"
       end
     }
-  end
-  def test_polychoric
-
-    matrix=Matrix[[58,52,1],[26,58,3],[8,12,9]]
-    poly=Statsample::Bivariate::Polychoric.new(matrix)
-    poly.compute_two_step_mle_drasgow_ruby
-    assert_in_delta(0.420, poly.r, 0.001)
-    assert_in_delta(-0.240, poly.threshold_y[0],0.001)
-    assert_in_delta(-0.027, poly.threshold_x[0],0.001)
-    assert_in_delta(1.578, poly.threshold_y[1],0.001)
-    assert_in_delta(1.137, poly.threshold_x[1],0.001)
-    if Statsample.has_gsl?
-      poly.method=:polychoric_series
-      poly.compute
-
-      assert_in_delta(0.556, poly.r, 0.001)
-      assert_in_delta(-0.240, poly.threshold_y[0],0.001)
-      assert_in_delta(-0.027, poly.threshold_x[0],0.001)
-      assert_in_delta(1.578, poly.threshold_y[1],0.001)
-      assert_in_delta(1.137, poly.threshold_x[1],0.001)
-
-      # Example for Tallis(1962, cited by Drasgow, 2006)
-
-      matrix=Matrix[[58,52,1],[26,58,3],[8,12,9]]
-      poly=Statsample::Bivariate::Polychoric.new(matrix)
-      poly.compute_two_step_mle_drasgow_gsl
-      assert_in_delta(0.420, poly.r, 0.001)
-      assert_in_delta(-0.240, poly.threshold_y[0],0.001)
-      assert_in_delta(-0.027, poly.threshold_x[0],0.001)
-      assert_in_delta(1.578, poly.threshold_y[1],0.001)
-      assert_in_delta(1.137, poly.threshold_x[1],0.001)
-
-
-      poly.method=:joint
-      poly.compute
-
-
-      assert_in_delta(0.4192, poly.r, 0.0001)
-      assert_in_delta(-0.2421, poly.threshold_y[0],0.0001)
-      assert_in_delta(-0.0297, poly.threshold_x[0],0.0001)
-      assert_in_delta(1.5938, poly.threshold_y[1],0.0001)
-      assert_in_delta(1.1331, poly.threshold_x[1],0.0001)
-    else
-      skip "Two-step optimized, polychoric series and Joint method for Polychoric  requires GSL"
-    end
-    assert(poly.summary)
   end
 
   def test_tetrachoric
@@ -176,7 +125,7 @@ class StatsampleBivariateTestCase < Test::Unit::TestCase
       for j in 0...expected.column_size
         #puts expected[i,j].inspect
         #puts obt[i,j].inspect
-        assert_in_delta(expected[i,j], obt[i,j],0.0001,"#{expected[i,j].class}!=#{obt[i,j].class}  ")
+        assert_in_delta(expected[i,j], obt[i,j],0.0001, "#{expected[i,j].class}!=#{obt[i,j].class}  ")
       end
     end
     #assert_equal(expected,obt)

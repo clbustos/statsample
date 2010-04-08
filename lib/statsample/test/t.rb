@@ -147,6 +147,8 @@ module Statsample
         include Math
         include Statsample::Test
         include DirtyMemoize
+        include GetText
+        bindtextdomain("statsample")
         # Options
         attr_accessor :opts
         # Name of test
@@ -197,25 +199,36 @@ module Statsample
           @probability_not_equal_variance = p_using_cdf(Distribution::T.cdf(@t_not_equal_variance, @df_not_equal_variance), tails)
 
         end
+        # Cohen's d is a measure of effect size. Its defined as the difference between two means divided by a standard deviation for the data
+        def d
+          n1=@v1.n_valid
+          n2=@v2.n_valid
+          num=@v1.mean-@v2.mean
+          den=Math::sqrt( ((n1-1)*@v1.sd+(n2-1)*@v2.sd).quo(n1+n2))
+          num.quo(den)
+        end
+        
         # Presents summary of analysis
-        # 
         def summary
           ReportBuilder.new(:no_title=>true).add(self).to_text
         end
+        
         def report_building(b) # :nodoc:
           b.section(:name=>@name) {|g|
-            g.table(:name=>"Mean and standard deviation", :header=>["Variable", "m", "sd","n"]) {|t|
-              t.row([1,"%0.4f" % @v1.mean,"%0.4f" % @v1.sd,@v1.n_valid])
-              t.row([2,"%0.4f" % @v2.mean,"%0.4f" % @v2.sd, @v2.n_valid])
+            g.table(:name=>_("Mean and standard deviation"), :header=>["Variable", "m", "sd","n"]) {|t|
+              t.row([@v1.name,"%0.4f" % @v1.mean,"%0.4f" % @v1.sd,@v1.n_valid])
+              t.row([@v2.name,"%0.4f" % @v2.mean,"%0.4f" % @v2.sd, @v2.n_valid])
             }
-            g.section(:name=>"Levene Test") {|g1|
-              g1.parse_element(Statsample::Test.levene([@v1,@v2]))
-            }
+            g.parse_element(Statsample::Test.levene([@v1,@v2],:name=>_("Levene test for equality of variances")))
             
-            g.table(:name=>"T statistics",:header=>["Type","t","df", "p (#{tails} tails)"]) {|t|
-              t.row(["Equal variance", "%0.4f" % t_equal_variance, df_equal_variance, "%0.4f" % probability_equal_variance])
-              t.row(["Non equal variance", "%0.4f" % t_not_equal_variance, "%0.4f" % df_not_equal_variance, "%0.4f" % probability_not_equal_variance])
+            g.table(:name=>_("T statistics"),:header=>["Type","t","df", "p (#{tails} tails)"].map{|v| _(v)}) {|t|
+              t.row([_("Equal variance"), "%0.4f" % t_equal_variance, df_equal_variance, "%0.4f" % probability_equal_variance])
+              t.row([_("Non equal variance"), "%0.4f" % t_not_equal_variance, "%0.4f" % df_not_equal_variance, "%0.4f" % probability_not_equal_variance])
             }
+            g.table(:name=>_("Effect size")) do |t|
+              t.row ['x1-x2', "%0.4f" % (@v1.mean-@v2.mean)]
+              t.row ['d', "%0.4f" % d]
+            end
           }
         end
       end      

@@ -1,7 +1,7 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
 
-class StatsampleReliabilityTestCase < Test::Unit::TestCase
+class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
 
   def setup
     @x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_vector(:scale)

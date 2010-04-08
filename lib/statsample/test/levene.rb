@@ -19,6 +19,7 @@ module Statsample
     # Reference:
     # * NIST/SEMATECH e-Handbook of Statistical Methods. Available on http://www.itl.nist.gov/div898/handbook/eda/section3/eda35a.htm
     class Levene
+      include Statsample::Test
       # Degrees of freedom 1 (k-1)
       attr_reader :d1
       # Degrees of freedom 2 (n-k)
@@ -42,18 +43,13 @@ module Statsample
       def f
         @w
       end
-      
-      def report_building(g) # :nodoc:
-        g.text @name
-        g.text "F: #{"%0.4f" % f}"
-        g.text "p: #{"%0.4f" % probability}"
-
+      def report_building(builder) # :nodoc:
+        builder.text "%s : F(%d, %d) = %0.4f , p = %0.4f" % [@name, @d1, @d2, f, probability]
       end
       # Summary of results
       def summary
         ReportBuilder.new(:no_title=>true).add(self).to_text
       end
-      
       def compute
         n=@vectors.inject(0) {|ac,v| ac+v.n_valid}
         
@@ -86,7 +82,7 @@ module Statsample
       # Probability.
       # With H_0 = Sum(s2)=0, probability of getting a value of the test upper or equal to the obtained on the sample
       def probability
-        1-Distribution::F.cdf(f, @d1, @d2) 
+        p_using_cdf(Distribution::F.cdf(f, @d1, @d2), :right)
       end
       
     end

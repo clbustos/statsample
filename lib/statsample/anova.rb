@@ -1,5 +1,13 @@
 module Statsample
   module Anova
+    class << self
+      def oneway(*args)
+        OneWay.new(*args)
+      end      
+      def oneway_with_vectors(*args)
+        OneWayWithVectors.new(*args)
+      end
+    end
     # = Generic Anova one-way.
     # You could enter the sum of squares or the mean squares. You
     # should enter the degrees of freedom for numerator and denominator.
@@ -10,7 +18,7 @@ module Statsample
       include GetText
        bindtextdomain("statsample")
       attr_reader :df_num, :df_den, :ss_num, :ss_den, :ms_num, :ms_den, :ms_total, :df_total, :ss_total
-      # Name of ANOVA Analisus
+      # Name of ANOVA Analisys
       attr_accessor :name
       attr_accessor :name_denominator
       attr_accessor :name_numerator
@@ -33,7 +41,9 @@ module Statsample
         end
         @ss_total=@ss_num+@ss_den
         @ms_total=@ms_num+@ms_den
-        opts_default={:name=>"ANOVA", :name_denominator=>"Explained variance", :name_numerator=>"Unexplained variance"}
+        opts_default={:name=>"ANOVA",
+                      :name_denominator=>"Explained variance",
+                      :name_numerator=>"Unexplained variance"}
         @opts=opts_default.merge(opts)
         opts_default.keys.each {|k|
           send("#{k}=", @opts[k])
@@ -46,13 +56,19 @@ module Statsample
       def probability
         @f_object.probability
       end
+      def summary
+        ReportBuilder.new(:no_title=>true).add(self).to_text
+      end
       def report_building(builder)
         builder.section(:name=>@name) do |b|
-          b.table(:name=>_("%s Table") % @name, :header=>%w{source ss ms df f p}.map {|v| _(v)}) do |t|
-            t.row([@name_numerator, sprintf("%0.3f",@ss_num),  sprintf("%0.3f",@ms_num), @df_num,  sprintf("%0.3f",f), sprintf("%0.3f", probability)])
-            t.row([@name_denominator, sprintf("%0.3f",@ss_den), sprintf("%0.3f",@ms_den), @df_den, "", ""])
-            t.row([_("Total"), sprintf("%0.3f",@ss_total), sprintf("%0.3f",@ms_total), @df_total,"",""])
-          end
+          report_building_table(b)
+        end
+      end
+      def report_building_table(builder)
+        builder.table(:name=>_("%s Table") % @name, :header=>%w{source ss df ms f p}.map {|v| _(v)}) do |t|
+          t.row([@name_numerator, sprintf("%0.3f",@ss_num),   @df_num, sprintf("%0.3f",@ms_num),  sprintf("%0.3f",f), sprintf("%0.3f", probability)])
+          t.row([@name_denominator, sprintf("%0.3f",@ss_den),  @df_den, sprintf("%0.3f",@ms_den), "", ""])
+          t.row([_("Total"), sprintf("%0.3f",@ss_total),  @df_total, sprintf("%0.3f",@ms_total),"",""])
         end
       end
 
@@ -62,7 +78,7 @@ module Statsample
     #   v1=[2,3,4,5,6].to_scale
     #   v2=[3,3,4,5,6].to_scale
     #   v3=[5,3,1,5,6].to_scale
-    #   anova=Statsample::Anova::OneWay.new([v1,v2,v3])
+    #   anova=Statsample::Anova::OneWayWithVectors.new([v1,v2,v3])
     #   anova.f
     #   => 0.0243902439024391
     #   anova.probability
@@ -71,7 +87,10 @@ module Statsample
     #   => 32.9333333333333
     #
     class OneWayWithVectors < OneWay
-       
+      # Show on summary Levene test
+      attr_accessor :summary_levene
+      # Show on summary descriptives for vectors
+      attr_accessor :summary_descriptives
       def initialize(*args)
         if args[0].is_a? Array
           @vectors=args.shift
@@ -80,11 +99,18 @@ module Statsample
           opts=args.find {|v| v.is_a? Hash}
         end
         opts||=Hash.new
-        opts_default={:name=>_("Anova One-Way"), :name_numerator=>"Between Groups", :name_denominator=>"Within Groups"}
+        opts_default={:name=>_("Anova One-Way"), 
+                      :name_numerator=>"Between Groups",
+                      :name_denominator=>"Within Groups",
+                      :summary_descriptives=>false,
+                      :summary_levene=>false}
         @opts=opts_default.merge(opts).merge(:ss_num=>ssbg, :ss_den=>sswg, :df_num=>df_bg, :df_den=>df_wg)
         super(@opts)
       end
       alias  :sst :ss_total 
+      def levene
+        Statsample::Test.levene(@vectors, :name=>_("Test of Homogeneity of variances (Levene)"))
+      end
       # Total mean
       def total_mean
         sum=@vectors.inject(0){|a,v| a+v.sum}
@@ -116,7 +142,21 @@ module Statsample
       def n
           @vectors.inject(0){|a,v| a+v.size}
       end
-      
+      def report_building(builder)
+        builder.section(:name=>@name) do |s|
+          if summary_descriptives
+            s.table(:name=>_("Descriptives"),:header=>%w{Name N Mean SD Min Max}.map {|v| _(v)}) do |t|
+              @vectors.each do |v|
+                t.row [v.name, v.n_valid, "%0.4f" % v.mean, "%0.4f" %  v.sd, "%0.4f" % v.min, "%0.4f" % v.max]
+              end
+            end
+          end
+          if summary_levene
+            s.parse_element(levene)
+          end
+          report_building_table(s)
+        end
+      end
     end
   end
 end

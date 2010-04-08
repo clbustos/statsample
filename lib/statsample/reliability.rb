@@ -7,9 +7,9 @@ module Statsample
         ds=ods.dup_only_valid
         n_items=ds.fields.size
         sum_var_items=ds.vectors.inject(0) {|ac,v|
-        ac+v[1].variance_sample }
+        ac+v[1].variance }
         total=ds.vector_sum
-        (n_items / (n_items-1).to_f) * (1-(sum_var_items/ total.variance_sample))
+        (n_items.quo(n_items-1)) * (1-(sum_var_items.quo(total.variance)))
       end
       # Calculate Chonbach's alpha for a given dataset
       # using standarized values for every vector.

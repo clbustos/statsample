@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleAnovaTestCase < Test::Unit::TestCase
+class StatsampleAnovaOneWayWithVectorsTestCase < MiniTest::Unit::TestCase
   context(Statsample::Anova::OneWayWithVectors) do
     context("when initializing") do
       setup do
@@ -11,6 +11,11 @@ class StatsampleAnovaTestCase < Test::Unit::TestCase
       should "be the same using [] or args*" do
         a1=Statsample::Anova::OneWayWithVectors.new(@v1,@v2,@v3)
         a2=Statsample::Anova::OneWayWithVectors.new([@v1,@v2,@v3])
+        assert_equal(a1.f,a2.f)
+      end
+      should "be the same using module method or object instantiation" do
+        a1=Statsample::Anova::OneWayWithVectors.new(@v1,@v2,@v3)
+        a2=Statsample::Anova.oneway_with_vectors(@v1,@v2,@v3)
         assert_equal(a1.f,a2.f)
       end
       should "detect optional hash" do
@@ -27,7 +32,21 @@ class StatsampleAnovaTestCase < Test::Unit::TestCase
       @v1=[3,3,2,3,6].to_vector(:scale)
       @v2=[7,6,5,6,7].to_vector(:scale)
       @v3=[9,8,9,7,8].to_vector(:scale)
-      @anova=Statsample::Anova::OneWayWithVectors.new(@v1,@v2,@v3)
+      @name="Anova testing"
+      @anova=Statsample::Anova::OneWayWithVectors.new(@v1,@v2,@v3, :name=>@name)
+    end
+    should "respond to #summary" do
+      assert(@anova.respond_to? :summary)
+    end
+    should "have correct name of analysis on #summary" do
+      assert_match(/#{@name}/, @anova.summary)
+    end
+    should "returns same levene values as direct Levene creation" do
+      assert_equal(@anova.levene.f, Statsample::Test.levene([@v1,@v2,@v3]).f)
+    end
+    should "have correct value for levene" do
+      assert_in_delta(0.604,@anova.levene.f, 0.001)
+      assert_in_delta(0.562,@anova.levene.probability, 0.001)
     end
     should "have correct value for sst" do
      assert_in_delta(72.933, @anova.sst,0.001)
@@ -56,10 +75,23 @@ class StatsampleAnovaTestCase < Test::Unit::TestCase
     should "p be correct" do
       assert(@anova.probability<0.01)
     end
-    should "be correct using more values" do
+    should "be correct using different test values" do
       anova2=Statsample::Anova::OneWayWithVectors.new([@v1,@v1,@v1,@v1,@v2])
       assert_in_delta(3.960, anova2.f,0.001)
       assert_in_delta(0.016, anova2.probability,0.001)
+    end
+    context "with extra information on summary" do
+      setup do
+        @anova.summary_descriptives=true
+        @anova.summary_levene=true
+        @summary=@anova.summary
+      end
+      should "have section with levene statistics" do
+        assert_match(/Levene/, @summary)
+      end
+      should "have section with descriptives" do
+        assert_match(/Min/, @summary)
+      end
     end
   end
 end

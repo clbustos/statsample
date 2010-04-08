@@ -1,6 +1,6 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
-class StatsampleLogitTestCase < Test::Unit::TestCase
+class StatsampleLogitTestCase < MiniTest::Unit::TestCase
   def test_logit_1
     crime=File.dirname(__FILE__)+'/../data/test_binomial.csv'
     ds=Statsample::CSV.read(crime)
