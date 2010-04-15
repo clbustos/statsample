@@ -1,6 +1,15 @@
 require(File.dirname(__FILE__)+'/test_helpers.rb')
 
 class StatsampleBivariatePolychoricTestCase < MiniTest::Unit::TestCase
+  context Statsample::Bivariate do
+    should "responde to polychoric_correlation_matrix" do
+      a=([1,1,2,2,2,3,3,3,2,2,3,3,3]*4).to_scale
+      b=([1,2,2,2,1,3,2,3,2,2,3,3,2]*4).to_scale
+      c=([1,1,1,2,2,2,2,3,2,3,2,2,3]*4).to_scale
+      ds={'a'=>a,'b'=>b,'c'=>c}.to_dataset
+      assert(Statsample::Bivariate.polychoric_correlation_matrix(ds).is_a? ::Matrix)
+    end
+  end
   context Statsample::Bivariate::Polychoric do
     setup do
       matrix=Matrix[[58,52,1],[26,58,3],[8,12,9]]

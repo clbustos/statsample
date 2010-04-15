@@ -3,17 +3,22 @@ module Statsample
     module Multiple
       # Base class for Multiple Regression Engines
       class BaseEngine
-        
-        include GetText
-        bindtextdomain("statsample")
+        include Statsample::Summarizable
         # Name of analysis
         attr_accessor :name
-        
+        # Minimum number of  valid case for pairs of correlation
+        attr_reader :cases
+        # Number of valid cases (listwise)
+        attr_reader :valid_cases
+        # Number of total cases (dataset.cases)
+        attr_reader :total_cases
         def self.univariate?
           true
         end
         def initialize(ds, y_var, opts = Hash.new)
           @ds=ds
+          @predictors_n=@ds.fields.size-1
+          @total_cases=@ds.cases
           @cases=@ds.cases
           @y_var=y_var
           @r2=nil
@@ -26,9 +31,13 @@ module Statsample
         def anova
           @anova||=Statsample::Anova::OneWay.new(:ss_num=>ssr, :ss_den=>sse, :df_num=>df_r, :df_den=>df_e, :name_numerator=>_("Regression"), :name_denominator=>_("Error"), :name=>"ANOVA")
         end
+        # Standard error of estimate
+        def se_estimate
+          Math::sqrt(sse.quo(df_e))
+        end
         # Retrieves a vector with predicted values for y
         def predicted
-          (0...@ds.cases).collect { |i|
+          @total_cases.times.collect { |i|
             invalid=false
             vect=@dep_columns.collect {|v| invalid=true if v[i].nil?; v[i]}
             if invalid
@@ -44,7 +53,7 @@ module Statsample
         end
         # Retrieves a vector with residuals values for y
         def residuals
-          (0...@ds.cases).collect{|i|
+          (0...@total_cases).collect{|i|
             invalid=false
             vect=@dep_columns.collect{|v| invalid=true if v[i].nil?; v[i]}
             if invalid or @ds[@y_var][i].nil?
@@ -61,6 +70,9 @@ module Statsample
         # Sum of squares Total
         def sst
           raise "You should implement this"
+        end
+        def r2_adjusted
+          r2-((1-r2)*@predictors_n).quo(df_e)
         end
         # Sum of squares (regression)
         def ssr
@@ -89,11 +101,11 @@ module Statsample
         end
         # Degrees of freedom for regression
         def df_r
-          @dep_columns.size
+          @predictors_n
         end
         # Degrees of freedom for error
         def df_e
-          @ds_valid.cases-@dep_columns.size-1
+          @valid_cases-@predictors_n-1
         end
         # Fisher for Anova
         def f
@@ -130,6 +142,7 @@ module Statsample
           out
         end
         # Estandar error of R^2
+        # ????
         def se_r2
           Math::sqrt((4*r2*(1-r2)**2*(df_e)**2).quo((@cases**2-1)*(@cases+3)))
         end
@@ -139,10 +152,11 @@ module Statsample
         def estimated_variance_covariance_matrix
           mse_p=mse
           columns=[]
-          @ds_valid.each_vector{|k,v|
+          @ds_valid.fields.each{|k|
+            v=@ds_valid[k]
             columns.push(v.data) unless k==@y_var
           }
-          columns.unshift([1.0]*@ds_valid.cases)
+          columns.unshift([1.0]*@valid_cases)
           x=Matrix.columns(columns)
           matrix=((x.t*x)).inverse * mse
           matrix.collect {|i| Math::sqrt(i) if i>0 }
@@ -155,25 +169,22 @@ module Statsample
         def constant_se
           estimated_variance_covariance_matrix[0,0]
         end
-        def summary
-          rp=ReportBuilder.new()
-          rp.add(self)
-          rp.to_text
-        end
         def report_building(b)
           b.section(:name=>@name) do |g|
             c=coeffs
-            g.text(_("Engine: %s") % self.class)
-            g.text(_("Cases(listwise)=%d(%d)") % [@ds.cases, @ds_valid.cases])
-            g.text("R=#{sprintf('%0.3f',r)}")
-            g.text("R^2=#{sprintf('%0.3f',r2)}")
+            g.text _("Engine: %s") % self.class
+            g.text(_("Cases(listwise)=%d(%d)") % [@total_cases, @valid_cases])
+            g.text _("R=%0.3f") % r
+            g.text _("R^2=%0.3f") % r2
+            g.text _"R^2 Adj=%0.3f" % r2_adjusted
+            g.text _("Std.Error R=%0.3f") % se_estimate
             
             g.text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
             
             g.parse_element(anova)
             sc=standarized_coeffs
             cse=coeffs_se
-            g.table(:name=>"Beta coefficients", :header=>%w{coeff b beta se t}.collect{|field| _(field)} ) do |t|
+            g.table(:name=>_("Beta coefficients"), :header=>%w{coeff b beta se t}.collect{|field| _(field)} ) do |t|
               t.row([_("Constant"), sprintf("%0.3f", constant), "-", sprintf("%0.3f", constant_se), sprintf("%0.3f", constant_t)])
               @fields.each do |f|
                 t.row([f, sprintf("%0.3f", c[f]), sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])

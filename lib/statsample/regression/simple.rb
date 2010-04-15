@@ -70,7 +70,7 @@ module Statsample
         end
       end
       def init_vectors(vx,vy)
-        @vx,@vy=Statsample.only_valid(vx,vy)
+        @vx,@vy=Statsample.only_valid_clone(vx,vy)
         x_m=@vx.mean
         y_m=@vy.mean
         num=den=0

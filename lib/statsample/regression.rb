@@ -65,23 +65,25 @@ module Statsample
       # Creates one of the Statsample::Regression::Multiple object,
       # for OLS multiple regression.
       # Parameters:
-      # * ds: Dataset.
+      # * <tt>ds</tt>: Dataset.
       # * y: Name of dependent variable.
-      # * missing_data: Could be
-      #   * :listwise: delete cases with one or more empty data (default).
-      #   * :pairwise: uses correlation matrix. Use with caution.
+      # * opts: A hash with options
+      #   * missing_data: Could be
+      #     * :listwise: delete cases with one or more empty data (default).
+      #     * :pairwise: uses correlation matrix. Use with caution.
       # 
       # <b>Usage:</b>
       #   lr=Statsample::Regression::multiple(ds,'y')
-      def self.multiple(ds,y_var, missing_data=:listwise)
+      def self.multiple(ds,y_var, opts=Hash.new)
+        missing_data= (opts[:missing_data].nil? ) ? :listwise : opts.delete(:missing_data)
         if missing_data==:pairwise
-           RubyEngine.new(ds,y_var)
+           Statsample::Regression::Multiple::RubyEngine.new(ds,y_var, opts)
         else
           if Statsample.has_gsl?
-            Statsample::Regression::Multiple::GslEngine.new(ds, y_var)
+            Statsample::Regression::Multiple::GslEngine.new(ds, y_var, opts)
           else
             ds2=ds.dup_only_valid
-            Statsample::Regression::Multiple::RubyEngine.new(ds2,y_var)
+            Statsample::Regression::Multiple::RubyEngine.new(ds2,y_var, opts)
           end
         end
       end

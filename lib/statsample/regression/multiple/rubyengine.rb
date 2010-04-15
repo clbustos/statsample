@@ -31,11 +31,9 @@ class RubyEngine < MatrixEngine
     @ds=ds
     @dy=ds[@y_var]
     @ds_valid=ds.dup_only_valid
+    @total_cases=@ds.cases
+    @valid_cases=@ds_valid.cases
     @ds_indep = ds.dup(ds.fields-[y_var])
-    
-#    p obtain_predictor_matrix
-#    p @matrix_x.correlation
-    
     set_dep_columns
   end
   
@@ -82,8 +80,6 @@ class RubyEngine < MatrixEngine
     @ds_indep.update_valid_data
     set_dep_columns
   end
-  
-
   # Standard error for constant
   def constant_se
     estimated_variance_covariance_matrix[0,0]

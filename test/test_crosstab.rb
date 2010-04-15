@@ -41,6 +41,12 @@ class StatsampleCrosstabTestCase < MiniTest::Unit::TestCase
     assert_equal(%w{man woman},fc.keys.sort)
     assert_equal(Matrix.rows([[3,4],[3,0],[1,0],[1,1]]),@ct.to_matrix)
   end
+  def test_summary
+    @ct.percentage_row=true
+    @ct.percentage_column=true
+    @ct.percentage_total=true
+    assert(@ct.summary.size>0)
+  end
   def test_expected
     v1=%w{1 1 1 1 1 0 0 0 0 0}.to_vector
     v2=%w{0 0 0 0 0 1 1 1 1 1}.to_vector

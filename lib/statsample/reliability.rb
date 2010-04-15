@@ -17,16 +17,16 @@ module Statsample
 
       def cronbach_alpha_standarized(ods)
         ds=ods.dup_only_valid.fields.inject({}){|a,f|
-          a[f]=ods[f].vector_standarized; a
+          a[f]=ods[f].standarized; a
         }.to_dataset
         cronbach_alpha(ds)
       end
     end
     class ItemCharacteristicCurve
-      attr_reader :totals, :counts,:vector_total
+      attr_reader :totals, :counts, :vector_total
       def initialize (ds, vector_total=nil)
         vector_total||=ds.vector_sum
-        raise "Total size != Dataset size" if vector_total.size!=ds.cases
+        raise ArgumentError, "Total size != Dataset size" if vector_total.size!=ds.cases
         @vector_total=vector_total
         @ds=ds
         @totals={}
@@ -48,19 +48,21 @@ module Statsample
           i+=1
         end
       end
+      # Return a hash with p for each different value on a vector
       def curve_field(field, item)
         out={}
         item=item.to_s
-        @totals.each{|value,n|
+        @totals.each do |value,n|
           count_value= @counts[field][value][item].nil? ? 0 : @counts[field][value][item]
-          out[value]=count_value.to_f/n.to_f
-        }
+          out[value]=count_value.quo(n)
+        end
         out
       end
     end
     class ItemAnalysis
       attr_reader :mean, :sd,:valid_n, :alpha , :alpha_standarized
-      def initialize(ds)
+      attr_accessor :name
+      def initialize(ds,opts=Hash.new)
         @ds=ds.dup_only_valid
         @total=@ds.vector_sum
         @item_mean=@ds.vector_mean.mean
@@ -70,11 +72,15 @@ module Statsample
         @kurtosis=@total.kurtosis
         @sd = @total.sd
         @valid_n = @total.size
+        opts_default={:name=>"Reliability Analisis"}
+        @opts=opts_default.merge(opts)
+        @name=@opts[:name]
+        
         begin
           @alpha = Statsample::Reliability.cronbach_alpha(ds)
           @alpha_standarized = Statsample::Reliability.cronbach_alpha_standarized(ds)
         rescue => e
-          raise DatasetException.new(@ds,e), "Problem on calculate alpha"
+          raise DatasetException.new(@ds,e), "Error calculating alpha"
         end
       end
       # Returns a hash with structure
@@ -201,51 +207,33 @@ module Statsample
           a
         end
       end
-      def html_summary
-				html = <<EOF
-<p><strong>Summary for scale:</strong></p>
-<ul>
-<li>Items=#{@ds.fields.size}</li>
-<li>Total Mean=#{@mean}</li>
-<li>Item Mean=#{@item_mean}</li>
-<li>Std.Dv.=#{@sd}</li>
-<li>Median=#{@median}</li>
-<li>Skewness=#{sprintf("%0.3f",@skew)}</li>
-<li>Kurtosis=#{sprintf("%0.3f",@kurtosis)}</li>
+      def summary
+        ReportBuilder.new(:no_title=>true).add(self).to_text
+      end
+      def report_building(builder)
+        builder.section(:name=>@name) do |s|
+          s.table(:name=>"Summary") do |t|
+            t.row ["Items", @ds.fields.size]
+            t.row ["Total Mean", @mean]
+            t.row ["Item Mean", @item_mean]
+            t.row ["S.D.", @sd]
+            t.row ["Median", @median]
+            t.row ["Skewness", "%0.4f" % @skew]
+            t.row ["Kurtosis", "%0.4f" % @kurtosis]
+            t.row ["Valid n", @valid_n]
+            t.row ["Cronbach's alpha", "%0.4f" % @alpha]
+            t.row ["Standarized Cronbach's alpha", "%0.4f" % @alpha_standarized]
+          end
+          itc=item_total_correlation
+          sid=stats_if_deleted
+          is=item_statistics
 
-<li>Valid n:#{@valid_n}</li>
-<li>Cronbach alpha: #{@alpha}</li>
-</ul>
-<table><thead><th>Variable</th>
-
-<th>Mean</th>
-<th>StDv.</th>
-<th>Mean if deleted</th><th>Var. if
-deleted</th><th>	StDv. if
-deleted</th><th>	Itm-Totl
-Correl.</th><th>Alpha if
-deleted</th></thead>
-EOF
-
-        itc=item_total_correlation
-        sid=stats_if_deleted
-        is=item_statistics
-        @ds.fields.each {|f|
-          html << <<EOF
-          <tr>
-          <td>#{f}</td>
-          <td>#{sprintf("%0.5f",is[f][:mean])}</td>
-          <td>#{sprintf("%0.5f",is[f][:sds])}</td>
-          <td>#{sprintf("%0.5f",sid[f][:mean])}</td>
-          <td>#{sprintf("%0.5f",sid[f][:variance_sample])}</td>
-          <td>#{sprintf("%0.5f",sid[f][:sds])}</td>
-          <td>#{sprintf("%0.5f",itc[f])}</td>
-          <td>#{sprintf("%0.5f",sid[f][:alpha])}</td>
-          </tr>
-EOF
-        }
-        html << "</table><hr />"
-        html
+          s.table(:name=>"Items report", :header=>["item","mean","sd", "mean if deleted", "var if deleted", "sd if deleted"," item-total correl.", "alpha if deleted"]) do |t|
+            @ds.fields.each do |f|
+              t.row(["#{@ds[f].name}(#{f})", sprintf("%0.5f",is[f][:mean]), sprintf("%0.5f",is[f][:sds]), sprintf("%0.5f",sid[f][:mean]), sprintf("%0.5f",sid[f][:variance_sample]), sprintf("%0.5f",sid[f][:sds]),  sprintf("%0.5f",itc[f]), sprintf("%0.5f",sid[f][:alpha])])
+            end
+          end
+          end
       end
     end
   end

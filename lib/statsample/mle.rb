@@ -101,17 +101,17 @@ module Statsample
           parameters = parameters-(h.inverse*(fd))
           
           if @stop_criteria==:parameters
-          flag=true
-          k.times do |j|
-            diff= ( parameters[j,0] - old_parameters[j,0] ) / parameters[j,0]
-            flag=false if diff.abs >= MIN_DIFF_PARAMETERS
-            @output.puts "Parameters #{j}: #{diff}" if @verbose
-          end
-          if flag
-            @var_cov_matrix = h.inverse*-1.0
-            return parameters
-          end
-          old_parameters=parameters
+            flag=true
+            k.times do |j|
+              diff= ( parameters[j,0] - old_parameters[j,0] ) / parameters[j,0]
+              flag=false if diff.abs >= MIN_DIFF_PARAMETERS
+              @output.puts "Parameters #{j}: #{diff}" if @verbose
+            end
+            if flag
+              @var_cov_matrix = h.inverse*-1.0
+              return parameters
+            end
+            old_parameters=parameters
           else
             begin
               new_likehood = log_likehood(x,y,parameters)

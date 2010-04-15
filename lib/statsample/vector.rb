@@ -7,7 +7,7 @@ class Array
 	end
     # Creates a new Statsample::Vector object of type :scale
     def to_scale(*args)
-        Statsample::Vector.new(self,:scale,*args)
+        Statsample::Vector.new(self, :scale,*args)
     end
 end
 
@@ -24,7 +24,7 @@ module Statsample
   class Vector
     include Enumerable
     include Writable
-    
+    include Summarizable
     # Level of measurement. Could be :nominal, :ordinal or :scale
     attr_reader :type
     # Original data. 
@@ -239,21 +239,21 @@ module Statsample
     end
     end
     def _set_valid_data_intern #:nodoc:
-    @data.each do |n|
-      if is_valid? n
-        @valid_data.push(n)
-        @data_with_nils.push(n)
-      else
-        @data_with_nils.push(nil)
-        @missing_data.push(n)
+      @data.each do |n|
+        if is_valid? n
+          @valid_data.push(n)
+          @data_with_nils.push(n)
+        else
+          @data_with_nils.push(nil)
+          @missing_data.push(n)
+        end
       end
-    end
-    @has_missing_data=@missing_data.size>0
+      @has_missing_data=@missing_data.size>0
     end
     
     # Retrieves true if data has one o more missing values
     def has_missing_data?
-    @has_missing_data
+      @has_missing_data
     end
     # Retrieves label for value x. Retrieves x if
     # no label defined.
@@ -262,14 +262,14 @@ module Statsample
     end
     # Returns a Vector with data with labels replaced by the label.
     def vector_labeled
-    d=@data.collect{|x|
-      if @labels.has_key? x
-        @labels[x]
-      else
-        x
-      end
-    }
-    Vector.new(d,@type)
+      d=@data.collect{|x|
+        if @labels.has_key? x
+          @labels[x]
+        else
+          x
+        end
+      }
+      Vector.new(d,@type)
     end
     # Size of total data
     def size
@@ -608,24 +608,22 @@ module Statsample
     def proportion(v=1)
         frequencies[v].quo(@valid_data.size)
     end
-    def summary
-      ReportBuilder.new(:to_title=>true).add(self).to_text
-    end
     def report_building(b)
       b.section(:name=>name) do |s|
-        s.text sprintf("n valid:%d",n_valid)
-        s.text  sprintf("factors:%s",factors.join(","))
-        s.text   "mode:"+mode.to_s
-        s.table(:name=>"Distribution") do |t|
+        s.text _("n :%d") % n        
+        s.text _("n valid:%d") % n_valid
+        s.text  _("factors:%s") % factors.join(",")
+        s.text   _("mode: %s") % mode
+        s.table(:name=>_("Distribution")) do |t|
           frequencies.sort.each do |k,v|
             key=labels.has_key?(k) ? labels[k]:k
             t.row [key,v, ("%0.2f%%" % (v.quo(n_valid)*100))]
           end
         end
-        s.text "median:"+median.to_s if(@type==:ordinal)
+        s.text _("median: %s") % median.to_s if(@type==:ordinal)
         if(@type==:scale)
-          s.text "mean:"+mean.to_s
-          s.text "sd:"+sd.to_s
+          s.text _("mean: %0.4f") % mean
+          s.text _("sd: %0.4f") % sd.to_s
         end
       end
     end

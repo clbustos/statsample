@@ -50,7 +50,7 @@ class MatrixEngine < BaseEngine
     @fields=matrix.fields-[y_var]
     
     @n_predictors=@fields.size
-    
+    @predictors_n=@n_predictors
     @matrix_x= @matrix_cor.submatrix(@fields)
     @matrix_x_cov= @matrix_cov.submatrix(@fields)
     
@@ -88,11 +88,11 @@ class MatrixEngine < BaseEngine
       }
     else
       @coeffs_stan=result_matrix.column(0).to_a
-      
       @coeffs=standarized_coeffs.collect {|k,v|
         standarized_coeffs[k]*@y_sd.quo(@x_sd[k])
       } 
     end
+    @total_cases=@valid_cases=@cases
   end
   def cases
     raise "You should define the number of valid cases first" if @cases.nil?
@@ -144,6 +144,7 @@ class MatrixEngine < BaseEngine
   # Reference:
   # * http://talkstats.com/showthread.php?t=5056
   def tolerance(var)
+    return 1 if @matrix_x.column_size==1
     lr=Statsample::Regression::Multiple::MatrixEngine.new(@matrix_x, var)
     1-lr.r2
   end
@@ -165,7 +166,7 @@ class MatrixEngine < BaseEngine
   # t value for constant
   def constant_t
     return nil if constant_se.nil?
-    constant.to_f/constant_se
+    constant.to_f / constant_se
   end
   # Standard error for constant.
   # This method recreates the estimaded variance-covariance matrix
@@ -197,32 +198,6 @@ class MatrixEngine < BaseEngine
     matrix.collect {|i| Math::sqrt(i) if i>0 }[0,0]
   end
   
-  def report_building(builder) # :nodoc:
-    builder.section(:name=>_("Multiple Regression: ")+@name) do |g|
-      c=coeffs
-      g.text(_("Engine: %s") % self.class)
-      g.text(_("Cases=%d") % [@cases])
-      g.text("R=#{sprintf('%0.3f',r)}")
-      g.text("R^2=#{sprintf('%0.3f',r2)}")
-      
-      g.text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
-      g.parse_element(anova)
-
-      sc=standarized_coeffs
-      cse=coeffs_se
-      g.table(:name=>"Beta coefficients", :header=>%w{coeff b beta se t}.collect{|field| _(field)} ) do |t|
-        if (constant_se.nil?)
-          t.row([_("Constant"), sprintf("%0.3f", constant),"--","?","?"])
-        else
-          t.row([_("Constant"), sprintf("%0.3f", constant), "-", sprintf("%0.3f", constant_se), sprintf("%0.3f", constant_t)])
-        end
-        
-        @fields.each do |f|
-          t.row([f, sprintf("%0.3f", c[f]), sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
-        end  
-      end
-    end    
-  end
 end
 end
 end

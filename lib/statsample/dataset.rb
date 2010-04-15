@@ -56,10 +56,13 @@ module Statsample
   
   class Dataset
     include Writable
+    include Summarizable
     # Hash of Statsample::Vector
     attr_reader :vectors
     # Ordered names of vectors
     attr_reader :fields
+    # Name of dataset
+    attr_accessor:name
     # Number of cases
     attr_reader :cases
     # Location of pointer on enumerations methods (like #each)
@@ -123,6 +126,9 @@ module Statsample
 
     #
     def initialize(vectors={}, fields=[])
+      @@n_dataset||=0
+      @@n_dataset+=1
+      @name=_("Dataset %d") % @@n_dataset
       if vectors.instance_of? Array
         @fields=vectors.dup
         @vectors=vectors.inject({}){|a,x| a[x]=Statsample::Vector.new(); a}
@@ -164,7 +170,8 @@ module Statsample
       @fields.slice(@fields.index(from)..@fields.index(to))
     end
     # Returns a duplicate of the Database
-    # If fields given, only include those vectors
+    # If fields given, only include those vectors.
+    # Every vector will be dup
     def dup(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
         fields_to_include=fields_to_include[0]
@@ -178,6 +185,21 @@ module Statsample
         fields.push(f)
       }
       Dataset.new(vectors,fields)
+    end
+    # Returns a shallow copy of Dataset.
+    # Object id will be distinct, but @vectors will be the same.
+    def clone(*fields_to_include)
+      if fields_to_include.size==1 and fields_to_include[0].is_a? Array
+        fields_to_include=fields_to_include[0]
+      end
+      fields_to_include=@fields.dup if fields_to_include.size==0
+      ds=Dataset.new
+      fields_to_include.each{|f|
+        raise "Vector #{f} doesn't exists" unless @vectors.has_key? f
+        ds[f]=@vectors[f]
+      }
+      ds.fields=fields_to_include
+      ds
     end
     # Creates a copy of the given dataset, without data on vectors
     def dup_empty
@@ -206,14 +228,14 @@ module Statsample
       ds_new.update_valid_data
       ds_new
     end
-    # Returns a dataset with standarized data
-	def standarize
-	  ds=dup()
-	  ds.fields.each {|f|
-		ds[f]=ds[f].vector_standarized
-	  }
-	  ds
-	end
+      # Returns a dataset with standarized data
+    def standarize
+      ds=dup()
+      ds.fields.each do |f|
+        ds[f]=ds[f].vector_standarized
+      end
+      ds
+    end
     # Generate a matrix, based on fields of dataset
     def collect_matrix
       rows=@fields.collect{|row|
@@ -495,15 +517,13 @@ module Statsample
     end
     # Returns the vector named i
     def[](i)
-      if i.is_a? String
-        raise Exception,"Vector '#{i}' doesn't exists on dataset" unless @vectors.has_key?(i)
-        @vectors[i]
-      elsif i.is_a? Range
+      if i.is_a? Range
         fields=from_to(i.begin,i.end)
         vectors=fields.inject({}) {|a,v| a[v]=@vectors[v];a}
         ds=Dataset.new(vectors,fields)
       else
-        raise ArgumentError, "You need a String or a Range"
+        raise Exception,"Vector '#{i}' doesn't exists on dataset" unless @vectors.has_key?(i)
+        @vectors[i]
       end
     end
     # Retrieves a Statsample::Vector, based on the result
@@ -769,17 +789,14 @@ module Statsample
       ds
     end
    
-		def summary
-			out=""
-			out << "Summary for dataset\n"
-			@vectors.each{|k,v|
-				out << "###############\n"
-				out << "Vector #{k}:\n"
-				out << v.summary
-				out << "###############\n"
-				
-			}
-			out 
+		def report_building(b)
+      b.section(:name=>@name) do |g|
+        g.text _"Cases: %d"  % cases
+        
+        @fields.each do |f|
+          g.parse_element(@vectors[f])
+        end
+      end
 		end
     def as_r
       require 'rsruby/dataframe'

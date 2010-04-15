@@ -6,6 +6,9 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
       'city'=>Statsample::Vector.new(['New York','London','London','Paris','Tome']),
     'a1'=>Statsample::Vector.new(['a,b','b,c','a',nil,'a,b,c'])}, ['id','name','age','city','a1'])
   end
+  def test_should_have_summary
+    assert(@ds.summary.size>0)
+  end
   def test_basic
     assert_equal(5,@ds.cases)
     assert_equal(%w{id name age city a1}, @ds.fields)
@@ -245,6 +248,29 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     assert_same(ds1['v2'],ds2['v2'])
 
 
+  end
+  def test_clone
+    v1=[1,2,3,4].to_vector
+    v2=[5,6,7,8].to_vector
+    ds1=Statsample::Dataset.new({'v1'=>v1,'v2'=>v2}, %w{v2 v1})
+    ds2=ds1.clone
+    assert_equal(ds1,ds2)
+    assert_not_same(ds1,ds2)
+    assert_equal(ds1['v1'],ds2['v1'])
+    assert_same(ds1['v1'], ds2['v1'])
+    assert_equal(ds1.fields,ds2.fields)
+    assert_not_same(ds1.fields,ds2.fields)
+
+    # partial clone
+    ds3=ds1.clone('v1')
+    ds_exp=Statsample::Dataset.new({'v1'=>v1},%w{v1})
+    assert_equal(ds_exp,ds3)
+    assert_not_same(ds_exp,ds3)
+    assert_equal(ds3['v1'],ds_exp['v1'])
+    assert_same(ds3['v1'],ds_exp['v1'])
+    assert_equal(ds3.fields,ds_exp.fields)
+    assert_not_same(ds3.fields,ds_exp.fields)
+     
   end
   def test_dup
     v1=[1,2,3,4].to_vector

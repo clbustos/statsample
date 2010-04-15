@@ -6,7 +6,7 @@ module Statsample
     class << self
       # Covariance between two vectors
       def covariance(v1,v2)
-        v1a,v2a=Statsample.only_valid(v1,v2)
+        v1a,v2a=Statsample.only_valid_clone(v1,v2)
         return nil if v1a.size==0
         if Statsample.has_gsl?
           GSL::Stats::covariance(v1a.gsl, v2a.gsl)
@@ -16,7 +16,7 @@ module Statsample
       end
       # Estimate the ML between two dichotomic vectors
       def maximum_likehood_dichotomic(pred,real)
-        preda,reala=Statsample.only_valid(pred,real)                
+        preda,reala=Statsample.only_valid_clone(pred,real)                
         sum=0
         pred.each_index{|i|
            sum+=(real[i]*Math::log(pred[i])) + ((1-real[i])*Math::log(1-pred[i]))
@@ -29,14 +29,14 @@ module Statsample
         sum_of_squares(v1a,v2a) / (v1a.size-1)
       end
       def sum_of_squares(v1,v2)
-        v1a,v2a=Statsample.only_valid(v1,v2)        
+        v1a,v2a=Statsample.only_valid_clone(v1,v2)        
         m1=v1a.mean
         m2=v2a.mean
         (v1a.size).times.inject(0) {|ac,i| ac+(v1a[i]-m1)*(v2a[i]-m2)}
       end
       # Calculate Pearson correlation coefficient (r) between 2 vectors
       def pearson(v1,v2)
-        v1a,v2a=Statsample.only_valid(v1,v2)
+        v1a,v2a=Statsample.only_valid_clone(v1,v2)
         return nil if v1a.size ==0
         if Statsample.has_gsl?
           GSL::Stats::correlation(v1a.gsl, v2a.gsl)
@@ -45,7 +45,7 @@ module Statsample
         end
       end
       def pearson_slow(v1,v2) # :nodoc:
-        v1a,v2a=Statsample.only_valid(v1,v2)
+        v1a,v2a=Statsample.only_valid_clone(v1,v2)
         # Calculate sum of squares
         ss=sum_of_squares(v1a,v2a)
         ss.quo(Math::sqrt(v1a.sum_of_squares) * Math::sqrt(v2a.sum_of_squares))
@@ -60,7 +60,7 @@ module Statsample
       # Retrieves the value for t test for a pearson correlation
       # between two vectors to test the null hipothesis of r=0
       def t_pearson(v1,v2)
-        v1a,v2a=Statsample.only_valid(v1,v2)
+        v1a,v2a=Statsample.only_valid_clone(v1,v2)
         r=pearson(v1a,v2a)
         if(r==1.0) 
           0
@@ -117,7 +117,7 @@ module Statsample
       # Correlation between v1 and v2, controling the effect of
       # control on both.
       def partial_correlation(v1,v2,control)
-        v1a,v2a,cona=Statsample.only_valid(v1,v2,control)
+        v1a,v2a,cona=Statsample.only_valid_clone(v1,v2,control)
         rv1v2=pearson(v1a,v2a)
         rv1con=pearson(v1a,cona)
         rv2con=pearson(v2a,cona)        
@@ -181,7 +181,7 @@ module Statsample
           if row==col
             ds[row].valid_data.size
           else
-            rowa,rowb=Statsample.only_valid(ds[row],ds[col])
+            rowa,rowb=Statsample.only_valid_clone(ds[row],ds[col])
             rowa.size
           end
         end
@@ -193,7 +193,7 @@ module Statsample
       def correlation_probability_matrix(ds, tails=:both)
         rows=ds.fields.collect do |row|
           ds.fields.collect do |col|
-            v1a,v2a=Statsample.only_valid(ds[row],ds[col])
+            v1a,v2a=Statsample.only_valid_clone(ds[row],ds[col])
             (row==col or ds[row].type!=:scale or ds[col].type!=:scale) ? nil : prop_pearson(t_pearson(ds[row],ds[col]), v1a.size, tails)
           end
         end
@@ -202,7 +202,7 @@ module Statsample
       
       # Spearman ranked correlation coefficient (rho) between 2 vectors
       def spearman(v1,v2)
-        v1a,v2a=Statsample.only_valid(v1,v2)
+        v1a,v2a=Statsample.only_valid_clone(v1,v2)
         v1r,v2r=v1a.ranked(:scale),v2a.ranked(:scale)
         pearson(v1r,v2r)
       end
@@ -220,7 +220,7 @@ module Statsample
       # Kendall Rank Correlation Coefficient.
       # Based on Hervé Adbi article
       def tau_a(v1,v2)
-        v1a,v2a=Statsample.only_valid(v1,v2)
+        v1a,v2a=Statsample.only_valid_clone(v1,v2)
         n=v1.size
         v1r,v2r=v1a.ranked(:scale),v2a.ranked(:scale)
         o1=ordered_pairs(v1r)

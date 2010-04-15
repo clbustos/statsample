@@ -16,7 +16,7 @@ variables.times do |i|
 end
 ds=vectors.to_dataset
 
-pa=Statsample::Factor::ParallelAnalysis.new(ds, :iterations=>100, :debug=>true)
+pa=Statsample::Factor::ParallelAnalysis.new(ds, :iterations=>10, :debug=>true)
 pca=Statsample::Factor::PCA.new(Statsample::Bivariate.correlation_matrix(ds))
 rb=ReportBuilder.new(:name=>"Parallel Analysis with simulation") do |g|
   g.text("There are 3 real factors on data")

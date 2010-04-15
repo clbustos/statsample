@@ -21,6 +21,7 @@ class GslEngine < BaseEngine
     super
     @ds=ds.dup_only_valid
     @ds_valid=@ds
+    @valid_cases=@ds_valid.cases
     @dy=@ds[@y_var]
     @ds_indep=ds.dup(ds.fields-[y_var])
     # Create a custom matrix
@@ -111,6 +112,19 @@ class GslEngine < BaseEngine
         v.quo(red_sd)
     }.to_vector(:scale)
   end
+  
+    # Standard error for coeffs
+  def coeffs_se
+    out={}
+    evcm=estimated_variance_covariance_matrix
+    @ds_valid.fields.each_with_index do |f,i|
+      mi=i+1
+      next if f==@y_var
+      out[f]=evcm[mi,mi]
+    end
+    out
+  end
+  
 end
 end
 end

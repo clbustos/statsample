@@ -13,6 +13,47 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     assert_equal([0,0,1,1,0,nil],b['d'].to_a)
     assert_equal([0,0,0,0,1,nil],b[10].to_a)
   end
+  context Statsample do
+    setup do
+      @sample=100
+      @a=@sample.times.map{|i| (i+rand(10)) %10 ==0 ? nil : rand(100)}.to_scale
+      @b=@sample.times.map{|i| (i+rand(10)) %10 ==0 ? nil : rand(100)}.to_scale
+      @correct_a=Array.new
+      @correct_b=Array.new
+      @a.each_with_index do |v,i|
+        if !@a[i].nil? and !@b[i].nil?
+          @correct_a.push(@a[i])
+          @correct_b.push(@b[i])
+        end
+      end
+      @correct_a=@correct_a.to_scale
+      @correct_b=@correct_b.to_scale
+      
+      @common=lambda  do |av,bv|
+        assert_equal(@correct_a,av)
+        assert_equal(@correct_b,bv)
+        assert(!av.has_missing_data?)
+        assert(!bv.has_missing_data?)        
+      end
+    end
+    should "return correct only_valid" do
+      av,bv=Statsample.only_valid @a,@b
+      av2,bv2=Statsample.only_valid av,bv
+      @common.call(av,bv)
+      assert_equal(av,av2)
+      assert_not_same(av,av2)
+      assert_not_same(bv,bv2)
+    end
+    should "return correct only_valid_clone" do
+      av,bv=Statsample.only_valid_clone @a,@b
+      @common.call(av,bv)
+      av2,bv2=Statsample.only_valid_clone av,bv
+      assert_equal(av,av2)
+      assert_same(av,av2)
+      assert_same(bv,bv2)
+    end
+    
+  end
   context Statsample::Vector do
     setup do 
       @c = Statsample::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :nominal)
@@ -133,14 +174,19 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       assert_equal(@c.data_with_nils,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99])
       
     end
-    should "has_missing_values" do 
+    should "correct has_missing_data? with missing data" do 
       a=[1,2,3,nil].to_vector
       assert(a.has_missing_data?)
+    end
+    should "correct has_missing_data? without missing data" do   
       a=[1,2,3,4,10].to_vector
       assert(!a.has_missing_data?)
+    end
+    should "with explicit missing_values, should respond has_missing_data?" do
+      a=[1,2,3,4,10].to_vector
       a.missing_values=[10]
       assert(a.has_missing_data?)
-    end
+    end 
     should "label correctly fields" do 
       @c.labels={5=>'FIVE'}
       assert_equal(["FIVE","FIVE","FIVE","FIVE","FIVE",6,6,7,8,9,10,1,2,3,4,nil,-99, -99],@c.vector_labeled.to_a)

@@ -112,7 +112,7 @@ module Statsample
       false
     end
   end
-  VERSION = '0.9.0'
+  VERSION = '0.10.0'
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')
@@ -186,6 +186,16 @@ module Statsample
       ds=Statsample::Dataset.new(h).dup_only_valid
       ds.vectors.values
     end
+    # Cheap version of #only_valid. 
+    # If any vectors have missing_values, return only valid.
+    # If not, return the vectors it self
+    def only_valid_clone(*vs)
+      if vs.any? {|v| v.has_missing_data?}
+        only_valid(*vs)
+      else
+        vs
+      end
+    end
   end  
   
   
@@ -214,7 +224,14 @@ module Statsample
       fp.close
     end        
   end
-    
+  # Provides basic method to generate summaries
+  module Summarizable
+    include GetText
+    bindtextdomain("statsample")
+    def summary(method=:to_text)
+      ReportBuilder.new(:no_title=>true).add(self).send(method)
+    end
+  end
   module STATSAMPLE__ #:nodoc:
   end
 end

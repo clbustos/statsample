@@ -1,3 +1,23 @@
+=== 0.10.0 / 2010-04-13
+
+<b>API modifications</b>
+* Refactoring of Statsample::Anova module. 
+  * Statsample::Anova::OneWay :implementation of generic ANOVA One-Way, used by Multiple Regression, for example.
+  * Statsample::Anova::OneWayWithVectors: implementation of ANOVA One-Way to test differences of means.
+
+<b>New features</b>
+* New Statsample::Factor::Parallel Analysis, to performs Horn's 'parallel analysis' to a PCA, to adjust for sample bias on retention of components.
+* New Statsample.only_valid_clone and Statsample::Dataset.clone, which allows to create shallow copys of valid vector and datasets. Used by correlation matrix methods to optimize calculations
+* New module Statsample::Summarizable, which add GetText and ReportBuilder support to classes. Better summaries for Vector, Dataset, Crosstab, PrincipalAxis, PCA and Regression::Multiple classes
+
+<b>Optimizations and bug fix</b>
+
+* Refactoring of Statsample::Regression::Multiple classes. Still needs works
+* Bug fix on Statsample::Factor::PCA and Statsample::Factor::PrincipalAxis
+* Bug fix on Statsample::Bivariate::Polychoric.new_with_vectors. Should be defined class method, no instance method.
+* Optimized correlation and covariance matrix. Only calculates the half of matrix and the other half is returned from cache
+* More tests coverage. RCOV Total: 82.51% , Code: 77.83%
+
 === 0.9.0 / 2010-04-04
 * New Statsample::Test::F. Anova::OneWay subclasses it and Regression classes uses it.
 === 0.8.2 / 2010-04-01

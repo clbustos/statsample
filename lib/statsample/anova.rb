@@ -11,7 +11,6 @@ module Statsample
     # = Generic Anova one-way.
     # You could enter the sum of squares or the mean squares. You
     # should enter the degrees of freedom for numerator and denominator.
-    # To enter sum of squares:
     # == Usage
     #  anova=Statsample::Anova::OneWay(:ss_num=>10,:ss_den=>20, :df_num=>2, :df_den=>10, @name=>"ANOVA for....")
     class OneWay
@@ -50,21 +49,24 @@ module Statsample
         }
         @f_object=Statsample::Test::F.new(@ms_num,@ms_den,@df_num,@df_den)
       end
+      # F value
       def f
         @f_object.f
       end
+      # P-value of F test
       def probability
         @f_object.probability
       end
+      # Summary of Anova analysis
       def summary
         ReportBuilder.new(:no_title=>true).add(self).to_text
       end
-      def report_building(builder)
+      def report_building(builder) #:nodoc:
         builder.section(:name=>@name) do |b|
           report_building_table(b)
         end
       end
-      def report_building_table(builder)
+      def report_building_table(builder) #:nodoc:
         builder.table(:name=>_("%s Table") % @name, :header=>%w{source ss df ms f p}.map {|v| _(v)}) do |t|
           t.row([@name_numerator, sprintf("%0.3f",@ss_num),   @df_num, sprintf("%0.3f",@ms_num),  sprintf("%0.3f",f), sprintf("%0.3f", probability)])
           t.row([@name_denominator, sprintf("%0.3f",@ss_den),  @df_den, sprintf("%0.3f",@ms_den), "", ""])
@@ -142,7 +144,7 @@ module Statsample
       def n
           @vectors.inject(0){|a,v| a+v.size}
       end
-      def report_building(builder)
+      def report_building(builder) # :nodoc:
         builder.section(:name=>@name) do |s|
           if summary_descriptives
             s.table(:name=>_("Descriptives"),:header=>%w{Name N Mean SD Min Max}.map {|v| _(v)}) do |t|

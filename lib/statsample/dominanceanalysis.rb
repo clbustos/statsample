@@ -309,11 +309,7 @@ module Statsample
       @general_averages
     end
     
-    def summary
-      rp=ReportBuilder.new()
-      rp.add(self)
-      rp.to_text
-    end
+
     def report_building(g)
       compute if @models.nil?
       

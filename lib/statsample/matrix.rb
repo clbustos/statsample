@@ -101,7 +101,7 @@ module Statsample
   #  matrix.extend CovariateMatrix
   # 
   module CovariateMatrix
-    # Gives a nice 
+    # Gives a nice summary
     def summary
       rp=ReportBuilder.new()
       rp.add(self)
@@ -161,16 +161,10 @@ module Statsample
       @fields_y=v
     end
     def fields_x
-      if @fields_x.nil?
-        @fields_x=row_size.times.collect {|i| i} 
-      end
-      @fields_x
+      @fields_x||=row_size.times.collect {|i| i} 
     end
     def fields_y
-      if @fields_y.nil?
-        @fields_y=column_size.times.collect {|i| i} 
-      end
-      @fields_y
+      @fields_y||=column_size.times.collect {|i| i} 
     end
     
     def name=(v)
@@ -197,6 +191,7 @@ module Statsample
     #   a.submatrix(%{c a})
     #   => Matrix[[1.0, 0.2] , [0.2, 1.0]]
     def submatrix(rows,columns=nil)
+      raise ArgumentError, "rows shouldn't be empty" if rows.respond_to? :size and rows.size==0
       columns||=rows
       # Convert all labels on index
       row_index=rows.collect {|v| 
@@ -205,8 +200,7 @@ module Statsample
       column_index=columns.collect {|v| 
         v.is_a?(Numeric) ? v : fields_y.index(v)
       }
-      
-      
+
       fx=row_index.collect {|v| fields_x[v]}
       fy=column_index.collect {|v| fields_y[v]}
         

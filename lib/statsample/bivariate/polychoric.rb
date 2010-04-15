@@ -10,18 +10,29 @@ module Statsample
     # Polychoric correlation matrix.
     # Order of rows and columns depends on Dataset#fields order
     def self.polychoric_correlation_matrix(ds)
-      ds.collect_matrix do |row,col|
+      cache={}
+      matrix=ds.collect_matrix do |row,col|
         if row==col
           1.0
         else
           begin
-            polychoric(ds[row],ds[col])
+            if cache[[col,row]].nil?
+              poly=polychoric(ds[row],ds[col])
+              cache[[row,col]]=poly
+              poly
+            else
+              cache[[col,row]]
+            end
           rescue RuntimeError
             nil
           end
         end
       end
+      matrix.extend CovariateMatrix
+      matrix.fields=ds.fields
+      matrix
     end
+    
     # = Polychoric correlation.
     #
     # The <em>polychoric</em> correlation is a measure of 
@@ -83,6 +94,7 @@ module Statsample
       
       
       # Method of calculation of polychoric series. 
+      # <tt>:two_step</tt> used by default.
       # 
       # :two_step:: two-step ML, based on code by Gegenfurtner(1992).
       # :polychoric_series:: polychoric series estimate, using 
@@ -107,7 +119,7 @@ module Statsample
       EPSILON=1e-6
       MINIMIZER_TYPE_TWO_STEP="brent"
       MINIMIZER_TYPE_JOINT="nmsimplex"
-      def new_with_vectors(v1,v2)
+      def self.new_with_vectors(v1,v2)
         Polychoric.new(Crosstab.new(v1,v2).to_matrix)
       end
       # Params:
@@ -249,6 +261,7 @@ module Statsample
               b=(j==@nc-1) ? 100: beta[j]
               #puts "a:#{a} b:#{b}"
               pd[i][j]=Distribution::NormalBivariate.cdf(a, b, rho)
+              
             end
             pc[i][j] = pd[i][j]
             pd[i][j] = pd[i][j] - pc[i-1][j] if i>0
@@ -256,7 +269,7 @@ module Statsample
             pd[i][j] = pd[i][j] + pc[i-1][j-1] if (i>0 and j>0)
             res= pd[i][j]
              #puts "i:#{i} | j:#{j} | ac: #{sprintf("%0.4f", pc[i][j])} | pd: #{sprintf("%0.4f", pd[i][j])} | res:#{sprintf("%0.4f", res)}"
-          if (res==0)
+          if (res<=0)
            #    puts "Correccion"
             res=1e-16
           end
@@ -328,7 +341,7 @@ module Statsample
         min.epsilon=@epsilon
         min.expected=0
         min.iterate
-        @log+=min.log
+        @log+=min.log.to_table.to_s
         @r=min.x_minimum
         @loglike_model=-min.f_minimum
         puts @log if @debug

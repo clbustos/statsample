@@ -14,7 +14,7 @@ Include:
 * Anova: generic and vector-based One-way ANOVA
 * Tests: F, T, Levene, U-Mannwhitney.
 * Regression: Simple, Multiple (OLS), Probit  and Logit
-* Factorial Analysis: Extraction (PCA and Principal Axis) and Rotation (Varimax, Equimax, Quartimax)
+* Factorial Analysis: Extraction (PCA and Principal Axis), Rotation (Varimax, Equimax, Quartimax) and Parallel Analysis, for estimation of number of factors.
 * Dominance Analysis, with multivariate dependent and bootstrap (Azen & Budescu)
 * Sample calculation related formulas
 * Creates reports on text, html and rtf, using ReportBuilder gem
@@ -40,6 +40,7 @@ Include:
     * Statsample::Factor::Varimax
     * Statsample::Factor::Equimax
     * Statsample::Factor::Quartimax
+  * Statsample::Factor::ParallelAnalysis performs Horn's 'parallel analysis' to a principal components analysis to adjust for sample bias in the retention of components. 
 * Dominance Analysis. Based on Budescu and Azen papers, Statsample::DominanceAnalysis class can report dominance analysis for a sample, using uni or multivariate dependent variables and DominanceAnalysisBootstrap can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/]. 
 * Module Statsample::Codification, to help to codify open questions
 * Converters to import and export data:
