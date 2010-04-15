@@ -90,8 +90,8 @@ task :release => [:tag] do
 end
 
 task :tag do	
-  sh %(svn commit -m "Version bump: #{Statsample::VERSION}")
-	sh %(svn cp https://ruby-statsample.googlecode.com/svn/statsample/trunk https://ruby-statsample.googlecode.com/svn/statsample/tags/v#{Statsample::VERSION} -m "ReportBuilder #{Statsample::VERSION} tagged")
+  sh %(svn commit -m "Statsample bump: #{Statsample::VERSION}")
+	sh %(svn cp https://ruby-statsample.googlecode.com/svn/statsample/trunk https://ruby-statsample.googlecode.com/svn/statsample/tags/v#{Statsample::VERSION} -m "Statsample #{Statsample::VERSION} tagged")
 end
 
 # vim: syntax=Ruby
