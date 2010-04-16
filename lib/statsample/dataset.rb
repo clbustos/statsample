@@ -186,6 +186,17 @@ module Statsample
       }
       Dataset.new(vectors,fields)
     end
+    def clone_only_valid(*fields_to_include)
+      if fields_to_include.size==1 and fields_to_include[0].is_a? Array
+        fields_to_include=fields_to_include[0]
+      end
+      fields_to_include=@fields.dup if fields_to_include.size==0
+      if fields_to_include.any? {|v| @vectors[v].has_missing_data?}
+        dup_only_valid(fields_to_include)
+      else
+        clone(fields_to_include)
+      end
+    end
     # Returns a shallow copy of Dataset.
     # Object id will be distinct, but @vectors will be the same.
     def clone(*fields_to_include)
@@ -199,6 +210,7 @@ module Statsample
         ds[f]=@vectors[f]
       }
       ds.fields=fields_to_include
+      ds.update_valid_data
       ds
     end
     # Creates a copy of the given dataset, without data on vectors
@@ -643,8 +655,10 @@ module Statsample
         end
       end
       ms=Multiset.new_empty_vectors(@fields,factors_total)
+
       p1=eval "Proc.new {|c| ms[["+fields.collect{|f| "c['#{f}']"}.join(",")+"]].add_case(c,false) }"
       each{|c| p1.call(c)}
+      
       ms.datasets.each do |k,ds|
         ds.update_valid_data
         ds.vectors.each{|k1,v1| v1.type=@vectors[k1].type }

@@ -260,6 +260,7 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     assert_same(ds1['v1'], ds2['v1'])
     assert_equal(ds1.fields,ds2.fields)
     assert_not_same(ds1.fields,ds2.fields)
+    assert_equal(ds1.cases,ds2.cases)
 
     # partial clone
     ds3=ds1.clone('v1')
@@ -269,6 +270,8 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     assert_equal(ds3['v1'],ds_exp['v1'])
     assert_same(ds3['v1'],ds_exp['v1'])
     assert_equal(ds3.fields,ds_exp.fields)
+    assert_equal(ds3.cases,ds_exp.cases)
+
     assert_not_same(ds3.fields,ds_exp.fields)
      
   end
@@ -281,6 +284,8 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     assert_not_same(ds1,ds2)
     assert_equal(ds1['v1'],ds2['v1'])
     assert_not_same(ds1['v1'],ds2['v1'])
+    assert_equal(ds1.cases,ds2.cases)
+
     assert_equal(ds1.fields,ds2.fields)
     assert_not_same(ds1.fields,ds2.fields)
     ds1['v1'].type=:scale
@@ -292,6 +297,8 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     assert_equal(ds3['v1'],ds_exp['v1'])
     assert_not_same(ds3['v1'],ds_exp['v1'])
     assert_equal(ds3.fields,ds_exp.fields)
+    assert_equal(ds3.cases,ds_exp.cases)
+
     assert_not_same(ds3.fields,ds_exp.fields)
 
 

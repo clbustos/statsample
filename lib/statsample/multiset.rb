@@ -43,6 +43,12 @@ module Statsample
         yield k, v[field]
       }
     end
+    
+    def each_vector(field)
+      @datasets.each {|k,v|
+        yield k, v[field]
+      }
+    end
     def[](i)
       @datasets[i]
     end
