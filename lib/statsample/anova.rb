@@ -11,8 +11,8 @@ module Statsample
       def oneway_with_vectors(*args)
         OneWayWithVectors.new(*args)
       end
-      def twoway_with_dataset(*args)
-        TwoWayWithDataset.new(*args)
+      def twoway_with_vectors(*args)
+        TwoWayWithVectors.new(*args)
       end
       
     end

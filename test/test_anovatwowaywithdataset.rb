@@ -1,22 +1,25 @@
 require(File.dirname(__FILE__)+'/helpers_tests.rb')
 # Reference:
 # * http://www.uwsp.edu/psych/Stat/13/anova-2w.htm#III
-class StatsampleAnovaTwoWayWithDatasetTestCase < MiniTest::Unit::TestCase
-  context(Statsample::Anova::TwoWayWithDataset) do
+class StatsampleAnovaTwoWayWithVectorsTestCase < MiniTest::Unit::TestCase
+  context(Statsample::Anova::TwoWayWithVectors) do
     setup do
-      pa=[5,4,3,4,2,18,19,14,12,15,6,7,5,8,4,6,9,5,9,3].to_scale
-      pa.name="Passive Avoidance"
-      a=[1,1,1,1,1,2,2,2,2,2,1,1,1,1,1,2,2,2,2,2].to_vector
-      a.labels={1=>'0%',2=>'35%'}
-      a.name='Diet'
-      b=[1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2].to_vector
-      b.labels={1=>'Young',2=>'Older'}
-      b.name="Age"
-      ds={'pa'=>pa,'a'=>a,'b'=>b}.to_dataset
-      @anova=Statsample::Anova::TwoWayWithDataset.new(ds,'pa','a','b')
+      @pa=[5,4,3,4,2,18,19,14,12,15,6,7,5,8,4,6,9,5,9,3].to_scale
+      @pa.name="Passive Avoidance"
+      @a=[1,1,1,1,1,2,2,2,2,2,1,1,1,1,1,2,2,2,2,2].to_vector
+      @a.labels={1=>'0%',2=>'35%'}
+      @a.name='Diet'
+      @b=[1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2].to_vector
+      @b.labels={1=>'Young',2=>'Older'}
+      @b.name="Age"
+      @anova=Statsample::Anova::TwoWayWithVectors.new(:a=>@a,:b=>@b, :dependent=>@pa)
     end
-    should "Statsample::Anova.twoway respond to #twoway_with_dataset" do
-    assert(Statsample::Anova.respond_to? :twoway_with_dataset)
+    should "Statsample::Anova respond to #twoway_with_vectors" do
+    assert(Statsample::Anova.respond_to? :twoway_with_vectors)
+    end
+    should "#new returns the same as Statsample::Anova.twoway_with_vectors" do
+      @anova2=Statsample::Anova.twoway_with_vectors(:a=>@a,:b=>@b, :dependent=>@pa)
+      assert_equal(@anova.summary, @anova2.summary)
     end
     should "return correct value for ms_a, ms_b and ms_axb" do
       assert_in_delta(192.2, @anova.ms_a, 0.01)
@@ -36,6 +39,7 @@ class StatsampleAnovaTwoWayWithDatasetTestCase < MiniTest::Unit::TestCase
     end
 
     should "respond to summary" do
+      
       @anova.summary_descriptives=true
       @anova.summary_levene=true
       assert(@anova.respond_to? :summary)

@@ -105,22 +105,38 @@ module Statsample
       end
     end
     
-    
-    class TwoWayWithDataset < TwoWay
+    # Two Way Anova with vectors
+    # Example:
+    #   v1=[2,3,4,5,6].to_scale
+    #   v2=[3,3,4,5,6].to_scale
+    #   v3=[5,3,1,5,6].to_scale
+    #   anova=Statsample::Anova::OneWayWithVectors.new([v1,v2,v3])
+    #   anova.f
+    #   => 0.0243902439024391
+    #   anova.probability
+    #   => 0.975953044203438
+    #   anova.sst 
+    #   => 32.9333333333333
+    #
+    class TwoWayWithVectors < TwoWay
        # Show summary Levene test
       attr_accessor :summary_levene
       # Show summary descriptives for variables (means)
       attr_accessor :summary_descriptives
       attr_reader :a_var, :b_var, :dep_var
       # For now, only equal sample cells allowed
-      def initialize(ds, dep_var, a_var,b_var, opts=Hash.new)
-        @ds=ds.clone_only_valid(dep_var,a_var,b_var)
-        @a_var=a_var
-        @b_var=b_var
-        @dep_var=dep_var
-        _p=@ds[a_var].factors.size
-        _q=@ds[b_var].factors.size
-        @x_general=@ds[dep_var].mean
+      def initialize(opts=Hash.new)
+        raise "You should insert at least :a, :b and :dependent" unless  [:a, :b, :dependent].all? {|v| opts.has_key? v}
+        @a_var='a'
+        @b_var='b'
+        @dep_var='dependent'
+        @a_vector, @b_vector, @dep_vector=Statsample.only_valid_clone opts[:a], opts[:b], opts[:dependent]
+        
+        ds={@a_var=>@a_vector, @b_var=>@b_vector, @dep_var=>@dep_vector}.to_dataset
+        @ds=ds.clone_only_valid
+        _p=@a_vector.factors.size
+        _q=@b_vector.factors.size
+        @x_general=@dep_vector.mean
         @axb_means={}
         @axb_sd={}
         @vectors=[]
