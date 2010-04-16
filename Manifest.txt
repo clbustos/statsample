@@ -31,7 +31,6 @@ lib/distribution/normal.rb
 lib/distribution/normalbivariate.rb
 lib/distribution/t.rb
 lib/spss.rb
-lib/statistics2.rb
 lib/statsample.rb
 lib/statsample/anova.rb
 lib/statsample/bivariate.rb

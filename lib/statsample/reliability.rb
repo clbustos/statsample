@@ -71,6 +71,7 @@ module Statsample
         @skew=@total.skew
         @kurtosis=@total.kurtosis
         @sd = @total.sd
+		@variance=@total.variance
         @valid_n = @total.size
         opts_default={:name=>"Reliability Analisis"}
         @opts=opts_default.merge(opts)
@@ -215,8 +216,9 @@ module Statsample
           s.table(:name=>"Summary") do |t|
             t.row ["Items", @ds.fields.size]
             t.row ["Total Mean", @mean]
-            t.row ["Item Mean", @item_mean]
-            t.row ["S.D.", @sd]
+            t.row ["Total S.D.", @sd]
+			t.row ["Total Variance", @variance]
+			t.row ["Item Mean", @item_mean]
             t.row ["Median", @median]
             t.row ["Skewness", "%0.4f" % @skew]
             t.row ["Kurtosis", "%0.4f" % @kurtosis]

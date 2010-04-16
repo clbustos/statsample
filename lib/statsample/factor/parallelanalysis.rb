@@ -100,10 +100,12 @@ class ParallelAnalysis
       if bootstrap_method==:parameter
         rng = GSL::Rng.alloc()
       end
-      
       @fields.each do |f|
+
         if bootstrap_method==:parameter
-          ds_bootstrap[f]=@n_cases.times.map {|c| rng.gaussian( @ds[f].sd)+@ds[f].mean}.to_scale
+          sd=@ds[f].sd
+          mean=@ds[f].mean
+          ds_bootstrap[f]=@n_cases.times.map {|c| rng.gaussian(sd)+mean}.to_scale
         elsif bootstrap_method==:raw_data
           ds_bootstrap[f]=ds[f].sample_with_replacement(@n_cases).to_scale
         end

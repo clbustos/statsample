@@ -1,3 +1,6 @@
+=== 0.11.0 / 2010-04-16
+* Removed library statistics2 from package. Used gem statistics2 instead, because have a extension version
+
 === 0.10.0 / 2010-04-13
 
 <b>API modifications</b>

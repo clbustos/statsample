@@ -35,4 +35,6 @@ module MiniTest
     end
   end
 end
+
 MiniTest::Unit.autorun
+

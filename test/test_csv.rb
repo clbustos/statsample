@@ -1,4 +1,4 @@
-require(File.dirname(__FILE__)+'/test_helpers.rb')
+require(File.dirname(__FILE__)+'/helpers_tests.rb')
 
 class StatsampleCSVTestCase < MiniTest::Unit::TestCase
   def setup
