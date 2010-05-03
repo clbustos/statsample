@@ -57,6 +57,7 @@ module Statsample
         t.quo(v2s.size-1)
 =end
       end
+      alias :correlation :pearson
       # Retrieves the value for t test for a pearson correlation
       # between two vectors to test the null hipothesis of r=0
       def t_pearson(v1,v2)

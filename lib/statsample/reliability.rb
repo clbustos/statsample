@@ -6,10 +6,10 @@ module Statsample
       def cronbach_alpha(ods)
         ds=ods.dup_only_valid
         n_items=ds.fields.size
-        sum_var_items=ds.vectors.inject(0) {|ac,v|
+        s2_items=ds.vectors.inject(0) {|ac,v|
         ac+v[1].variance }
         total=ds.vector_sum
-        (n_items.quo(n_items-1)) * (1-(sum_var_items.quo(total.variance)))
+        (n_items.quo(n_items-1)) * (1-(s2_items.quo(total.variance)))
       end
       # Calculate Chonbach's alpha for a given dataset
       # using standarized values for every vector.
@@ -20,6 +20,24 @@ module Statsample
           a[f]=ods[f].standarized; a
         }.to_dataset
         cronbach_alpha(ds)
+      end
+      # First derivative for alfa
+      # Parameters
+      # <tt>n</tt>: Number of items
+      # <tt>sx</tt>: mean of variances 
+      # <tt>sxy</tt>: mean of covariances
+      
+      def alfa_first_derivative(n,sx,sxy)
+        (sxy*(sx-sxy)).quo(((sxy*(n-1))+sx)**2)
+      end
+      # Second derivative for alfa
+      # Parameters
+      # <tt>n</tt>: Number of items
+      # <tt>sx</tt>: mean of variances 
+      # <tt>sxy</tt>: mean of covariances
+      
+      def alfa_second_derivative(n,sx,sxy)
+        (2*(sxy**2)*(sxy-sx)).quo(((sxy*(n-1))+sx)**3)
       end
     end
     class ItemCharacteristicCurve
@@ -60,10 +78,11 @@ module Statsample
       end
     end
     class ItemAnalysis
-      attr_reader :mean, :sd,:valid_n, :alpha , :alpha_standarized
+      attr_reader :mean, :sd,:valid_n, :alpha , :alpha_standarized, :variances_mean, :covariances_mean
       attr_accessor :name
       def initialize(ds,opts=Hash.new)
         @ds=ds.dup_only_valid
+        @k=@ds.fields.size
         @total=@ds.vector_sum
         @item_mean=@ds.vector_mean.mean
         @mean=@total.mean
@@ -71,12 +90,15 @@ module Statsample
         @skew=@total.skew
         @kurtosis=@total.kurtosis
         @sd = @total.sd
-		@variance=@total.variance
+        @variance=@total.variance
         @valid_n = @total.size
         opts_default={:name=>"Reliability Analisis"}
         @opts=opts_default.merge(opts)
         @name=@opts[:name]
-        
+        # Mean for covariances and variances
+        @variances=@ds.fields.map {|f| @ds[f].variance}.to_scale
+        @variances_mean=@variances.mean
+        @covariances_mean=(@variance-@variances.sum).quo(@k**2-@k)
         begin
           @alpha = Statsample::Reliability.cronbach_alpha(ds)
           @alpha_standarized = Statsample::Reliability.cronbach_alpha_standarized(ds)
@@ -217,15 +239,18 @@ module Statsample
             t.row ["Items", @ds.fields.size]
             t.row ["Total Mean", @mean]
             t.row ["Total S.D.", @sd]
-			t.row ["Total Variance", @variance]
-			t.row ["Item Mean", @item_mean]
+            t.row ["Total Variance", @variance]
+            t.row ["Item Mean", @item_mean]
             t.row ["Median", @median]
             t.row ["Skewness", "%0.4f" % @skew]
             t.row ["Kurtosis", "%0.4f" % @kurtosis]
             t.row ["Valid n", @valid_n]
             t.row ["Cronbach's alpha", "%0.4f" % @alpha]
             t.row ["Standarized Cronbach's alpha", "%0.4f" % @alpha_standarized]
+            t.row ["Variances mean",  "%g" % @variances_mean]
+            t.row ["Covariances mean" , "%g" % @covariances_mean]
           end
+          
           itc=item_total_correlation
           sid=stats_if_deleted
           is=item_statistics

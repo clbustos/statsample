@@ -100,7 +100,7 @@ module Statsample
     end
     # Raises an exception if type of vector is inferior to t type
     def check_type(t)
-    raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal) or (t==:date)
+      raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal) or (t==:date)
     end
     private :check_type
 
@@ -153,10 +153,11 @@ module Statsample
     end
     # Returns a new vector, with data modified by block.
     # Equivalent to create a Vector after #collect on data 
-    def recode
-    @data.collect{|x|
-      yield x
-    }.to_vector(@type)
+    def recode(type=nil)
+      type||=@type
+      @data.collect{|x|
+        yield x
+      }.to_vector(type)
     end
     # Modifies current vector, with data modified by block.
     # Equivalent to #collect! on @data 

@@ -12,6 +12,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         @n_variables.times do |i|
           @ds[i]=base.collect {|v| v+rand()}.to_scale
         end
+        
         @ds.update_valid_data
         @k=@ds.fields.size
         @cm=Statsample::Bivariate.covariance_matrix(@ds)
@@ -94,11 +95,23 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         @x4=[1,2,3,4,4,4,4,3,4,4,5,30].to_vector(:scale)
         @ds={'x1'=>@x1,'x2'=>@x2,'x3'=>@x3,'x4'=>@x4}.to_dataset
         @ia=Statsample::Reliability::ItemAnalysis.new(@ds)
-
+        @cov_matrix=Statsample::Bivariate.covariance_matrix(@ds)
       end     
       should "return correct values for item analysis" do 
         assert_in_delta(0.980,@ia.alpha,0.001)
         assert_in_delta(0.999,@ia.alpha_standarized,0.001)
+        var_mean=4.times.map{|m| @cov_matrix[m,m]}.to_scale.mean 
+        assert_in_delta(var_mean, @ia.variances_mean)
+        
+        covariances=[]
+        4.times.each {|i|
+          4.times.each {|j|
+            if i!=j 
+              covariances.push(@cov_matrix[i,j])
+            end
+          }
+        }
+        assert_in_delta(covariances.to_scale.mean, @ia.covariances_mean)
         assert_in_delta(0.999,@ia.item_total_correlation()['x1'],0.001)
         assert_in_delta(1050.455,@ia.stats_if_deleted()['x1'][:variance_sample],0.001)
       end

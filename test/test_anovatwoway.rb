@@ -31,7 +31,6 @@ class StatsampleAnovaTwoWayTestCase < MiniTest::Unit::TestCase
     end
 
     should "respond to summary" do
-      puts @anova.summary
       assert(@anova.respond_to? :summary)
       assert(@anova.summary.size>0)
     end

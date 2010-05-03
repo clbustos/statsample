@@ -185,7 +185,7 @@ module Statsample
             sc=standarized_coeffs
             cse=coeffs_se
             g.table(:name=>_("Beta coefficients"), :header=>%w{coeff b beta se t}.collect{|field| _(field)} ) do |t|
-              t.row([_("Constant"), sprintf("%0.3f", constant), "-", sprintf("%0.3f", constant_se), sprintf("%0.3f", constant_t)])
+				t.row([_("Constant"), sprintf("%0.3f", constant), "-", constant_se.nil? ? "": sprintf("%0.3f", constant_se), constant_t.nil? ? "" : sprintf("%0.3f", constant_t)])
               @fields.each do |f|
                 t.row([f, sprintf("%0.3f", c[f]), sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
               end  

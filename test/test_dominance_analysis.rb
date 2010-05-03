@@ -21,6 +21,7 @@ class StatsampleDominanceAnalysisTestCase < MiniTest::Unit::TestCase
       assert_equal(expected_dominances[i], da.conditional_dominance_pairwise(a[0],a[1]))
       assert_equal(expected_g_dominances[i], da.general_dominance_pairwise(a[0],a[1]))
     end
+    assert(da.summary.size>0)
   end
   def test_dominance_multivariate
     m=Matrix[[1.0, -0.19, -0.358, -0.343, 0.359, 0.257], [-0.19, 1.0, 0.26, 0.29, -0.11, -0.11], [-0.358, 0.26, 1.0, 0.54, -0.49, -0.23], [-0.343, 0.29, 0.54, 1.0, -0.22, -0.41], [0.359, -0.11, -0.49, -0.22, 1.0, 0.62], [0.257, -0.11, -0.23, -0.41, 0.62, 1]]

@@ -57,8 +57,7 @@ module Statsample
   # * Azen, R. & Budescu, D.V. (2006). Comparing predictors in Multivariate Regression Models: An extension of Dominance Analysis. <em>Journal of Educational and Behavioral Statistics, 31</em>(2), 157-180.
   #
   class DominanceAnalysis
-    include GetText
-    bindtextdomain("statsample")
+	include Summarizable
     # Class to generate the regressions. Default to Statsample::Regression::Multiple::MatrixEngine
     attr_accessor :regression_class
     # Name of analysis
@@ -312,14 +311,12 @@ module Statsample
 
     def report_building(g)
       compute if @models.nil?
-      
       g.section(:name=>@name) do |generator|
         header=["","r2",_("sign")]+@predictors.collect {|c| DominanceAnalysis.predictor_name(c) }
         
         generator.table(:name=>_("Dominance Analysis result"), :header=>header) do |t|
-          
           row=[_("Model 0"),"",""]+@predictors.collect{|f|
-            sprintf("%0.3f", md([f]).r2)
+            sprintf("%0.3f",md([f]).r2)
           }
           
           t.row(row)
@@ -349,15 +346,15 @@ module Statsample
                     sprintf("%0.3f",g[f])
           }
           t.row(row)
-        end        
+        end
         
         td=total_dominance
         cd=conditional_dominance
         gd=general_dominance
         generator.table(:name=>_("Pairwise dominance"), :header=>[_("Pairs"),_("Total"),_("Conditional"),_("General")]) do |t|
-          pairs.each{|p|
-            name=p.join(" - ")
-            row=[name, sprintf("%0.1f",td[p]), sprintf("%0.1f",cd[p]), sprintf("%0.1f",gd[p])]
+          pairs.each{|pair|
+            name=pair.map{|v| v.is_a?(Array) ? "("+v.join("-")+")" : v}.join(" - ")
+            row=[name, sprintf("%0.1f",td[pair]), sprintf("%0.1f",cd[pair]), sprintf("%0.1f",gd[pair])]
             t.row(row)
           }
         end
@@ -394,10 +391,10 @@ module Statsample
         }.join("*")
       end
       def add_table_row
-        begin
-          sign=sprintf("%0.3f", @lr.significance)
-        rescue RuntimeError
-          sign="???"
+        if @cases
+          sign=sprintf("%0.3f", @lr.probability)
+		else
+		sign="???"
         end
       
         [name, sprintf("%0.3f",r2), sign] + @predictors.collect{|k|

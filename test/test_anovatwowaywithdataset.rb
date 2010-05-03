@@ -6,11 +6,11 @@ class StatsampleAnovaTwoWayWithVectorsTestCase < MiniTest::Unit::TestCase
     setup do
       @pa=[5,4,3,4,2,18,19,14,12,15,6,7,5,8,4,6,9,5,9,3].to_scale
       @pa.name="Passive Avoidance"
-      @a=[1,1,1,1,1,2,2,2,2,2,1,1,1,1,1,2,2,2,2,2].to_vector
-      @a.labels={1=>'0%',2=>'35%'}
+      @a=[0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1].to_vector
+      @a.labels={0=>'0%',1=>'35%'}
       @a.name='Diet'
-      @b=[1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2].to_vector
-      @b.labels={1=>'Young',2=>'Older'}
+      @b=[0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1].to_vector
+      @b.labels={0=>'Young',1=>'Older'}
       @b.name="Age"
       @anova=Statsample::Anova::TwoWayWithVectors.new(:a=>@a,:b=>@b, :dependent=>@pa)
     end

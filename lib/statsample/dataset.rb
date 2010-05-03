@@ -806,8 +806,8 @@ module Statsample
 		def report_building(b)
       b.section(:name=>@name) do |g|
         g.text _"Cases: %d"  % cases
-        
         @fields.each do |f|
+          g.text "Element:[#{f}]"
           g.parse_element(@vectors[f])
         end
       end

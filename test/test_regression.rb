@@ -19,7 +19,7 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
       assert_in_delta(0.132, @lr.constant,0.001,"constant")
       assert_in_delta(0.195, @lr.coeffs_se['x'],0.001,"coeff x se")
       assert_in_delta(0.064, @lr.constant_se,0.001,"constant se")
-    end
+  end
   end
   def test_parameters
     @x=[13,20,10,33,15].to_vector(:scale)
@@ -45,7 +45,6 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
     ds={'a'=>a,'b'=>b,'y'=>y}.to_dataset
     lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y')
     assert(lr.summary.size>0)
-    
   end
   def test_multiple_dependent
     complete=Matrix[
@@ -152,7 +151,7 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
     assert_in_delta(639.6,lr.sst,0.001)
     assert_in_delta(583.76,lr.ssr,0.001)
     assert_in_delta(55.840,lr.sse,0.001)
-
+	assert(lr.summary.size>0, "#{name} without summary")
   end
   def model_test(lr,name='undefined')
     model_test_matrix(lr,name)
