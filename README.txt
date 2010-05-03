@@ -100,9 +100,12 @@ Optional:
 
 <b>Note</b>: Use gsl 1.12.109 or later.
 
-== DOWNLOAD
-* Gems and bugs report: http://rubyforge.org/projects/ruby-statsample/
-* SVN and Wiki: http://code.google.com/p/ruby-statsample/
+== RESOURCES
+
+* Source code on github: http://github.com/clbustos/statsample
+* API: http://ruby-statsample.rubyforge.org/statsample/
+* Bug report and feature request: http://code.google.com/p/ruby-statsample/issues/list
+
 
 == INSTALL:
 

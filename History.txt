@@ -1,5 +1,11 @@
 === 0.11.0 / 2010-04-16
+<b>New features:</b>
+* Added Statsample::Anova::TwoWay and Statsample::Anova::TwoWayWithVectors
+* Added Statsample.clone_only valid and Statsample::Dataset.clone_only_valid, for cheap copy on already clean vectors
+<b>Optimizations and bug fix</b> 
 * Removed library statistics2 from package. Used gem statistics2 instead, because have a extension version
+* Added example for Reliability class
+* Bug fix on Statsample::DominanceAnalysis
 
 === 0.10.0 / 2010-04-13
 

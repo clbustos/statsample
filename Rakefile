@@ -6,11 +6,7 @@ $:.unshift(File.dirname(__FILE__)+'/lib/')
 require 'rubygems'
 require 'hoe'
 require './lib/statsample'
-
-
-if File.exists? './local_rakefile.rb'
-	require './local_rakefile'
-end
+Hoe.plugin :git
 
 desc "Ruby Lint"
 task :lint do
@@ -86,13 +82,4 @@ task :publicar_docs => [:clean, :docs] do
   }
   sh %{rsync #{h.rsync_args} #{local_dir}/ #{host}:#{remote_dir}}
 end
-    
-task :release => [:tag] do 
-end
-
-task :tag do	
-  sh %(svn commit -m "Statsample bump: #{Statsample::VERSION}")
-	sh %(svn cp https://ruby-statsample.googlecode.com/svn/statsample/trunk https://ruby-statsample.googlecode.com/svn/statsample/tags/v#{Statsample::VERSION} -m "Statsample #{Statsample::VERSION} tagged")
-end
-
 # vim: syntax=Ruby

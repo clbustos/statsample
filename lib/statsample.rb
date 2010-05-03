@@ -22,7 +22,6 @@
 require 'matrix'
 require 'distribution'
 require 'dirty-memoize'
-gem 'reportbuilder','~>1.0'
 require 'reportbuilder'
 class Numeric
   def square ; self * self ; end
@@ -112,7 +111,7 @@ module Statsample
       false
     end
   end
-  VERSION = '0.10.0'
+  VERSION = '0.11.0'
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')
