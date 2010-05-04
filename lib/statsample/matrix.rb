@@ -2,6 +2,10 @@ require 'extendmatrix'
 
 
 class ::Matrix
+  def to_matrix
+    self
+  end
+  
   def to_gsl
     out=[]
     self.row_size.times{|i|
@@ -13,6 +17,9 @@ end
 
 module GSL
   class Matrix
+    def to_gsl
+      self
+    end
     def to_matrix
       rows=self.size1
       cols=self.size2

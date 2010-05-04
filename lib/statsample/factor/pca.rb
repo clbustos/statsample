@@ -34,20 +34,22 @@ module Factor
     # Number of factors. Set by default to the number of factors
     # with eigen values > 1
     attr_accessor :m
+    # Use GSL if available
+    attr_accessor :use_gsl
     include GetText
     bindtextdomain("statsample")
     
     def initialize(matrix ,opts=Hash.new)
-      if matrix.respond_to? :to_gsl
-        matrix=matrix.to_gsl
-      end
       @name=_("Principal Component Analysis")
       @matrix=matrix
-      @n_variables=@matrix.size1
+      @n_variables=@matrix.column_size
       @m=nil
       opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
       }
+      if @use_gsl.nil?
+        @use_gsl=Statsample.has_gsl?
+      end
       calculate_eigenpairs
       if @m.nil?
         # Set number of factors with eigenvalues > 1
@@ -67,9 +69,9 @@ module Factor
     # Feature vector for m factors
     def feature_vector(m=nil)
       m||=@m
-      omega_m=GSL::Matrix.zeros(@n_variables, m)
+      omega_m=::Matrix.new(@n_variables, m,0)
       m.times do |i|
-        omega_m.set_col(i, @eigenpairs[i][1])
+        omega_m.column= i, @eigenpairs[i][1]
       end
       omega_m
     end
@@ -84,13 +86,13 @@ module Factor
     def component_matrix(m=nil)
       m||=@m
       raise "m should be > 0" if m<1
-      omega_m=GSL::Matrix.zeros(@n_variables, m)
+      omega_m=::Matrix.new(@n_variables, m,0)
       gammas=[]
       m.times {|i|
-        omega_m.set_col(i, @eigenpairs[i][1])
+        omega_m.column=i, @eigenpairs[i][1]
         gammas.push(Math::sqrt(@eigenpairs[i][0]))
       }
-      gamma_m=GSL::Matrix.diagonal(gammas)
+      gamma_m=::Matrix.diagonal(*gammas)
       (omega_m*(gamma_m)).to_matrix
     end
     # Communalities for all variables given m factors
@@ -112,13 +114,30 @@ module Factor
     end
     
     def calculate_eigenpairs
-      eigval, eigvec= GSL::Eigen.symmv(@matrix)
+      if @use_gsl
+        calculate_eigenpairs_gsl
+      else
+        calculate_eigenpairs_ruby
+      end
+    end
+  
+    def calculate_eigenpairs_ruby
+      eigval, eigvec= @matrix.eigenvaluesJacobi, @matrix.cJacobiV
       @eigenpairs={}
-      eigval.each_index {|i|
-        @eigenpairs[eigval[i]]=eigvec.get_col(i)
+      eigval.to_a.each_index {|i|
+        @eigenpairs[eigval[i]]=eigvec.column(i)
       }
       @eigenpairs=@eigenpairs.sort.reverse
     end
+    def calculate_eigenpairs_gsl
+      eigval, eigvec= GSL::Eigen.symmv(@matrix.to_gsl)
+        @eigenpairs={}
+        eigval.each_index {|i|
+          @eigenpairs[eigval[i]]=eigvec.get_col(i)
+        }
+        @eigenpairs=@eigenpairs.sort.reverse
+    end
+    
     def summary
       ReportBuilder.new(:no_title=>true).add(self).to_text
     end

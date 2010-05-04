@@ -18,7 +18,9 @@ task :lint do
   }
 end
 
-
+task :release do
+system %{git push origin master}
+end
 desc "Update pot/po files."
 task :updatepo do
   require 'gettext/tools'
