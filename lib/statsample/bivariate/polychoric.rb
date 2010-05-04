@@ -438,8 +438,7 @@ module Statsample
           message+=sprintf("f() = %7.3f size = %.3f\n", minimizer.fval, minimizer.size)+"\n";
         end while status == GSL::CONTINUE and iter < @max_iterations
         @iteration=iter
-        @log+=message
-        puts message if @debug
+        @log+=message        
         @r=minimizer.x[0]
         @alpha=minimizer.x[1,@nr-1].to_a
         @beta=minimizer.x[@nr,@nc-1].to_a

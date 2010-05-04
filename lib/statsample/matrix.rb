@@ -1,19 +1,4 @@
-require 'matrix'
-
-class ::Vector
-  if RUBY_VERSION<="1.9.0"
-    alias_method :old_coerce, :coerce
-    def coerce(other)
-      case other
-      when Numeric
-        return Matrix::Scalar.new(other), self
-      else
-        raise TypeError, "#{self.class} can't be coerced into #{other.class}"
-      end
-    end
-    
-  end
-end
+require 'extendmatrix'
 
 
 class ::Matrix
@@ -24,63 +9,6 @@ class ::Matrix
     }
     GSL::Matrix[*out]
   end
-  # Calculate marginal of rows
-  def row_sum
-  (0...row_size).collect {|i|
-    row(i).to_a.inject(0) {|a,v| a+v}
-  }
-  end
-  # Calculate marginal of columns
-  def column_sum
-  (0...column_size).collect {|i|
-    column(i).to_a.inject(0) {|a,v| a+v}
-  }
-  end
-
-  
-  alias :old_par :[]
-  
-  # Select elements and submatrixes
-  # Implement row, column and minor in one method
-  # 
-  # * [i,j]:: Element i,j
-  # * [i,:*]:: Row i
-  # * [:*,j]:: Column j
-  # * [i1..i2,j]:: Row i1 to i2, column j
-  
-  def [](*args)
-    raise ArgumentError if args.size!=2
-    x=args[0]
-    y=args[1]
-    if x.is_a? Integer and y.is_a? Integer
-      @rows[args[0]][args[1]]
-    else
-      # set ranges according to arguments
-      
-      rx=case x
-        when Numeric
-          x..x
-        when :*
-          0..(row_size-1)
-        when Range
-          x
-      end
-      ry=case y
-        when Numeric
-          y..y
-        when :*
-          0..(column_size-1)
-        when Range
-          y
-      end
-      Matrix.rows(rx.collect {|i| ry.collect {|j| @rows[i][j]}})
-    end
-  end
-  # Calculate sum of cells
-  def total_sum
-    row_sum.inject(0){|a,v| a+v}
-  end
-
 end
 
 module GSL
@@ -101,6 +29,7 @@ module Statsample
   #  matrix.extend CovariateMatrix
   # 
   module CovariateMatrix
+    include Summarizable
     # Gives a nice summary
     def summary
       rp=ReportBuilder.new()

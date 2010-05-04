@@ -1,3 +1,6 @@
+=== 0.11.1 / 2010-05-04
+* Removed Matrix almost all Matrix extensions and replaced by dependency on 'extendmatrix' gem
+
 === 0.11.0 / 2010-04-16
 <b>New features:</b>
 * Added Statsample::Anova::TwoWay and Statsample::Anova::TwoWayWithVectors
