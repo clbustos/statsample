@@ -39,7 +39,7 @@ class DistributionTestCase < MiniTest::Unit::TestCase
   def test_normal_bivariate
     if Distribution.has_gsl?
       [0.2,0.4,0.6,0.8,0.9, 0.99,0.999,0.999999].each {|rho|
-        assert_equal(GSL::Ran::bivariate_gaussian_pdf(0, 0, 1,1,rho), Distribution::NormalBivariate.pdf(0,0, rho , 1,1))
+        assert_in_delta(GSL::Ran::bivariate_gaussian_pdf(0, 0, 1,1,rho), Distribution::NormalBivariate.pdf(0,0, rho , 1,1),1e-8)
 
       }
     end
