@@ -12,6 +12,8 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
       if Statsample.has_gsl?
         pca=Statsample::Factor::PCA.new(cov_matrix,:use_gsl=>true)
         pca_set(pca)
+      else
+        skip("Eigenvalues could be calculated with GSL (requires gsl)")
       end
       pca=Statsample::Factor::PCA.new(cov_matrix,:use_gsl=>false)
       pca_set(pca)
@@ -77,7 +79,8 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
     varimax=Statsample::Factor::Varimax.new(a)
     assert(!varimax.rotated.nil?, "Rotated shouldn't be empty")
     assert(!varimax.component_transformation_matrix.nil?, "Component matrix shouldn't be empty")
-    assert(!varimax.h2.nil?,"H2 shouldn't be empty")
+    assert(!varimax.h2.nil?, "H2 shouldn't be empty")
+    
     _test_matrix(expected,varimax.rotated)
   end
   def _test_matrix(a,b)

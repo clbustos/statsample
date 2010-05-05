@@ -40,6 +40,7 @@ module Factor
     bindtextdomain("statsample")
     
     def initialize(matrix ,opts=Hash.new)
+	@use_gsl=nil
       @name=_("Principal Component Analysis")
       @matrix=matrix
       @n_variables=@matrix.column_size
@@ -69,7 +70,7 @@ module Factor
     # Feature vector for m factors
     def feature_vector(m=nil)
       m||=@m
-      omega_m=::Matrix.new(@n_variables, m,0)
+      omega_m=::Matrix.build(@n_variables, m) {0}
       m.times do |i|
         omega_m.column= i, @eigenpairs[i][1]
       end
@@ -86,7 +87,7 @@ module Factor
     def component_matrix(m=nil)
       m||=@m
       raise "m should be > 0" if m<1
-      omega_m=::Matrix.new(@n_variables, m,0)
+      omega_m=::Matrix.build(@n_variables, m) {0}
       gammas=[]
       m.times {|i|
         omega_m.column=i, @eigenpairs[i][1]

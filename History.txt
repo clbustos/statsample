@@ -1,3 +1,6 @@
+=== 0.11.2 / 2010-05-05
+* Updated dependency for 'extendedmatrix' to 0.2 (Matrix#build method)
+
 === 0.11.1 / 2010-05-04
 * Removed Matrix almost all Matrix extensions and replaced by dependency on 'extendmatrix' gem
 * Added dependency to gsl >=1.12.109. Polychoric with joint method fails without this explicit dependency
