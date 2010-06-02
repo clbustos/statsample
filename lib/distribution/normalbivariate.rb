@@ -15,7 +15,13 @@ module Distribution
     class << self
       SIDE=0.1 # :nodoc:
       LIMIT=5 # :nodoc:
-      
+      # Return the partial derivative of cdf over x, with y and rho constant
+      # Reference:
+      # * Tallis, 1962, p.346, cited by Olsson, 1979
+      def partial_derivative_cdf_x(x,y,rho)
+        Distribution::Normal.pdf(x) * Distribution::Normal.cdf((y-rho*x).quo( Math::sqrt( 1 - rho**2 )))
+      end
+      alias  :pd_cdf_x  :partial_derivative_cdf_x 
       # Probability density function for a given x, y and rho value.
       # 
       # Source: http://en.wikipedia.org/wiki/Multivariate_normal_distribution

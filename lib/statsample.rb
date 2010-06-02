@@ -23,6 +23,7 @@ require 'matrix'
 require 'distribution'
 require 'dirty-memoize'
 require 'reportbuilder'
+
 class Numeric
   def square ; self * self ; end
 end

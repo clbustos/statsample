@@ -1,3 +1,4 @@
+require 'tempfile'
 module Statsample
   module Graph
     class SvgScatterplot < SVG::Graph::Plot # :nodoc:
@@ -6,6 +7,14 @@ module Statsample
           super(config)
           @ds=ds
           set_x(@ds.fields[0])
+      end
+      def report_building_html(g)
+        self.parse()
+        tf=Tempfile.new(['image','.svg'])
+        tf.write self.burn
+        tf.close
+        image=ReportBuilder::Image.new(tf.path)
+        g.parse_element(image)
       end
       def set_defaults
           super
@@ -27,7 +36,7 @@ module Statsample
         }
         data.each{|y,d|
           add_data({
-                  :data=>d, :title=>@ds.vector_label(y)
+              :data=>d, :title=>@ds[y].name
           })
         }
       end

@@ -5,7 +5,8 @@ $:.unshift(File.dirname(__FILE__)+'/lib/')
 
 require 'rubygems'
 require 'hoe'
-require './lib/statsample'
+require 'statsample'
+
 Hoe.plugin :git
 
 desc "Ruby Lint"
@@ -40,7 +41,8 @@ h=Hoe.spec('statsample') do
 	self.rubyforge_name = "ruby-statsample"
 	self.developer('Claudio Bustos', 'clbustos@gmail.com')
 	self.extra_deps << ["spreadsheet","~>0.6.0"] << ["svg-graph", "~>1.0"] << ["reportbuilder", "~>1.0"] << ["minimization", "~>0.2.0"] << ["fastercsv"] << ["dirty-memoize", "~>0.0"] << ["statistics2", "~>0.54"] << ["extendmatrix","~>0.2.0"] << ["gsl", "~>1.12.109"]
-	self.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"
+	self.extra_dev_deps << ["shoulda"]
+  self.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"
 	self.need_rdoc=false
 end
 

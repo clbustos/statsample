@@ -49,7 +49,7 @@ class StatsampleBivariatePolychoricTestCase < MiniTest::Unit::TestCase
       assert_in_delta(1.137, @poly.threshold_x[1],0.001)
       end
     end
-    if Statsample.has_gsl?
+    if true and Statsample.has_gsl?
     context "compute joint" do
       setup do
         @poly.method=:joint
@@ -57,11 +57,11 @@ class StatsampleBivariatePolychoricTestCase < MiniTest::Unit::TestCase
       end
       should "have correct values" do 
         assert_equal(:joint, @poly.method)
-      assert_in_delta(0.4192, @poly.r, 0.0001)
-      assert_in_delta(-0.2421, @poly.threshold_y[0],0.0001)
-      assert_in_delta(-0.0297, @poly.threshold_x[0],0.0001)
-      assert_in_delta(1.5938, @poly.threshold_y[1],0.0001)
-      assert_in_delta(1.1331, @poly.threshold_x[1],0.0001)
+        assert_in_delta(0.4192, @poly.r, 0.0001)
+        assert_in_delta(-0.2421, @poly.threshold_y[0],0.0001)
+        assert_in_delta(-0.0297, @poly.threshold_x[0],0.0001)
+        assert_in_delta(1.5938, @poly.threshold_y[1],0.0001)
+        assert_in_delta(1.1331, @poly.threshold_x[1],0.0001)
     end
     end
     end

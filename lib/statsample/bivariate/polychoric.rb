@@ -174,7 +174,7 @@ module Statsample
           raise "Not implemented"
         end
       end
-      
+      # Retrieve log likehood for actual data.
       def loglike_data
         loglike=0
         @nr.times do |i|
@@ -188,72 +188,29 @@ module Statsample
         end
         loglike
       end
+      
+      # Chi Square of model
       def chi_square
         if @loglike_model.nil?
           compute
         end
         -2*(@loglike_model-loglike_data)
       end
+      
       def chi_square_df
         (@nr*@nc)-@nc-@nr
       end
-      
-      def loglike_fd_rho(alpha,beta,rho)
-        if rho.abs>0.9999
-          rho= (rho>0) ? 0.9999 : -0.9999
-        end
-         #puts "rho: #{rho}"
-        
-        loglike=0
-        pd=@nr.times.collect{ [0]*@nc}
-        pc=@nr.times.collect{ [0]*@nc}
-        @nr.times { |i|
-          @nc.times { |j|
-            if i==@nr-1 and j==@nc-1
-              pd[i][j]=1.0
-              a=100
-              b=100
-            else
-              a=(i==@nr-1) ? 100: alpha[i]
-              b=(j==@nc-1) ? 100: beta[j]
-              pd[i][j]=Distribution::NormalBivariate.cdf(a, b, rho)
-            end
-            pc[i][j] = pd[i][j]
-            pd[i][j] = pd[i][j] - pc[i-1][j] if i>0
-            pd[i][j] = pd[i][j] - pc[i][j-1] if j>0
-            pd[i][j] = pd[i][j] + pc[i-1][j-1] if (i>0 and j>0)
-            
-            pij= pd[i][j]+EPSILON
-            if i==0
-              alpha_m1=-10
-            else
-              alpha_m1=alpha[i-1]
-            end
-            
-            if j==0
-              beta_m1=-10
-            else
-              beta_m1=beta[j-1]
-            end
-            
-            loglike+= (@matrix[i,j].quo(pij))*(Distribution::NormalBivariate.pdf(a,b,rho) - Distribution::NormalBivariate.pdf(alpha_m1, b,rho) - Distribution::NormalBivariate.pdf(a, beta_m1,rho) + Distribution::NormalBivariate.pdf(alpha_m1, beta_m1,rho) )
-            
-          }
-        }
-        #puts "derivative: #{loglike}"
-        -loglike
-      end
-      def loglike(alpha,beta,rho)
-        if rho.abs>0.9999
-          rho= (rho>0) ? 0.9999 : -0.9999
-        end
-        
-        loglike=0
-        pd=@nr.times.collect{ [0]*@nc}
-        pc=@nr.times.collect{ [0]*@nc}
-        @nr.times { |i|
-          @nc.times { |j|
-            #puts "i:#{i} | j:#{j}"
+
+
+
+
+      # Retrieve all cell probabilities for givens alpha, beta and rho
+      def cell_probabilities(alpha,beta,rho)
+        pd=@nr.times.collect{ [0] * @nc}
+        pc=@nr.times.collect{ [0] * @nc}
+        @nr.times do |i|
+          @nc.times do |j|
+           
             if i==@nr-1 and j==@nc-1
               pd[i][j]=1.0
             else
@@ -261,24 +218,169 @@ module Statsample
               b=(j==@nc-1) ? 100: beta[j]
               #puts "a:#{a} b:#{b}"
               pd[i][j]=Distribution::NormalBivariate.cdf(a, b, rho)
-              
             end
             pc[i][j] = pd[i][j]
             pd[i][j] = pd[i][j] - pc[i-1][j] if i>0
             pd[i][j] = pd[i][j] - pc[i][j-1] if j>0
             pd[i][j] = pd[i][j] + pc[i-1][j-1] if (i>0 and j>0)
-            res= pd[i][j]
-             #puts "i:#{i} | j:#{j} | ac: #{sprintf("%0.4f", pc[i][j])} | pd: #{sprintf("%0.4f", pd[i][j])} | res:#{sprintf("%0.4f", res)}"
-          if (res<=0)
-           #    puts "Correccion"
-            res=1e-16
           end
-            loglike+= @matrix[i,j]  * Math::log( res )
-          }
-        }
+        end
         @pd=pd
+        pd
+      end
+      def loglike(alpha,beta,rho)
+        if rho.abs>0.9999
+          rho= (rho>0) ? 0.9999 : -0.9999
+        end
+        pr=Processor.new(alpha,beta,rho)
+        loglike=0
+
+        
+        @nr.times do |i|
+          @nc.times do |j|
+            res=pr.pd[i][j]+EPSILON
+            loglike+= @matrix[i,j]  * Math::log( res )
+          end
+        end
         -loglike
       end
+      
+      
+      def fd_loglike_rho(alpha,beta,rho)
+        if rho.abs>0.9999
+          rho= (rho>0) ? 0.9999 : -0.9999
+        end
+        total=0
+        pr=Processor.new(alpha,beta,rho)
+        @nr.times do |i|
+          @nc.times do |j|
+            pi=pr.pd[i][j] + EPSILON
+            total+= (@matrix[i,j] / pi)  * (pr.bipdf(i,j)-pr.bipdf(i-1,j)-pr.bipdf(i,j-1)+pr.bipdf(i-1,j-1))  
+          end
+        end
+        total
+      end
+      
+      class Processor
+        attr_reader :alpha, :beta, :rho
+        def initialize(alpha,beta,rho)
+          @alpha=alpha
+          @beta=beta
+          @nr=@alpha.size+1
+          @nc=@beta.size+1
+          @rho=rho
+        end
+        def bipdf(i,j)
+           Distribution::NormalBivariate.pdf(a(i), b(j), rho)
+        end
+        def a(i)
+          i < 0 ? -100 : (i==@nr-1 ? 100 : alpha[i])
+        end
+        def b(j)
+          j < 0 ? -100 : (j==@nc-1 ? 100 : beta[j])
+        end
+        
+        def fd_loglike_cell_a(i,j,k)
+          if k==i
+            Distribution::NormalBivariate.pd_cdf_x(a(k),b(j), rho) - Distribution::NormalBivariate.pd_cdf_x(a(k),b(j-1),rho)
+          elsif k==(i-1)
+            -Distribution::NormalBivariate.pd_cdf_x(a(k),b(j),rho) + Distribution::NormalBivariate.pd_cdf_x(a(k),b(j-1),rho)
+          else
+            0
+          end
+          
+        end
+        def pd
+          if @pd.nil?
+            @pd=@nr.times.collect{ [0] * @nc}
+            pc=@nr.times.collect{ [0] * @nc}
+            @nr.times do |i|
+            @nc.times do |j|
+             
+              if i==@nr-1 and j==@nc-1
+                @pd[i][j]=1.0
+              else
+                a=(i==@nr-1) ? 100: alpha[i]
+                b=(j==@nc-1) ? 100: beta[j]
+                #puts "a:#{a} b:#{b}"
+                @pd[i][j]=Distribution::NormalBivariate.cdf(a, b, rho)
+              end
+              pc[i][j] = @pd[i][j]
+              @pd[i][j] = @pd[i][j] - pc[i-1][j] if i>0
+              @pd[i][j] = @pd[i][j] - pc[i][j-1] if j>0
+              @pd[i][j] = @pd[i][j] + pc[i-1][j-1] if (i>0 and j>0)
+            end
+            end
+          end
+          @pd
+        end
+      end
+      def fd_loglike_a(alpha,beta,rho,k)
+        fd_loglike_a_eq6(alpha,beta,rho,k)
+      end
+      # Uses equation (6) from Olsson(1979)
+      def fd_loglike_a_eq6(alpha,beta,rho,k)
+        if rho.abs>0.9999
+          rho= (rho>0) ? 0.9999 : -0.9999
+        end
+        pr=Processor.new(alpha,beta,rho)
+        total=0
+        pd=pr.pd
+        @nr.times do |i|
+          @nc.times  do |j|
+            total+=@matrix[i,j].quo(pd[i][j]+EPSILON) * pr.fd_loglike_cell_a(i,j,k)
+          end
+        end
+        total
+      end
+      # Uses equation(13) from Olsson(1979)
+      def fd_loglike_a_eq10(alpha,beta,rho,k)
+        if rho.abs>0.9999
+          rho= (rho>0) ? 0.9999 : -0.9999
+        end
+        pr=Processor.new(alpha,beta,rho)
+        total=0
+        a_k=pr.a(k)
+        pd=pr.pd
+        @nc.times do |j|
+          #puts "j: #{j}"
+          #puts "b #{j} : #{b.call(j)}"
+          #puts "b #{j-1} : #{b.call(j-1)}"
+
+          e_1=@matrix[k,j].quo(pd[k][j]+EPSILON) - @matrix[k+1,j].quo(pd[k+1][j]+EPSILON)
+          e_2=Distribution::Normal.pdf(a_k)
+          e_3=Distribution::Normal.cdf((pr.b(j)-rho*a_k).quo(Math::sqrt(1-rho**2))) - Distribution::Normal.cdf((pr.b(j-1)-rho*a_k).quo(Math::sqrt(1-rho**2)))
+          #puts "val #{j}: #{e_1} | #{e_2} | #{e_3}"
+          
+          total+= e_1*e_2*e_3
+        end
+        total
+      end
+      
+      def fd_loglike_b(alpha,beta,rho,m)
+        if rho.abs>0.9999
+          rho= (rho>0) ? 0.9999 : -0.9999
+        end
+        pr=Processor.new(alpha,beta,rho)
+        total=0
+        b_m=pr.b m
+        pd=pr.pd
+        @nr.times do |i|
+          #puts "j: #{j}"
+          #puts "b #{j} : #{b.call(j)}"
+          #puts "b #{j-1} : #{b.call(j-1)}"
+
+          e_1=@matrix[i,m].quo(pd[i][m]+EPSILON) - @matrix[i,m+1].quo(pd[i][m+1]+EPSILON)
+          e_2=Distribution::Normal.pdf(b_m)
+          e_3=Distribution::Normal.cdf((pr.a(i)-rho*b_m).quo(Math::sqrt(1-rho**2))) - Distribution::Normal.cdf((pr.a(i-1)-rho*b_m).quo(Math::sqrt(1-rho**2)))
+          #puts "val #{j}: #{e_1} | #{e_2} | #{e_3}"
+          
+          total+= e_1*e_2*e_3
+        end
+        total
+      end
+      
+      
       def compute_basic_parameters
         @nr=@matrix.row_size
         @nc=@matrix.column_size
@@ -333,7 +435,7 @@ module Statsample
       
       def compute_two_step_mle_drasgow_ruby #:nodoc:
         
-        f=proc {|rho| 
+        f=proc {|rho|
           loglike(@alpha,@beta, rho)
         }
         @log="Minimizing using GSL Brent method\n"
@@ -405,8 +507,19 @@ module Statsample
         parameters=[rho]+cut_alpha+cut_beta
         minimization = Proc.new { |v, params|
          rho=v[0]
-         alpha=v[1,@nr-1]
-         beta=v[@nr,@nc-1]
+         alpha=v[1, @nr-1]
+         beta=v[@nr, @nc-1]
+         
+         #puts "f'rho=#{fd_loglike_rho(alpha,beta,rho)}"
+         #(@nr-1).times {|k|
+         #  puts "f'a(#{k}) = #{fd_loglike_a(alpha,beta,rho,k)}"         
+         #  puts "f'a(#{k}) v2 = #{fd_loglike_a2(alpha,beta,rho,k)}"         
+         #
+         #}
+         #(@nc-1).times {|k|
+         #  puts "f'b(#{k}) = #{fd_loglike_b(alpha,beta,rho,k)}"         
+         #}
+         
          loglike(alpha,beta,rho)
         }
         np=@nc-1+@nr
