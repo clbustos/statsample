@@ -8,5 +8,5 @@ ds=Statsample::Dataset.new
         ds["v#{i}"]=a.collect {|v| v+rand(20)}.to_scale
 end
 ds.update_valid_data
-rel=Statsample::Reliability::ItemAnalysis.new(ds)
+rel=Statsample::Reliability::ScaleAnalysis.new(ds)
 puts rel.summary

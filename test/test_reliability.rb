@@ -1,6 +1,4 @@
 require(File.dirname(__FILE__)+'/helpers_tests.rb')
-
-
 class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
   context Statsample::Reliability do
     context "Cronbach's alpha" do 
@@ -87,14 +85,53 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
       end
       
     end
-    context Statsample::Reliability::ItemAnalysis do
+    context Statsample::Reliability::MultiScaleAnalysis do
+      setup do
+        
+        size=100
+        @scales=4
+        @items_per_scale=10
+        h={}
+        @scales.times {|s|
+          @items_per_scale.times {|i|
+            h["#{s}_#{i}"] = (size.times.map {(s*2)+rand}).to_scale
+          }
+        }
+        @ds=h.to_dataset
+        @msa=Statsample::Reliability::MultiScaleAnalysis.new(@ds) do |m|
+          @scales.times {|s|
+            m.scale "scale_#{s}".to_sym, {:name=>"Scale #{s}"}, @items_per_scale.times.map {|i| "#{s}_#{i}"}
+          }
+        end
+      end
+        should "Retrieve correct ScaleAnalysis for whole scale" do
+          sa=Statsample::Reliability::ScaleAnalysis.new(@ds, :name=>"Complete Scale") 
+          assert_equal(sa.variances_mean, @msa.complete_scale.variances_mean)
+        end
+        should "Retrieve correct ScaleAnalysis for each scale" do
+          @scales.times {|s|
+          sa=Statsample::Reliability::ScaleAnalysis.new(@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}), :name=>"Scale #{s}")
+          assert_equal(sa.variances_mean,@msa.scale("scale_#{s}".to_sym).variances_mean)
+          }
+        end
+        should "Retrieve correct correlation matrix for each scale" do
+          vectors={}
+          @scales.times {|s|
+           vectors["scale_#{s}"]=@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}).vector_sum 
+          }
+          ds2=vectors.to_dataset
+          assert_equal(Statsample::Bivariate.correlation_matrix(ds2), @msa.correlation_matrix)
+        end
+      
+    end
+    context Statsample::Reliability::ScaleAnalysis do
       setup do 
-        @x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_vector(:scale)
-        @x2=[1,1,1,2,2,3,3,3,3,4,4,50].to_vector(:scale)
-        @x3=[2,2,1,1,1,2,2,2,3,4,5,40].to_vector(:scale)
-        @x4=[1,2,3,4,4,4,4,3,4,4,5,30].to_vector(:scale)
+        @x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_scale
+        @x2=[1,1,1,2,2,3,3,3,3,4,4,50].to_scale
+        @x3=[2,2,1,1,1,2,2,2,3,4,5,40].to_scale
+        @x4=[1,2,3,4,4,4,4,3,4,4,5,30].to_scale
         @ds={'x1'=>@x1,'x2'=>@x2,'x3'=>@x3,'x4'=>@x4}.to_dataset
-        @ia=Statsample::Reliability::ItemAnalysis.new(@ds)
+        @ia=Statsample::Reliability::ScaleAnalysis.new(@ds)
         @cov_matrix=Statsample::Bivariate.covariance_matrix(@ds)
       end     
       should "return correct values for item analysis" do 

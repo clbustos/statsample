@@ -145,6 +145,7 @@ module Statsample
           self.send("#{k}=",v) if self.respond_to? k
         }
         @r=nil
+        @pd=nil
         compute_basic_parameters
       end
       # Returns the polychoric correlation
@@ -269,6 +270,7 @@ module Statsample
           @nr=@alpha.size+1
           @nc=@beta.size+1
           @rho=rho
+          @pd=nil
         end
         def bipdf(i,j)
            Distribution::NormalBivariate.pdf(a(i), b(j), rho)
