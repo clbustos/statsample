@@ -98,31 +98,48 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
           }
         }
         @ds=h.to_dataset
-        @msa=Statsample::Reliability::MultiScaleAnalysis.new(@ds) do |m|
+        @msa=Statsample::Reliability::MultiScaleAnalysis.new(:name=>'Multiple Analysis') do |m|
+          m.scale :complete, {:name=>"Complete Scale"}, @ds
           @scales.times {|s|
-            m.scale "scale_#{s}".to_sym, {:name=>"Scale #{s}"}, @items_per_scale.times.map {|i| "#{s}_#{i}"}
+            m.scale "scale_#{s}", {:name=>"Scale #{s}"}, @ds.clone(@items_per_scale.times.map {|i| "#{s}_#{i}"})
           }
         end
       end
         should "Retrieve correct ScaleAnalysis for whole scale" do
           sa=Statsample::Reliability::ScaleAnalysis.new(@ds, :name=>"Complete Scale") 
-          assert_equal(sa.variances_mean, @msa.complete_scale.variances_mean)
+          assert_equal(sa.variances_mean, @msa.scale(:complete).variances_mean)
         end
         should "Retrieve correct ScaleAnalysis for each scale" do
           @scales.times {|s|
-          sa=Statsample::Reliability::ScaleAnalysis.new(@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}), :name=>"Scale #{s}")
-          assert_equal(sa.variances_mean,@msa.scale("scale_#{s}".to_sym).variances_mean)
+            sa=Statsample::Reliability::ScaleAnalysis.new(@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}), :name=>"Scale #{s}")
+            assert_equal(sa.variances_mean,@msa.scale("scale_#{s}").variances_mean)
           }
         end
-        should "Retrieve correct correlation matrix for each scale" do
-          vectors={}
+        should "retrieve correct correlation matrix for each scale" do
+          vectors={'complete'=>@ds.vector_sum}
+          
           @scales.times {|s|
            vectors["scale_#{s}"]=@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}).vector_sum 
           }
           ds2=vectors.to_dataset
           assert_equal(Statsample::Bivariate.correlation_matrix(ds2), @msa.correlation_matrix)
         end
-      
+        should "delete scale using delete_scale" do
+          @msa.delete_scale(:complete)
+          assert_equal(@msa.scales.keys.sort, @scales.times.map {|s| "scale_#{s}"})
+        end
+        should "retrieve pca for scales" do
+          @msa.delete_scale(:complete)
+          vectors=Hash.new
+          @scales.times {|s|
+           vectors["scale_#{s}"]=@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}).vector_sum 
+          }
+          ds2=vectors.to_dataset
+          cor_matrix=Statsample::Bivariate.correlation_matrix(ds2)
+          m=rand(5)+2
+          pca=Statsample::Factor::PCA.new(cor_matrix, :m=>m)
+          assert_equal(pca.component_matrix, @msa.pca(:m=>m).component_matrix)
+        end
     end
     context Statsample::Reliability::ScaleAnalysis do
       setup do 

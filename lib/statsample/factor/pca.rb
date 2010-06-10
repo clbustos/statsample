@@ -39,7 +39,7 @@ module Factor
     include GetText
     bindtextdomain("statsample")
     
-    def initialize(matrix ,opts=Hash.new)
+    def initialize(matrix, opts=Hash.new)
 	@use_gsl=nil
       @name=_("Principal Component Analysis")
       @matrix=matrix
