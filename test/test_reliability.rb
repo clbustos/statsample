@@ -136,7 +136,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
           }
           ds2=vectors.to_dataset
           cor_matrix=Statsample::Bivariate.correlation_matrix(ds2)
-          m=rand(5)+2
+          m=3
           pca=Statsample::Factor::PCA.new(cor_matrix, :m=>m)
           assert_equal(pca.component_matrix, @msa.pca(:m=>m).component_matrix)
         end
