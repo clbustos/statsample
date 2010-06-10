@@ -166,20 +166,20 @@ module Statsample
       end
       def report_building(builder)
         builder.section(:name=>@name) do |s|
-          s.table(:name=>"Summary") do |t|
-          t.row ["Items", @ds.fields.size]
-          t.row ["Total Mean", @mean]
-          t.row ["Total S.D.", @sd]
-          t.row ["Total Variance", @variance]
-          t.row ["Item Mean", @item_mean]
-          t.row ["Median", @median]
-          t.row ["Skewness", "%0.4f" % @skew]
-          t.row ["Kurtosis", "%0.4f" % @kurtosis]
-          t.row ["Valid n", @valid_n]
-          t.row ["Cronbach's alpha", "%0.4f" % @alpha]
-          t.row ["Standarized Cronbach's alpha", "%0.4f" % @alpha_standarized]
-          t.row ["Variances mean",  "%g" % @variances_mean]
-          t.row ["Covariances mean" , "%g" % @covariances_mean]
+          s.table(:name=>_("Summary")) do |t|
+          t.row [_("Items"), @ds.fields.size]
+          t.row [_("Total mean"), @mean]
+          t.row [_("Total sd"), @sd]
+          t.row [_("Total variance"), @variance]
+          t.row [_("Item mean"), @item_mean]
+          t.row [_("Median"), @median]
+          t.row [_("Skewness"), "%0.4f" % @skew]
+          t.row [_("Kurtosis"), "%0.4f" % @kurtosis]
+          t.row [_("Valid n"), @valid_n]
+          t.row [_("Cronbach's alpha"), "%0.4f" % @alpha]
+          t.row [_("Standarized Cronbach's alpha"), "%0.4f" % @alpha_standarized]
+          t.row [_("Variances mean"),  "%g" % @variances_mean]
+          t.row [_("Covariances mean") , "%g" % @covariances_mean]
           end
 
           itc=item_total_correlation

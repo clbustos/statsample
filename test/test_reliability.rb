@@ -99,15 +99,15 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         }
         @ds=h.to_dataset
         @msa=Statsample::Reliability::MultiScaleAnalysis.new(:name=>'Multiple Analysis') do |m|
-          m.scale :complete, {:name=>"Complete Scale"}, @ds
+          m.scale "complete", @ds
           @scales.times {|s|
-            m.scale "scale_#{s}", {:name=>"Scale #{s}"}, @ds.clone(@items_per_scale.times.map {|i| "#{s}_#{i}"})
+            m.scale "scale_#{s}", @ds.clone(@items_per_scale.times.map {|i| "#{s}_#{i}"}), {:name=>"Scale #{s}"}
           }
         end
       end
         should "Retrieve correct ScaleAnalysis for whole scale" do
-          sa=Statsample::Reliability::ScaleAnalysis.new(@ds, :name=>"Complete Scale") 
-          assert_equal(sa.variances_mean, @msa.scale(:complete).variances_mean)
+          sa=Statsample::Reliability::ScaleAnalysis.new(@ds, :name=>"Scale complete") 
+          assert_equal(sa.variances_mean, @msa.scale("complete").variances_mean)
         end
         should "Retrieve correct ScaleAnalysis for each scale" do
           @scales.times {|s|
@@ -125,11 +125,11 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
           assert_equal(Statsample::Bivariate.correlation_matrix(ds2), @msa.correlation_matrix)
         end
         should "delete scale using delete_scale" do
-          @msa.delete_scale(:complete)
+          @msa.delete_scale("complete")
           assert_equal(@msa.scales.keys.sort, @scales.times.map {|s| "scale_#{s}"})
         end
         should "retrieve pca for scales" do
-          @msa.delete_scale(:complete)
+          @msa.delete_scale("complete")
           vectors=Hash.new
           @scales.times {|s|
            vectors["scale_#{s}"]=@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}).vector_sum 
@@ -139,6 +139,16 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
           m=3
           pca=Statsample::Factor::PCA.new(cor_matrix, :m=>m)
           assert_equal(pca.component_matrix, @msa.pca(:m=>m).component_matrix)
+        end
+        should "retrieve acceptable summary" do
+          @msa.delete_scale("scale_0")
+          @msa.delete_scale("scale_1")
+          @msa.delete_scale("scale_2")
+          
+          
+          #@msa.summary_correlation_matrix=true
+          #@msa.summary_pca=true
+          assert(@msa.summary.size>0)
         end
     end
     context Statsample::Reliability::ScaleAnalysis do

@@ -16,18 +16,32 @@ module Statsample
     #  end
     #  puts msa.summary
     class MultiScaleAnalysis
+      include Statsample::Summarizable
       attr_reader :scales
+      attr_accessor :name
+      attr_accessor :summary_correlation_matrix
+      attr_accessor :summary_pca
+      attr_accessor :pca_options
       def initialize(opts=Hash.new, &block)
         @scales=Hash.new
+        opts_default={  :name=>"Multiple Scale analysis",
+                        :summary_correlation_matrix=>false,
+                        :summary_pca=>false,
+                        :pca_options=>Hash.new}
+        @opts=opts_default.merge(opts)
+        @opts.each{|k,v|
+          self.send("#{k}=",v) if self.respond_to? k
+        }
+
         if block
           block.arity<1 ? instance_eval(&block) : block.call(self)
         end
       end
-      def scale(code,opts=nil,ds=nil)
+      def scale(code,ds=nil, opts=nil)
         if ds.nil?
           @scales[code]
         else
-          opts={:name=>"Scale #{code}"} if opts.nil?
+          opts={:name=>_("Scale %s") % [code]} if opts.nil?
           @scales[code]=ScaleAnalysis.new(ds, opts)
         end
       end
@@ -37,7 +51,8 @@ module Statsample
       def pca(opts=Hash.new)
         Statsample::Factor::PCA.new(correlation_matrix,opts)
       end
-      def factor_analysis(opts=Hash.new)
+      def factor_analysis(opts=nil)
+        opts||=pca_options
         Statsample::Factor::FactorAnalysis.new(correlation_matrix,opts)
       end
       
@@ -47,6 +62,21 @@ module Statsample
           vectors[code.to_s]=scale.ds.vector_sum
         end
         Statsample::Bivariate.correlation_matrix(vectors.to_dataset)
+      end
+      def report_building(b)
+        b.section(:name=>name) do |s|
+          s.section(:name=>"Reliability analysis of scales") do |s2|
+            @scales.each_pair do |k,scale|
+              s2.parse_element(scale)
+            end
+          end
+          if summary_correlation_matrix
+            s.parse_element(correlation_matrix)
+          end
+          if summary_pca
+            s.parse_element(pca)
+          end
+        end
       end
     end
   end
