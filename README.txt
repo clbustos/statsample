@@ -15,6 +15,7 @@ Include:
 * Tests: F, T, Levene, U-Mannwhitney.
 * Regression: Simple, Multiple (OLS), Probit  and Logit
 * Factorial Analysis: Extraction (PCA and Principal Axis), Rotation (Varimax, Equimax, Quartimax) and Parallel Analysis, for estimation of number of factors.
+* Reliability analysis for simple scale and helpers to analyze multiple scales using factor analysis and correlations
 * Dominance Analysis, with multivariate dependent and bootstrap (Azen & Budescu)
 * Sample calculation related formulas
 * Creates reports on text, html and rtf, using ReportBuilder gem
@@ -50,7 +51,9 @@ Include:
   * Statsample::Mx    : Write Mx Files
   * Statsample::GGobi : Write Ggobi files
 * Module Statsample::Crosstab provides function to create crosstab for categorical data
-* Reliability analysis provides functions to analyze scales. Class ItemAnalysis provides statistics like mean, standard deviation for a scale, Cronbach's alpha and standarized Cronbach's alpha, and for each item: mean, correlation with total scale, mean if deleted, Cronbach's alpha is deleted. With HtmlReport, graph the histogram of the scale and the Item Characteristic Curve for each item
+* Module Statsample::Reliability provides functions to analyze scales. 
+  * Class ScaleAnalysis provides statistics like mean, standard deviation for a scale, Cronbach's alpha and standarized Cronbach's alpha, and for each item: mean, correlation with total scale, mean if deleted, Cronbach's alpha is deleted.
+  * Class MultiScaleAnalysis provides a DSL to easily analyze reliability of multiple scales and retrieve correlation matrix and factor analysis of them.
 * Module Statsample::SRS (Simple Random Sampling) provides a lot of functions to estimate standard error for several type of samples
 * Module Statsample::Test provides several methods and classes to perform inferencial statistics
   * Statsample::Test::Levene

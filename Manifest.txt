@@ -10,6 +10,7 @@ data/repeated_fields.csv
 data/test_binomial.csv
 data/tetmat_matrix.txt
 data/tetmat_test.txt
+doc_latex/manual/equations.tex
 examples/correlation_matrix.rb
 examples/dataset.rb
 examples/dominance_analysis.rb
@@ -30,6 +31,7 @@ lib/distribution/chisquare.rb
 lib/distribution/f.rb
 lib/distribution/normal.rb
 lib/distribution/normalbivariate.rb
+lib/distribution/normalmultivariate.rb
 lib/distribution/t.rb
 lib/spss.rb
 lib/statsample.rb
@@ -79,6 +81,8 @@ lib/statsample/regression/multiple/matrixengine.rb
 lib/statsample/regression/multiple/rubyengine.rb
 lib/statsample/regression/simple.rb
 lib/statsample/reliability.rb
+lib/statsample/reliability/multiscaleanalysis.rb
+lib/statsample/reliability/scaleanalysis.rb
 lib/statsample/resample.rb
 lib/statsample/srs.rb
 lib/statsample/test.rb
