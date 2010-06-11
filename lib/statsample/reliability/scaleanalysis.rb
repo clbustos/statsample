@@ -166,27 +166,33 @@ module Statsample
       end
       def report_building(builder)
         builder.section(:name=>@name) do |s|
-          s.table(:name=>_("Summary")) do |t|
+          s.table(:name=>_("Summary for %s") % @name) do |t|
           t.row [_("Items"), @ds.fields.size]
-          t.row [_("Total mean"), @mean]
-          t.row [_("Total sd"), @sd]
-          t.row [_("Total variance"), @variance]
+          t.row [_("Sum mean"), @mean]
+          t.row [_("Sum sd"), @sd]
+          t.row [_("Sum variance"), @variance]
+          t.row [_("Sum median"), @median]
+          t.hr
           t.row [_("Item mean"), @item_mean]
-          t.row [_("Median"), @median]
           t.row [_("Skewness"), "%0.4f" % @skew]
           t.row [_("Kurtosis"), "%0.4f" % @kurtosis]
+          t.hr
           t.row [_("Valid n"), @valid_n]
           t.row [_("Cronbach's alpha"), "%0.4f" % @alpha]
           t.row [_("Standarized Cronbach's alpha"), "%0.4f" % @alpha_standarized]
+          t.hr
           t.row [_("Variances mean"),  "%g" % @variances_mean]
           t.row [_("Covariances mean") , "%g" % @covariances_mean]
           end
-
+          s.text _("items for obtain alpha(0.8) : %d" % Statsample::Reliability::n_for_desired_alpha(0.8, @variances_mean,@covariances_mean))
+          s.text _("items for obtain alpha(0.9) : %d" % Statsample::Reliability::n_for_desired_alpha(0.9, @variances_mean,@covariances_mean))          
           itc=item_total_correlation
           sid=stats_if_deleted
           is=item_statistics
-
-          s.table(:name=>"Items report", :header=>["item","mean","sd", "mean if deleted", "var if deleted", "sd if deleted"," item-total correl.", "alpha if deleted"]) do |t|
+          
+          
+          
+          s.table(:name=>_("Items report for %s") % @name, :header=>["item","mean","sd", "mean if deleted", "var if deleted", "sd if deleted"," item-total correl.", "alpha if deleted"]) do |t|
             @ds.fields.each do |f|
               t.row(["#{@ds[f].name}(#{f})", sprintf("%0.5f",is[f][:mean]), sprintf("%0.5f",is[f][:sds]), sprintf("%0.5f",sid[f][:mean]), sprintf("%0.5f",sid[f][:variance_sample]), sprintf("%0.5f",sid[f][:sds]),  sprintf("%0.5f",itc[f]), sprintf("%0.5f",sid[f][:alpha])])
             end # end each

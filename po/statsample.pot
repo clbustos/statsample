@@ -6,8 +6,8 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: statsample 0.9.0\n"
-"POT-Creation-Date: 2010-04-11 13:57-0400\n"
+"Project-Id-Version: statsample 0.12.0\n"
+"POT-Creation-Date: 2010-06-10 17:00-0400\n"
 "PO-Revision-Date: 2009-08-04 15:36-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -160,38 +160,63 @@ msgstr ""
 msgid "p.95"
 msgstr ""
 
-#: lib/statsample/anova.rb:70
+#: lib/statsample/anova/twoway.rb:59
+msgid "ANOVA Two-Way"
+msgstr ""
+
+#: lib/statsample/anova/twoway.rb:60
+msgid "A"
+msgstr ""
+
+#: lib/statsample/anova/twoway.rb:61
+msgid "B"
+msgstr ""
+
+#: lib/statsample/anova/twoway.rb:62
+msgid "Within"
+msgstr ""
+
+#: lib/statsample/anova/twoway.rb:98 lib/statsample/anova/oneway.rb:57
 msgid "%s Table"
 msgstr ""
 
-#: lib/statsample/anova.rb:73 lib/statsample/crosstab.rb:108
-#: lib/statsample/crosstab.rb:123 lib/statsample/crosstab.rb:159
-#: lib/statsample/crosstab.rb:181 lib/statsample/dominanceanalysis.rb:357
+#: lib/statsample/anova/twoway.rb:103 lib/statsample/anova/oneway.rb:60
+#: lib/statsample/crosstab.rb:101 lib/statsample/crosstab.rb:116
+#: lib/statsample/crosstab.rb:151 lib/statsample/crosstab.rb:173
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "Total"
 msgstr ""
 
-#: lib/statsample/anova.rb:104
-msgid "Anova One-Way"
+#: lib/statsample/anova/twoway.rb:178
+msgid "Anova Two-Way on %s"
 msgstr ""
 
-#: lib/statsample/anova.rb:114
+#: lib/statsample/anova/twoway.rb:190 lib/statsample/anova/oneway.rb:101
 msgid "Test of Homogeneity of variances (Levene)"
 msgstr ""
 
-#: lib/statsample/anova.rb:150
+#: lib/statsample/anova/twoway.rb:195 lib/statsample/anova/twoway.rb:199
+msgid "%s Mean"
+msgstr ""
+
+#: lib/statsample/anova/oneway.rb:91
+msgid "Anova One-Way"
+msgstr ""
+
+#: lib/statsample/anova/oneway.rb:137
 msgid "Descriptives"
 msgstr ""
 
-#: lib/statsample/bivariate/polychoric.rb:752
+#: lib/statsample/bivariate/polychoric.rb:866
 #: lib/statsample/bivariate/tetrachoric.rb:122
 msgid "Contingence Table"
 msgstr ""
 
-#: lib/statsample/bivariate/polychoric.rb:760
+#: lib/statsample/bivariate/polychoric.rb:874
 msgid "Thresholds"
 msgstr ""
 
-#: lib/statsample/bivariate/polychoric.rb:768
+#: lib/statsample/bivariate/polychoric.rb:882
 msgid "Test of bivariate normality: X2 = %0.3f, df = %d, p= %0.5f"
 msgstr ""
 
@@ -219,15 +244,15 @@ msgstr ""
 msgid "Principal Component Analysis"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:128 lib/statsample/factor/principalaxis.rb:183
+#: lib/statsample/factor/pca.rb:148 lib/statsample/factor/principalaxis.rb:183
 msgid "Communalities"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:133 lib/statsample/factor/principalaxis.rb:189
+#: lib/statsample/factor/pca.rb:153 lib/statsample/factor/principalaxis.rb:189
 msgid "Eigenvalues"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:139 lib/statsample/factor/principalaxis.rb:195
+#: lib/statsample/factor/pca.rb:159 lib/statsample/factor/principalaxis.rb:195
 msgid "Component Matrix"
 msgstr ""
 
@@ -239,82 +264,190 @@ msgstr ""
 msgid "Factor Analysis"
 msgstr ""
 
-#: lib/statsample/crosstab.rb:25
+#: lib/statsample/reliability/multiscaleanalysis.rb:27
+msgid "Multiple Scale analysis"
+msgstr ""
+
+#: lib/statsample/reliability/multiscaleanalysis.rb:44
+msgid "Scale %s"
+msgstr ""
+
+#: lib/statsample/reliability/multiscaleanalysis.rb:68
+msgid "Reliability analysis of scales"
+msgstr ""
+
+#: lib/statsample/reliability/multiscaleanalysis.rb:74
+msgid "Correlation matrix for %s"
+msgstr ""
+
+#: lib/statsample/reliability/multiscaleanalysis.rb:79
+msgid "PCA for %s"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:169
+msgid "Summary for %s"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:170
+msgid "Items"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:171
+msgid "Total mean"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:172
+msgid "Total sd"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:173
+msgid "Total variance"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:174
+msgid "Item mean"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:175
+msgid "Median"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:176
+msgid "Skewness"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:177
+msgid "Kurtosis"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:178
+msgid "Valid n"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:179
+msgid "Cronbach's alpha"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:180
+msgid "Standarized Cronbach's alpha"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:181
+msgid "Variances mean"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:182
+msgid "Covariances mean"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:189
+msgid "Items report for %s"
+msgstr ""
+
+#: lib/statsample/crosstab.rb:22
 msgid "Crosstab %s - %s"
 msgstr ""
 
-#: lib/statsample/crosstab.rb:27 lib/statsample/crosstab.rb:98
-msgid "Crosstab"
-msgstr ""
-
-#: lib/statsample/crosstab.rb:97
-msgid "Crosstab: "
-msgstr ""
-
-#: lib/statsample/crosstab.rb:105
+#: lib/statsample/crosstab.rb:98
 msgid "Rows: %s"
 msgstr ""
 
-#: lib/statsample/crosstab.rb:106
+#: lib/statsample/crosstab.rb:99
 msgid "Columns: %s"
 msgstr ""
 
-#: lib/statsample/crosstab.rb:108
+#: lib/statsample/crosstab.rb:101
 msgid "Raw"
 msgstr ""
 
-#: lib/statsample/crosstab.rb:154
+#: lib/statsample/crosstab.rb:146
 msgid "% Row"
 msgstr ""
 
-#: lib/statsample/crosstab.rb:155
+#: lib/statsample/crosstab.rb:147
 msgid "% Column"
 msgstr ""
 
-#: lib/statsample/crosstab.rb:156
+#: lib/statsample/crosstab.rb:148
 msgid "% Total"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:123
+#: lib/statsample/dominanceanalysis.rb:122
 msgid "Dominance Analysis:  %s over %s"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:317
+#: lib/statsample/dominanceanalysis.rb:315
 msgid "sign"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:319
+#: lib/statsample/dominanceanalysis.rb:317
 msgid "Dominance Analysis result"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:321
+#: lib/statsample/dominanceanalysis.rb:318
 msgid "Model 0"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:336
+#: lib/statsample/dominanceanalysis.rb:333
 msgid "k=%d Average"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:348
+#: lib/statsample/dominanceanalysis.rb:345
 msgid "Overall averages"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:357
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "Pairwise dominance"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:357
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "Pairs"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:357
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "Conditional"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:357
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "General"
 msgstr ""
 
-#: lib/statsample/converters.rb:321
-msgid ")}"
+#: lib/statsample/vector.rb:614
+msgid "n :%d"
+msgstr ""
+
+#: lib/statsample/vector.rb:615
+msgid "n valid:%d"
+msgstr ""
+
+#: lib/statsample/vector.rb:616
+msgid "factors:%s"
+msgstr ""
+
+#: lib/statsample/vector.rb:617
+msgid "mode: %s"
+msgstr ""
+
+#: lib/statsample/vector.rb:618
+msgid "Distribution"
+msgstr ""
+
+#: lib/statsample/vector.rb:624
+msgid "median: %s"
+msgstr ""
+
+#: lib/statsample/vector.rb:626
+msgid "mean: %0.4f"
+msgstr ""
+
+#: lib/statsample/vector.rb:627
+msgid "sd: %0.4f"
+msgstr ""
+
+#: lib/statsample/dataset.rb:131
+msgid "Dataset %d"
+msgstr ""
+
+#: lib/statsample/dataset.rb:808
+msgid "Cases: %d"
 msgstr ""

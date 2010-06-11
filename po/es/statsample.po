@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: statsample 0.9.0\n"
-"POT-Creation-Date: 2010-04-11 13:57-0400\n"
-"PO-Revision-Date: 2010-04-11 13:58-0300\n"
+"Project-Id-Version: statsample 0.12.0\n"
+"POT-Creation-Date: 2010-06-10 17:00-0400\n"
+"PO-Revision-Date: 2010-06-10 17:02-0300\n"
 "Last-Translator: Claudio Bustos <clbustos@gmail.com>\n"
 "Language-Team: Desarrollador\n"
 "MIME-Version: 1.0\n"
@@ -155,41 +155,69 @@ msgstr "p.5"
 msgid "p.95"
 msgstr "p.95"
 
-#: lib/statsample/anova.rb:70
+#: lib/statsample/anova/twoway.rb:59
+msgid "ANOVA Two-Way"
+msgstr "Anova de dos vías"
+
+#: lib/statsample/anova/twoway.rb:60
+msgid "A"
+msgstr "A"
+
+#: lib/statsample/anova/twoway.rb:61
+msgid "B"
+msgstr "B"
+
+#: lib/statsample/anova/twoway.rb:62
+msgid "Within"
+msgstr "Dentro"
+
+#: lib/statsample/anova/twoway.rb:98
+#: lib/statsample/anova/oneway.rb:57
 msgid "%s Table"
 msgstr "Tabla %s"
 
-#: lib/statsample/anova.rb:73
-#: lib/statsample/crosstab.rb:108
-#: lib/statsample/crosstab.rb:123
-#: lib/statsample/crosstab.rb:159
-#: lib/statsample/crosstab.rb:181
-#: lib/statsample/dominanceanalysis.rb:357
+#: lib/statsample/anova/twoway.rb:103
+#: lib/statsample/anova/oneway.rb:60
+#: lib/statsample/crosstab.rb:101
+#: lib/statsample/crosstab.rb:116
+#: lib/statsample/crosstab.rb:151
+#: lib/statsample/crosstab.rb:173
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "Total"
 msgstr "Total"
 
-#: lib/statsample/anova.rb:104
-msgid "Anova One-Way"
-msgstr "Anova de una vía"
+#: lib/statsample/anova/twoway.rb:178
+msgid "Anova Two-Way on %s"
+msgstr "Anova de dos vías en %s"
 
-#: lib/statsample/anova.rb:114
+#: lib/statsample/anova/twoway.rb:190
+#: lib/statsample/anova/oneway.rb:101
 msgid "Test of Homogeneity of variances (Levene)"
 msgstr "Test de homogeneidad de varianza (Levene)"
 
-#: lib/statsample/anova.rb:150
+#: lib/statsample/anova/twoway.rb:195
+#: lib/statsample/anova/twoway.rb:199
+msgid "%s Mean"
+msgstr "Promedio %s"
+
+#: lib/statsample/anova/oneway.rb:91
+msgid "Anova One-Way"
+msgstr "Anova de una vía"
+
+#: lib/statsample/anova/oneway.rb:137
 msgid "Descriptives"
 msgstr "Descriptivos"
 
-#: lib/statsample/bivariate/polychoric.rb:752
+#: lib/statsample/bivariate/polychoric.rb:866
 #: lib/statsample/bivariate/tetrachoric.rb:122
 msgid "Contingence Table"
 msgstr "Tabla de Contingencia"
 
-#: lib/statsample/bivariate/polychoric.rb:760
+#: lib/statsample/bivariate/polychoric.rb:874
 msgid "Thresholds"
 msgstr "Umbrales"
 
-#: lib/statsample/bivariate/polychoric.rb:768
+#: lib/statsample/bivariate/polychoric.rb:882
 msgid "Test of bivariate normality: X2 = %0.3f, df = %d, p= %0.5f"
 msgstr "Prueba de normalidad bivariada: X2 = %0.3f, g.l. = %d, p= %0.5f"
 
@@ -217,17 +245,17 @@ msgstr "Histograma: %s"
 msgid "Principal Component Analysis"
 msgstr "Análisis de componentes principales"
 
-#: lib/statsample/factor/pca.rb:128
+#: lib/statsample/factor/pca.rb:148
 #: lib/statsample/factor/principalaxis.rb:183
 msgid "Communalities"
 msgstr "Comunalidades"
 
-#: lib/statsample/factor/pca.rb:133
+#: lib/statsample/factor/pca.rb:153
 #: lib/statsample/factor/principalaxis.rb:189
 msgid "Eigenvalues"
 msgstr "Eigenvalues"
 
-#: lib/statsample/factor/pca.rb:139
+#: lib/statsample/factor/pca.rb:159
 #: lib/statsample/factor/principalaxis.rb:195
 msgid "Component Matrix"
 msgstr "Matriz de componentes"
@@ -240,84 +268,200 @@ msgstr "Análisis de Factores:"
 msgid "Factor Analysis"
 msgstr "Análisis de Factores"
 
-#: lib/statsample/crosstab.rb:25
+#: lib/statsample/reliability/multiscaleanalysis.rb:27
+msgid "Multiple Scale analysis"
+msgstr "Análisis de múltiples escalas"
+
+#: lib/statsample/reliability/multiscaleanalysis.rb:44
+msgid "Scale %s"
+msgstr "Escala %s"
+
+#: lib/statsample/reliability/multiscaleanalysis.rb:68
+msgid "Reliability analysis of scales"
+msgstr "Análisis de confiabilidad de escalas"
+
+#: lib/statsample/reliability/multiscaleanalysis.rb:74
+msgid "Correlation matrix for %s"
+msgstr "Matriz de correlaciones para %s"
+
+#: lib/statsample/reliability/multiscaleanalysis.rb:79
+msgid "PCA for %s"
+msgstr "ACP para %s"
+
+#: lib/statsample/reliability/scaleanalysis.rb:169
+msgid "Summary for %s"
+msgstr "Sumario para %s"
+
+#: lib/statsample/reliability/scaleanalysis.rb:170
+msgid "Items"
+msgstr "Ítems"
+
+#: lib/statsample/reliability/scaleanalysis.rb:171
+msgid "Total mean"
+msgstr "Promedio total"
+
+#: lib/statsample/reliability/scaleanalysis.rb:172
+msgid "Total sd"
+msgstr "d.e. total"
+
+#: lib/statsample/reliability/scaleanalysis.rb:173
+msgid "Total variance"
+msgstr "Varianza Total"
+
+#: lib/statsample/reliability/scaleanalysis.rb:174
+msgid "Item mean"
+msgstr "Promedio de los ítemes"
+
+#: lib/statsample/reliability/scaleanalysis.rb:175
+msgid "Median"
+msgstr "Mediana"
+
+#: lib/statsample/reliability/scaleanalysis.rb:176
+msgid "Skewness"
+msgstr "Sesgo"
+
+#: lib/statsample/reliability/scaleanalysis.rb:177
+msgid "Kurtosis"
+msgstr "Curtosis"
+
+#: lib/statsample/reliability/scaleanalysis.rb:178
+msgid "Valid n"
+msgstr "n válido"
+
+#: lib/statsample/reliability/scaleanalysis.rb:179
+msgid "Cronbach's alpha"
+msgstr "Alfa de Cronbach"
+
+#: lib/statsample/reliability/scaleanalysis.rb:180
+msgid "Standarized Cronbach's alpha"
+msgstr "Alfa de Cronbach estandarizado"
+
+#: lib/statsample/reliability/scaleanalysis.rb:181
+msgid "Variances mean"
+msgstr "Promedio de las varianzas"
+
+#: lib/statsample/reliability/scaleanalysis.rb:182
+msgid "Covariances mean"
+msgstr "Promedio de las covarianzas"
+
+#: lib/statsample/reliability/scaleanalysis.rb:189
+msgid "Items report for %s"
+msgstr "Reporte de ítems para %s"
+
+#: lib/statsample/crosstab.rb:22
 msgid "Crosstab %s - %s"
 msgstr "Tabulación cruzada %s - %s"
 
-#: lib/statsample/crosstab.rb:27
 #: lib/statsample/crosstab.rb:98
-msgid "Crosstab"
-msgstr "Tabulación cruzada"
-
-#: lib/statsample/crosstab.rb:97
-msgid "Crosstab: "
-msgstr "Tabulación cruzada:"
-
-#: lib/statsample/crosstab.rb:105
 msgid "Rows: %s"
 msgstr "Filas: %s"
 
-#: lib/statsample/crosstab.rb:106
+#: lib/statsample/crosstab.rb:99
 msgid "Columns: %s"
 msgstr "Columnas: %s"
 
-#: lib/statsample/crosstab.rb:108
+#: lib/statsample/crosstab.rb:101
 msgid "Raw"
 msgstr "En Bruto"
 
-#: lib/statsample/crosstab.rb:154
+#: lib/statsample/crosstab.rb:146
 msgid "% Row"
 msgstr "% Fila"
 
-#: lib/statsample/crosstab.rb:155
+#: lib/statsample/crosstab.rb:147
 msgid "% Column"
 msgstr "% Columna"
 
-#: lib/statsample/crosstab.rb:156
+#: lib/statsample/crosstab.rb:148
 msgid "% Total"
 msgstr "% Total"
 
-#: lib/statsample/dominanceanalysis.rb:123
+#: lib/statsample/dominanceanalysis.rb:122
 msgid "Dominance Analysis:  %s over %s"
 msgstr "Análisis de dominancia: %s en %s"
 
-#: lib/statsample/dominanceanalysis.rb:317
+#: lib/statsample/dominanceanalysis.rb:315
 msgid "sign"
 msgstr "signo"
 
-#: lib/statsample/dominanceanalysis.rb:319
+#: lib/statsample/dominanceanalysis.rb:317
 msgid "Dominance Analysis result"
 msgstr "Resultados del análisis de dominancia"
 
-#: lib/statsample/dominanceanalysis.rb:321
+#: lib/statsample/dominanceanalysis.rb:318
 msgid "Model 0"
 msgstr "Modelo 0"
 
-#: lib/statsample/dominanceanalysis.rb:336
+#: lib/statsample/dominanceanalysis.rb:333
 msgid "k=%d Average"
 msgstr "k=%d Promedio"
 
-#: lib/statsample/dominanceanalysis.rb:348
+#: lib/statsample/dominanceanalysis.rb:345
 msgid "Overall averages"
 msgstr "Promedios generales"
 
-#: lib/statsample/dominanceanalysis.rb:357
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "Pairwise dominance"
 msgstr "Dominancia en pares"
 
-#: lib/statsample/dominanceanalysis.rb:357
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "Pairs"
 msgstr "Pares"
 
-#: lib/statsample/dominanceanalysis.rb:357
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "Conditional"
 msgstr "Condicional"
 
-#: lib/statsample/dominanceanalysis.rb:357
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "General"
 msgstr "General"
 
-#: lib/statsample/converters.rb:321
-msgid ")}"
-msgstr ")}"
+#: lib/statsample/vector.rb:614
+msgid "n :%d"
+msgstr "n: %s"
+
+#: lib/statsample/vector.rb:615
+msgid "n valid:%d"
+msgstr "n válido: %d"
+
+#: lib/statsample/vector.rb:616
+msgid "factors:%s"
+msgstr "factores:%s"
+
+#: lib/statsample/vector.rb:617
+msgid "mode: %s"
+msgstr "modo: %s"
+
+#: lib/statsample/vector.rb:618
+msgid "Distribution"
+msgstr "Distribución"
+
+#: lib/statsample/vector.rb:624
+msgid "median: %s"
+msgstr "Mediana: %s"
+
+#: lib/statsample/vector.rb:626
+msgid "mean: %0.4f"
+msgstr "promedio: %0.3f"
+
+#: lib/statsample/vector.rb:627
+msgid "sd: %0.4f"
+msgstr "d.e.: %0.3f"
+
+#: lib/statsample/dataset.rb:131
+msgid "Dataset %d"
+msgstr "Dataset %d"
+
+#: lib/statsample/dataset.rb:808
+msgid "Cases: %d"
+msgstr "Casos: %s"
+
+#~ msgid "\"Anova Two-Way on #{@ds[dep_var].name}\""
+#~ msgstr "\"Anova de dos vías en #{@ds[dep_var].name}\""
+#~ msgid "Crosstab"
+#~ msgstr "Tabulación cruzada"
+#~ msgid "Crosstab: "
+#~ msgstr "Tabulación cruzada:"
+#~ msgid ")}"
+#~ msgstr ")}"
 

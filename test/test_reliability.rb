@@ -28,6 +28,19 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         expected = @k.quo(@k-1) * (1-(ind_var.quo(total_sum)))
         assert_in_delta(expected, @a,1e-10)
       end
+      should "method cronbach_alpha_from_n_s2_cov return correct values" do
+        sa=Statsample::Reliability::ScaleAnalysis.new(@ds)
+        vm, cm = sa.variances_mean, sa.covariances_mean
+        assert_in_delta(sa.alpha, Statsample::Reliability.cronbach_alpha_from_n_s2_cov(@n_variables, vm,cm), 1e-10 )
+        
+      end
+      should "return correct n for desired alpha, covariance and variance" do
+        sa=Statsample::Reliability::ScaleAnalysis.new(@ds)
+        vm, cm = sa.variances_mean, sa.covariances_mean
+        n_obtained=Statsample::Reliability.n_for_desired_alpha(@a, vm,cm)
+        #p n_obtained
+        assert_in_delta(Statsample::Reliability.cronbach_alpha_from_n_s2_cov(n_obtained, vm,cm) ,@a,0.001) 
+      end
       should "standarized alpha will be equal to sum of matrix covariance less the individual variances on standarized values" do
         total_sum=@cme.total_sum
         ind_var=@dse.fields.inject(0) {|ac,v| ac+@dse[v].variance}
@@ -85,7 +98,10 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
       end
       
     end
+    
+=begin    
     context Statsample::Reliability::MultiScaleAnalysis do
+      
       setup do
         
         size=100
@@ -151,6 +167,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
           assert(@msa.summary.size>0)
         end
     end
+=end
     context Statsample::Reliability::ScaleAnalysis do
       setup do 
         @x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_scale

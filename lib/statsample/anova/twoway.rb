@@ -175,7 +175,7 @@ module Statsample
         df_b=_q-1
         df_within=(_p*_q)*(n-1)
         
-        opts_default={:name=>_("Anova Two-Way on #{@ds[dep_var].name}"), 
+        opts_default={:name=>_("Anova Two-Way on %s") % @ds[dep_var].name, 
           :name_a=>@ds[a_var].name,
             :name_b=>@ds[b_var].name,
             :summary_descriptives=>true,

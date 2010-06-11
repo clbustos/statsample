@@ -24,7 +24,7 @@ module Statsample
       attr_accessor :pca_options
       def initialize(opts=Hash.new, &block)
         @scales=Hash.new
-        opts_default={  :name=>"Multiple Scale analysis",
+        opts_default={  :name=>_("Multiple Scale analysis"),
                         :summary_correlation_matrix=>false,
                         :summary_pca=>false,
                         :pca_options=>Hash.new}
@@ -41,7 +41,7 @@ module Statsample
         if ds.nil?
           @scales[code]
         else
-          opts={:name=>_("Scale %s") % [code]} if opts.nil?
+          opts={:name=>_("Scale %s") % code} if opts.nil?
           @scales[code]=ScaleAnalysis.new(ds, opts)
         end
       end
@@ -65,16 +65,20 @@ module Statsample
       end
       def report_building(b)
         b.section(:name=>name) do |s|
-          s.section(:name=>"Reliability analysis of scales") do |s2|
+          s.section(:name=>_("Reliability analysis of scales")) do |s2|
             @scales.each_pair do |k,scale|
               s2.parse_element(scale)
             end
           end
           if summary_correlation_matrix
-            s.parse_element(correlation_matrix)
+            s.section(:name=>_("Correlation matrix for %s") % name) do |s2|
+              s2.parse_element(correlation_matrix)
+            end
           end
           if summary_pca
-            s.parse_element(pca)
+            s.section(:name=>_("PCA for %s") % name) do |s2|
+              s2.parse_element(pca)
+            end
           end
         end
       end

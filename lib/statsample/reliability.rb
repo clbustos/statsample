@@ -21,13 +21,44 @@ module Statsample
         }.to_dataset
         cronbach_alpha(ds)
       end
+      def cronbach_alpha_from_n_s2_cov(n,s2,cov)
+        (n.quo(n-1)) * (1-(s2.quo(s2+(n-1)*cov)))
+      end
+      # Returns n necessary to obtain specific alpha
+      # given variance and covariance mean of items
+      def n_for_desired_alpha(alpha,s2,cov)
+        # Start with a regular test : 50 items
+        min=2
+        max=1000
+        n=50
+        prev_n=0
+        epsilon=0.0001
+        dif=1000
+        c_a=cronbach_alpha_from_n_s2_cov(n,s2,cov)
+        dif=c_a - alpha
+        while(dif.abs>epsilon and n!=prev_n)
+          prev_n=n
+          if dif<0
+            min=n
+            n=(n+(max-min).quo(2)).to_i
+          else
+            max=n
+            n=(n-(max-min).quo(2)).to_i
+          end
+          c_a=cronbach_alpha_from_n_s2_cov(n,s2,cov)
+          dif=c_a - alpha
+          #puts "#{n} , #{c_a}"
+          
+        end
+        n
+      end
       # First derivative for alfa
       # Parameters
       # <tt>n</tt>: Number of items
       # <tt>sx</tt>: mean of variances 
       # <tt>sxy</tt>: mean of covariances
       
-      def alfa_first_derivative(n,sx,sxy)
+      def alpha_first_derivative(n,sx,sxy)
         (sxy*(sx-sxy)).quo(((sxy*(n-1))+sx)**2)
       end
       # Second derivative for alfa
