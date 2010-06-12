@@ -99,7 +99,6 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
       
     end
     
-=begin    
     context Statsample::Reliability::MultiScaleAnalysis do
       
       setup do
@@ -167,7 +166,6 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
           assert(@msa.summary.size>0)
         end
     end
-=end
     context Statsample::Reliability::ScaleAnalysis do
       setup do 
         @x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_scale
