@@ -1,5 +1,5 @@
 begin
-require 'statistics2'
+    require 'statistics2'
 rescue LoadError
         puts "You should install statistics2"
 end
