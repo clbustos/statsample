@@ -43,6 +43,25 @@ h=Hoe.spec('statsample') do
 	self.extra_deps << ["spreadsheet","~>0.6.0"] << ["svg-graph", "~>1.0"] << ["reportbuilder", "~>1.0"] << ["minimization", "~>0.2.0"] << ["fastercsv"] << ["dirty-memoize", "~>0.0"] << ["extendmatrix","~>0.2.0"]
 	self.extra_dev_deps << ["shoulda"]
   self.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"
+  self.post_install_message = <<-EOF
+***************************************************
+Thanks for installing statsample.
+
+On *nix, you should install statsample-optimization
+to retrieve gems gsl, statistics2 and a C extension
+to speed some methods.
+
+  $sudo gem install statsample-optimization
+
+To use it, on Ubuntu I recommend install 
+build-essential and libgsl0-dev using apt-get and 
+compile ruby 1.8 or 1.9 from source code first.
+
+  $sudo apt-get install build-essential libgsl0-dev
+
+
+*****************************************************
+  EOF
 	self.need_rdoc=false
 end
 
