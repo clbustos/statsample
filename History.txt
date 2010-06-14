@@ -1,5 +1,7 @@
 === 0.12.0 / 2010-06-09
 
+* Modified Rakefile to remove dependencies based on C extensions. These are moved to statsample-optimization
+* T test with unequal variance fixed on i686
 * API Change: Renamed Reliability::ItemAnalysis and moved to independent file 
 * New Reliability::MultiScaleAnalysis for easy analysis of scales on a same survey, includind reliability, correlation matrix and Factor Analysis
 * Updated README to reflect changes on Reliability module
