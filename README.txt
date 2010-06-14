@@ -112,11 +112,11 @@ Optional:
 
 == INSTALL:
 
-  sudo gem install ruby-statsample
+  sudo gem install statsample
 
 For optimization on *nix env
 
-  sudo gem install gsl ruby-statsample-optimization
+  sudo gem install gsl statsample-optimization
 
 Available setup.rb file
 

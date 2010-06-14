@@ -75,6 +75,65 @@ module Statsample
     # * Drasgow F. (2006). Polychoric and polyserial correlations. In Kotz L, Johnson NL (Eds.), Encyclopedia of statistical sciences. Vol. 7 (pp. 69-74). New York: Wiley.
     
     class Polychoric
+
+      class Processor
+        attr_reader :alpha, :beta, :rho
+        def initialize(alpha,beta,rho)
+          @alpha=alpha
+          @beta=beta
+          @nr=@alpha.size+1
+          @nc=@beta.size+1
+          @rho=rho
+          @pd=nil
+        end
+        def bipdf(i,j)
+           Distribution::NormalBivariate.pdf(a(i), b(j), rho)
+        end
+        def a(i)
+          i < 0 ? -100 : (i==@nr-1 ? 100 : alpha[i])
+        end
+        def b(j)
+          j < 0 ? -100 : (j==@nc-1 ? 100 : beta[j])
+        end
+        # Equation(10) from Olsson(1979)
+        def fd_loglike_cell_a(i,j,k)
+          if k==i
+            Distribution::NormalBivariate.pd_cdf_x(a(k),b(j), rho) - Distribution::NormalBivariate.pd_cdf_x(a(k),b(j-1),rho)
+          elsif k==(i-1)
+            -Distribution::NormalBivariate.pd_cdf_x(a(k),b(j),rho) + Distribution::NormalBivariate.pd_cdf_x(a(k),b(j-1),rho)
+          else
+            0
+          end
+          
+        end
+        # phi_ij for each i and j
+        # Uses equation(4) from Olsson(1979)
+        def pd
+          if @pd.nil?
+            @pd=@nr.times.collect{ [0] * @nc}
+            pc=@nr.times.collect{ [0] * @nc}
+            @nr.times do |i|
+            @nc.times do |j|
+             
+              if i==@nr-1 and j==@nc-1
+                @pd[i][j]=1.0
+              else
+                a=(i==@nr-1) ? 100: alpha[i]
+                b=(j==@nc-1) ? 100: beta[j]
+                #puts "a:#{a} b:#{b}"
+                @pd[i][j]=Distribution::NormalBivariate.cdf(a, b, rho)
+              end
+              pc[i][j] = @pd[i][j]
+              @pd[i][j] = @pd[i][j] - pc[i-1][j] if i>0
+              @pd[i][j] = @pd[i][j] - pc[i][j-1] if j>0
+              @pd[i][j] = @pd[i][j] + pc[i-1][j-1] if (i>0 and j>0)
+            end
+            end
+          end
+          @pd
+        end
+      end
+      
       include GetText
       include DirtyMemoize
       bindtextdomain("statsample")
@@ -245,8 +304,8 @@ module Statsample
         end
         -loglike
       end
-      
-      
+      # First derivate for rho
+      # Uses equation (9) from Olsson(1979)
       def fd_loglike_rho(alpha,beta,rho)
         if rho.abs>0.9999
           rho= (rho>0) ? 0.9999 : -0.9999
@@ -262,61 +321,7 @@ module Statsample
         total
       end
       
-      class Processor
-        attr_reader :alpha, :beta, :rho
-        def initialize(alpha,beta,rho)
-          @alpha=alpha
-          @beta=beta
-          @nr=@alpha.size+1
-          @nc=@beta.size+1
-          @rho=rho
-          @pd=nil
-        end
-        def bipdf(i,j)
-           Distribution::NormalBivariate.pdf(a(i), b(j), rho)
-        end
-        def a(i)
-          i < 0 ? -100 : (i==@nr-1 ? 100 : alpha[i])
-        end
-        def b(j)
-          j < 0 ? -100 : (j==@nc-1 ? 100 : beta[j])
-        end
-        
-        def fd_loglike_cell_a(i,j,k)
-          if k==i
-            Distribution::NormalBivariate.pd_cdf_x(a(k),b(j), rho) - Distribution::NormalBivariate.pd_cdf_x(a(k),b(j-1),rho)
-          elsif k==(i-1)
-            -Distribution::NormalBivariate.pd_cdf_x(a(k),b(j),rho) + Distribution::NormalBivariate.pd_cdf_x(a(k),b(j-1),rho)
-          else
-            0
-          end
-          
-        end
-        def pd
-          if @pd.nil?
-            @pd=@nr.times.collect{ [0] * @nc}
-            pc=@nr.times.collect{ [0] * @nc}
-            @nr.times do |i|
-            @nc.times do |j|
-             
-              if i==@nr-1 and j==@nc-1
-                @pd[i][j]=1.0
-              else
-                a=(i==@nr-1) ? 100: alpha[i]
-                b=(j==@nc-1) ? 100: beta[j]
-                #puts "a:#{a} b:#{b}"
-                @pd[i][j]=Distribution::NormalBivariate.cdf(a, b, rho)
-              end
-              pc[i][j] = @pd[i][j]
-              @pd[i][j] = @pd[i][j] - pc[i-1][j] if i>0
-              @pd[i][j] = @pd[i][j] - pc[i][j-1] if j>0
-              @pd[i][j] = @pd[i][j] + pc[i-1][j-1] if (i>0 and j>0)
-            end
-            end
-          end
-          @pd
-        end
-      end
+      # First derivative for alpha_k
       def fd_loglike_a(alpha,beta,rho,k)
         fd_loglike_a_eq6(alpha,beta,rho,k)
       end
@@ -336,7 +341,7 @@ module Statsample
         total
       end
       # Uses equation(13) from Olsson(1979)
-      def fd_loglike_a_eq10(alpha,beta,rho,k)
+      def fd_loglike_a_eq13(alpha,beta,rho,k)
         if rho.abs>0.9999
           rho= (rho>0) ? 0.9999 : -0.9999
         end
@@ -358,7 +363,8 @@ module Statsample
         end
         total
       end
-      
+      # First derivative for beta_m
+      # Uses equation(14) from Olsson(1979)
       def fd_loglike_b(alpha,beta,rho,m)
         if rho.abs>0.9999
           rho= (rho>0) ? 0.9999 : -0.9999
@@ -455,9 +461,9 @@ module Statsample
       
       def compute_two_step_mle_drasgow_gsl #:nodoc:
         
-        fn1=GSL::Function.alloc {|rho| 
-          loglike(@alpha,@beta, rho)
-        }
+      fn1=GSL::Function.alloc {|rho| 
+        loglike(@alpha,@beta, rho)
+      }
       @iteration = 0
       max_iter = @max_iterations
       m = 0             # initial guess
