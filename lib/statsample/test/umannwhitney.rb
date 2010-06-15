@@ -20,10 +20,11 @@ module Statsample
       MAX_MN_EXACT=10000
       
       # U sampling distribution, based on Dinneen & Blakesley (1973) algorithm.
-      # This is the algorithm used on SPSS
+      # This is the algorithm used on SPSS.
+      # 
       # Parameters:
-      # * n1: group 1 size
-      # * n2: group 2 size 
+      # * <tt>n1</tt>: group 1 size
+      # * <tt>n2</tt>: group 2 size 
       # Reference: 
       # * Dinneen, L., & Blakesley, B. (1973). Algorithm AS 62: A Generator for the Sampling Distribution of the Mann- Whitney U Statistic. <em>Journal of the Royal Statistical Society, 22</em>(2), 269-273
       # 
@@ -109,11 +110,14 @@ module Statsample
       attr_reader :t
       # Name of test
       attr_accessor :name
+      include Summarizable
       #
       # Create a new U Mann-Whitney test
       # Params: Two Statsample::Vectors
       # 
       def initialize(v1,v2, opts=Hash.new)
+        @v1=v1
+        @v2=v2
         @n1=v1.valid_data.size
         @n2=v2.valid_data.size
         data=(v1.valid_data+v2.valid_data).to_scale
@@ -133,29 +137,25 @@ module Statsample
         @u1=r1-((@n1*(@n1+1)).quo(2))
         @u2=r2-((@n2*(@n2+1)).quo(2))
         @u=(u1<u2) ? u1 : u2
-        opts_default={:name=>"Mann-Whitney's U"}
+        opts_default={:name=>_("Mann-Whitney's U")}
         @opts=opts_default.merge(opts)
         opts_default.keys.each {|k|
           send("#{k}=", @opts[k])
         }
           
       end
-      # Report results.
-      def summary
-        out=<<-HEREDOC
-@name
-Sum of ranks v1: #{@r1.to_f}
-Sum of ranks v1: #{@r2.to_f}
-U Value: #{@u.to_f}
-Z: #{sprintf("%0.3f",z)} (p: #{sprintf("%0.3f",z_probability)})
-        HEREDOC
-        if @n1*@n2<MAX_MN_EXACT
-          out+="Exact p (Dinneen & Blakesley): #{sprintf("%0.3f",exact_probability)}"
-        end
-          out
-      end
       def report_building(generator) # :nodoc:
-        generator.text(summary)
+        generator.section(:name=>@name) do |s|
+          s.table(:name=>_("%s results") % @name) do |t|
+            t.row([_("Sum of ranks %s") % @v1.name, "%0.3f" % @r1])
+            t.row([_("Sum of ranks %s") % @v2.name, "%0.3f" % @r2])
+            t.row([_("U Value"), "%0.3f" % @u])
+            t.row([_("Z"), "%0.3f (p: %0.3f)" % [z, probability_z]])
+            if @n1*@n2<MAX_MN_EXACT
+              t.row([_("Exact p (Dinneen & Blakesley, 1973):"), "%0.3f" % probability_exact])
+            end
+          end
+        end
       end
       # Exact probability of finding values of U lower or equal to sample on U distribution. Use with caution with m*n>100000.
       # Uses u_sampling_distribution_as62

@@ -20,6 +20,7 @@ module Statsample
     # * NIST/SEMATECH e-Handbook of Statistical Methods. Available on http://www.itl.nist.gov/div898/handbook/eda/section3/eda35a.htm
     class Levene
       include Statsample::Test
+      include Summarizable
       # Degrees of freedom 1 (k-1)
       attr_reader :d1
       # Degrees of freedom 2 (n-k)
@@ -33,7 +34,7 @@ module Statsample
         else
           @vectors=input
         end
-        @name="Levene Test"
+        @name=_("Levene Test")
         opts.each{|k,v|
           self.send("#{k}=",v) if self.respond_to? k
         }

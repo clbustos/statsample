@@ -35,7 +35,6 @@ module Statsample
       #   => 1.99973746599856
       #   sr.r
       #   => 0.999987881153254
-
       def self.simple(x,y)
         Statsample::Regression::Simple.new_from_vectors(x,y)
       end

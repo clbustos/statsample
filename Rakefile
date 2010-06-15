@@ -23,13 +23,13 @@ task :release do
 system %{git push origin master}
 end
 desc "Update pot/po files."
-task :updatepo do
+task "gettext:updatepo" do
   require 'gettext/tools'
   GetText.update_pofiles("statsample", Dir.glob("{lib,bin}/**/*.{rb,rhtml}"), "statsample #{Statsample::VERSION}")
 end
 
 desc "Create mo-files"
-task :makemo do
+task "gettext:makemo" do
   require 'gettext/tools'
   GetText.create_mofiles()
   # GetText.create_mofiles(true, "po", "locale")  # This is for "Ruby on Rails".

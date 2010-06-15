@@ -134,7 +134,6 @@ module Statsample
     end
   end
 end
-
 require 'statsample/mle/normal'
 require 'statsample/mle/logit'
 require 'statsample/mle/probit'

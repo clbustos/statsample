@@ -39,13 +39,15 @@ module Statsample
   # 
   # 
   # ==Usage
-  # Create a empty dataset
+  # Create a empty dataset:
   #   Dataset.new()
-  # Create a dataset with three empty vectors, called <tt>v1</tt>, <tt>v2</tt> and <tt>v3</tt>
+  # Create a dataset with three empty vectors, called <tt>v1</tt>, <tt>v2</tt> and <tt>v3</tt>:
   #   Dataset.new(%w{v1 v2 v3})
-  # Create a dataset with two vectors
+  # Create a dataset with two vectors, called <tt>v1</tt>
+  # and <tt>v2</tt>:
   #   Dataset.new({'v1'=>%w{1 2 3}.to_vector, 'v2'=>%w{4 5 6}.to_vector})
-  # Create a dataset with two given vectors (v1 and v2), with vectors on inverted order
+  # Create a dataset with two given vectors (v1 and v2), 
+  # with vectors on inverted order:
   #   Dataset.new({'v2'=>v2,'v1'=>v1},['v2','v1'])
   #
   # The fast way to create a dataset uses Hash#to_dataset, with
@@ -59,7 +61,7 @@ module Statsample
     include Summarizable
     # Hash of Statsample::Vector
     attr_reader :vectors
-    # Ordered names of vectors
+    # Ordered ids of vectors
     attr_reader :fields
     # Name of dataset
     attr_accessor:name
@@ -67,7 +69,7 @@ module Statsample
     attr_reader :cases
     # Location of pointer on enumerations methods (like #each)
     attr_reader :i
-    
+
     # Generates a new dataset, using three vectors
     # - Rows
     # - Columns
@@ -87,7 +89,8 @@ module Statsample
     #    b  1   0
     #
     # Useful to process outputs from databases
-    #    
+    #
+    
     def self.crosstab_by_asignation(rows,columns,values)
       raise "Three vectors should be equal size" if rows.size!=columns.size or rows.size!=values.size
       cols_values=columns.factors
@@ -123,7 +126,6 @@ module Statsample
     # [fields]  Array of names for vectors. Is only used for set the
     # order of variables. If empty, vectors keys on alfabethic order as
     # used as fields
-
     #
     def initialize(vectors={}, fields=[])
       @@n_dataset||=0
@@ -141,6 +143,10 @@ module Statsample
       end
       @i=nil
     end
+    
+    #
+    # Returns a GSL::matrix
+    #
     def to_gsl_matrix
       matrix=GSL::Matrix.alloc(cases,@vectors.size)
       each_array do |row|
@@ -171,7 +177,7 @@ module Statsample
     end
     # Returns a duplicate of the Database
     # If fields given, only include those vectors.
-    # Every vector will be dup
+    # Every vector will be dup.
     def dup(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
         fields_to_include=fields_to_include[0]
@@ -186,6 +192,10 @@ module Statsample
       }
       Dataset.new(vectors,fields)
     end
+    # Returns (when possible) a cheap copy of dataset.
+    # If no vector have missing values, returns original vectors.
+    # If missing values presents, uses Dataset.dup_only_valid
+    #
     def clone_only_valid(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
         fields_to_include=fields_to_include[0]
@@ -240,7 +250,7 @@ module Statsample
       ds_new.update_valid_data
       ds_new
     end
-      # Returns a dataset with standarized data
+    # Returns a dataset with standarized data
     def standarize
       ds=dup()
       ds.fields.each do |f|
@@ -261,15 +271,18 @@ module Statsample
     def ==(d2)
       @vectors==d2.vectors and @fields==d2.fields
     end
+    # Returns vector <tt>c</tt>
     def col(c)
       @vectors[c]
     end
     alias_method :vector, :col
-    def add_vector(name,vector)
+    # Equal to Dataset[<tt>name</tt>]=<tt>vector</tt>
+    def add_vector(name, vector)
       raise ArgumentError, "Vector have different size" if vector.size!=@cases
       @vectors[name]=vector
       check_order
     end
+    # Returns true if dataset have vector <tt>v</tt>
     def has_vector? (v)
       return @vectors.has_key?(v)
     end
@@ -295,8 +308,8 @@ module Statsample
     # * Hash: keys equal to fields
     # If uvd is false, #update_valid_data is not executed after 
     # inserting a case. This is very useful if you want to increase the 
-    # performance on inserting many cases, 
-    # because #update_valid_data performs check on vectors and on the dataset
+    # performance on inserting many cases,  because #update_valid_data 
+    # performs check on vectors and on the dataset
     
     def add_case(v,uvd=true)
       case v
@@ -323,7 +336,7 @@ module Statsample
       @fields.each{|f| @vectors[f].set_valid_data}
       check_length
     end
-    # Delete a vector
+    # Delete vector named <tt>name</tt>.
     def delete_vector(name)
       @fields.delete(name)
       @vectors.delete(name)
@@ -345,26 +358,27 @@ module Statsample
         add_vector(name+join+k,v)
       }
     end
-		def vector_by_calculation(type=:scale)
-			a=[]
-			each {|row|
-				a.push(yield(row))
-			}
-			a.to_vector(type)
-		end
-		# Returns a vector with sumatory of fields
-		# if fields parameter is empty, sum all fields 
-		def vector_sum(fields=nil)
-			a=[]
-			fields||=@fields
-			collect_with_index do |row, i|
-				if(fields.find{|f| !@vectors[f].data_with_nils[i]})
-					nil
-				else
-					fields.inject(0) {|ac,v| ac + row[v].to_f}
-				end
+    
+    def vector_by_calculation(type=:scale)
+      a=[]
+      each do |row|
+        a.push(yield(row))
       end
-		end
+      a.to_vector(type)
+    end
+    # Returns a vector with sumatory of fields
+    # if fields parameter is empty, sum all fields 
+    def vector_sum(fields=nil)
+      a=[]
+      fields||=@fields
+      collect_with_index do |row, i|
+        if(fields.find{|f| !@vectors[f].data_with_nils[i]})
+          nil
+        else
+          fields.inject(0) {|ac,v| ac + row[v].to_f}
+        end
+      end
+    end
     # Check if #fields attribute is correct, after inserting or deleting vectors
     def check_fields(fields)
       fields||=@fields
@@ -614,14 +628,14 @@ module Statsample
       ds
     end
     
-		# creates a new vector with the data of a given field which the block returns true
-		def filter_field(field)
-			a=[]
-			each {|c|
-				a.push(c[field]) if yield c
-			}
-			a.to_vector(@vectors[field].type)
-		end
+    # creates a new vector with the data of a given field which the block returns true
+    def filter_field(field)
+      a=[]
+      each do |c|
+        a.push(c[field]) if yield c
+      end
+      a.to_vector(@vectors[field].type)
+    end
     
     def to_multiset_by_split_one_field(field)
       raise ArgumentError,"Should use a correct field name" if !@fields.include? field
@@ -802,8 +816,7 @@ module Statsample
       ds.update_valid_data
       ds
     end
-   
-		def report_building(b)
+    def report_building(b)
       b.section(:name=>@name) do |g|
         g.text _"Cases: %d"  % cases
         @fields.each do |f|
@@ -811,11 +824,6 @@ module Statsample
           g.parse_element(@vectors[f])
         end
       end
-		end
-    def as_r
-      require 'rsruby/dataframe'
-      r=RSRuby.instance
-
     end
   end
 end
