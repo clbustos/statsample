@@ -57,8 +57,7 @@ module Statsample
     # * Uebersax, J.S. (2006). The tetrachoric and polychoric correlation coefficients. Statistical Methods for Rater Agreement web site. 2006. Available at: http://john-uebersax.com/stat/tetra.htm . Accessed February, 11, 2010
 
     class Tetrachoric
-      include GetText
-      bindtextdomain("statsample")
+      include Summarizable
       attr_reader :r
       attr_accessor :name
 
@@ -128,8 +127,8 @@ module Statsample
         #generator.parse_element(t)
         section.add(sprintf("r: %0.3f",r))
         section.add(_("SE: %0.3f") % se)
-        section.add(_("Threshold X: %0.3f ") % [threshold_x] )
-        section.add(_("Threshold Y: %0.3f ") % [threshold_y] )
+        section.add(_("Threshold X: %0.3f ") % threshold_x)
+        section.add(_("Threshold Y: %0.3f ") % threshold_y )
         generator.parse_element(section)
       end
 

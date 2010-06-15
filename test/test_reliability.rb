@@ -31,8 +31,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
       should "method cronbach_alpha_from_n_s2_cov return correct values" do
         sa=Statsample::Reliability::ScaleAnalysis.new(@ds)
         vm, cm = sa.variances_mean, sa.covariances_mean
-        assert_in_delta(sa.alpha, Statsample::Reliability.cronbach_alpha_from_n_s2_cov(@n_variables, vm,cm), 1e-10 )
-        
+        assert_in_delta(sa.alpha, Statsample::Reliability.cronbach_alpha_from_n_s2_cov(@n_variables, vm,cm), 1e-10)        
       end
       should "return correct n for desired alpha, covariance and variance" do
         sa=Statsample::Reliability::ScaleAnalysis.new(@ds)
@@ -102,7 +101,6 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
     context Statsample::Reliability::MultiScaleAnalysis do
       
       setup do
-        
         size=100
         @scales=4
         @items_per_scale=10
@@ -132,7 +130,6 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         end
         should "retrieve correct correlation matrix for each scale" do
           vectors={'complete'=>@ds.vector_sum}
-          
           @scales.times {|s|
            vectors["scale_#{s}"]=@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}).vector_sum 
           }
@@ -163,6 +160,8 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
           
           #@msa.summary_correlation_matrix=true
           #@msa.summary_pca=true
+          
+          
           assert(@msa.summary.size>0)
         end
     end

@@ -66,9 +66,8 @@ module Statsample
     #
     # * Azen, R. & Budescu, D.V. (2003). The dominance analysis approach for comparing predictors in multiple regression. <em>Psychological Methods, 8</em>(2), 129-148.
     class Bootstrap
-      include GetText
       include Writable
-      bindtextdomain("statsample")
+      include Summarizable
       # Total Dominance results
       attr_reader :samples_td
       # Conditional Dominance results
@@ -169,68 +168,61 @@ module Statsample
           }
         end
       end
-      # Summary of analysis
-      def summary
-        rp=ReportBuilder.new().add(self).to_text
-      end
-      
       def t
         Distribution::T.p_value(1-((1-@alpha) / 2), @n_samples - 1)
       end
-      def report_building(generator) # :nodoc:
+      def report_building(builder) # :nodoc:
         raise "You should bootstrap first" if @n_samples==0
-        anchor=generator.toc_entry(_("DAB: ")+@name)
-        generator.html "<div class='dominance-analysis-bootstrap'>#{@name}<a name='#{anchor}'></a>"
-        
-        generator.text _("Sample size: %d\n") % @n_samples
-        generator.text "t: #{t}\n"
-        generator.text _("Linear Regression Engine: %s") % @regression_class.name
-        
-        table=ReportBuilder::Table.new(:name=>"Bootstrap report", :header => [_("pairs"), "sD","Dij", _("SE(Dij)"), "Pij", "Pji", "Pno", _("Reproducibility")])
-        table.row([_("Complete dominance")])
-        table.hr
-        @pairs.each{|pair|
-          std=@samples_td[pair].to_vector(:scale)
-          ttd=da.total_dominance_pairwise(pair[0],pair[1])
-          table.row(summary_pairs(pair,std,ttd))
-        }
-        table.hr
-        table.row([_("Conditional dominance")])
-        table.hr
-        @pairs.each{|pair|
-          std=@samples_cd[pair].to_vector(:scale)
-          ttd=da.conditional_dominance_pairwise(pair[0],pair[1])
-          table.row(summary_pairs(pair,std,ttd))
-        
-        }
-        table.hr
-        table.row([_("General Dominance")])
-        table.hr
-        @pairs.each{|pair|
-          std=@samples_gd[pair].to_vector(:scale)
-          ttd=da.general_dominance_pairwise(pair[0],pair[1])
-          table.row(summary_pairs(pair,std,ttd))
-        }
-        generator.parse_element(table)
-        
-        table=ReportBuilder::Table.new(:name=>_("General averages"), :header=>[_("var"), _("mean"), _("se"), _("p.5"), _("p.95")])
-        
-        @fields.each{|f|
-          v=@samples_ga[f].to_vector(:scale)
-          row=[@ds.label(f), sprintf("%0.3f",v.mean), sprintf("%0.3f",v.sd), sprintf("%0.3f",v.percentil(5)),sprintf("%0.3f",v.percentil(95))]
-          table.row(row)
-        
-        }
-        
-        generator.parse_element(table)
-        generator.html("</div>")
+        builder.section(:name=>@name) do |generator|
+          generator.text _("Sample size: %d\n") % @n_samples
+          generator.text "t: #{t}\n"
+          generator.text _("Linear Regression Engine: %s") % @regression_class.name
+          
+          table=ReportBuilder::Table.new(:name=>"Bootstrap report", :header => [_("pairs"), "sD","Dij", _("SE(Dij)"), "Pij", "Pji", "Pno", _("Reproducibility")])
+          table.row([_("Complete dominance"),"","","","","","",""])
+          table.hr
+          @pairs.each{|pair|
+            std=@samples_td[pair].to_vector(:scale)
+            ttd=da.total_dominance_pairwise(pair[0],pair[1])
+            table.row(summary_pairs(pair,std,ttd))
+          }
+          table.hr
+          table.row([_("Conditional dominance"),"","","","","","",""])
+          table.hr
+          @pairs.each{|pair|
+            std=@samples_cd[pair].to_vector(:scale)
+            ttd=da.conditional_dominance_pairwise(pair[0],pair[1])
+            table.row(summary_pairs(pair,std,ttd))
+          
+          }
+          table.hr
+          table.row([_("General Dominance"),"","","","","","",""])
+          table.hr
+          @pairs.each{|pair|
+            std=@samples_gd[pair].to_vector(:scale)
+            ttd=da.general_dominance_pairwise(pair[0],pair[1])
+            table.row(summary_pairs(pair,std,ttd))
+          }
+          generator.parse_element(table)
+          
+          table=ReportBuilder::Table.new(:name=>_("General averages"), :header=>[_("var"), _("mean"), _("se"), _("p.5"), _("p.95")])
+          
+          @fields.each{|f|
+            v=@samples_ga[f].to_vector(:scale)
+            row=[@ds[f].name, sprintf("%0.3f",v.mean), sprintf("%0.3f",v.sd), sprintf("%0.3f",v.percentil(5)),sprintf("%0.3f",v.percentil(95))]
+            table.row(row)
+          
+          }
+          
+          generator.parse_element(table)
+        end
       end
       def summary_pairs(pair,std,ttd)
           freqs=std.proportions
           [0, 0.5, 1].each{|n|
               freqs[n]=0 if freqs[n].nil?
           }
-          name=@ds.label(pair[0])+" - "+@ds.label(pair[1])
+          name="%s - %s" % [@ds[pair[0]].name, @ds[pair[1]].name]
           [name,f(ttd,1),f(std.mean,4),f(std.sd),f(freqs[1]), f(freqs[0]), f(freqs[0.5]), f(freqs[ttd])]
       end
       def f(v,n=3)

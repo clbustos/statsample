@@ -31,9 +31,9 @@ end
 class String
   def is_number?
     if self =~ /^-?\d+[,.]?\d*(e-?\d+)?$/
-        true
+      true
     else
-        false
+      false
     end
   end
 end
@@ -201,19 +201,19 @@ module Statsample
   
   
   
-	module Util
+  module Util
     # Reference: http://www.itl.nist.gov/div898/handbook/eda/section3/normprpl.htm
     def normal_order_statistic_medians(i,n)
       if i==1
-          u= 1.0 - normal_order_statistic_medians(n,n)
+        u= 1.0 - normal_order_statistic_medians(n,n)
       elsif i==n
-          u=0.5**(1 / n.to_f)
+        u=0.5**(1 / n.to_f)
       else
-          u= (i - 0.3175) / (n + 0.365)
+        u= (i - 0.3175) / (n + 0.365)
       end
       u
     end
-	end
+  end
   
   
   
@@ -224,7 +224,7 @@ module Statsample
       fp.close
     end        
   end
-  # Provides basic method to generate summaries
+  # Provides method summary to generate summaries and include GetText
   module Summarizable
     include GetText
     bindtextdomain("statsample")
@@ -242,8 +242,8 @@ end
 begin 
   require 'statsamplert'
 rescue LoadError
-  module Statsample 
-      OPTIMIZED=false
+  module Statsample
+    OPTIMIZED=false
   end
 end
 

@@ -116,8 +116,8 @@ module Statsample
       end
       def item_total_correlation
         @ds.fields.inject({}) do |a,v|
-          vector=@ds[v].dup
-          ds2=@ds.dup
+          vector=@ds[v].clone
+          ds2=@ds.clone
           ds2.delete_vector(v)
           total=ds2.vector_sum
           a[v]=Statsample::Bivariate.pearson(vector,total)
@@ -153,7 +153,7 @@ module Statsample
       end
       def stats_if_deleted
         @ds.fields.inject({}) do |a,v|
-          ds2=@ds.dup
+          ds2=@ds.clone
           ds2.delete_vector(v)
           total=ds2.vector_sum
           a[v]={}
@@ -164,10 +164,11 @@ module Statsample
           a
         end
       end
-      def report_building(builder)
+      def report_building(builder) #:nodoc:
         builder.section(:name=>@name) do |s|
           s.table(:name=>_("Summary for %s") % @name) do |t|
           t.row [_("Items"), @ds.fields.size]
+          t.row [_("Valid cases"), @valid_n]
           t.row [_("Sum mean"), @mean]
           t.row [_("Sum sd"), @sd]
           t.row [_("Sum variance"), @variance]
@@ -177,10 +178,8 @@ module Statsample
           t.row [_("Skewness"), "%0.4f" % @skew]
           t.row [_("Kurtosis"), "%0.4f" % @kurtosis]
           t.hr
-          t.row [_("Valid n"), @valid_n]
           t.row [_("Cronbach's alpha"), "%0.4f" % @alpha]
           t.row [_("Standarized Cronbach's alpha"), "%0.4f" % @alpha_standarized]
-          t.hr
           t.row [_("Variances mean"),  "%g" % @variances_mean]
           t.row [_("Covariances mean") , "%g" % @covariances_mean]
           end

@@ -75,9 +75,8 @@ module Statsample
     # * Drasgow F. (2006). Polychoric and polyserial correlations. In Kotz L, Johnson NL (Eds.), Encyclopedia of statistical sciences. Vol. 7 (pp. 69-74). New York: Wiley.
     
     class Polychoric
-      include GetText
+      include Summarizable
       include DirtyMemoize
-      bindtextdomain("statsample")
       # Name of the analysis
       attr_accessor :name
       # Max number of iterations used on iterative methods. Default to MAX_ITERATIONS
@@ -134,7 +133,7 @@ module Statsample
         raise "column size <1" if @n<=1
         
         @method=METHOD
-        @name="Polychoric correlation"
+        @name=_("Polychoric correlation")
         @max_iterations=MAX_ITERATIONS
         @epsilon=EPSILON
         @minimizer_type_two_step=MINIMIZER_TYPE_TWO_STEP
@@ -440,7 +439,7 @@ module Statsample
         f=proc {|rho|
           loglike(@alpha,@beta, rho)
         }
-        @log="Minimizing using GSL Brent method\n"
+        @log=_("Minimizing using GSL Brent method\n")
         min=Minimization::Brent.new(-0.9999,0.9999,f)
         min.epsilon=@epsilon
         min.expected=0
@@ -466,7 +465,7 @@ module Statsample
       b=+0.9999
       gmf = GSL::Min::FMinimizer.alloc(@minimizer_type_two_step)
       gmf.set(fn1, m, a, b)
-      header=sprintf("Two step minimization using %s method\n", gmf.name)
+      header=_("Two step minimization using %s method\n") % gmf.name
       header+=sprintf("%5s [%9s, %9s] %9s %10s %9s\n", "iter", "lower", "upper", "min",
          "err", "err(est)")
         
@@ -854,11 +853,6 @@ module Statsample
       def xnorm(t) # :nodoc:
         Math::exp(-0.5 * t **2) * (1.0/Math::sqrt(2*Math::PI))
       end
-      
-      def summary
-        rp=ReportBuilder.new(:no_title=>true).add(self).to_text
-      end
-     
       
       def report_building(generator) # :nodoc: 
         compute if dirty?

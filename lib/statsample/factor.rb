@@ -11,7 +11,6 @@ module Statsample
   #   * Statsample::Factor::Varimax
   #   * Statsample::Factor::Equimax
   #   * Statsample::Factor::Quartimax
-  # 
   # See documentation of each class to use it
   module Factor
   end

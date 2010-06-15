@@ -32,8 +32,8 @@ module Statsample
         @ss_total=@ss_num+@ss_den
         @ms_total=@ms_num+@ms_den
         opts_default={:name=>"ANOVA",
-                      :name_denominator=>"Explained variance",
-                      :name_numerator=>"Unexplained variance"}
+                      :name_denominator=>_("Explained variance"),
+                      :name_numerator=>_("Unexplained variance")}
         @opts=opts_default.merge(opts)
         opts_default.keys.each {|k|
           send("#{k}=", @opts[k])
@@ -89,8 +89,8 @@ module Statsample
         end
         opts||=Hash.new
         opts_default={:name=>_("Anova One-Way"), 
-                      :name_numerator=>"Between Groups",
-                      :name_denominator=>"Within Groups",
+                      :name_numerator=>_("Between Groups"),
+                      :name_denominator=>_("Within Groups"),
                       :summary_descriptives=>false,
                       :summary_levene=>false}
         @opts=opts_default.merge(opts).merge(:ss_num=>ssbg, :ss_den=>sswg, :df_num=>df_bg, :df_den=>df_wg)

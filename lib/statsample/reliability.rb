@@ -108,7 +108,7 @@ module Statsample
         out
       end # def
     end # self
-   end # Reliability
- end # Statsample
+  end # Reliability
+end # Statsample
 require 'statsample/reliability/scaleanalysis.rb'
 require 'statsample/reliability/multiscaleanalysis.rb'
