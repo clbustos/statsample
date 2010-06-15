@@ -107,16 +107,22 @@ Optional:
 
 * Source code on github: http://github.com/clbustos/statsample
 * API: http://ruby-statsample.rubyforge.org/statsample/
-* Bug report and feature request: http://code.google.com/p/ruby-statsample/issues/list
+* Bug report and feature request: http://github.com/clbustos/statsample/issues
 
 
 == INSTALL:
 
-  sudo gem install ruby-statsample
+  $ sudo gem install statsample
 
-For optimization on *nix env
+On *nix, you should install statsample-optimization to retrieve gems gsl, statistics2 and a C extension to speed some methods. 
 
-  sudo gem install gsl ruby-statsample-optimization
+  $sudo gem install statsample-optimization
+
+To use it, on Ubuntu I recommend install build-essential and libgsl0-dev using apt-get and compile ruby 1.8 or 1.9 from source code.
+
+  $sudo apt-get install build-essential libgsl0-dev
+
+
 
 Available setup.rb file
 

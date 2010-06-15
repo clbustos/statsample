@@ -200,14 +200,6 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       
       assert_match(/#{@c.name}/, @c.summary)
     end
-    should "have output dependent of #type" do
-      @c.type=:nominal
-      assert_match(/Distribution/, @c.summary())
-      @c.type=:ordinal
-      assert_match(/median/, @c.summary())
-      @c.type=:scale
-      assert_match(/mean/, @c.summary())
-    end
     
     
   end
