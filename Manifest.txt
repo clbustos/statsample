@@ -25,6 +25,7 @@ examples/principal_axis.rb
 examples/reliability.rb
 examples/t_test.rb
 examples/tetrachoric.rb
+examples/u_test.rb
 examples/vector.rb
 lib/distribution.rb
 lib/distribution/chisquare.rb
@@ -39,6 +40,7 @@ lib/statsample/anova.rb
 lib/statsample/anova/oneway.rb
 lib/statsample/anova/twoway.rb
 lib/statsample/bivariate.rb
+lib/statsample/bivariate/pearson.rb
 lib/statsample/bivariate/polychoric.rb
 lib/statsample/bivariate/tetrachoric.rb
 lib/statsample/codification.rb

@@ -39,7 +39,15 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
     # Test ruby method
     v3a,v4a=Statsample.only_valid v3, v4
     assert_in_delta(0.525, Statsample::Bivariate.pearson_slow(v3a,v4a),0.001)
-
+  end
+  def test_bivariate_pearson
+    v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
+    v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
+    r=Statsample::Bivariate::Pearson.new(v1,v2)
+    assert_in_delta(0.525,r.r, 0.001)
+    assert_in_delta(Statsample::Bivariate.t_pearson(v1,v2), r.t, 0.001)
+    assert_in_delta(Statsample::Bivariate.prop_pearson(r.t,8,:both), r.probability, 0.001)
+    assert(r.summary.size>0)
   end
   def test_tetrachoric_matrix
     ds=Statsample::PlainText.read(File.dirname(__FILE__)+"/../data/tetmat_test.txt", %w{a b c d e})

@@ -872,10 +872,10 @@ module Statsample
         section.add(sprintf("r: %0.4f",r))
         t=ReportBuilder::Table.new(:name=>_("Thresholds"), :header=>["","Value"])
         threshold_x.each_with_index {|val,i|
-          t.row(["Threshold X #{i}", sprintf("%0.4f", val)])
+          t.row([_("Threshold X %d") % i, sprintf("%0.4f", val)])
         }
         threshold_y.each_with_index {|val,i|
-          t.row(["Threshold Y #{i}", sprintf("%0.4f", val)])
+          t.row([_("Threshold Y %d") % i, sprintf("%0.4f", val)])
         }
         section.add(t)
         section.add(_("Test of bivariate normality: X2 = %0.3f, df = %d, p= %0.5f" % [ chi_square, chi_square_df, 1-Distribution::ChiSquare.cdf(chi_square, chi_square_df)])) 

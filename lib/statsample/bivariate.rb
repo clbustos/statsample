@@ -1,7 +1,13 @@
 require 'statsample/bivariate/tetrachoric'
 require 'statsample/bivariate/polychoric'
+require 'statsample/bivariate/pearson'
+
 module Statsample
-  # Diverse bivariate methods, including #covariance, #pearson correlation (r), #spearman ranked correlation (rho), #tetrachoric correlation and #polychoric correlation.
+  # Diverse methods and classes to calculate bivariate relations
+  # Specific classes: 
+  # * Statsample::Bivariate::Pearson : Pearson correlation coefficient (r)
+  # * Statsample::Bivariate::Tetrachoric : Tetrachoric correlation
+  # * Statsample::Bivariate::Polychoric  : Polychoric correlation (using joint, two-step and polychoric series)
   module Bivariate
     class << self
       # Covariance between two vectors
