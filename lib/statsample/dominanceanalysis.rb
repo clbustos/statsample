@@ -1,4 +1,3 @@
-
 module Statsample
   # Dominance Analysis is a procedure based on an examination of the R<sup>2</sup> values
   # for all possible subset models, to identify the relevance of one or more 
@@ -57,7 +56,7 @@ module Statsample
   # * Azen, R. & Budescu, D.V. (2006). Comparing predictors in Multivariate Regression Models: An extension of Dominance Analysis. <em>Journal of Educational and Behavioral Statistics, 31</em>(2), 157-180.
   #
   class DominanceAnalysis
-	include Summarizable
+    include Summarizable
     # Class to generate the regressions. Default to Statsample::Regression::Multiple::MatrixEngine
     attr_accessor :regression_class
     # Name of analysis

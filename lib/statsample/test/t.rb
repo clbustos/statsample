@@ -67,6 +67,7 @@ module Statsample
       class OneSample
         include Math
         include Statsample::Test
+        include Summarizable
         # Options
         attr_accessor :opts
         # Name of test
@@ -99,11 +100,6 @@ module Statsample
         
         def probability
           p_using_cdf(Distribution::T.cdf(t, @df), tails)
-        end
-        # Summary of analysis
-        # 
-        def summary
-          ReportBuilder.new(:no_title=>true).add(self).to_text
         end
         def report_building(b) # :nodoc:
           b.section(:name=>@name) {|s|
@@ -146,9 +142,9 @@ module Statsample
       class TwoSamplesIndependent
         include Math
         include Statsample::Test
+        
         include DirtyMemoize
-        include GetText
-        bindtextdomain("statsample")
+        include Summarizable
         # Options
         attr_accessor :opts
         # Name of test
@@ -208,14 +204,9 @@ module Statsample
           num.quo(den)
         end
         
-        # Presents summary of analysis
-        def summary
-          ReportBuilder.new(:no_title=>true).add(self).to_text
-        end
-        
         def report_building(b) # :nodoc:
           b.section(:name=>@name) {|g|
-            g.table(:name=>_("Mean and standard deviation"), :header=>["Variable", "m", "sd","n"]) {|t|
+            g.table(:name=>_("Mean and standard deviation"), :header=>[_("Variable"), _("mean"), _("sd"),_("n")]) {|t|
               t.row([@v1.name,"%0.4f" % @v1.mean,"%0.4f" % @v1.sd,@v1.n_valid])
               t.row([@v2.name,"%0.4f" % @v2.mean,"%0.4f" % @v2.sd, @v2.n_valid])
             }

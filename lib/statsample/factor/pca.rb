@@ -36,8 +36,7 @@ module Factor
     attr_accessor :m
     # Use GSL if available
     attr_accessor :use_gsl
-    include GetText
-    bindtextdomain("statsample")
+    include Summarizable
     
     def initialize(matrix, opts=Hash.new)
 	@use_gsl=nil
@@ -139,25 +138,21 @@ module Factor
         @eigenpairs=@eigenpairs.sort.reverse
     end
     
-    def summary
-      ReportBuilder.new(:no_title=>true).add(self).to_text
-    end
     def report_building(builder) # :nodoc:
       builder.section(:name=>@name) do |generator|
-      generator.text "Number of factors: #{m}"
-      generator.table(:name=>_("Communalities"), :header=>["Variable","Initial","Extraction"]) do |t|
+      generator.text _("Number of factors: %d") % m
+      generator.table(:name=>_("Communalities"), :header=>[_("Variable"),_("Initial"),_("Extraction")]) do |t|
         communalities(m).each_with_index {|com,i|
           t.row([i, 1.0, sprintf("%0.3f", com)])
         }
       end      
-      generator.table(:name=>_("Eigenvalues"), :header=>["Variable","Value"]) do |t|
+      generator.table(:name=>_("Eigenvalues"), :header=>[_("Variable"),_("Value")]) do |t|
         eigenvalues.each_with_index {|eigenvalue,i|
           t.row([i, sprintf("%0.3f",eigenvalue)])
         }
       end
       
-      generator.table(:name=>_("Component Matrix"), :header=>["Variable"]+m.times.collect {|c| c+1}) do |t|
-        
+      generator.table(:name=>_("Component Matrix"), :header=>[_("Variable")]+m.times.collect {|c| c+1}) do |t|
         i=0
         component_matrix(m).to_a.each do |row|
           t.row([i]+row.collect {|c| sprintf("%0.3f",c)})

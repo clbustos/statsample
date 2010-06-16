@@ -37,12 +37,8 @@ module Statsample
   # 
   module CovariateMatrix
     include Summarizable
-    # Gives a nice summary
-    def summary
-      rp=ReportBuilder.new()
-      rp.add(self)
-      rp.to_text
-    end
+    @@covariatematrix=0
+
     # Get type of covariate matrix. Could be :covariance or :correlation
     def type
       if row_size==column_size
@@ -81,7 +77,7 @@ module Statsample
     end
     def fields
       raise "Should be square" if !square?
-      @fields_x
+      fields_x
     end
     def fields=(v)
       raise "Matrix should be square" if !square?
@@ -97,17 +93,21 @@ module Statsample
       @fields_y=v
     end
     def fields_x
-      @fields_x||=row_size.times.collect {|i| i} 
+      @fields_x||=row_size.times.collect {|i| _("X%d") % i} 
     end
     def fields_y
-      @fields_y||=column_size.times.collect {|i| i} 
+      @fields_y||=column_size.times.collect {|i| _("Y%d") % i} 
     end
     
     def name=(v)
       @name=v
     end
     def name
-      @name
+      @name||=get_new_name
+    end
+    def get_new_name
+      @@covariatematrix+=1
+      _("Covariate matrix %d") % @@covariatematrix
     end
     # Select a submatrix of factors. If you have a correlation matrix
     # with a, b and c, you could obtain a submatrix of correlations of
@@ -149,7 +149,7 @@ module Statsample
       matrix
     end
     def report_building(generator)
-      @name||= (type==:correlation ? "Correlation":"Covariance")+" Matrix"
+      @name||= (type==:correlation ? _("Correlation"):_("Covariance"))+_(" Matrix")
       generator.table(:name=>@name, :header=>[""]+fields_y) do |t|
         row_size.times {|i|
           t.row([fields_x[i]]+@rows[i].collect {|i1| sprintf("%0.3f",i1).gsub("0.",".")})

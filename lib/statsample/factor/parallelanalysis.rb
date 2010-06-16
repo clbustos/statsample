@@ -15,7 +15,7 @@ module Factor
 class ParallelAnalysis
   
   include DirtyMemoize
-  
+  include Summarizable
   # Number of random sets to produce. 50 by default
   attr_accessor :iterations
   # Name of analysis
@@ -47,7 +47,7 @@ class ParallelAnalysis
     @n_variables=@fields.size
     @n_cases=ds.cases
     opts_default={
-      :name=>"Parallel Analysis",
+      :name=>_("Parallel Analysis"),
       :iterations=>50,
       :bootstrap_method => :raw_data,
       :factor_class => Statsample::Factor::PCA,
@@ -59,10 +59,6 @@ class ParallelAnalysis
     @opts[:matrix_method]==:correlation_matrix if @opts[:bootstrap_method]==:parameters
     opts_default.keys.each {|k| send("#{k}=", @opts[k]) }
   end
-  # Summary of results
-  def summary
-    ReportBuilder.new(:no_title=>true).add(self).to_text
-  end
   # Number of factor to retent
   def number_of_factors
     total=0
@@ -73,13 +69,13 @@ class ParallelAnalysis
   end
   def report_building(g) #:nodoc:
     g.section(:name=>@name) do |s|
-      s.text "Bootstrap Method: #{bootstrap_method}"
-      s.text "Correlation Matrix type : #{matrix_method}"
-      s.text "Number of variables: #{@n_variables}"
-      s.text "Number of cases: #{@n_cases}"
-      s.text "Number of iterations: #{@iterations}"
-      s.text "Number or factors to preserve: #{number_of_factors}"
-      s.table(:name=>"Eigenvalues", :header=>["Eigenvalue", "actual", "mean","p.#{percentil}","preserve?"]) do |t|
+      s.text _("Bootstrap Method: %s") % bootstrap_method
+      s.text _("Correlation Matrix type : %s") % matrix_method
+      s.text _("Number of variables: %d") % @n_variables
+      s.text _("Number of cases: %d") % @n_cases
+      s.text _("Number of iterations: %d") % @iterations
+      s.text _("Number or factors to preserve: %d") % number_of_factors
+      s.table(:name=>_("Eigenvalues"), :header=>[_("Eigenvalue"), _("actual"), _("mean"),"p.#{percentil}",_("preserve?")]) do |t|
         ds_eigenvalues.fields.each_with_index do |f,i|
           v=ds_eigenvalues[f]
           t.row [i+1, "%0.4f" % @original[i], "%0.4f" %  v.mean, "%0.4f" %  v.percentil(percentil), (v.percentil(percentil)>0 and @original[i] > v.percentil(percentil)) ? "Yes":""]

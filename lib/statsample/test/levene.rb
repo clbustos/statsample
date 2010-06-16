@@ -47,10 +47,6 @@ module Statsample
       def report_building(builder) # :nodoc:
         builder.text "%s : F(%d, %d) = %0.4f , p = %0.4f" % [@name, @d1, @d2, f, probability]
       end
-      # Summary of results
-      def summary
-        ReportBuilder.new(:no_title=>true).add(self).to_text
-      end
       def compute
         n=@vectors.inject(0) {|ac,v| ac+v.n_valid}
         

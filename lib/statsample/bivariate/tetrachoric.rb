@@ -111,25 +111,19 @@ module Statsample
       def threshold_y
         @zac
       end
-      # Summary of the analysis
-      def summary
-        ReportBuilder.new(:name=>@name).add(self).to_text
-      end
-
       def report_building(generator) # :nodoc:
-        section=ReportBuilder::Section.new(:name=>@name)
-        t=ReportBuilder::Table.new(:name=>_("Contingence Table"),:header=>["","Y=0","Y=1", "T"])
-        t.row(["X=0", @a,@b,@a+@b])
-        t.row(["X=1", @c,@d,@c+@d])
-        t.hr
-        t.row(["T", @a+@c,@b+@d,@a+@b+@c+@d])
-        section.add(t)
-        #generator.parse_element(t)
-        section.add(sprintf("r: %0.3f",r))
-        section.add(_("SE: %0.3f") % se)
-        section.add(_("Threshold X: %0.3f ") % threshold_x)
-        section.add(_("Threshold Y: %0.3f ") % threshold_y )
-        generator.parse_element(section)
+        generator.section(:name=>@name) do |s|
+          s.table(:name=>_("Contingence Table"),:header=>["","Y=0","Y=1", "T"]) do |t|
+            t.row(["X=0", @a,@b,@a+@b])
+            t.row(["X=1", @c,@d,@c+@d])
+            t.hr
+            t.row(["T", @a+@c,@b+@d,@a+@b+@c+@d])
+          end
+          s.text(sprintf("r: %0.3f",r))
+          s.text(_("SE: %0.3f") % se)
+          s.text(_("Threshold X: %0.3f ") % threshold_x)
+          s.text(_("Threshold Y: %0.3f ") % threshold_y )
+        end
       end
 
       # Creates a new tetrachoric object for analysis

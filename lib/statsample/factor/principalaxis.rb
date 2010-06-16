@@ -28,12 +28,11 @@ module Factor
   #   
   class PrincipalAxis
     include DirtyMemoize
+    include Summarizable
     # Minimum difference between succesive iterations on sum of communalities
     DELTA=1e-3
     # Maximum number of iterations
     MAX_ITERATIONS=50
-    include GetText
-    bindtextdomain("statsample")
     # Number of factors. Set by default to the number of factors
     # with eigen values > 1 on PCA over data
     attr_accessor :m
@@ -58,6 +57,12 @@ module Factor
     
     def initialize(matrix, opts=Hash.new)
       @matrix=matrix
+      if @matrix.respond_to? :fields
+        @fields=@matrix.fields
+      else
+        @fields=@matrix.row_size.times.map {|i| _("Variable %d") % (i+1)}
+      end
+      
       @name=""
       @m=nil
       @initial_eigenvalues=nil
@@ -167,40 +172,29 @@ module Factor
       rxx=Matrix.rows(rows)
       [rxx,rxy]
     end
-    def summary
-      rp=ReportBuilder.new()
-      rp.add(self)
-      rp.to_text
-    end
     def report_building(generator)
       iterate if @clean
-      anchor=generator.toc_entry(_("Factor Analysis: ")+name)
-      generator.html "<div class='pca'>"+_("Factor Analysis")+" #{@name}<a name='#{anchor}'></a>"
-     
-      generator.text "Number of factors: #{m}"
-      generator.text "Iterations: #{@iterations}"
-      
-      t=ReportBuilder::Table.new(:name=>_("Communalities"), :header=>["Variable","Initial","Extraction"])
-      communalities(m).each_with_index {|com,i|
-        t.row([i, sprintf("%0.4f", initial_communalities[i]), sprintf("%0.3f", com)])
-      }
-      generator.parse_element(t)
-      
-      t=ReportBuilder::Table.new(:name=>_("Eigenvalues"), :header=>["Variable","Value"])
-      @initial_eigenvalues.each_with_index {|eigenvalue,i|
-        t.row([i, sprintf("%0.3f",eigenvalue)])
-      }
-      generator.parse_element(t)
-      
-      t=ReportBuilder::Table.new(:name=>_("Component Matrix"), :header=>["Variable"]+m.times.collect {|c| c+1})
-      
-      i=0
-      component_matrix(m).to_a.each do |row|
-        t.row([i]+row.collect {|c| sprintf("%0.3f",c)})
-        i+=1
+      generator.section(:name=>@name) do |s|
+        s.text _("Number of factors: %d") % m
+        s.text _("Iterations: %d") % @iterations
+        s.table(:name=>_("Communalities"), :header=>[_("Variable"),_("Initial"),_("Extraction")]) do |t|
+          communalities(m).each_with_index {|com,i|
+            t.row([@fields[i], sprintf("%0.4f", initial_communalities[i]), sprintf("%0.3f", com)])
+          }
+        end
+        s.table(:name=>_("Eigenvalues"), :header=>[_("Variable"),_("Value")]) do |t|
+          @initial_eigenvalues.each_with_index {|eigenvalue,i|
+            t.row([@fields[i], sprintf("%0.3f",eigenvalue)])
+          }
+        end
+        s.table(:name=>_("Component Matrix"), :header=>["Variable"]+m.times.collect {|c| c+1}) do |t|
+          i=0
+          component_matrix(m).to_a.each do |row|
+            t.row([@fields[i]]+row.collect {|c| sprintf("%0.3f",c)})
+            i+=1
+          end
+        end
       end
-      generator.parse_element(t)
-      generator.html("</div>")
     end
     
     dirty_writer :max_iterations, :epsilon, :smc
