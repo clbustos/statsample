@@ -1,3 +1,14 @@
+=== 0.13.0 / 2010-06-13
+
+* Polychoric and Tetrachoric moved to gem statsample-bivariate-extension
+* All classes left with summary method include Summarizable now. Every method which return localizable string is now parsed with _()
+* Correct implementation of Reliability::MultiScaleAnalysis. 
+* Spanish translation for Mann-Whitney's U
+* Added example for Mann-Whitney's U test
+* Better summary for Mann-Whitney's U Test
+* Added Statsample::Bivariate::Pearson class to retrieve complete analysis for r correlations
+* Bug fix on DominanceAnalysis::Bootstrap
+
 === 0.12.0 / 2010-06-09
 
 * Modified Rakefile to remove dependencies based on C extensions. These are moved to statsample-optimization
