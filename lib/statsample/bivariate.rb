@@ -1,5 +1,3 @@
-require 'statsample/bivariate/tetrachoric'
-require 'statsample/bivariate/polychoric'
 require 'statsample/bivariate/pearson'
 
 module Statsample
@@ -9,6 +7,9 @@ module Statsample
   # * Statsample::Bivariate::Tetrachoric : Tetrachoric correlation
   # * Statsample::Bivariate::Polychoric  : Polychoric correlation (using joint, two-step and polychoric series)
   module Bivariate
+    autoload(:Polychoric, "statsample/bivariate/polychoric")
+    autoload(:Tetrachoric, "statsample/bivariate/tetrachoric")
+    
     class << self
       # Covariance between two vectors
       def covariance(v1,v2)

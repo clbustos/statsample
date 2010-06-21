@@ -76,23 +76,6 @@ Include:
     cm=Statsample::Bivariate.correlation_matrix(ds)
     puts cm.summary
 
-=== Tetrachoric correlation
-
-    require 'statsample'
-    a=40
-    b=10
-    c=20
-    d=30
-    tetra=Statsample::Bivariate::Tetrachoric.new(a,b,c,d)
-    puts tetra.summary
-    
-=== Polychoric correlation
-
-    require 'statsample'
-    ct=Matrix[[58,52,1],[26,58,3],[8,12,9]]
-    
-    poly=Statsample::Bivariate::Polychoric.new(ct)
-    puts poly.summary
 
 == REQUIREMENTS:
 
