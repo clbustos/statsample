@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: statsample 0.13.0\n"
-"POT-Creation-Date: 2010-06-21 12:23-0400\n"
+"POT-Creation-Date: 2010-06-21 16:08-0400\n"
 "PO-Revision-Date: 2009-08-04 15:36-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,7 +33,6 @@ msgstr ""
 
 #: lib/statsample/test/t.rb:209
 #: lib/statsample/dominanceanalysis/bootstrap.rb:208
-#: lib/statsample/factor/parallelanalysis.rb:78
 msgid "mean"
 msgstr ""
 
@@ -41,7 +40,7 @@ msgstr ""
 msgid "sd"
 msgstr ""
 
-#: lib/statsample/test/t.rb:209
+#: lib/statsample/test/t.rb:209 lib/statsample/factor/parallelanalysis.rb:79
 msgid "n"
 msgstr ""
 
@@ -281,48 +280,48 @@ msgstr ""
 msgid "Histogram %s"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:50
+#: lib/statsample/factor/parallelanalysis.rb:51
 msgid "Parallel Analysis"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:72
+#: lib/statsample/factor/parallelanalysis.rb:73
 msgid "Bootstrap Method: %s"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:73
+#: lib/statsample/factor/parallelanalysis.rb:74
 msgid "Correlation Matrix type : %s"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:74
+#: lib/statsample/factor/parallelanalysis.rb:75
 msgid "Number of variables: %d"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:75
+#: lib/statsample/factor/parallelanalysis.rb:76
 msgid "Number of cases: %d"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:76
+#: lib/statsample/factor/parallelanalysis.rb:77
 msgid "Number of iterations: %d"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:77
+#: lib/statsample/factor/parallelanalysis.rb:78
 msgid "Number or factors to preserve: %d"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:78
+#: lib/statsample/factor/parallelanalysis.rb:79
 #: lib/statsample/factor/pca.rb:149 lib/statsample/factor/principalaxis.rb:185
 msgid "Eigenvalues"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:78
-msgid "Eigenvalue"
+#: lib/statsample/factor/parallelanalysis.rb:79
+msgid "data eigenvalue"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:78
-msgid "actual"
+#: lib/statsample/factor/parallelanalysis.rb:79
+msgid "generated eigenvalue"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:78
+#: lib/statsample/factor/parallelanalysis.rb:79
 msgid "preserve?"
 msgstr ""
 

@@ -2,6 +2,7 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 
 require 'statsample'
+require 'statsample/bivariate/tetrachoric'
 samples=1000
 variables=10
 rng = GSL::Rng.alloc()
