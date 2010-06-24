@@ -231,13 +231,13 @@ module Statsample
     end
     
     if Statsample::STATSAMPLE__.respond_to?(:set_valid_data_intern)
-    def set_valid_data_intern #:nodoc:
-      Statsample::STATSAMPLE__.set_valid_data_intern(self)
-    end
+      def set_valid_data_intern #:nodoc:
+        Statsample::STATSAMPLE__.set_valid_data_intern(self)
+      end
     else
-    def set_valid_data_intern #:nodoc:
-      _set_valid_data_intern                  
-    end
+      def set_valid_data_intern #:nodoc:
+        _set_valid_data_intern                  
+      end
     end
     def _set_valid_data_intern #:nodoc:
       @data.each do |n|
@@ -280,16 +280,16 @@ module Statsample
     
     # Retrieves i element of data
     def [](i)
-    @data[i]
+      @data[i]
     end
     # Set i element of data. 
     # Note: Use set_valid_data if you include missing values
     def []=(i,v)
-    @data[i]=v
+      @data[i]=v
     end
     # Return true if a value is valid (not nil and not included on missing values)
     def is_valid?(x)
-    !(x.nil? or @missing_values.include? x)
+      !(x.nil? or @missing_values.include? x)
     end
     # Set missing_values.
     # if update_valid = false, you should use
