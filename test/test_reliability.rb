@@ -193,7 +193,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         vector_sum=ds2.vector_sum
         assert_equal(vector_sum.mean, @ia.stats_if_deleted['x1'][:mean])
         assert_equal(vector_sum.sds, @ia.stats_if_deleted['x1'][:sds])
-        assert_equal(vector_sum.variance, @ia.stats_if_deleted['x1'][:variance_sample])
+        assert_in_delta(vector_sum.variance, @ia.stats_if_deleted['x1'][:variance_sample],1e-10)
 
         assert_equal(Statsample::Reliability.cronbach_alpha(ds2), @ia.stats_if_deleted['x1'][:alpha])
         
