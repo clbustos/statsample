@@ -21,8 +21,17 @@ module Statsample
         }.to_dataset
         cronbach_alpha(ds)
       end
+      # Get Cronbach alpha from <tt>n</tt> cases, 
+      # <tt>s2</tt> mean variance and <tt>cov</tt>
+      # mean covariance
       def cronbach_alpha_from_n_s2_cov(n,s2,cov)
         (n.quo(n-1)) * (1-(s2.quo(s2+(n-1)*cov)))
+      end
+      # Get Cronbach's alpha from a covariance matrix
+      def cronbach_alpha_from_covariance_matrix(cov)
+        n=cov.row_size
+        s2=n.times.inject(0) {|ac,i| ac+cov[i,i]}
+        (n.quo(n-1))*(1-(s2.quo(cov.total_sum)))
       end
       # Returns n necessary to obtain specific alpha
       # given variance and covariance mean of items

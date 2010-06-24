@@ -105,6 +105,11 @@ module Statsample
     def name
       @name||=get_new_name
     end
+    # Get variance for field k
+    # 
+    def variance(k)
+      submatrix([k])[0,0]
+    end
     def get_new_name
       @@covariatematrix+=1
       _("Covariate matrix %d") % @@covariatematrix
