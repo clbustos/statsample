@@ -33,6 +33,10 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         vm, cm = sa.variances_mean, sa.covariances_mean
         assert_in_delta(sa.alpha, Statsample::Reliability.cronbach_alpha_from_n_s2_cov(@n_variables, vm,cm), 1e-10)        
       end
+      should "method cronbach_alpha_from_covariance_matrix returns correct value" do
+        cov=Statsample::Bivariate.covariance_matrix(@ds)
+        assert_in_delta(@a, Statsample::Reliability.cronbach_alpha_from_covariance_matrix(cov),0.0000001)
+      end
       should "return correct n for desired alpha, covariance and variance" do
         sa=Statsample::Reliability::ScaleAnalysis.new(@ds)
         vm, cm = sa.variances_mean, sa.covariances_mean
@@ -102,7 +106,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
       
       setup do
         size=100
-        @scales=4
+        @scales=3
         @items_per_scale=10
         h={}
         @scales.times {|s|
@@ -173,13 +177,25 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         @x4=[1,2,3,4,4,4,4,3,4,4,5,30].to_scale
         @ds={'x1'=>@x1,'x2'=>@x2,'x3'=>@x3,'x4'=>@x4}.to_dataset
         @ia=Statsample::Reliability::ScaleAnalysis.new(@ds)
-        @cov_matrix=Statsample::Bivariate.covariance_matrix(@ds)
+        @cov_matrix=@ia.cov_m
       end     
       should "return correct values for item analysis" do 
         assert_in_delta(0.980,@ia.alpha,0.001)
         assert_in_delta(0.999,@ia.alpha_standarized,0.001)
         var_mean=4.times.map{|m| @cov_matrix[m,m]}.to_scale.mean 
         assert_in_delta(var_mean, @ia.variances_mean)
+        assert_equal(@x1.mean, @ia.item_statistics['x1'][:mean])
+        assert_equal(@x4.mean, @ia.item_statistics['x4'][:mean])
+        assert_equal(@x1.sds, @ia.item_statistics['x1'][:sds])
+        assert_equal(@x4.sds, @ia.item_statistics['x4'][:sds])
+        ds2=@ds.clone
+        ds2.delete_vector('x1')
+        vector_sum=ds2.vector_sum
+        assert_equal(vector_sum.mean, @ia.stats_if_deleted['x1'][:mean])
+        assert_equal(vector_sum.sds, @ia.stats_if_deleted['x1'][:sds])
+        assert_equal(vector_sum.variance, @ia.stats_if_deleted['x1'][:variance_sample])
+
+        assert_equal(Statsample::Reliability.cronbach_alpha(ds2), @ia.stats_if_deleted['x1'][:alpha])
         
         covariances=[]
         4.times.each {|i|

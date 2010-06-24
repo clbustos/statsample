@@ -12,7 +12,7 @@ module Statsample
     #  puts ia.summary
     class ScaleAnalysis
       include Summarizable
-      attr_reader :ds,:mean, :sd,:valid_n, :alpha , :alpha_standarized, :variances_mean, :covariances_mean
+      attr_reader :ds,:mean, :sd,:valid_n, :alpha , :alpha_standarized, :variances_mean, :covariances_mean, :cov_m
       attr_accessor :name
       def initialize(ds, opts=Hash.new)
         @ds=ds.dup_only_valid
@@ -29,8 +29,9 @@ module Statsample
         opts_default={:name=>"Reliability Analisis"}
         @opts=opts_default.merge(opts)
         @name=@opts[:name]
+        @cov_m=Statsample::Bivariate.covariance_matrix(@ds)
         # Mean for covariances and variances
-        @variances=@ds.fields.map {|f| @ds[f].variance}.to_scale
+        @variances=@k.times.map {|i| @cov_m[i,i]}.to_scale
         @variances_mean=@variances.mean
         @covariances_mean=(@variance-@variances.sum).quo(@k**2-@k)
         begin
@@ -125,10 +126,10 @@ module Statsample
         end
       end
       def item_statistics
-        @ds.fields.inject({}) do |a,v|
-          a[v]={:mean=>@ds[v].mean,:sds=>@ds[v].sds}
-          a
-        end
+          @is||=@ds.fields.inject({}) do |a,v|
+            a[v]={:mean=>@ds[v].mean, :sds=>Math::sqrt(@cov_m.variance(v))}
+            a
+          end
       end
       # Returns a dataset with cases ordered by score
       # and variables ordered by difficulty
@@ -152,15 +153,21 @@ module Statsample
         ds_new
       end
       def stats_if_deleted
+        @sif||=stats_if_deleted_intern
+      end
+      def stats_if_deleted_intern # :nodoc:
+        
         @ds.fields.inject({}) do |a,v|
-          ds2=@ds.clone
-          ds2.delete_vector(v)
-          total=ds2.vector_sum
+          cov_2=@cov_m.submatrix(@ds.fields-[v])
+          #ds2=@ds.clone
+          #ds2.delete_vector(v)
+          #total=ds2.vector_sum
           a[v]={}
-          a[v][:mean]=total.mean
-          a[v][:sds]=total.sds
-          a[v][:variance_sample]=total.variance_sample
-          a[v][:alpha]=Statsample::Reliability.cronbach_alpha(ds2)
+          #a[v][:mean]=total.mean
+          a[v][:mean]=@mean-item_statistics[v][:mean]
+          a[v][:variance_sample]=cov_2.total_sum
+          a[v][:sds]=Math::sqrt(a[v][:variance_sample])
+          a[v][:alpha]=Statsample::Reliability.cronbach_alpha_from_covariance_matrix(cov_2)
           a
         end
       end

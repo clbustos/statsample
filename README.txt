@@ -10,12 +10,12 @@ A suite for basic and advanced statistics on Ruby. Tested on Ruby 1.8.7, 1.9.1, 
 Include:
 * Descriptive statistics: frequencies, median, mean, standard error, skew, kurtosis (and many others).
 * Imports and exports datasets from and to Excel, CSV and plain text files.
-* Correlations: Pearson's r, Spearman's rank correlation (rho), Tetrachoric, Polychoric.
-* Anova: generic and vector-based One-way ANOVA
+* Correlations: Pearson's r, Spearman's rank correlation (rho), point biserial, tau a, tau b, gamma,  Tetrachoric and Polychoric.
+* Anova: generic and vector-based One-way ANOVA and Two-way ANOVA
 * Tests: F, T, Levene, U-Mannwhitney.
 * Regression: Simple, Multiple (OLS), Probit  and Logit
 * Factorial Analysis: Extraction (PCA and Principal Axis), Rotation (Varimax, Equimax, Quartimax) and Parallel Analysis, for estimation of number of factors.
-* Reliability analysis for simple scale and helpers to analyze multiple scales using factor analysis and correlations
+* Reliability analysis for simple scale and a DSL to easily analyze multiple scales using factor analysis and correlations, if you want it.
 * Dominance Analysis, with multivariate dependent and bootstrap (Azen & Budescu)
 * Sample calculation related formulas
 * Creates reports on text, html and rtf, using ReportBuilder gem
@@ -42,7 +42,9 @@ Include:
     * Statsample::Factor::Equimax
     * Statsample::Factor::Quartimax
   * Statsample::Factor::ParallelAnalysis performs Horn's 'parallel analysis' to a principal components analysis to adjust for sample bias in the retention of components. 
-* Dominance Analysis. Based on Budescu and Azen papers, Statsample::DominanceAnalysis class can report dominance analysis for a sample, using uni or multivariate dependent variables and DominanceAnalysisBootstrap can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/]. 
+* Dominance Analysis. Based on Budescu and Azen papers, dominance analysis is a method to analyze the relative importance of one predictor relative to another on multiple regression
+  * Statsample::DominanceAnalysis class can report dominance analysis for a sample, using uni or multivariate dependent variables
+  * Statsample::DominanceAnalysis::Bootstrap can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/]. 
 * Module Statsample::Codification, to help to codify open questions
 * Converters to import and export data:
   * Statsample::Database : Can create sql to create tables, read and insert data
@@ -51,7 +53,7 @@ Include:
   * Statsample::Mx    : Write Mx Files
   * Statsample::GGobi : Write Ggobi files
 * Module Statsample::Crosstab provides function to create crosstab for categorical data
-* Module Statsample::Reliability provides functions to analyze scales. 
+* Module Statsample::Reliability provides functions to analyze scales with psychometric methods. 
   * Class ScaleAnalysis provides statistics like mean, standard deviation for a scale, Cronbach's alpha and standarized Cronbach's alpha, and for each item: mean, correlation with total scale, mean if deleted, Cronbach's alpha is deleted.
   * Class MultiScaleAnalysis provides a DSL to easily analyze reliability of multiple scales and retrieve correlation matrix and factor analysis of them.
 * Module Statsample::SRS (Simple Random Sampling) provides a lot of functions to estimate standard error for several type of samples
@@ -60,8 +62,8 @@ Include:
   * Statsample::Test::UMannWhitney
   * Statsample::Test::T
   * Statsample::Test::F  
-* Interfaces to gdchart, gnuplot and SVG::Graph 
-
+* Interfaces to gdchart, gnuplot and SVG::Graph (experimental)
+* Close integration with gem <tt>reportbuilder</tt>, to easily create reports on text, html and rtf formats.
 
 == Examples of use:
 
@@ -99,13 +101,13 @@ Optional:
 
 On *nix, you should install statsample-optimization to retrieve gems gsl, statistics2 and a C extension to speed some methods. 
 
-  $sudo gem install statsample-optimization
+There are available precompiled version for Ruby 1.9 on x86, x86_64 and mingw32 archs.
 
-To use it, on Ubuntu I recommend install build-essential and libgsl0-dev using apt-get and compile ruby 1.8 or 1.9 from source code.
+  $ sudo gem install statsample-optimization
 
-  $sudo apt-get install build-essential libgsl0-dev
+If you use Ruby 1.8, you should compile statsample-optimization, usign parameter <tt>--platform ruby</tt>
 
-
+  $ sudo gem install statsample-optimization --platform ruby
 
 Available setup.rb file
 

@@ -229,7 +229,6 @@ module Statsample
       set_scale_data if(@type==:scale)
       set_date_data if(@type==:date)
     end
-    
     if Statsample::STATSAMPLE__.respond_to?(:set_valid_data_intern)
       def set_valid_data_intern #:nodoc:
         Statsample::STATSAMPLE__.set_valid_data_intern(self)
@@ -274,7 +273,7 @@ module Statsample
     end
     # Size of total data
     def size
-    @data.size
+      @data.size
     end
     alias_method :n, :size
     
