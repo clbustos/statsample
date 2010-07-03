@@ -1,3 +1,11 @@
+=== 0.13.1 / 2010-07-03
+
+* Rserve extensions for dataset and vector operational
+* On x86_64, variance from gsl is not exactly equal to sum of variance-covariance on Statsample::Reliability::Scale, but in delta 1e-10
+* Updated README.txt
+* Reliability::ScaleAnalysis uses covariance matrix for 'if deleted' calculations to optimize memory and speed. Test for 'if deleted' statistics
+* More string translated. Added dependency on tetrachoric on parallel analysis
+
 === 0.13.0 / 2010-06-13
 
 * Polychoric and Tetrachoric moved to gem statsample-bivariate-extension
