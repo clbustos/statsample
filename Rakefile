@@ -4,9 +4,9 @@
 $:.unshift(File.dirname(__FILE__)+'/lib/')
 
 require 'rubygems'
-require 'hoe'
 require 'statsample'
 
+require 'hoe'
 Hoe.plugin :git
 
 desc "Ruby Lint"

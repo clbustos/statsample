@@ -10,7 +10,7 @@ A suite for basic and advanced statistics on Ruby. Tested on Ruby 1.8.7, 1.9.1, 
 Include:
 * Descriptive statistics: frequencies, median, mean, standard error, skew, kurtosis (and many others).
 * Imports and exports datasets from and to Excel, CSV and plain text files.
-* Correlations: Pearson's r, Spearman's rank correlation (rho), point biserial, tau a, tau b, gamma,  Tetrachoric and Polychoric.
+* Correlations: Pearson's r, Spearman's rank correlation (rho), point biserial, tau a, tau b and  gamma.  Tetrachoric and Polychoric correlation provides by +statsample-bivariate-extension+ gem.
 * Anova: generic and vector-based One-way ANOVA and Two-way ANOVA
 * Tests: F, T, Levene, U-Mannwhitney.
 * Regression: Simple, Multiple (OLS), Probit  and Logit
@@ -18,6 +18,7 @@ Include:
 * Reliability analysis for simple scale and a DSL to easily analyze multiple scales using factor analysis and correlations, if you want it.
 * Dominance Analysis, with multivariate dependent and bootstrap (Azen & Budescu)
 * Sample calculation related formulas
+* Structural Equation Modeling (SEM), using R libraries +sem+ and +OpenMx+
 * Creates reports on text, html and rtf, using ReportBuilder gem
 
 == FEATURES:
@@ -62,6 +63,7 @@ Include:
   * Statsample::Test::UMannWhitney
   * Statsample::Test::T
   * Statsample::Test::F  
+* Gem +statsample-sem+ provides a DSL to R libraries +sem+ and +OpenMx+
 * Interfaces to gdchart, gnuplot and SVG::Graph (experimental)
 * Close integration with gem <tt>reportbuilder</tt>, to easily create reports on text, html and rtf formats.
 
@@ -108,6 +110,10 @@ There are available precompiled version for Ruby 1.9 on x86, x86_64 and mingw32 
 If you use Ruby 1.8, you should compile statsample-optimization, usign parameter <tt>--platform ruby</tt>
 
   $ sudo gem install statsample-optimization --platform ruby
+
+If you need to work on Structural Equation Modeling, you could see +statsample-sem+. You need R with +sem+ or +OpenMx+ [http://openmx.psyc.virginia.edu/] libraries installed
+
+  $ sudo gem install statsample-sem
 
 Available setup.rb file
 
