@@ -2,15 +2,29 @@ require(File.dirname(__FILE__)+'/helpers_tests.rb')
 
 
 class StatsampleTestTestCase < MiniTest::Unit::TestCase
-  def test_chi_square
+  def test_chi_square_matrix_with_expected
     real=Matrix[[95,95],[45,155]]
     expected=Matrix[[68,122],[72,128]]
     assert_nothing_raised do
       chi=Statsample::Test.chi_square(real,expected)
     end
-    chi=Statsample::Test.chi_square(real,expected)
+    chi=Statsample::Test.chi_square(real,expected).chi_square
     assert_in_delta(32.53,chi,0.1)
+    
   end
+  def test_chi_square_matrix_only_observed
+    observed=Matrix[[20,30,40],[30,40,50],[60,70,80],[10,20,40]]
+    assert_nothing_raised do
+      chi=Statsample::Test.chi_square(observed)
+    end
+    chi=Statsample::Test.chi_square(observed)
+    assert_in_delta(9.5602, chi.chi_square, 0.0001)
+    assert_in_delta(0.1444, chi.probability, 0.0001)
+
+    assert_equal(6, chi.df)
+    
+  end
+  
   def test_u_mannwhitney
     a=[1,2,3,4,5,6].to_scale
     b=[0,5,7,9,10,11].to_scale

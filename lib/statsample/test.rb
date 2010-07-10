@@ -6,6 +6,8 @@ module Statsample
     autoload(:Levene, 'statsample/test/levene')
     autoload(:T, 'statsample/test/t')
     autoload(:F, 'statsample/test/f')
+    autoload(:ChiSquare, 'statsample/test/chisquare')
+    
     # Returns probability of getting a value lower or higher
     # than sample, using cdf and number of tails.
     # 
@@ -29,17 +31,16 @@ module Statsample
     extend self
     # Calculate chi square for two Matrix
     class << self
-      def chi_square(real,expected)
-        sum=0
-        (0...real.row_size).each {|row_i|
-          (0...real.column_size).each {|col_i|
-            val=((real[row_i,col_i].to_f - expected[row_i,col_i].to_f)**2) / expected[row_i,col_i].to_f
-            # puts "Real: #{real[row_i,col_i].to_f} ; esperado: #{expected[row_i,col_i].to_f}"
-# puts "Diferencial al cuadrado: #{(real[row_i,col_i].to_f - expected[row_i,col_i].to_f)**2}"
-            sum+=val
-          }
-        }
-        sum
+      
+      def chi_square(observed, expected=nil)
+        case observed
+          when Vector
+            ChiSquare::WithVector.new(observed,expected)
+          when Matrix
+            ChiSquare::WithMatrix.new(observed,expected)
+          else
+            raise "Not implemented for #{observed.class}"
+          end
       end
       # Shorthand for Statsample::Test::UMannWhitney.new
       # 

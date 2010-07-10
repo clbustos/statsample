@@ -8,7 +8,7 @@ module Distribution
             # Return the P-value of the corresponding integral with 
             # k degrees of freedom
             def p_value(pr,k)
-                Statistics2.pchi2X_(k, pr)
+                Statistics2.pchi2X_(k.to_i, pr)
             end
             # Chi-square cumulative distribution function (cdf).
             # 
@@ -16,7 +16,7 @@ module Distribution
             # with k degrees of freedom over [0, x]
             # 
             def cdf(x,k)
-                Statistics2.chi2dist(k,x)
+                Statistics2.chi2dist(k.to_i,x)
             end
         end
     end

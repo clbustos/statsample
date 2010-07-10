@@ -57,20 +57,20 @@ module Statsample
     end
     def correlation
       if(type==:covariance)
-      matrix=Matrix.rows(row_size.times.collect { |i|
-        column_size.times.collect { |j|
-          if i==j
-            1.0
-          else
-            self[i,j].quo(Math::sqrt(self[i,i])*Math::sqrt(self[j,j]))
-          end
-        }
-      })
-      matrix.extend CovariateMatrix 
-      matrix.fields_x=fields_x
-      matrix.fields_y=fields_y
-      matrix.type=:correlation
-      matrix
+        matrix=Matrix.rows(row_size.times.collect { |i|
+          column_size.times.collect { |j|
+            if i==j
+              1.0
+            else
+              self[i,j].quo(Math::sqrt(self[i,i])*Math::sqrt(self[j,j]))
+            end
+          }
+        })
+        matrix.extend CovariateMatrix 
+        matrix.fields_x=fields_x
+        matrix.fields_y=fields_y
+        matrix.type=:correlation
+        matrix
       else
         self
       end

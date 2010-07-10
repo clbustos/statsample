@@ -15,7 +15,7 @@ module Statsample
       @row_label=v1.name
       @column_label=v2.name
       @name=nil
-      @percentage_row=@percentage_column=@percentage_total=false
+      @percentage_row = @percentage_column = @percentage_total=false
       opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
       }
