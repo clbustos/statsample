@@ -32,10 +32,14 @@ module Statsample
       attr_accessor :summary_pca
       # Add Principal Axis to summary
       attr_accessor :summary_principal_axis
+      # Add Parallel Analysis to summary
+      attr_accessor :summary_parallel_analysis
       # Options for Factor::PCA object
       attr_accessor :pca_options
       # Options for Factor::PrincipalAxis 
       attr_accessor :principal_axis_options
+      # Options for Parallel Analysis
+      attr_accessor :parallel_analysis_options
       # Generates a new MultiScaleAnalysis
       # Opts could be any accessor of the class 
       # * :name, 
@@ -54,8 +58,10 @@ module Statsample
                         :summary_correlation_matrix=>false,
                         :summary_pca=>false,
                         :summary_principal_axis=>false,
+                        :summary_parallel_analysis=>false,
                         :pca_options=>Hash.new,
-                        :principal_axis_options=>Hash.new
+                        :principal_axis_options=>Hash.new,
+                        :parallel_analysis_options=>Hash.new
         }
         @opts=opts_default.merge(opts)
         @opts.each{|k,v|
@@ -88,22 +94,31 @@ module Statsample
       # using all scales, using <tt>opts</tt> a options.
       def pca(opts=nil)
         opts||=pca_options        
-        Statsample::Factor::PCA.new(correlation_matrix,opts)
+        Statsample::Factor::PCA.new(correlation_matrix, opts)
       end
       # Retrieves a PrincipalAxis Analysis (Factor::PrincipalAxis)
       # using all scales, using <tt>opts</tt> a options.
       def principal_axis_analysis(opts=nil)
         opts||=principal_axis_options
-        Statsample::Factor::PrincipalAxis.new(correlation_matrix,opts)
+        Statsample::Factor::PrincipalAxis.new(correlation_matrix, opts)
+      end
+      def dataset_from_scales
+        ds=Dataset.new(@scales.keys)
+        @scales.each_pair do |code,scale|
+          ds[code.to_s]=scale.ds.vector_sum
+          ds[code.to_s].name=scale.name
+        end
+        ds.update_valid_data
+        ds
+      end
+      def parallel_analysis(opts=nil)
+        opts||=parallel_analysis_options
+        Statsample::Factor::ParallelAnalysis.new(dataset_from_scales, opts)
       end
       # Retrieves a Correlation Matrix between scales.
       # 
       def correlation_matrix
-        vectors=Hash.new
-        @scales.each_pair do |code,scale|
-          vectors[code.to_s]=scale.ds.vector_sum
-        end
-        Statsample::Bivariate.correlation_matrix(vectors.to_dataset)
+        Statsample::Bivariate.correlation_matrix(dataset_from_scales)
       end
       def report_building(b) # :nodoc:
         b.section(:name=>name) do |s|
@@ -126,7 +141,14 @@ module Statsample
             s.section(:name=>_("Principal Axis for %s") % name) do |s2|
               s2.parse_element(principal_axis_analysis)
             end
-          end          
+          end
+          
+          if summary_parallel_analysis
+            s.section(:name=>_("Parallel Analysis for %s") % name) do |s2|
+              s2.parse_element(parallel_analysis)
+            end
+          end 
+          
         end
       end
     end

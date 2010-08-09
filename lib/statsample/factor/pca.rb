@@ -36,19 +36,33 @@ module Factor
     attr_accessor :m
     # Use GSL if available
     attr_accessor :use_gsl
+    # Add to the summary a rotation report
+    attr_accessor :summary_rotation
+    # Add to the summary a parallel analysis report
+    attr_accessor :summary_parallel_analysis
+    # Type of rotation. By default, Statsample::Factor::Rotation::Varimax
+    attr_accessor :rotation_type
     include Summarizable
     
     def initialize(matrix, opts=Hash.new)
-	@use_gsl=nil
+      @use_gsl=nil
       @name=_("Principal Component Analysis")
       @matrix=matrix
       @n_variables=@matrix.column_size
       @m=nil
+      
+      @rotation_type=Statsample::Factor::Varimax
+      
       opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
       }
       if @use_gsl.nil?
         @use_gsl=Statsample.has_gsl?
+      end
+      if @matrix.respond_to? :fields
+        @variables_names=@matrix.fields
+      else
+        @variables_names=@n_variables.times.map {|i| "V#{i+1}"}
       end
       calculate_eigenpairs
       if @m.nil?
@@ -56,6 +70,9 @@ module Factor
         @m=@eigenpairs.find_all {|ev,ec| ev>=1.0}.size
       end
 
+    end
+    def rotation
+      @rotation_type.new(component_matrix)
     end
     def create_centered_ds
       h={}
@@ -93,7 +110,12 @@ module Factor
         gammas.push(Math::sqrt(@eigenpairs[i][0]))
       }
       gamma_m=::Matrix.diagonal(*gammas)
-      (omega_m*(gamma_m)).to_matrix
+      cm=(omega_m*(gamma_m)).to_matrix
+      cm.extend CovariateMatrix
+      cm.name=_("Component matrix")
+      cm.fields_x = @variables_names
+      cm.fields_y = m.times.map {|i| "component_#{i+1}"}
+      cm
     end
     # Communalities for all variables given m factors
     def communalities(m=nil)
@@ -142,23 +164,31 @@ module Factor
       builder.section(:name=>@name) do |generator|
       generator.text _("Number of factors: %d") % m
       generator.table(:name=>_("Communalities"), :header=>[_("Variable"),_("Initial"),_("Extraction")]) do |t|
-        communalities(m).each_with_index {|com,i|
-          t.row([i, 1.0, sprintf("%0.3f", com)])
-        }
-      end      
-      generator.table(:name=>_("Eigenvalues"), :header=>[_("Variable"),_("Value")]) do |t|
-        eigenvalues.each_with_index {|eigenvalue,i|
-          t.row([i, sprintf("%0.3f",eigenvalue)])
+        communalities(m).each_with_index {|com, i|
+          t.row([@variables_names[i], 1.0, sprintf("%0.3f", com)])
         }
       end
       
+      generator.table(:name=>_("Eigenvalues"), :header=>[_("Variable"),_("Value")]) do |t|
+        eigenvalues.each_with_index {|eigenvalue, i|
+          t.row([@variables_names[i], sprintf("%0.3f",eigenvalue)])
+        }
+      end
+=begin      
       generator.table(:name=>_("Component Matrix"), :header=>[_("Variable")]+m.times.collect {|c| c+1}) do |t|
         i=0
         component_matrix(m).to_a.each do |row|
-          t.row([i]+row.collect {|c| sprintf("%0.3f",c)})
+          t.row([@variables_names[i]]+row.collect {|c| sprintf("%0.3f",c)})
           i+=1
         end
       end
+=end
+    generator.parse_element(component_matrix(m))
+      if (summary_rotation)
+        generator.parse_element(rotation)
+      end
+      
+      
       end
     end
     private :calculate_eigenpairs, :create_centered_ds

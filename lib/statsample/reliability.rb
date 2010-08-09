@@ -30,6 +30,7 @@ module Statsample
       # Get Cronbach's alpha from a covariance matrix
       def cronbach_alpha_from_covariance_matrix(cov)
         n=cov.row_size
+        raise "covariance matrix should have at least 2 variables" if n < 2
         s2=n.times.inject(0) {|ac,i| ac+cov[i,i]}
         (n.quo(n-1))*(1-(s2.quo(cov.total_sum)))
       end

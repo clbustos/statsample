@@ -1,6 +1,6 @@
+require 'statsample/factor/rotation'
 require 'statsample/factor/pca'
 require 'statsample/factor/principalaxis'
-require 'statsample/factor/rotation'
 require 'statsample/factor/parallelanalysis'
 module Statsample
   # Factor Analysis toolbox.

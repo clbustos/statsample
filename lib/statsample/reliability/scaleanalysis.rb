@@ -167,7 +167,8 @@ module Statsample
           a[v][:mean]=@mean-item_statistics[v][:mean]
           a[v][:variance_sample]=cov_2.total_sum
           a[v][:sds]=Math::sqrt(a[v][:variance_sample])
-          a[v][:alpha]=Statsample::Reliability.cronbach_alpha_from_covariance_matrix(cov_2)
+          n=cov_2.row_size
+          a[v][:alpha] = (n>=2) ? Statsample::Reliability.cronbach_alpha_from_covariance_matrix(cov_2) : nil
           a
         end
       end
@@ -200,7 +201,7 @@ module Statsample
           
           s.table(:name=>_("Items report for %s") % @name, :header=>["item","mean","sd", "mean if deleted", "var if deleted", "sd if deleted"," item-total correl.", "alpha if deleted"]) do |t|
             @ds.fields.each do |f|
-              t.row(["#{@ds[f].name}(#{f})", sprintf("%0.5f",is[f][:mean]), sprintf("%0.5f",is[f][:sds]), sprintf("%0.5f",sid[f][:mean]), sprintf("%0.5f",sid[f][:variance_sample]), sprintf("%0.5f",sid[f][:sds]),  sprintf("%0.5f",itc[f]), sprintf("%0.5f",sid[f][:alpha])])
+              t.row(["#{@ds[f].name}(#{f})", sprintf("%0.5f",is[f][:mean]), sprintf("%0.5f",is[f][:sds]), sprintf("%0.5f",sid[f][:mean]), sprintf("%0.5f",sid[f][:variance_sample]), sprintf("%0.5f",sid[f][:sds]),  sprintf("%0.5f",itc[f]), (sid[f][:alpha].nil?) ?  "--" : sprintf("%0.5f",sid[f][:alpha])])
             end # end each
           end # table
         end # section

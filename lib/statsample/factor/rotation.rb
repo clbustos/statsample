@@ -18,6 +18,7 @@ module Factor
   class Rotation
     EPSILON=1e-15
     MAX_ITERATIONS=25
+    include Summarizable
     include DirtyMemoize
     attr_reader :iterations, :rotated, :component_transformation_matrix, :h2
     # Maximum number of iterations    
@@ -29,6 +30,7 @@ module Factor
     dirty_memoize :iterations, :rotated, :component_transformation_matrix, :h2
     
     def initialize(matrix, opts=Hash.new)
+      @name=_("%s rotation") % rotation_name
       @matrix=matrix
       @n=@matrix.row_size # Variables, p on original
       @m=@matrix.column_size # Factors, r on original
@@ -40,6 +42,11 @@ module Factor
       opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
       }
+    end
+    def report_building(g)
+      g.section(:name=>@name) do |s|
+        s.parse_element(rotated)
+      end
     end
     alias_method :communalities, :h2
     alias_method :rotated_component_matrix, :rotated
@@ -111,6 +118,10 @@ module Factor
         end #i
       end # while
       @rotated=h*bh
+      @rotated.extend CovariateMatrix
+      @rotated.name=_("Rotated Component matrix")
+      @rotated.fields_x = @matrix.fields_x
+      @rotated.fields_y = @matrix.fields_y
       @component_transformation_matrix=t
       @rotated
     end
@@ -123,6 +134,9 @@ module Factor
     def y(a,b,c,d)
       c-((a**2-b**2) / @n.to_f)
     end
+    def rotation_name
+      "Varimax"
+    end
   end
   class Equimax < Rotation
     def x(a,b,c,d)
@@ -131,6 +145,10 @@ module Factor
     def y(a,b,c,d)
       c-@m*((a**2-b**2) / (2*@n.to_f))
     end
+    def rotation_name
+      "Equimax"
+    end
+
   end
   class Quartimax < Rotation
     def x(a,b,c,d)
@@ -139,6 +157,10 @@ module Factor
     def y(a,b,c,d)
       c
     end
+    def rotation_name
+      "Quartimax"
+    end
+    
   end
 end
 end
