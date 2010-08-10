@@ -82,6 +82,7 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
     assert(!varimax.h2.nil?, "H2 shouldn't be empty")
     
     _test_matrix(expected,varimax.rotated)
+    assert(varimax.summary.size>0)
   end
   def _test_matrix(a,b)
     a.row_size.times {|i|

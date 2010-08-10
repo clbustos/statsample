@@ -108,19 +108,26 @@ module Statsample
     # with sd with denominator n-1
     
     def vector_standarized(use_population=false)
-    raise "Should be a scale" unless @type==:scale
-    m=mean
-    sd=use_population ? sdp : sds
-    @data_with_nils.collect{|x|
-      if !x.nil?
-        (x.to_f - m).quo(sd)
-      else
-        nil
-      end
-    }.to_vector(:scale)
+      check_type :scale
+      m=mean
+      sd=use_population ? sdp : sds
+      @data_with_nils.collect{|x|
+        if !x.nil?
+          (x.to_f - m).quo(sd)
+        else
+          nil
+        end
+      }.to_vector(:scale)
     end
     alias_method :standarized, :vector_standarized
-    
+    # Return a vector with values replaced with the percentiles
+    # of each values
+    def vector_percentil
+      check_type :ordinal
+      c=size
+      ranked.map {|i| i.quo(c)*100 }.to_vector(@type)
+      
+    end
     def box_cox_transformation(lambda) # :nodoc:
     raise "Should be a scale" unless @type==:scale
     @data_with_nils.collect{|x|

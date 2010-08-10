@@ -241,6 +241,11 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     v2=[1,2,3].to_vector()
     assert_equal(v1,v2)
   end
+  def test_vector_percentil
+    a=[1,2,2,3,4,5,5,5,6,10].to_scale
+    expected=[10,25,25,40,50,70,70,70,90,100].to_scale
+    assert_equal(expected, a.vector_percentil)
+  end
   def test_ordinal
     @c.type=:ordinal
     assert_equal(5,@c.median)
@@ -249,7 +254,11 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
 
     v=[200000, 200000, 210000, 220000, 230000, 250000, 250000, 250000, 270000, 300000, 450000, 130000, 140000, 140000, 140000, 145000, 148000, 165000, 170000, 180000, 180000, 180000, 180000, 180000, 180000 ].to_scale
     assert_equal(180000,v.median)
-
+    a=[7.0, 7.0, 7.0, 7.0, 7.0, 8.0, 8.0, 8.0, 9.0, 9.0, 10.0, 10.0, 10.0, 10.0, 10.0, 12.0, 12.0, 13.0, 14.0, 14.0, 2.0, 3.0, 3.0, 3.0, 3.0, 4.0, 4.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 6.0, 6.0, 6.0].to_scale
+    assert_equal(4.5, a.percentil(25))
+    assert_equal(6.5, a.percentil(50))
+    assert_equal(9.5, a.percentil(75))
+    assert_equal(3.0, a.percentil(10))
   end
   def test_ranked
     v1=[0.8,1.2,1.2,2.3,18].to_vector(:ordinal)

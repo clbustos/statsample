@@ -1,10 +1,12 @@
 module Statsample
 module Factor
-  # Base class for rotate matrixes
-  # References: 
+  # Base class for component matrix rotation.
+  #
+  # == References: 
   # * SPSS Manual
-  # * Johnny Lin code for IDL: http://www.johnny-lin.com/idl_code/varimax_k58.pro
-  # Use Varimax, Equimax or Quartimax for desired type of rotation
+  # * Johnny Lin code for IDL: [http://www.johnny-lin.com/idl_code/varimax_k58.pro]
+  # 
+  # Use subclasses Varimax, Equimax or Quartimax for desired type of rotation
   #   Use:
   #   a = Matrix[ [ 0.4320,  0.8129,  0.3872] 
   #     , [ 0.7950, -0.5416,  0.2565]  
@@ -46,6 +48,7 @@ module Factor
     def report_building(g)
       g.section(:name=>@name) do |s|
         s.parse_element(rotated)
+        s.parse_element(component_transformation_matrix)
       end
     end
     alias_method :communalities, :h2
@@ -120,9 +123,31 @@ module Factor
       @rotated=h*bh
       @rotated.extend CovariateMatrix
       @rotated.name=_("Rotated Component matrix")
-      @rotated.fields_x = @matrix.fields_x
-      @rotated.fields_y = @matrix.fields_y
+      
+      if @matrix.respond_to? :fields_x
+        @rotated.fields_x = @matrix.fields_x
+      else
+        @rotated.fields_x = @n.times.map {|i| "var_#{i+1}"}
+      end
+      if @matrix.respond_to? :fields_y
+        @rotated.fields_y = @matrix.fields_y
+      else
+        @rotated.fields_y = @m.times.map {|i| "var_#{i+1}"}
+      end
+      
+      
+      
       @component_transformation_matrix=t
+      @component_transformation_matrix.extend CovariateMatrix
+      @component_transformation_matrix.name=_("Component transformation matrix")
+      
+      if @matrix.respond_to? :fields_y
+        @component_transformation_matrix.fields = @matrix.fields_y
+        
+      else
+        @component_transformation_matrix.fields = @m.times.map {|i| "var_#{i+1}"}
+      end
+      
       @rotated
     end
 
