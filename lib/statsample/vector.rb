@@ -125,7 +125,7 @@ module Statsample
     def vector_percentil
       check_type :ordinal
       c=size
-      ranked.map {|i| i.quo(c)*100 }.to_vector(@type)
+      ranked.map {|i| (i.quo(c)*100).to_f }.to_vector(@type)
       
     end
     def box_cox_transformation(lambda) # :nodoc:

@@ -90,7 +90,7 @@ raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all
         fields=row.to_a.collect{|c| c.downcase}
         fields.recode_repeated
       end
-    
+                                         
       def process_row(row,empty)
         row.to_a.collect do |c|
           if empty.include?(c)
@@ -146,7 +146,7 @@ raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all
         sheet = book.create_worksheet
         format = Spreadsheet::Format.new :color => :blue,
                            :weight => :bold
-        sheet.row(0).concat(dataset.fields)
+        sheet.row(0).concat(dataset.fields.map {|i| i.dup}) # Unfreeze strings
         sheet.row(0).default_format = format
         i=1
         dataset.each_array{|row|

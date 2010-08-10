@@ -29,8 +29,10 @@ module Factor
   # * Smith, L. (2002). A tutorial on Principal Component Analysis. Available on http://courses.eas.ualberta.ca/eas570/pca_tutorial.pdf 
   # 
   class PCA
+    include Summarizable
     # Name of analysis
     attr_accessor :name
+
     # Number of factors. Set by default to the number of factors
     # with eigen values > 1
     attr_accessor :m
@@ -42,7 +44,7 @@ module Factor
     attr_accessor :summary_parallel_analysis
     # Type of rotation. By default, Statsample::Factor::Rotation::Varimax
     attr_accessor :rotation_type
-    include Summarizable
+
     
     def initialize(matrix, opts=Hash.new)
       @use_gsl=nil
@@ -111,6 +113,7 @@ module Factor
       }
       gamma_m=::Matrix.diagonal(*gammas)
       cm=(omega_m*(gamma_m)).to_matrix
+      
       cm.extend CovariateMatrix
       cm.name=_("Component matrix")
       cm.fields_x = @variables_names
@@ -162,33 +165,24 @@ module Factor
     
     def report_building(builder) # :nodoc:
       builder.section(:name=>@name) do |generator|
-      generator.text _("Number of factors: %d") % m
-      generator.table(:name=>_("Communalities"), :header=>[_("Variable"),_("Initial"),_("Extraction")]) do |t|
-        communalities(m).each_with_index {|com, i|
-          t.row([@variables_names[i], 1.0, sprintf("%0.3f", com)])
-        }
-      end
-      
-      generator.table(:name=>_("Eigenvalues"), :header=>[_("Variable"),_("Value")]) do |t|
-        eigenvalues.each_with_index {|eigenvalue, i|
-          t.row([@variables_names[i], sprintf("%0.3f",eigenvalue)])
-        }
-      end
-=begin      
-      generator.table(:name=>_("Component Matrix"), :header=>[_("Variable")]+m.times.collect {|c| c+1}) do |t|
-        i=0
-        component_matrix(m).to_a.each do |row|
-          t.row([@variables_names[i]]+row.collect {|c| sprintf("%0.3f",c)})
-          i+=1
+        generator.text _("Number of factors: %d") % m
+        generator.table(:name=>_("Communalities"), :header=>[_("Variable"),_("Initial"),_("Extraction")]) do |t|
+          communalities(m).each_with_index {|com, i|
+            t.row([@variables_names[i], 1.0, sprintf("%0.3f", com)])
+          }
         end
-      end
-=end
-    generator.parse_element(component_matrix(m))
-      if (summary_rotation)
-        generator.parse_element(rotation)
-      end
-      
-      
+        
+        generator.table(:name=>_("Total Variance Explained"), :header=>[_("Component"), _("E.Total"), _("%"), _("Cum. %")]) do |t|
+          ac_eigen=0
+          eigenvalues.each_with_index {|eigenvalue,i|
+            ac_eigen+=eigenvalue
+            t.row([_("Component %d") % (i+1), sprintf("%0.3f",eigenvalue), sprintf("%0.3f%%", eigenvalue*100.quo(@n_variables)), sprintf("%0.3f",ac_eigen*100.quo(@n_variables))])
+          }
+        end
+        generator.parse_element(component_matrix(m))
+        if (summary_rotation)
+          generator.parse_element(rotation)
+        end
       end
     end
     private :calculate_eigenpairs, :create_centered_ds

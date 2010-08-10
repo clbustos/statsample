@@ -177,14 +177,14 @@ module Statsample
           s.table(:name=>_("Summary for %s") % @name) do |t|
           t.row [_("Items"), @ds.fields.size]
           t.row [_("Valid cases"), @valid_n]
-          t.row [_("Sum mean"), @mean]
-          t.row [_("Sum sd"), @sd]
-          t.row [_("Sum variance"), @variance]
-          t.row [_("Sum median"), @median]
+          t.row [_("Sum mean"),     "%0.4f" % @mean]
+          t.row [_("Sum sd"),       "%0.4f" % @sd  ]
+          t.row [_("Sum variance"), "%0.4f" % @variance]
+          t.row [_("Sum median"),   @median]
           t.hr
-          t.row [_("Item mean"), @item_mean]
-          t.row [_("Skewness"), "%0.4f" % @skew]
-          t.row [_("Kurtosis"), "%0.4f" % @kurtosis]
+          t.row [_("Item mean"),    "%0.4f" % @item_mean]
+          t.row [_("Skewness"),     "%0.4f" % @skew]
+          t.row [_("Kurtosis"),     "%0.4f" % @kurtosis]
           t.hr
           t.row [_("Cronbach's alpha"), "%0.4f" % @alpha]
           t.row [_("Standarized Cronbach's alpha"), "%0.4f" % @alpha_standarized]

@@ -29,16 +29,14 @@ module Factor
   class PrincipalAxis
     include DirtyMemoize
     include Summarizable
-    # Minimum difference between succesive iterations on sum of communalities
-    DELTA=1e-3
-    # Maximum number of iterations
-    MAX_ITERATIONS=50
-    # Number of factors. Set by default to the number of factors
-    # with eigen values > 1 on PCA over data
-    attr_accessor :m
-    
     # Name of analysis
     attr_accessor :name
+
+    # Number of factors. Set by default to the number of factors
+    # with eigen values > 1
+    attr_accessor :m
+    
+    
     
     # Number of iterations required to converge
     attr_reader :iterations
@@ -53,7 +51,10 @@ module Factor
     # Eigenvalues of factor analysis
     attr_reader :eigenvalues
     
-    
+    # Minimum difference between succesive iterations on sum of communalities
+    DELTA=1e-3
+    # Maximum number of iterations
+    MAX_ITERATIONS=25
     
     def initialize(matrix, opts=Hash.new)
       @matrix=matrix
@@ -62,7 +63,7 @@ module Factor
       else
         @fields=@matrix.row_size.times.map {|i| _("Variable %d") % (i+1)}
       end
-      
+      @n_variables=@matrix.row_size
       @name=""
       @m=nil
       @initial_eigenvalues=nil
@@ -74,7 +75,11 @@ module Factor
       opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
       }
-      
+      if @matrix.respond_to? :fields
+        @variables_names=@matrix.fields
+      else
+        @variables_names=@n_variables.times.map {|i| "V#{i+1}"}
+      end
       if @m.nil?
         pca=PCA.new(::Matrix.rows(@matrix.to_a))
         @m=pca.m
@@ -119,7 +124,7 @@ module Factor
         pca=PCA.new(::Matrix.rows(work_matrix))
         @communalities=pca.communalities(m)
         @eigenvalues=pca.eigenvalues
-        com_sum=@communalities.inject(0) {|ac,v| ac+v}
+        com_sum = @communalities.inject(0) {|ac,v| ac+v}
         jump=true
         
         break if (com_sum-prev_sum).abs<@delta
@@ -131,6 +136,11 @@ module Factor
         
       end
       @component_matrix=pca.component_matrix(m)
+      @component_matrix.extend CovariateMatrix
+      @component_matrix.name=_("Factor Matrix")
+      @component_matrix.fields_x = @variables_names
+      @component_matrix.fields_y = m.times.map {|i| "factor_#{i+1}"}
+      
     end
     alias :compute :iterate 
     
@@ -182,18 +192,33 @@ module Factor
             t.row([@fields[i], sprintf("%0.4f", initial_communalities[i]), sprintf("%0.3f", com)])
           }
         end
-        s.table(:name=>_("Eigenvalues"), :header=>[_("Variable"),_("Value")]) do |t|
+        s.table(:name=>_("Total Variance"), :header=>[_("Factor"), _("I.E.Total"), _("I.E. %"), _("I.E.Cum. %"),
+        _("S.L.Total"), _("S.L. %"), _("S.L.Cum. %")
+          ]) do |t|
+        ac_eigen,ac_i_eigen=0,0
           @initial_eigenvalues.each_with_index {|eigenvalue,i|
-            t.row([@fields[i], sprintf("%0.3f",eigenvalue)])
+            ac_i_eigen+=eigenvalue
+            ac_eigen+=@eigenvalues[i]
+            new_row=[
+            _("Factor %d") % (i+1), 
+            sprintf("%0.3f",eigenvalue),
+            sprintf("%0.3f%%", eigenvalue*100.quo(@n_variables)),
+            sprintf("%0.3f",ac_i_eigen*100.quo(@n_variables))
+            ]
+            if i<@m
+              new_row.concat [
+                sprintf("%0.3f", @eigenvalues[i]),
+                sprintf("%0.3f%%", @eigenvalues[i]*100.quo(@n_variables)),
+                sprintf("%0.3f",ac_eigen*100.quo(@n_variables))              
+              ]
+            else
+              new_row.concat ["","",""]
+            end
+            
+            t.row new_row
           }
         end
-        s.table(:name=>_("Component Matrix"), :header=>["Variable"]+m.times.collect {|c| c+1}) do |t|
-          i=0
-          component_matrix(m).to_a.each do |row|
-            t.row([@fields[i]]+row.collect {|c| sprintf("%0.3f",c)})
-            i+=1
-          end
-        end
+        s.parse_element(component_matrix)
       end
     end
     
