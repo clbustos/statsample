@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
-
+require 'benchmark'
 require 'statsample'
 a=1000.times.collect {rand}.to_scale
 b=1000.times.collect {rand}.to_scale

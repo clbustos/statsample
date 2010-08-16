@@ -2,6 +2,8 @@ require(File.dirname(__FILE__)+'/helpers_tests.rb')
 
 
 class StatsampleMatrixTestCase < MiniTest::Unit::TestCase
+  
+  
   def test_covariate
     a=Matrix[[1.0, 0.3, 0.2], [0.3, 1.0, 0.5], [0.2, 0.5, 1.0]]
     a.extend Statsample::CovariateMatrix

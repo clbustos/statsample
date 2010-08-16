@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: statsample 0.13.1\n"
 "POT-Creation-Date: 2010-08-10 17:00-0400\n"
-"PO-Revision-Date: 2010-08-10 17:02-0300\n"
+"PO-Revision-Date: 2010-08-10 17:27-0300\n"
 "Last-Translator: Claudio Bustos <clbustos@gmail.com>\n"
 "Language-Team: Desarrollador\n"
 "MIME-Version: 1.0\n"
@@ -330,7 +330,6 @@ msgid "Principal Component Analysis"
 msgstr "Análisis de componentes principales"
 
 #: lib/statsample/factor/pca.rb:118
-#, fuzzy
 msgid "Component matrix"
 msgstr "Matriz de componentes"
 
@@ -391,7 +390,6 @@ msgid "Iterations: %d"
 msgstr "Iteraciones: %d"
 
 #: lib/statsample/factor/principalaxis.rb:195
-#, fuzzy
 msgid "Total Variance"
 msgstr "Varianza Total"
 
@@ -400,9 +398,8 @@ msgid "Factor"
 msgstr "Factor"
 
 #: lib/statsample/factor/principalaxis.rb:195
-#, fuzzy
 msgid "I.E.Total"
-msgstr "Total"
+msgstr "E.I. Total"
 
 #: lib/statsample/factor/principalaxis.rb:195
 msgid "I.E. %"
@@ -413,9 +410,8 @@ msgid "I.E.Cum. %"
 msgstr "E.I. Acum. %"
 
 #: lib/statsample/factor/principalaxis.rb:196
-#, fuzzy
 msgid "S.L.Total"
-msgstr "Total"
+msgstr "C.C. Total"
 
 #: lib/statsample/factor/principalaxis.rb:196
 msgid "S.L. %"
@@ -426,23 +422,20 @@ msgid "S.L.Cum. %"
 msgstr "C.C. Acum %"
 
 #: lib/statsample/factor/principalaxis.rb:203
-#, fuzzy
 msgid "Factor %d"
-msgstr "factores:%s"
+msgstr "Factor %d"
 
 #: lib/statsample/factor/rotation.rb:35
 msgid "%s rotation"
 msgstr "rotación %s"
 
 #: lib/statsample/factor/rotation.rb:125
-#, fuzzy
 msgid "Rotated Component matrix"
-msgstr "Matriz de componentes"
+msgstr "Matriz de componentes rotada"
 
 #: lib/statsample/factor/rotation.rb:142
-#, fuzzy
 msgid "Component transformation matrix"
-msgstr "Matriz de componentes"
+msgstr "Matriz de transformación de componentes"
 
 #: lib/statsample/reliability/multiscaleanalysis.rb:57
 msgid "Multiple Scale analysis"
@@ -469,9 +462,8 @@ msgid "Principal Axis for %s"
 msgstr "Ejes principales para %s"
 
 #: lib/statsample/reliability/multiscaleanalysis.rb:147
-#, fuzzy
 msgid "Parallel Analysis for %s"
-msgstr "Análisis Paralelo"
+msgstr "Análisis Paralelo para %s"
 
 #: lib/statsample/reliability/scaleanalysis.rb:177
 msgid "Summary for %s"

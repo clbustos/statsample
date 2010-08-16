@@ -1,6 +1,12 @@
 require(File.dirname(__FILE__)+'/helpers_tests.rb')
 
 class StatsampleFactorTestCase < MiniTest::Unit::TestCase
+  def test_parallelanalysis
+    pa=Statsample::Factor::ParallelAnalysis.with_random_data(305,8,100)
+    assert_in_delta(1.2454, pa.ds_eigenvalues['ev_00001'].mean, 0.01)
+    assert_in_delta(1.1542, pa.ds_eigenvalues['ev_00002'].mean, 0.01)
+    assert_in_delta(1.0836, pa.ds_eigenvalues['ev_00003'].mean, 0.01)
+  end
   # Tested with SPSS and R
   def test_pca
       a=[2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2.0, 1.0, 1.5, 1.1].to_scale
@@ -44,7 +50,7 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
   def test_principalaxis
       matrix=::Matrix[
       [1.0, 0.709501601093587, 0.877596585880047, 0.272219316266807],  [0.709501601093587, 1.0, 0.291633797330304, 0.871141831433844], [0.877596585880047, 0.291633797330304, 1.0, -0.213373722977167], [0.272219316266807, 0.871141831433844, -0.213373722977167, 1.0]]
-      fa=Statsample::Factor::PrincipalAxis.new(matrix,:m=>1)
+      fa=Statsample::Factor::PrincipalAxis.new(matrix,:m=>1, :max_iterations=>50)
       
       cm=::Matrix[[0.923],[0.912],[0.507],[0.483]]
       
@@ -56,12 +62,12 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
       }
       eigen1=2.175
       assert_in_delta(eigen1, fa.eigenvalues[0],0.001)
-
+      assert(fa.summary.size>0)
       fa=Statsample::Factor::PrincipalAxis.new(matrix,:smc=>false)
+            
       assert_raise RuntimeError do
         fa.iterate
       end
-      assert(fa.summary.size>0)
 
   end
 

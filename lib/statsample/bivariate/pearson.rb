@@ -13,7 +13,6 @@ module Statsample
     #   puts pearson.r
     #   puts pearson.t
     #   puts pearson.probability
-    # 
     #   puts pearson.summary
     # 
     class Pearson

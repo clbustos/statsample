@@ -33,21 +33,28 @@ module Factor
     attr_accessor :name
 
     # Number of factors. Set by default to the number of factors
-    # with eigen values > 1
+    # with eigenvalues > 1 (Kaiser criterion).
+    # 
+    # _Warning:_ Kaiser criterion overfactors! Give yourself some time
+    # and use Horn's Parallel Analysis.
+    #
     attr_accessor :m
-    
-    
     
     # Number of iterations required to converge
     attr_reader :iterations
+    
     # Initial eigenvalues 
     attr_reader :initial_eigenvalues
-    # Tolerance for iteratios.
+    
+    # Tolerance for iterations
     attr_accessor :epsilon
+    
     # Use SMC(squared multiple correlations) as diagonal. If false, use 1
     attr_accessor :smc
+    
     # Maximum number of iterations
     attr_accessor :max_iterations
+    
     # Eigenvalues of factor analysis
     attr_reader :eigenvalues
     

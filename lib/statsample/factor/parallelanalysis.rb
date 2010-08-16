@@ -2,8 +2,9 @@ module Statsample
   module Factor
     # Performs Horn's 'parallel analysis' to a principal components analysis
     # to adjust for sample bias in the retention of components. 
-    # Can create the bootstrap samples using parameters (mean and standard
-    # deviation of each variable) or sampling for actual data.
+    # Can create the bootstrap samples using random data, using number
+    # of cases and variables, parameters for actual data (mean and standard
+    # deviation of each variable) or bootstrap sampling for actual data.
     # == Description
     # "PA involves the construction of a number of correlation matrices of random variables based on the same sample size and number of variables in the real data set. The average eigenvalues from the random correlation matrices are then compared to the eigenvalues from the real data correlation matrix, such that the first observed eigenvalue is compared to the first random eigenvalue, the second observed eigenvalue is compared to the second random eigenvalue, and so on." (Hayton, Allen & Scarpello, 2004, p.194)
     # == Usage
@@ -12,9 +13,17 @@ module Statsample
     #
     # == References:
     # * Hayton, J., Allen, D. & Scarpello, V.(2004). Factor Retention Decisions in Exploratory Factor Analysis: a Tutorial on Parallel Analysis. <i>Organizational Research Methods, 7</i> (2), 191-205.
+    # * O'Connor, B. (2000). SPSS and SAS programs for determining the number of components using parallel analysis and Velicer’s MAP test. Behavior Research Methods, Instruments, & Computers, 32 (3), 396-402
     # * https://people.ok.ubc.ca/brioconn/nfactors/nfactors.html (for inspiration)
     class ParallelAnalysis
-      
+      def self.with_random_data(cases,vars,iterations=100,percentil=95)
+        require 'ostruct'
+        ds=OpenStruct.new
+        ds.fields=vars.times.map {|i| "v#{i+1}"}
+        ds.cases=cases
+        pa=new(ds,{:bootstrap_method=>:random, :no_data=>true, :iterations=>iterations,:percentil=>percentil})
+        
+      end
       include DirtyMemoize
       include Summarizable
       # Number of random sets to produce. 50 by default
@@ -23,10 +32,10 @@ module Statsample
       attr_accessor :name
       # Dataset. You could use mock vectors when use bootstrap method
       attr_reader :ds
-      # Bootstrap method. <tt>:raw_data</tt> used by default
-      # * <tt>:parameter</tt>: uses mean and standard deviation of each variable
+      # Bootstrap method. <tt>:random</tt> used by default
+      # * <tt>:random</tt>: uses number of variables and cases for the dataset
+      # * <tt>:parameter</tt>: uses number of variables and cases, uses mean and standard deviation of each variable
       # * <tt>:raw_data</tt> : sample with replacement from actual data. 
-      # 
       attr_accessor :bootstrap_method
       # Factor method.
       # Could be Statsample::Factor::PCA or Statsample::Factor::PrincipalAxis.
@@ -35,13 +44,17 @@ module Statsample
       # Percentil over bootstrap eigenvalue should be accepted. 95 by default
       attr_accessor :percentil
       # Correlation matrix used with :raw_data . <tt>:correlation_matrix</tt> used by default
-      attr_accessor :matrix_method 
+      attr_accessor :matrix_method
+      # Number of eigenvalues to calculate. Should be set for 
+      # Principal Axis Analysis.
+      attr_accessor :n_variables
       # Dataset with bootstrapped eigenvalues
       attr_reader :ds_eigenvalues
+      # Perform analysis without actual data. 
+      attr_accessor :no_data
       # Show extra information if true
       attr_accessor :debug
-      
-      
+
       def initialize(ds, opts=Hash.new)
         @ds=ds
         @fields=@ds.fields
@@ -49,11 +62,12 @@ module Statsample
         @n_cases=ds.cases
         opts_default={
           :name=>_("Parallel Analysis"),
-          :iterations=>50,
-          :bootstrap_method => :raw_data,
+          :iterations=>100,
+          :bootstrap_method => :random,
           :factor_class => Statsample::Factor::PCA,
           :percentil=>95, 
           :debug=>false,
+          :no_data=>false,
           :matrix_method=>:correlation_matrix
         }
         @opts=opts_default.merge(opts)
@@ -75,11 +89,20 @@ module Statsample
           s.text _("Number of variables: %d") % @n_variables
           s.text _("Number of cases: %d") % @n_cases
           s.text _("Number of iterations: %d") % @iterations
-          s.text _("Number or factors to preserve: %d") % number_of_factors
-          s.table(:name=>_("Eigenvalues"), :header=>[_("n"), _("data eigenvalue"), _("generated eigenvalue"),"p.#{percentil}",_("preserve?")]) do |t|
-            ds_eigenvalues.fields.each_with_index do |f,i|
-              v=ds_eigenvalues[f]
-              t.row [i+1, "%0.4f" % @original[i], "%0.4f" %  v.mean, "%0.4f" %  v.percentil(percentil), (v.percentil(percentil)>0 and @original[i] > v.percentil(percentil)) ? "Yes":""]
+          if @no_data
+            s.table(:name=>_("Eigenvalues"), :header=>[_("n"), _("generated eigenvalue"), "p.#{percentil}"]) do |t|
+              ds_eigenvalues.fields.each_with_index do |f,i|
+                v=ds_eigenvalues[f]
+                t.row [i+1, "%0.4f" %  v.mean, "%0.4f" %  v.percentil(percentil), ]
+              end
+            end
+          else
+            s.text _("Number or factors to preserve: %d") % number_of_factors 
+            s.table(:name=>_("Eigenvalues"), :header=>[_("n"), _("data eigenvalue"), _("generated eigenvalue"),"p.#{percentil}",_("preserve?")]) do |t|
+              ds_eigenvalues.fields.each_with_index do |f,i|
+                v=ds_eigenvalues[f]
+                t.row [i+1, "%0.4f" % @original[i], "%0.4f" %  v.mean, "%0.4f" %  v.percentil(percentil), (v.percentil(percentil)>0 and @original[i] > v.percentil(percentil)) ? "Yes":""]
+              end
             end
           end
           
@@ -87,26 +110,29 @@ module Statsample
       end
       # Perform calculation. Shouldn't be called directly for the user
       def compute
-        @original=factor_class.new(Statsample::Bivariate.correlation_matrix(@ds), :m=>@n_variables).eigenvalues.sort.reverse
+        @original=factor_class.new(Statsample::Bivariate.correlation_matrix(@ds), :m=>@n_variables).eigenvalues.sort.reverse unless no_data
+        
         @ds_eigenvalues=Statsample::Dataset.new((1..@n_variables).map{|v| "ev_%05d" % v})
         @ds_eigenvalues.fields.each {|f| @ds_eigenvalues[f].type=:scale}
+        if bootstrap_method==:parameter or bootstrap_method==:random
+          rng = GSL::Rng.alloc(GSL::Rng::MT19937, rand(32000))
+        end
         
         @iterations.times do |i|
           # Create a dataset of dummy values
           ds_bootstrap=Statsample::Dataset.new(@ds.fields)
-          if bootstrap_method==:parameter
-            rng = GSL::Rng.alloc()
-          end
           @fields.each do |f|
-    
             if bootstrap_method==:parameter
               sd=@ds[f].sd
               mean=@ds[f].mean
-              ds_bootstrap[f]=@n_cases.times.map {|c| rng.gaussian(sd)+mean}.to_scale
+              ds_bootstrap[f]=@n_cases.times.map {|c| rng.gaussian(sd) + mean }.to_scale
+            elsif bootstrap_method==:random
+              ds_bootstrap[f]=@n_cases.times.map {|c| rng.ugaussian()}.to_scale
             elsif bootstrap_method==:raw_data
               ds_bootstrap[f]=ds[f].sample_with_replacement(@n_cases).to_scale
             end
           end
+          #pp Statsample::Bivariate.correlation_matrix(ds_bootstrap)
           fa=factor_class.new(Statsample::Bivariate.send(matrix_method, ds_bootstrap), :m=>@n_variables)
           ev=fa.eigenvalues.sort.reverse
           @ds_eigenvalues.add_case_array(ev)

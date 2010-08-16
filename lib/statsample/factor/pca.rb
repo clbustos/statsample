@@ -45,7 +45,6 @@ module Factor
     # Type of rotation. By default, Statsample::Factor::Rotation::Varimax
     attr_accessor :rotation_type
 
-    
     def initialize(matrix, opts=Hash.new)
       @use_gsl=nil
       @name=_("Principal Component Analysis")
