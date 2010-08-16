@@ -5,6 +5,7 @@ README.txt
 Rakefile
 bin/statsample
 data/crime.txt
+data/hartman_23.matrix
 data/locale/es/LC_MESSAGES/statsample.mo
 data/repeated_fields.csv
 data/test_binomial.csv
@@ -27,6 +28,7 @@ examples/t_test.rb
 examples/tetrachoric.rb
 examples/u_test.rb
 examples/vector.rb
+examples/velicer_map_test.rb
 lib/distribution.rb
 lib/distribution/chisquare.rb
 lib/distribution/f.rb
@@ -51,6 +53,7 @@ lib/statsample/dataset.rb
 lib/statsample/dominanceanalysis.rb
 lib/statsample/dominanceanalysis/bootstrap.rb
 lib/statsample/factor.rb
+lib/statsample/factor/map.rb
 lib/statsample/factor/parallelanalysis.rb
 lib/statsample/factor/pca.rb
 lib/statsample/factor/principalaxis.rb
@@ -87,6 +90,7 @@ lib/statsample/resample.rb
 lib/statsample/rserve_extension.rb
 lib/statsample/srs.rb
 lib/statsample/test.rb
+lib/statsample/test/chisquare.rb
 lib/statsample/test/f.rb
 lib/statsample/test/levene.rb
 lib/statsample/test/t.rb

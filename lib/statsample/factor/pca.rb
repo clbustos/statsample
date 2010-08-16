@@ -146,12 +146,7 @@ module Factor
     end
   
     def calculate_eigenpairs_ruby
-      eigval, eigvec= @matrix.eigenvaluesJacobi, @matrix.cJacobiV
-      @eigenpairs={}
-      eigval.to_a.each_index {|i|
-        @eigenpairs[eigval[i]]=eigvec.column(i)
-      }
-      @eigenpairs=@eigenpairs.sort.reverse
+      @eigenpairs = @matrix.eigenpairs
     end
     def calculate_eigenpairs_gsl
       eigval, eigvec= GSL::Eigen.symmv(@matrix.to_gsl)

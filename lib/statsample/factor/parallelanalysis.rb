@@ -8,13 +8,16 @@ module Statsample
     # == Description
     # "PA involves the construction of a number of correlation matrices of random variables based on the same sample size and number of variables in the real data set. The average eigenvalues from the random correlation matrices are then compared to the eigenvalues from the real data correlation matrix, such that the first observed eigenvalue is compared to the first random eigenvalue, the second observed eigenvalue is compared to the second random eigenvalue, and so on." (Hayton, Allen & Scarpello, 2004, p.194)
     # == Usage
+    # *With real dataset*
     #   # ds should be any valid dataset
     #   pa=Statsample::Factor::ParallelAnalysis.new(ds, :iterations=>100, :bootstrap_method=>:raw_data)
     #
+    # *With number of cases and variables*
+    #   pa=Statsample::Factor::ParallelAnalysis.with_random_data(100,8)
+    # 
     # == References:
     # * Hayton, J., Allen, D. & Scarpello, V.(2004). Factor Retention Decisions in Exploratory Factor Analysis: a Tutorial on Parallel Analysis. <i>Organizational Research Methods, 7</i> (2), 191-205.
     # * O'Connor, B. (2000). SPSS and SAS programs for determining the number of components using parallel analysis and Velicer’s MAP test. Behavior Research Methods, Instruments, & Computers, 32 (3), 396-402
-    # * https://people.ok.ubc.ca/brioconn/nfactors/nfactors.html (for inspiration)
     class ParallelAnalysis
       def self.with_random_data(cases,vars,iterations=100,percentil=95)
         require 'ostruct'
@@ -22,7 +25,6 @@ module Statsample
         ds.fields=vars.times.map {|i| "v#{i+1}"}
         ds.cases=cases
         pa=new(ds,{:bootstrap_method=>:random, :no_data=>true, :iterations=>iterations,:percentil=>percentil})
-        
       end
       include DirtyMemoize
       include Summarizable
@@ -34,12 +36,14 @@ module Statsample
       attr_reader :ds
       # Bootstrap method. <tt>:random</tt> used by default
       # * <tt>:random</tt>: uses number of variables and cases for the dataset
+      # * <tt>:raw_data</tt> : sample with replacement from actual data.       
       # * <tt>:parameter</tt>: uses number of variables and cases, uses mean and standard deviation of each variable
-      # * <tt>:raw_data</tt> : sample with replacement from actual data. 
+
       attr_accessor :bootstrap_method
       # Factor method.
       # Could be Statsample::Factor::PCA or Statsample::Factor::PrincipalAxis.
       # PCA used by default.
+      # Remember to set n_variables when using Principal Axis Analysis.
       attr_accessor :factor_class
       # Percentil over bootstrap eigenvalue should be accepted. 95 by default
       attr_accessor :percentil

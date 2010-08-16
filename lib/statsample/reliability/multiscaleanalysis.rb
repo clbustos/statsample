@@ -54,6 +54,7 @@ module Statsample
       # 
       def initialize(opts=Hash.new, &block)
         @scales=Hash.new
+        @scales_keys=Array.new
         opts_default={  :name=>_("Multiple Scale analysis"),
                         :summary_correlation_matrix=>false,
                         :summary_pca=>false,
@@ -78,16 +79,18 @@ module Statsample
       # 
       # If second parameters is empty, returns the ScaleAnalysis
       # <tt>code</tt>.
-      def scale(code,ds=nil, opts=nil)
+      def scale(code, ds=nil, opts=nil)
         if ds.nil?
           @scales[code]
         else
           opts={:name=>_("Scale %s") % code} if opts.nil?
+          @scales_keys.push(code)
           @scales[code]=ScaleAnalysis.new(ds, opts)
         end
       end
       # Delete ScaleAnalysis named <tt>code</tt>
       def delete_scale(code)
+        @scales_keys.delete code
         @scales.delete code
       end
       # Retrieves a Principal Component Analysis (Factor::PCA)
@@ -103,7 +106,7 @@ module Statsample
         Statsample::Factor::PrincipalAxis.new(correlation_matrix, opts)
       end
       def dataset_from_scales
-        ds=Dataset.new(@scales.keys)
+        ds=Dataset.new(@scales_keys)
         @scales.each_pair do |code,scale|
           ds[code.to_s]=scale.ds.vector_sum
           ds[code.to_s].name=scale.name

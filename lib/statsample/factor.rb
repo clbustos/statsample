@@ -2,6 +2,8 @@ require 'statsample/factor/rotation'
 require 'statsample/factor/pca'
 require 'statsample/factor/principalaxis'
 require 'statsample/factor/parallelanalysis'
+require 'statsample/factor/map'
+
 module Statsample
   # Factor Analysis toolbox.
   # * Classes for Extraction of factors: 

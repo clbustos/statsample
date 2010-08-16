@@ -12,7 +12,7 @@ class StatsampleRserveExtensionTestCase < MiniTest::Unit::TestCase
     should "return a valid rexp for numeric vector" do
       a=100.times.map {|i| rand()>0.9 ? nil : i+rand() }.to_scale
       rexp=a.to_REXP
-      assert_instance_of(rexp, Rserve::REXP::Double)
+      assert(rexp.is_a? Rserve::REXP::Double)
       assert_equal(rexp.to_ruby,a.data_with_nils)
       @r.assign 'a',rexp
       assert_equal(a.data_with_nils, @r.eval('a').to_ruby)
@@ -23,7 +23,7 @@ class StatsampleRserveExtensionTestCase < MiniTest::Unit::TestCase
       c=100.times.map {|i| rand()>0.9 ? nil : i+rand() }.to_scale
       ds={'a'=>a,'b'=>b,'c'=>c}.to_dataset
       rexp=ds.to_REXP
-      assert_instance_of(rexp, Rserve::REXP::GenericVector)
+      assert(rexp.is_a? Rserve::REXP::GenericVector)
       ret=rexp.to_ruby
       assert_equal(a.data_with_nils, ret['a']) 
       @r.assign 'df', rexp
