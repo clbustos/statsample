@@ -1,5 +1,17 @@
 === 0.14.0 / 2010-08-16
-
+* Added Statsample::Factor::MAP, to execute Velicer's (1976) MAP to determine the number of factors to retain on EFA 
+* Bug fix on test suite on Ruby 1.8.7
+* Horn's Parallel Analysis operational and tested for pure random data
+* Fixed bug on Excel writer on Ruby1.9 (frozen string on header raises an error). 
+* Extra information on Factorial Analysis on summaries
+* Fixed bug on Factor::Rotation when used ::Matrix without field method. 
+* Added Vector#vector_percentil method
+* Summaries for PCA, Rotation, MultiScale and ScaleAnalysis created or improved. 
+* Factor::PCA could have rotation and parallel analysis on summary.
+* Cronbach's alpha from covariance matrix raise an error on size<2 
+* MultiScaleAnalysis could have Parallel Analysis on summary.
+* Added Chi Square test
+* Added new information on README.txt
 
 === 0.13.1 / 2010-07-03
 

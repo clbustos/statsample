@@ -14,7 +14,7 @@ Include:
 * Anova: generic and vector-based One-way ANOVA and Two-way ANOVA
 * Tests: F, T, Levene, U-Mannwhitney.
 * Regression: Simple, Multiple (OLS), Probit  and Logit
-* Factorial Analysis: Extraction (PCA and Principal Axis), Rotation (Varimax, Equimax, Quartimax) and Parallel Analysis, for estimation of number of factors.
+* Factorial Analysis: Extraction (PCA and Principal Axis), Rotation (Varimax, Equimax, Quartimax) and Parallel Analysis and Velicer's MAP test, for estimation of number of factors.
 * Reliability analysis for simple scale and a DSL to easily analyze multiple scales using factor analysis and correlations, if you want it.
 * Dominance Analysis, with multivariate dependent and bootstrap (Azen & Budescu)
 * Sample calculation related formulas
@@ -42,7 +42,9 @@ Include:
     * Statsample::Factor::Varimax
     * Statsample::Factor::Equimax
     * Statsample::Factor::Quartimax
-  * Statsample::Factor::ParallelAnalysis performs Horn's 'parallel analysis' to a principal components analysis to adjust for sample bias in the retention of components. 
+  * Classes for calculation of factors to retain
+    * Statsample::Factor::ParallelAnalysis performs Horn's 'parallel analysis' to a principal components analysis to adjust for sample bias in the retention of components.
+    * Statsample::Factor::MAP performs Velicer's Minimum Average Partial (MAP) test, which retain components as long as the variance in the correlation matrix represents systematic variance.
 * Dominance Analysis. Based on Budescu and Azen papers, dominance analysis is a method to analyze the relative importance of one predictor relative to another on multiple regression
   * Statsample::DominanceAnalysis class can report dominance analysis for a sample, using uni or multivariate dependent variables
   * Statsample::DominanceAnalysis::Bootstrap can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/]. 

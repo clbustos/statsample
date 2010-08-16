@@ -138,8 +138,6 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
          vectors["scale_#{s}"]=@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}).vector_sum 
         }
         ds2=vectors.to_dataset
-        puts Statsample::Bivariate.correlation_matrix(ds2).summary
-        puts @msa.correlation_matrix.summary
         assert_equal(Statsample::Bivariate.correlation_matrix(ds2), @msa.correlation_matrix)
       end
       should "delete scale using delete_scale" do
