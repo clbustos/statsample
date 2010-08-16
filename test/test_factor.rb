@@ -2,10 +2,13 @@ require(File.dirname(__FILE__)+'/helpers_tests.rb')
 
 class StatsampleFactorTestCase < MiniTest::Unit::TestCase
   def test_parallelanalysis
-    pa=Statsample::Factor::ParallelAnalysis.with_random_data(305,8,150)
+    pa=Statsample::Factor::ParallelAnalysis.with_random_data(305,8,100,95)
     assert_in_delta(1.2454, pa.ds_eigenvalues['ev_00001'].mean, 0.01)
     assert_in_delta(1.1542, pa.ds_eigenvalues['ev_00002'].mean, 0.01)
     assert_in_delta(1.0836, pa.ds_eigenvalues['ev_00003'].mean, 0.01)
+    assert(pa.summary.size>0)
+    #pa=Statsample::Factor::ParallelAnalysis.with_random_data(305,8,100, 95, true)
+    #puts pa.summary
   end
   def test_map
     fields=%w{height arm.span forearm lower.leg weight bitro.diameter chest.girth chest.width}
@@ -69,8 +72,10 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
   def test_principalaxis
       matrix=::Matrix[
       [1.0, 0.709501601093587, 0.877596585880047, 0.272219316266807],  [0.709501601093587, 1.0, 0.291633797330304, 0.871141831433844], [0.877596585880047, 0.291633797330304, 1.0, -0.213373722977167], [0.272219316266807, 0.871141831433844, -0.213373722977167, 1.0]]
-      fa=Statsample::Factor::PrincipalAxis.new(matrix,:m=>1, :max_iterations=>50)
       
+      
+      fa=Statsample::Factor::PrincipalAxis.new(matrix,:m=>1, :max_iterations=>50)
+
       cm=::Matrix[[0.923],[0.912],[0.507],[0.483]]
       
       _test_matrix(cm,fa.component_matrix)

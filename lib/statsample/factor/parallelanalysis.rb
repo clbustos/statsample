@@ -18,13 +18,15 @@ module Statsample
     # == References:
     # * Hayton, J., Allen, D. & Scarpello, V.(2004). Factor Retention Decisions in Exploratory Factor Analysis: a Tutorial on Parallel Analysis. <i>Organizational Research Methods, 7</i> (2), 191-205.
     # * O'Connor, B. (2000). SPSS and SAS programs for determining the number of components using parallel analysis and Velicer’s MAP test. Behavior Research Methods, Instruments, & Computers, 32 (3), 396-402
+    # * Liu, O., & Rijmen, F. (2008). A modified procedure for parallel analysis of ordered categorical data. Behavior Research Methods, 40(2), 556-562.
+
     class ParallelAnalysis
-      def self.with_random_data(cases,vars,iterations=100,percentil=95)
+      def self.with_random_data(cases,vars,iterations=100,percentil=95, smc=false)
         require 'ostruct'
         ds=OpenStruct.new
         ds.fields=vars.times.map {|i| "v#{i+1}"}
         ds.cases=cases
-        pa=new(ds,{:bootstrap_method=>:random, :no_data=>true, :iterations=>iterations,:percentil=>percentil})
+        pa=new(ds,{:bootstrap_method=>:random, :no_data=>true, :iterations=>iterations,:percentil=>percentil, :smc=>smc})
       end
       include DirtyMemoize
       include Summarizable
@@ -37,14 +39,14 @@ module Statsample
       # Bootstrap method. <tt>:random</tt> used by default
       # * <tt>:random</tt>: uses number of variables and cases for the dataset
       # * <tt>:raw_data</tt> : sample with replacement from actual data.       
-      # * <tt>:parameter</tt>: uses number of variables and cases, uses mean and standard deviation of each variable
 
       attr_accessor :bootstrap_method
-      # Factor method.
-      # Could be Statsample::Factor::PCA or Statsample::Factor::PrincipalAxis.
-      # PCA used by default.
-      # Remember to set n_variables when using Principal Axis Analysis.
-      attr_accessor :factor_class
+      # Uses smc on diagonal of matrixes, to perform simulation
+      # of a Principal Axis analysis.
+      # By default, false.
+
+      attr_accessor :smc
+
       # Percentil over bootstrap eigenvalue should be accepted. 95 by default
       attr_accessor :percentil
       # Correlation matrix used with :raw_data . <tt>:correlation_matrix</tt> used by default
@@ -66,9 +68,9 @@ module Statsample
         @n_cases=ds.cases
         opts_default={
           :name=>_("Parallel Analysis"),
-          :iterations=>100,
+          :iterations=>50, # See Liu and Rijmen (2008)
           :bootstrap_method => :random,
-          :factor_class => Statsample::Factor::PCA,
+          :smc=>false,
           :percentil=>95, 
           :debug=>false,
           :no_data=>false,
@@ -89,6 +91,7 @@ module Statsample
       def report_building(g) #:nodoc:
         g.section(:name=>@name) do |s|
           s.text _("Bootstrap Method: %s") % bootstrap_method
+          s.text _("Uses SMC: %s") % (smc ? _("Yes") : _("No"))
           s.text _("Correlation Matrix type : %s") % matrix_method
           s.text _("Number of variables: %d") % @n_variables
           s.text _("Number of cases: %d") % @n_cases
@@ -126,18 +129,21 @@ module Statsample
           # Create a dataset of dummy values
           ds_bootstrap=Statsample::Dataset.new(@ds.fields)
           @fields.each do |f|
-            if bootstrap_method==:parameter
-              sd=@ds[f].sd
-              mean=@ds[f].mean
-              ds_bootstrap[f]=@n_cases.times.map {|c| rng.gaussian(sd) + mean }.to_scale
-            elsif bootstrap_method==:random
+            if bootstrap_method==:random
               ds_bootstrap[f]=@n_cases.times.map {|c| rng.ugaussian()}.to_scale
             elsif bootstrap_method==:raw_data
               ds_bootstrap[f]=ds[f].sample_with_replacement(@n_cases).to_scale
             end
           end
-          #pp Statsample::Bivariate.correlation_matrix(ds_bootstrap)
-          fa=factor_class.new(Statsample::Bivariate.send(matrix_method, ds_bootstrap), :m=>@n_variables)
+          matrix=Statsample::Bivariate.send(matrix_method, ds_bootstrap)
+          if smc
+              smc_v=matrix.inverse.diagonal.map{|i| 1-(1.quo(i))}
+              smc_v.each_with_index do |v,i| 
+                matrix[i,i]=v
+              end
+          end
+          
+          fa=Statsample::Factor::PCA.new(matrix, :m=>@n_variables)
           ev=fa.eigenvalues.sort.reverse
           @ds_eigenvalues.add_case_array(ev)
           puts "iteration #{i}" if $DEBUG or debug
@@ -145,7 +151,7 @@ module Statsample
         @ds_eigenvalues.update_valid_data
       end
       dirty_memoize :number_of_factors, :ds_eigenvalues
-      dirty_writer :iterations, :bootstrap_method, :factor_class, :percentil
+      dirty_writer :iterations, :bootstrap_method, :percentil, :smc
     end
   end
 end

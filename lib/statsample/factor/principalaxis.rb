@@ -153,12 +153,17 @@ module Factor
     
     def initial_communalities
       if @initial_communalities.nil?
+        
         if @smc
+          # Based on O'Connors(2000)
+          @initial_communalities=@matrix.inverse.diagonal.map{|i| 1-(1.quo(i))}
+=begin
         @initial_communalities=@matrix.column_size.times.collect {|i|
           rxx , rxy = PrincipalAxis.separate_matrices(@matrix,i)
           matrix=(rxy.t*rxx.inverse*rxy)
           matrix[0,0]
         }
+=end
         else
           @initial_communalities=[1.0]*@matrix.column_size
         end
