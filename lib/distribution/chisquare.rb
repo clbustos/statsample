@@ -15,7 +15,7 @@ module Distribution
             # Returns the integral of Chi-squared distribution 
             # with k degrees of freedom over [0, x]
             # 
-            def cdf(x,k)
+            def cdf(x, k)
                 Statistics2.chi2dist(k.to_i,x)
             end
         end

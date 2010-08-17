@@ -7,6 +7,7 @@ module Statsample
     autoload(:T, 'statsample/test/t')
     autoload(:F, 'statsample/test/f')
     autoload(:ChiSquare, 'statsample/test/chisquare')
+    autoload(:BartlettSphericity, 'statsample/test/bartlettsphericity')
     
     # Returns probability of getting a value lower or higher
     # than sample, using cdf and number of tails.

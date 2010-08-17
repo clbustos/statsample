@@ -1,6 +1,23 @@
 require(File.dirname(__FILE__)+'/helpers_tests.rb')
 
 class StatsampleFactorTestCase < MiniTest::Unit::TestCase
+  def test_antiimage
+    cor=Matrix[[1,0.964, 0.312],[0.964,1,0.411],[0.312,0.411,1]]
+    expected=Matrix[[0.062,-0.057, 0.074],[-0.057, 0.057, -0.089], [0.074, -0.089, 0.729]]
+    ai=Statsample::Factor.anti_image_covariance_matrix(cor)
+    assert(Matrix.equal_in_delta?(expected, ai, 0.01), "#{expected.to_s} not equal to #{ai.to_s}")
+  end
+  def test_kmo
+      @v1=[1 ,2 ,3 ,4 ,7 ,8 ,9 ,10,14,15,20,50,60,70].to_scale
+      @v2=[5 ,6 ,11,12,13,16,17,18,19,20,30,0,0,0].to_scale
+      @v3=[10,3 ,20,30,40,50,80,10,20,30,40,2,3,4].to_scale
+      # KMO: 0.490
+      ds={'v1'=>@v1,'v2'=>@v2,'v3'=>@v3}.to_dataset
+      cor=Statsample::Bivariate.correlation_matrix(ds)
+
+     kmo=Statsample::Factor.kmo(cor)
+     assert_in_delta(0.667, kmo,0.001)
+  end
   def test_parallelanalysis
     pa=Statsample::Factor::ParallelAnalysis.with_random_data(305,8,100,95)
     assert_in_delta(1.2454, pa.ds_eigenvalues['ev_00001'].mean, 0.01)
