@@ -26,11 +26,16 @@ module Statsample
       s2=Matrix.diag(*(matrix.inverse.diagonal)).inverse
       aicm=(s2)*matrix.inverse*(s2)
       aicm.extend(Statsample::CovariateMatrix)
+      aicm.fields=matrix.fields if matrix.respond_to? :fields
+      aicm
     end
     def self.anti_image_correlation_matrix(matrix)
       s=Matrix.diag(*(matrix.inverse.diagonal)).sqrt.inverse
       aicm=s*matrix.inverse*s
       aicm.extend(Statsample::CovariateMatrix)
+      aicm.fields=matrix.fields if matrix.respond_to? :fields
+      aicm
+      
     end
       
     # Kaiser-Meyer-Olkin measure of sampling adequacy for correlation matrix.
@@ -62,7 +67,7 @@ module Statsample
       if var.is_a? String
         if matrix.respond_to? :fields
           j=matrix.fields.index(var)
-          raise "Matrix doesn't have field #{var}" if i.nil?
+          raise "Matrix doesn't have field #{var}" if j.nil?
         else
           raise "Matrix doesn't respond to fields"
         end

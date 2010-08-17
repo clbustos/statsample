@@ -1,6 +1,7 @@
 require(File.dirname(__FILE__)+'/helpers_tests.rb')
 
 class StatsampleFactorTestCase < MiniTest::Unit::TestCase
+  include Statsample::Fixtures
   def test_antiimage
     cor=Matrix[[1,0.964, 0.312],[0.964,1,0.411],[0.312,0.411,1]]
     expected=Matrix[[0.062,-0.057, 0.074],[-0.057, 0.057, -0.089], [0.074, -0.089, 0.729]]
@@ -16,10 +17,15 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
       cor=Statsample::Bivariate.correlation_matrix(ds)
      kmo=Statsample::Factor.kmo(cor)
      assert_in_delta(0.667, kmo,0.001)
-     p Statsample::Factor.kmo_univariate(cor,'v1')
-     p Statsample::Factor.kmo_univariate(cor,'v2')
-     p Statsample::Factor.kmo_univariate(cor,'v3')
+     assert_in_delta(0.81, Statsample::Factor.kmo(harman_817),0.01)
      
+  end
+  def test_kmo_univariate
+    m=harman_817
+    expected=[0.73,0.76,0.84,0.87,0.53,0.93,0.78,0.86]
+    m.row_size.times.map {|i|
+      assert_in_delta(expected[i], Statsample::Factor.kmo_univariate(m,i),0.01)
+    }
   end
   def test_parallelanalysis
     pa=Statsample::Factor::ParallelAnalysis.with_random_data(305,8,100,95)
