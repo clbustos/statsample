@@ -31,10 +31,9 @@ module Statsample
       s=Matrix.diag(*(matrix.inverse.diagonal)).sqrt.inverse
       aicm=s*matrix.inverse*s
       aicm.extend(Statsample::CovariateMatrix)
-
     end
       
-    # Kaiser-Meyer-Olkin measure of sampling adequacy
+    # Kaiser-Meyer-Olkin measure of sampling adequacy for correlation matrix.
     # 
     # Kaiser's (1974, cited on Dziuban  & Shirkey, 1974) present calibration of the index is as follows :
     # * .90s—marvelous
@@ -57,5 +56,33 @@ module Statsample
       end
       sum_r.quo(sum_r+sum_q)
     end
+    # Kaiser-Meyer-Olkin measure of sampling adequacy for one variable.
+    # 
+    def self.kmo_univariate(matrix, var)
+      if var.is_a? String
+        if matrix.respond_to? :fields
+          j=matrix.fields.index(var)
+          raise "Matrix doesn't have field #{var}" if i.nil?
+        else
+          raise "Matrix doesn't respond to fields"
+        end
+      else
+        j=var
+      end
+      
+      q=anti_image_correlation_matrix(matrix)
+      n=matrix.row_size
+      
+      sum_r,sum_q=0,0
+      
+      n.times do |k|
+        if j!=k
+          sum_r+=matrix[j,k]**2
+          sum_q+=q[j,k]**2
+        end
+      end
+      sum_r.quo(sum_r+sum_q)
+    end
+    
   end
 end

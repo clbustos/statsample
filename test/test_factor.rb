@@ -14,9 +14,12 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
       # KMO: 0.490
       ds={'v1'=>@v1,'v2'=>@v2,'v3'=>@v3}.to_dataset
       cor=Statsample::Bivariate.correlation_matrix(ds)
-
      kmo=Statsample::Factor.kmo(cor)
      assert_in_delta(0.667, kmo,0.001)
+     p Statsample::Factor.kmo_univariate(cor,'v1')
+     p Statsample::Factor.kmo_univariate(cor,'v2')
+     p Statsample::Factor.kmo_univariate(cor,'v3')
+     
   end
   def test_parallelanalysis
     pa=Statsample::Factor::ParallelAnalysis.with_random_data(305,8,100,95)
