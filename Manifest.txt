@@ -90,6 +90,7 @@ lib/statsample/resample.rb
 lib/statsample/rserve_extension.rb
 lib/statsample/srs.rb
 lib/statsample/test.rb
+lib/statsample/test/bartlettsphericity.rb
 lib/statsample/test/chisquare.rb
 lib/statsample/test/f.rb
 lib/statsample/test/levene.rb
@@ -100,11 +101,13 @@ po/es/statsample.mo
 po/es/statsample.po
 po/statsample.pot
 setup.rb
+test/fixtures/correlation_matrix.rb
 test/helpers_tests.rb
 test/test_anovaoneway.rb
 test/test_anovatwoway.rb
 test/test_anovatwowaywithdataset.rb
 test/test_anovawithvectors.rb
+test/test_bartlettsphericity.rb
 test/test_bivariate.rb
 test/test_codification.rb
 test/test_combination.rb
