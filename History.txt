@@ -1,3 +1,15 @@
+=== 0.14.1 / 2010-08-18
+
+* Added extra information on $DEBUG=true. 
+* Changed ParallelAnalysis: with_random_data parameters, bootstrap_method options are data and random, resolve bug related to number of factors to preserve, resolved bug related to original eigenvalues, can support failed bootstrap of data for Tetrachoric  correlation. 
+* Optimized eigenpairs on Matrix when GSL is available. 
+* Added test for parallel analysis using data bootstraping
+* Updated .pot and Manifest.txt
+* Added test for kmo(global and univariate), bartlett and anti-image. Kmo and Bartlett have test based on Dziuban and Shirkey with correct results
+* Complete set of test to test if a correlation matrix is appropriate for factor analysis: test of sphericity, KMO and anti-image (see Dziuban and Shirkey, 1974)
+* Updated Parallel Analysis to work on Principal Axis Analysis based on O'Connors formulae
+* Added reference for Statsample::Factor::MAP
+
 === 0.14.0 / 2010-08-16
 * Added Statsample::Factor::MAP, to execute Velicer's (1976) MAP to determine the number of factors to retain on EFA 
 * Bug fix on test suite on Ruby 1.8.7
