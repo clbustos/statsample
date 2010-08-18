@@ -124,6 +124,7 @@ module Factor
       prev_sum=prev_com.inject(0) {|ac,v| ac+v}
       @iterations=0
       t.times do |i|
+        "#{@name}: Iteration #{i}" if $DEBUG
         @iterations+=1
         prev_com.each_with_index{|v,it|
           work_matrix[it][it]=v
@@ -134,7 +135,7 @@ module Factor
         com_sum = @communalities.inject(0) {|ac,v| ac+v}
         jump=true
         
-        break if (com_sum-prev_sum).abs<@delta
+        break if (com_sum-prev_sum).abs < @delta
         @communalities.each_with_index do |v2,i2|
           raise "Variable #{i2} with communality > 1" if v2>1.0
         end

@@ -58,12 +58,13 @@ module Statsample
       end
       def compute
         eigen=@matrix.eigen
-        eigvect,@eigenvalues=eigen[:eigenvectors],eigen[:eigenvalues]
+        eigvect,@eigenvalues=eigen[:eigenvectors], eigen[:eigenvalues]
         loadings=eigvect*(Matrix.diag(*@eigenvalues).sqrt)
         fm=Array.new(@matrix.row_size)
         ncol=@matrix.column_size
         fm[0]=(@matrix.mssq - ncol).quo(ncol*(ncol-1))
         (ncol-1).times do |m|
+          puts "MAP:Eigenvalue #{m+1}" if $DEBUG
           a=loadings[0..(loadings.row_size-1),0..m]
           partcov= @matrix - (a*a.t)
           pc_prediag=partcov.row_size.times.map{|i|

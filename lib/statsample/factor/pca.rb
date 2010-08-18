@@ -146,15 +146,15 @@ module Factor
     end
   
     def calculate_eigenpairs_ruby
-      @eigenpairs = @matrix.eigenpairs
+      @eigenpairs = @matrix.eigenpairs_ruby
     end
     def calculate_eigenpairs_gsl
       eigval, eigvec= GSL::Eigen.symmv(@matrix.to_gsl)
-        @eigenpairs={}
-        eigval.each_index {|i|
-          @eigenpairs[eigval[i]]=eigvec.get_col(i)
-        }
-        @eigenpairs=@eigenpairs.sort.reverse
+      
+      ep=eigval.size.times.map {|i|
+        [eigval[i], eigvec.get_col(i)]
+      }
+      @eigenpairs=ep.sort{|a,b| a[0]<=>b[0]}.reverse
     end
     
     def report_building(builder) # :nodoc:

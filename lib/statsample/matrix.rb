@@ -5,7 +5,22 @@ class ::Matrix
   def to_matrix
     self
   end
+  alias :eigenpairs_ruby :eigenpairs 
   
+  if Statsample.has_gsl?
+    # Optimize eigenpairs of extendmatrix module using gsl
+    def eigenpairs
+      eigval, eigvec= GSL::Eigen.symmv(self.to_gsl)
+      ep=eigval.size.times.map {|i|
+        [eigval[i], eigvec.get_col(i)]
+      }
+      ep.sort{|a,b| a[0]<=>b[0]}.reverse
+    end
+  end
+  def eigenvalues
+    eigen[:eigenvalues]
+  end
+
   def to_gsl
     out=[]
     self.row_size.times{|i|

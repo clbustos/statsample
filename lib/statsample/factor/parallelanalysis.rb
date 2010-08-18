@@ -21,12 +21,13 @@ module Statsample
     # * Liu, O., & Rijmen, F. (2008). A modified procedure for parallel analysis of ordered categorical data. Behavior Research Methods, 40(2), 556-562.
 
     class ParallelAnalysis
-      def self.with_random_data(cases,vars,iterations=100,percentil=95, smc=false)
+      def self.with_random_data(cases,vars,opts=Hash.new)
         require 'ostruct'
         ds=OpenStruct.new
         ds.fields=vars.times.map {|i| "v#{i+1}"}
         ds.cases=cases
-        pa=new(ds,{:bootstrap_method=>:random, :no_data=>true, :iterations=>iterations,:percentil=>percentil, :smc=>smc})
+        opts=opts.merge({:bootstrap_method=> :random, :no_data=>true})
+        pa=new(ds, opts)
       end
       include DirtyMemoize
       include Summarizable
@@ -38,7 +39,7 @@ module Statsample
       attr_reader :ds
       # Bootstrap method. <tt>:random</tt> used by default
       # * <tt>:random</tt>: uses number of variables and cases for the dataset
-      # * <tt>:raw_data</tt> : sample with replacement from actual data.       
+      # * <tt>:data</tt> : sample with replacement from actual data.       
 
       attr_accessor :bootstrap_method
       # Uses smc on diagonal of matrixes, to perform simulation
@@ -84,7 +85,11 @@ module Statsample
       def number_of_factors
         total=0
         ds_eigenvalues.fields.each_with_index do |f,i|
-          total+=1 if (@original[i]>0 and @original[i]>ds_eigenvalues[f].percentil(percentil))
+          if (@original[i]>0 and @original[i]>ds_eigenvalues[f].percentil(percentil))
+            total+=1
+          else
+            break
+          end
         end
         total
       end
@@ -117,8 +122,8 @@ module Statsample
       end
       # Perform calculation. Shouldn't be called directly for the user
       def compute
-        @original=factor_class.new(Statsample::Bivariate.correlation_matrix(@ds), :m=>@n_variables).eigenvalues.sort.reverse unless no_data
         
+        @original=Statsample::Bivariate.send(matrix_method, @ds).eigenvalues unless no_data        
         @ds_eigenvalues=Statsample::Dataset.new((1..@n_variables).map{|v| "ev_%05d" % v})
         @ds_eigenvalues.fields.each {|f| @ds_eigenvalues[f].type=:scale}
         if bootstrap_method==:parameter or bootstrap_method==:random
@@ -126,27 +131,32 @@ module Statsample
         end
         
         @iterations.times do |i|
-          # Create a dataset of dummy values
-          ds_bootstrap=Statsample::Dataset.new(@ds.fields)
-          @fields.each do |f|
-            if bootstrap_method==:random
-              ds_bootstrap[f]=@n_cases.times.map {|c| rng.ugaussian()}.to_scale
-            elsif bootstrap_method==:raw_data
-              ds_bootstrap[f]=ds[f].sample_with_replacement(@n_cases).to_scale
-            end
-          end
-          matrix=Statsample::Bivariate.send(matrix_method, ds_bootstrap)
-          if smc
-              smc_v=matrix.inverse.diagonal.map{|i| 1-(1.quo(i))}
-              smc_v.each_with_index do |v,i| 
-                matrix[i,i]=v
+          begin
+            puts "#{@name}: Iteration #{i}" if $DEBUG or debug
+            # Create a dataset of dummy values
+            ds_bootstrap=Statsample::Dataset.new(@ds.fields)
+            @fields.each do |f|
+              if bootstrap_method==:random
+                ds_bootstrap[f]=@n_cases.times.map {|c| rng.ugaussian()}.to_scale
+              elsif bootstrap_method==:data
+                ds_bootstrap[f]=ds[f].sample_with_replacement(@n_cases).to_scale
+              else
+                raise "bootstrap_method doesn't recogniced"
               end
+            end
+            matrix=Statsample::Bivariate.send(matrix_method, ds_bootstrap)
+            if smc
+                smc_v=matrix.inverse.diagonal.map{|ii| 1-(1.quo(ii))}
+                smc_v.each_with_index do |v,ii| 
+                  matrix[ii,ii]=v
+                end
+            end
+            ev=matrix.eigenvalues
+            @ds_eigenvalues.add_case_array(ev)
+          rescue Tetrachoric::RequerimentNotMeet => e
+            puts "Error: #{e}" if $DEBUG
+            redo
           end
-          
-          fa=Statsample::Factor::PCA.new(matrix, :m=>@n_variables)
-          ev=fa.eigenvalues.sort.reverse
-          @ds_eigenvalues.add_case_array(ev)
-          puts "iteration #{i}" if $DEBUG or debug
         end
         @ds_eigenvalues.update_valid_data
       end
