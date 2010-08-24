@@ -120,5 +120,7 @@ module Statsample
     end # self
   end # Reliability
 end # Statsample
+
+require 'statsample/reliability/icc.rb'
 require 'statsample/reliability/scaleanalysis.rb'
 require 'statsample/reliability/multiscaleanalysis.rb'

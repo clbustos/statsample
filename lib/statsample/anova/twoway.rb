@@ -107,16 +107,10 @@ module Statsample
     
     # Two Way Anova with vectors
     # Example:
-    #   v1=[2,3,4,5,6].to_scale
-    #   v2=[3,3,4,5,6].to_scale
-    #   v3=[5,3,1,5,6].to_scale
-    #   anova=Statsample::Anova::OneWayWithVectors.new([v1,v2,v3])
-    #   anova.f
-    #   => 0.0243902439024391
-    #   anova.probability
-    #   => 0.975953044203438
-    #   anova.sst 
-    #   => 32.9333333333333
+    #   v1=[1,1,2,2].to_scale
+    #   v2=[1,2,1,2].to_scale
+    #   v3=[5,3,1,5].to_scale
+    #   anova=Statsample::Anova::TwoWayWithVectors.new(:a=>v1,:b=>v2, :dependent=>v3)
     #
     class TwoWayWithVectors < TwoWay
        # Show summary Levene test

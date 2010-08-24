@@ -407,7 +407,7 @@ module Statsample
     # if fields parameter is empty, return the mean for all fields
     # if max invalid parameter > 0, returns the mean for all tuples
     # with 0 to max_invalid invalid fields
-    def vector_mean(fields=nil,max_invalid=0)
+    def vector_mean(fields=nil, max_invalid=0)
       a=[]
       fields=check_fields(fields)
       size=fields.size

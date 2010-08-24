@@ -1,0 +1,95 @@
+require(File.dirname(__FILE__)+'/helpers_tests.rb')
+class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
+  context Statsample::Reliability::ICC do
+    setup do
+      a=[9,6,8,7,10,6].to_scale
+      b=[2,1,4,1,5,2].to_scale
+      c=[5,3,6,2,6,4].to_scale
+      d=[8,2,8,6,9,7].to_scale
+      @ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
+      @icc=Statsample::Reliability::ICC.new(@ds)
+    end
+    should "basic method be correct" do
+      assert_equal(6,@icc.n)
+      assert_equal(4,@icc.k)
+    end
+    should "total mean be correct" do
+      assert_in_delta(5.291, @icc.total_mean, 0.001)
+    end
+    should "df methods be correct" do
+      assert_equal(5,  @icc.df_bt)
+      assert_equal(18, @icc.df_wt)
+      assert_equal(3,  @icc.df_bj)
+      assert_equal(15, @icc.df_residual)
+    end
+    should "ms between targets be correct" do
+      assert_in_delta(11.24, @icc.ms_bt, 0.01)
+    end
+    should "ms within targets be correct" do
+      assert_in_delta(6.26,  @icc.ms_wt, 0.01)
+    end
+    should "ms between judges be correct" do 
+      assert_in_delta(32.49, @icc.ms_bj, 0.01)
+    end
+    should "ms residual be correct" do
+      assert_in_delta(1.02,  @icc.ms_residual, 0.01)
+    end
+    should "icc(1,1) method be correct" do
+      assert_in_delta(0.17, @icc.icc_1_1, 0.01)
+    end
+    should "icc(2,1) method be correct" do    
+      assert_in_delta(0.29, @icc.icc_2_1, 0.01)
+    end
+    should "icc(3,1) method be correct" do
+      assert_in_delta(0.71, @icc.icc_3_1, 0.01)
+    end
+    should "icc(1,k) method be correct" do
+      assert_in_delta(0.44, @icc.icc_1_k, 0.01)
+    end
+    should "icc(2,k) method be correct" do
+      assert_in_delta(0.62, @icc.icc_2_k, 0.01)
+    end
+    should "icc(3,k) method be correct" do
+      assert_in_delta(0.91, @icc.icc_3_k, 0.01)
+    end
+    
+    should "icc(1,1) F be correct" do
+      assert_in_delta(1.795, @icc.icc_1_f.f)
+    end
+    should "icc(1,1) confidence interval should be correct" do
+      assert_in_delta(-0.133, @icc.icc_1_1_ci[0], 0.001)
+      assert_in_delta(0.723, @icc.icc_1_1_ci[1], 0.001)
+    end
+    should "icc(1,k) confidence interval should be correct" do
+      assert_in_delta(-0.884, @icc.icc_1_k_ci[0], 0.001)
+      assert_in_delta(0.912, @icc.icc_1_k_ci[1], 0.001)
+    end
+    
+    should "icc(2,1) F be correct" do
+      assert_in_delta(11.027, @icc.icc_2_f.f)
+    end
+    should "icc(2,1) confidence interval should be correct" do
+      assert_in_delta(0.019, @icc.icc_2_1_ci[0], 0.001)
+      assert_in_delta(0.761, @icc.icc_2_1_ci[1], 0.001)
+    end
+    should "icc(2,k) confidence interval should be correct" do
+      assert_in_delta(0.039, @icc.icc_2_k_ci[0], 0.001)
+      assert_in_delta(0.929, @icc.icc_2_k_ci[1], 0.001)
+    end
+    
+    
+    should "icc(3,1) F be correct" do
+      assert_in_delta(11.027, @icc.icc_3_f.f)
+    end
+    should "icc(3,1) confidence interval should be correct" do
+      assert_in_delta(0.342, @icc.icc_3_1_ci[0], 0.001)
+      assert_in_delta(0.946, @icc.icc_3_1_ci[1], 0.001)
+    end
+    should "icc(3,k) confidence interval should be correct" do
+      assert_in_delta(0.676, @icc.icc_3_k_ci[0], 0.001)
+      assert_in_delta(0.986, @icc.icc_3_k_ci[1], 0.001)
+    end
+    
+    
+  end
+end

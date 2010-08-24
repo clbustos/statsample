@@ -361,7 +361,7 @@ module Statsample
               sum.push(nil)
           end
       }
-      Statsample::Vector.new(sum)
+      Statsample::Vector.new(sum, :scale  )
       else
       raise ArgumentError, "The array/vector parameter should be of the same size of the original vector"
       end
@@ -373,8 +373,7 @@ module Statsample
           else
             nil
           end
-        }
-      )
+        } , :scale)
     else
         raise TypeError,"You should pass a scalar or a array/vector"
     end
@@ -761,7 +760,7 @@ module Statsample
       m||=mean
       @scale_data.inject(0){|a,x| a+(x-m).square}
     end
-    
+    alias :ss :sum_of_squares
     # Sum of squared deviation
     def sum_of_squared_deviation
       check_type :scale

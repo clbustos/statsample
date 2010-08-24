@@ -92,7 +92,7 @@ module Statsample
                       :name_numerator=>_("Between Groups"),
                       :name_denominator=>_("Within Groups"),
                       :summary_descriptives=>false,
-                      :summary_levene=>false}
+                      :summary_levene=>true}
         @opts=opts_default.merge(opts).merge(:ss_num=>ssbg, :ss_den=>sswg, :df_num=>df_bg, :df_den=>df_wg)
         super(@opts)
       end
