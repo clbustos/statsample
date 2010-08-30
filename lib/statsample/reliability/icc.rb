@@ -30,15 +30,21 @@ module Statsample
       alias :jms :ms_bj
       alias :ems :ms_residual
       
+      alias :msr :ms_bt
+      alias :msw :ms_wt
+      alias :mse :ms_residual
+      
+      # :section: Shrout and Fleiss ICC denominations
       attr_reader :icc_1_1
       attr_reader :icc_2_1
       attr_reader :icc_3_1
-
       attr_reader :icc_1_k
       attr_reader :icc_2_k
       attr_reader :icc_3_k
-
-
+      
+      
+      
+      
       
       attr_reader :n, :k
       
@@ -74,11 +80,16 @@ module Statsample
         @ss_residual=@ss_wt-@ss_bj
         @ms_residual=@ss_residual.quo(@df_residual)
         
-        # Icc
-        
+
+        # ICC(1,1) or ICC(1)
         @icc_1_1=(bms-wms).quo(bms+(k-1)*wms)
+        # ICC(2,1) or ICC(A,1)
         @icc_2_1=(bms-ems).quo(bms+(k-1)*ems + k*(jms-ems).quo(n))
+        # ICC(3,1) or ICC(C,1) 
         @icc_3_1=(bms-ems).quo(bms+(k-1)*ems)
+        
+        
+        # ICC(C,1)
         
         @icc_1_k=(bms-wms).quo(bms)
         @icc_2_k=(bms-ems).quo(bms+(jms-ems).quo(n))
@@ -109,13 +120,26 @@ module Statsample
       def icc_2_f
         Statsample::Test::F.new(bms, ems, @df_bt, @df_residual)
       end
-      
+      # SPSS version
+      def icc_2_1_ci_spss(alpha=0.05)
+        per=1-(0.5*alpha)
+
+        a=(k*icc_2_1).quo(n*(1-icc_2_1))
+        b=1+(k*icc_2_1*(n-1).quo(n*(1-icc_2_1)))
+        v=((a*ms_bj+b*ms_residual)**2).quo((a*ms_bj)**2.quo(k-1)+(b*ms_residual)**2.quo((n-1)*(k-1)))
+        f1=Distribution::F.p_value(per, n-1,v)
+        f2=Distribution::F.p_value(per, v, n-1)
+ 
+        [n*(ms_bt-f1*ms_residual).quo(f1*(k*ms_bj+(k*n-k-n)*ms_residual)+(n*ms_bt)),
+        n*(ms_bt-f2*ms_residual).quo(f2*(k*ms_bj+(k*n-k-n)*ms_residual)+(n*ms_bt))]
+      end
+      # Paper version
       def icc_2_1_ci(alpha=0.05)
         fj=jms.quo(ems)
         pp=icc_2_1
         per=1-(0.5*alpha)
-        vn=(k-1)*(n-1)*(k*pp*fj+n*(1+(k-1)*pp)-k*pp)**2
-        vd=(n-1)*(k**2)*(pp**2)*(fj**2)+(n*(1+(k-1)*pp)-k*pp)**2
+        vn=(k-1)*(n-1)*((k*pp*fj+n*(1+(k-1)*pp)-k*pp)**2)
+        vd=(n-1)*(k**2)*(pp**2)*(fj**2)+((n*(1+(k-1)*pp)-k*pp)**2)
         v=vn.quo(vd)
         f1=Distribution::F.p_value(per, n-1,v)
         f2=Distribution::F.p_value(per, v, n-1)

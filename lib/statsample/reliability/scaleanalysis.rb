@@ -18,7 +18,9 @@ module Statsample
         @ds=ds.dup_only_valid
         @k=@ds.fields.size
         @total=@ds.vector_sum
-        @item_mean=@ds.vector_mean.mean
+        @vector_mean=@ds.vector_mean
+        @item_mean=@vector_mean.mean
+        @item_sd=@vector_mean.sd
         @mean=@total.mean
         @median=@total.median
         @skew=@total.skew
@@ -115,8 +117,11 @@ module Statsample
           }
         end
       end
+      # =Adjusted R.P.B. for each item
+      # Adjusted RPB(Point biserial-correlation) for each item
+      #
       def item_total_correlation
-        @ds.fields.inject({}) do |a,v|
+        @itc||=@ds.fields.inject({}) do |a,v|
           vector=@ds[v].clone
           ds2=@ds.clone
           ds2.delete_vector(v)
@@ -124,6 +129,9 @@ module Statsample
           a[v]=Statsample::Bivariate.pearson(vector,total)
           a
         end
+      end
+      def mean_rpb
+        item_total_correlation.values.to_scale.mean
       end
       def item_statistics
           @is||=@ds.fields.inject({}) do |a,v|
@@ -183,20 +191,24 @@ module Statsample
           t.row [_("Sum median"),   @median]
           t.hr
           t.row [_("Item mean"),    "%0.4f" % @item_mean]
+          t.row [_("Item sd"),    "%0.4f" % @item_sd]
+          t.hr
           t.row [_("Skewness"),     "%0.4f" % @skew]
           t.row [_("Kurtosis"),     "%0.4f" % @kurtosis]
           t.hr
           t.row [_("Cronbach's alpha"), "%0.4f" % @alpha]
           t.row [_("Standarized Cronbach's alpha"), "%0.4f" % @alpha_standarized]
+          t.row [_("Mean rpb"), "%0.4f" % mean_rpb]
+          
           t.row [_("Variances mean"),  "%g" % @variances_mean]
           t.row [_("Covariances mean") , "%g" % @covariances_mean]
           end
           s.text _("items for obtain alpha(0.8) : %d" % Statsample::Reliability::n_for_desired_alpha(0.8, @variances_mean,@covariances_mean))
-          s.text _("items for obtain alpha(0.9) : %d" % Statsample::Reliability::n_for_desired_alpha(0.9, @variances_mean,@covariances_mean))          
-          itc=item_total_correlation
+          s.text _("items for obtain alpha(0.9) : %d" % Statsample::Reliability::n_for_desired_alpha(0.9, @variances_mean, @covariances_mean))          
+          
           sid=stats_if_deleted
           is=item_statistics
-          
+          itc=item_total_correlation
           
           
           s.table(:name=>_("Items report for %s") % @name, :header=>["item","mean","sd", "mean if deleted", "var if deleted", "sd if deleted"," item-total correl.", "alpha if deleted"]) do |t|
