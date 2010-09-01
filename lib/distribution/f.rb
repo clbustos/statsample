@@ -8,7 +8,13 @@ module Distribution
       #
       #   Distribution::F.p_value(0.95,1,2)
       def p_value(pr,k1,k2)
-        Statistics2.pfdist(k1,k2, pr)
+        # Statistics2 has some troubles with extreme f values
+        if Distribution.has_gsl?
+          GSL::Cdf.fdist_Pinv(pr,k1,k2)
+        else
+          #puts "F:#{k1}, #{k2},#{pr}"
+          Statistics2.pfdist(k1,k2, pr)
+        end
       end
       # F cumulative distribution function (cdf).
       # 
