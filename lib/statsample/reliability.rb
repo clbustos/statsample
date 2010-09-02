@@ -21,6 +21,21 @@ module Statsample
         }.to_dataset
         cronbach_alpha(ds)
       end
+      # Predicted reliability of a test by replicating
+      # +n+ times the number of items 
+      def spearman_brown_prophecy(r,n)
+        (n*r).quo(1+(n-1)*r)
+      end
+      
+      alias :sbp :spearman_brown_prophecy
+      # Returns the number of items 
+      # to obtain +r_d+ desired reliability
+      # from +r+ current reliability, achieved with
+      # +n+ items
+      def n_for_desired_reliability(r,r_d,n=1)
+        (r_d*(1-r)).quo(r*(1-r_d))*n
+      end
+      
       # Get Cronbach alpha from <tt>n</tt> cases, 
       # <tt>s2</tt> mean variance and <tt>cov</tt>
       # mean covariance

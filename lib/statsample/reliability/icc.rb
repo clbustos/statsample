@@ -7,6 +7,8 @@ module Statsample
     # 
     # == Reference
     # * Shrout,P. & Fleiss, J. (1979). Intraclass Correlation: Uses in assessing rater reliability. Psychological Bulletin, 86(2), 420-428
+    # * McGraw, K. & Wong, S.P. (1996). Forming Inferences About Some Intraclass Correlation Coefficients. Psychological methods, 1(1), 30-46.
+
     class ICC
       include Summarizable
       
@@ -32,6 +34,7 @@ module Statsample
       
       alias :msr :ms_bt
       alias :msw :ms_wt
+      alias :msc :ms_bj
       alias :mse :ms_residual
       
       # :section: Shrout and Fleiss ICC denominations
@@ -41,6 +44,16 @@ module Statsample
       attr_reader :icc_1_k
       attr_reader :icc_2_k
       attr_reader :icc_3_k
+
+      # :section: McGraw and Wong ICC denominations
+      
+      attr_reader :icc_1
+      attr_reader :icc_c_1
+      attr_reader :icc_a_1
+      attr_reader :icc_k
+      attr_reader :icc_c_k
+      attr_reader :icc_a_k
+      
       
       
       
@@ -79,21 +92,29 @@ module Statsample
         
         @ss_residual=@ss_wt-@ss_bj
         @ms_residual=@ss_residual.quo(@df_residual)
+        ###
+        # Shrout and Fleiss denomination
+        ###
+        # ICC(1,1) / ICC(1)
+        @icc_1_1=(bms-wms).quo(bms+(k-1)*wms) 
+        # ICC(2,1) / ICC(A,1)
+        @icc_2_1=(bms-ems).quo(bms+(k-1)*ems+k*(jms - ems).quo(n))  
+        # ICC(3,1) / ICC(C,1)
+        @icc_3_1=(bms-ems).quo(bms+(k-1)*ems) 
         
-
-        # ICC(1,1) or ICC(1)
-        @icc_1_1=(bms-wms).quo(bms+(k-1)*wms)
-        # ICC(2,1) or ICC(A,1)
-        @icc_2_1=(bms-ems).quo(bms+(k-1)*ems + k*(jms-ems).quo(n))
-        # ICC(3,1) or ICC(C,1) 
-        @icc_3_1=(bms-ems).quo(bms+(k-1)*ems)
         
         
-        # ICC(C,1)
-        
-        @icc_1_k=(bms-wms).quo(bms)
+        # ICC(1,K) / ICC(K)
+        @icc_1_k=(bms-wms).quo(bms) 
+        # ICC(2,K) / ICC(A,k)
         @icc_2_k=(bms-ems).quo(bms+(jms-ems).quo(n))
-        @icc_3_k=(bms-ems).quo(bms)
+        # ICC(3,K) / ICC(C,k)
+        @icc_3_k=(bms-ems).quo(bms) 
+        
+        ###
+        # McGraw and Wong
+        ###
+        
       end
       # F test for ICC Case 1
       def icc_1_f
@@ -120,34 +141,47 @@ module Statsample
       def icc_2_f
         Statsample::Test::F.new(bms, ems, @df_bt, @df_residual)
       end
-      # SPSS version
-      def icc_2_1_ci_spss(alpha=0.05)
-        per=1-(0.5*alpha)
-
-        a=(k*icc_2_1).quo(n*(1-icc_2_1))
-        b=1+(k*icc_2_1*(n-1).quo(n*(1-icc_2_1)))
-        v=((a*ms_bj+b*ms_residual)**2).quo((a*ms_bj)**2.quo(k-1)+(b*ms_residual)**2.quo((n-1)*(k-1)))
-        f1=Distribution::F.p_value(per, n-1,v)
-        f2=Distribution::F.p_value(per, v, n-1)
- 
-        [n*(ms_bt-f1*ms_residual).quo(f1*(k*ms_bj+(k*n-k-n)*ms_residual)+(n*ms_bt)),
-        n*(ms_bt-f2*ms_residual).quo(f2*(k*ms_bj+(k*n-k-n)*ms_residual)+(n*ms_bt))]
-      end
-      # Paper version
-      def icc_2_1_ci(alpha=0.05)
+      #
+      # F* for ICC(2,1) and ICC(2,k)
+      # 
+      def icc_2_1_fs(pp,alpha=0.05)
         fj=jms.quo(ems)
-        pp=icc_2_1
         per=1-(0.5*alpha)
         vn=(k-1)*(n-1)*((k*pp*fj+n*(1+(k-1)*pp)-k*pp)**2)
         vd=(n-1)*(k**2)*(pp**2)*(fj**2)+((n*(1+(k-1)*pp)-k*pp)**2)
         v=vn.quo(vd)
         f1=Distribution::F.p_value(per, n-1,v)
         f2=Distribution::F.p_value(per, v, n-1)
-        [(n*(bms-f1*ems)).quo(f1*(k*jms+(k*n-k-n)*ems)+n*bms),
-         (n*(f2*bms-ems)).quo(k*jms+(k*n-k-n)*ems+n*f2*bms)]
+        [f1,f2]
+      end
+     
+      
+      def icc_2_1_ci(alpha=0.05)
+        icc_2_1_ci_mcgraw
+      end
+      
+      # Confidence interval ICC(A,1), McGawn
+      
+      def icc_2_1_ci_mcgraw(alpha=0.05)
+        fd,fu=icc_2_1_fs(icc_2_1,alpha)
+        cl=(n*(msr-fd*mse)).quo(fd*(k*msc+(k*n-k-n)*mse)+n*msr)
+        cu=(n*(fu*msr-mse)).quo(k*msc+(k*n-k-n)*mse+n*fu*msr)
+        [cl,cu]
+      end
+      
+      def icc_2_k_ci(alpha=0.05)
+        icc_2_k_ci_mcgraw(alpha)
+      end
+      
+      def icc_2_k_ci_mcgraw(alpha=0.05)
+        f1,f2=icc_2_1_fs(icc_2_k,alpha)
+        [
+        (n*(msr-f1*mse)).quo(f1*(msc-mse)+n*msr),
+        (n*(f2*msr-mse)).quo(msc-mse+n*f2*msr)
+        ]
         
       end
-      def icc_2_k_ci(alpha=0.05)
+      def icc_2_k_ci_shrout(alpha=0.05)
         ci=icc_2_1_ci(alpha)
         [(ci[0]*k).quo(1+(k-1)*ci[0]), (ci[1]*k).quo(1+(k-1)*ci[1])]
       end

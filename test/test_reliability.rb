@@ -1,6 +1,16 @@
 require(File.dirname(__FILE__)+'/helpers_tests.rb')
 class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
   context Statsample::Reliability do
+    should "return correct r according to Spearman-Brown prophecy" do
+      r=0.6849
+      n=62.quo(15)
+      assert_in_delta(0.9, Statsample::Reliability.sbp(r,n), 0.001)
+    end
+    should "return correct n for desired realiability" do
+        r=0.6849
+        r_d=0.9
+        assert_in_delta(62, Statsample::Reliability.n_for_desired_reliability(r, r_d, 15),0.5)
+      end
     context "Cronbach's alpha" do 
       setup do
         @samples=40
@@ -44,6 +54,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         #p n_obtained
         assert_in_delta(Statsample::Reliability.cronbach_alpha_from_n_s2_cov(n_obtained, vm,cm) ,@a,0.001) 
       end
+      
       should "standarized alpha will be equal to sum of matrix covariance less the individual variances on standarized values" do
         total_sum=@cme.total_sum
         ind_var=@dse.fields.inject(0) {|ac,v| ac+@dse[v].variance}

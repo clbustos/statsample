@@ -203,8 +203,8 @@ module Statsample
           t.row [_("Variances mean"),  "%g" % @variances_mean]
           t.row [_("Covariances mean") , "%g" % @covariances_mean]
           end
-          s.text _("items for obtain alpha(0.8) : %d" % Statsample::Reliability::n_for_desired_alpha(0.8, @variances_mean,@covariances_mean))
-          s.text _("items for obtain alpha(0.9) : %d" % Statsample::Reliability::n_for_desired_alpha(0.9, @variances_mean, @covariances_mean))          
+          s.text _("Items for obtain alpha(0.8) : %d" % Statsample::Reliability::n_for_desired_reliability(@alpha, 0.8, @ds.fields.size))
+          s.text _("Items for obtain alpha(0.9) : %d" % Statsample::Reliability::n_for_desired_reliability(@alpha, 0.9, @ds.fields.size))          
           
           sid=stats_if_deleted
           is=item_statistics
