@@ -1,12 +1,12 @@
 require(File.dirname(__FILE__)+'/helpers_tests.rb')
 
 class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
-  def test_sum_of_squares
+  should "method sum of squares should be correct" do
     v1=[1,2,3,4,5,6].to_vector(:scale)
     v2=[6,2,4,10,12,8].to_vector(:scale)
     assert_equal(23.0, Statsample::Bivariate.sum_of_squares(v1,v2))
   end
-  def test_covariance
+  should "return same covariance with ruby and gls implementation" do
     if Statsample.has_gsl?
       v1=20.times.collect {|a| rand()}.to_scale
       v2=20.times.collect {|a| rand()}.to_scale
@@ -17,7 +17,7 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
 
   end
 
-  def test_gsl_pearson
+  should "return same correlation with ruby and gls implementation" do
     if Statsample.has_gsl?
       v1=20.times.collect {|a| rand()}.to_scale
       v2=20.times.collect {|a| rand()}.to_scale
@@ -27,7 +27,7 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
       skip "Not tested gsl versus ruby correlation (needs GSL)"
     end
   end
-  def test_pearson
+  should "return correct pearson correlation" do
     v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
     v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
     assert_in_delta(0.525,Statsample::Bivariate.pearson(v1,v2), 0.001)
@@ -40,7 +40,7 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
     v3a,v4a=Statsample.only_valid v3, v4
     assert_in_delta(0.525, Statsample::Bivariate.pearson_slow(v3a,v4a),0.001)
   end
-  def test_bivariate_pearson
+  should "return correct values for t_pearson and prop_pearson" do
     v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
     v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
     r=Statsample::Bivariate::Pearson.new(v1,v2)
@@ -49,7 +49,7 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
     assert_in_delta(Statsample::Bivariate.prop_pearson(r.t,8,:both), r.probability, 0.001)
     assert(r.summary.size>0)
   end
-  def test_matrix_correlation
+  should "return correct correlation_matrix" do
     v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
     v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
     v3=[6,2,  1000,1000,5,4,7,8].to_vector(:scale)
@@ -69,7 +69,7 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
     end
     #assert_equal(expected,obt)
   end
-  def test_prop_pearson
+  should "return correct value for prop pearson" do
     assert_in_delta(0.42, Statsample::Bivariate.prop_pearson(Statsample::Bivariate.t_r(0.084,94), 94),0.01)
     assert_in_delta(0.65, Statsample::Bivariate.prop_pearson(Statsample::Bivariate.t_r(0.046,95), 95),0.01)
     r=0.9
@@ -87,13 +87,13 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
     assert(Statsample::Bivariate.prop_pearson(t,n,:left)<0.05)
   end
 
-  def test_spearman
+  should "return correct value for Spearman's rho" do
     v1=[86,97,99,100,101,103,106,110,112,113].to_vector(:scale)
     v2=[0,20,28,27,50,29,7,17,6,12].to_vector(:scale)
     assert_in_delta(-0.175758,Statsample::Bivariate.spearman(v1,v2),0.0001)
 
   end
-  def test_point_biserial
+  should "return correct value for point_biserial correlation" do
     c=[1,3,5,6,7,100,200,300,400,300].to_vector(:scale)
     d=[1,1,1,1,1,0,0,0,0,0].to_vector(:scale)
     assert_raises TypeError do
@@ -101,7 +101,7 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
     end
     assert_in_delta(Statsample::Bivariate.point_biserial(d,c), Statsample::Bivariate.pearson(d,c), 0.0001)
   end
-  def test_tau
+  should "return correct value for tau_a and tau_b" do
     v1=[1,2,3,4,5,6,7,8,9,10,11].to_vector(:ordinal)
     v2=[1,3,4,5,7,8,2,9,10,6,11].to_vector(:ordinal)
     assert_in_delta(0.6727,Statsample::Bivariate.tau_a(v1,v2),0.001)
@@ -110,7 +110,7 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
     v2=[11,4,4,2,0,0,0,0,0,0,4,0,4,0,0,0,0,4,0,0,0,0,0].to_vector(:ordinal)
     assert_in_delta(-0.376201540231705, Statsample::Bivariate.tau_b(Statsample::Crosstab.new(v1,v2).to_matrix),0.001)
   end
-  def test_gamma
+  should "return correct value for gamma correlation" do
     m=Matrix[[10,5,2],[10,15,20]]
     assert_in_delta(0.636,Statsample::Bivariate.gamma(m),0.001)
     m2=Matrix[[15,12,6,5],[12,8,10,8],[4,6,9,10]]

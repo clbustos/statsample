@@ -84,6 +84,7 @@ lib/statsample/regression/multiple/matrixengine.rb
 lib/statsample/regression/multiple/rubyengine.rb
 lib/statsample/regression/simple.rb
 lib/statsample/reliability.rb
+lib/statsample/reliability/icc.rb
 lib/statsample/reliability/multiscaleanalysis.rb
 lib/statsample/reliability/scaleanalysis.rb
 lib/statsample/resample.rb
@@ -128,6 +129,7 @@ test/test_multiset.rb
 test/test_permutation.rb
 test/test_regression.rb
 test/test_reliability.rb
+test/test_reliability_icc.rb
 test/test_resample.rb
 test/test_rserve_extension.rb
 test/test_srs.rb

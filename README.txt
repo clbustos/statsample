@@ -11,6 +11,7 @@ Include:
 * Descriptive statistics: frequencies, median, mean, standard error, skew, kurtosis (and many others).
 * Imports and exports datasets from and to Excel, CSV and plain text files.
 * Correlations: Pearson's r, Spearman's rank correlation (rho), point biserial, tau a, tau b and  gamma.  Tetrachoric and Polychoric correlation provides by +statsample-bivariate-extension+ gem.
+* Intra-class correlation
 * Anova: generic and vector-based One-way ANOVA and Two-way ANOVA
 * Tests: F, T, Levene, U-Mannwhitney.
 * Regression: Simple, Multiple (OLS), Probit  and Logit
@@ -57,10 +58,13 @@ Include:
   * Statsample::GGobi : Write Ggobi files
 * Module Statsample::Crosstab provides function to create crosstab for categorical data
 * Module Statsample::Reliability provides functions to analyze scales with psychometric methods. 
-  * Class ScaleAnalysis provides statistics like mean, standard deviation for a scale, Cronbach's alpha and standarized Cronbach's alpha, and for each item: mean, correlation with total scale, mean if deleted, Cronbach's alpha is deleted.
-  * Class MultiScaleAnalysis provides a DSL to easily analyze reliability of multiple scales and retrieve correlation matrix and factor analysis of them.
+  * Class Reliability::ScaleAnalysis provides statistics like mean, standard deviation for a scale, Cronbach's alpha and standarized Cronbach's alpha, and for each item: mean, correlation with total scale, mean if deleted, Cronbach's alpha is deleted.
+  * Class Reliability::MultiScaleAnalysis provides a DSL to easily analyze reliability of multiple scales and retrieve correlation matrix and factor analysis of them.
+  * Class Reliability::ICC provides intra-class correlation, using Shrout & Fleiss(1979) and McGraw & Wong (1996) formulas.
 * Module Statsample::SRS (Simple Random Sampling) provides a lot of functions to estimate standard error for several type of samples
 * Module Statsample::Test provides several methods and classes to perform inferencial statistics
+  * Statsample::Test::BartlettSphericity
+  * Statsample::Test::ChiSquare
   * Statsample::Test::Levene
   * Statsample::Test::UMannWhitney
   * Statsample::Test::T
@@ -70,6 +74,8 @@ Include:
 * Close integration with gem <tt>reportbuilder</tt>, to easily create reports on text, html and rtf formats.
 
 == Examples of use:
+
+See multiples examples of use on [http://github.com/clbustos/statsample/tree/master/examples/]
 
 === Correlation matrix
 
