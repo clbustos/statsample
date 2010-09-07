@@ -24,7 +24,11 @@ module Distribution
       #   Distribution::F.cdf(20,3,2)
       # 
       def cdf(x, k1, k2)
-        Statistics2.fdist(k1, k2,x)
+        if Distribution.has_gsl?
+          GSL::Cdf.fdist_P(x.to_f,k1,k2)
+        else
+          Statistics2.fdist(k1, k2,x)
+        end
       end
     end
   end

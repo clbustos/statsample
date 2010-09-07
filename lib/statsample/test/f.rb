@@ -41,7 +41,11 @@ module Statsample
         p_using_cdf(Distribution::F.cdf(f, @df_num, @df_den), tails)
       end
       def report_building(builder) #:nodoc:
-        builder.text "%s : F(%d, %d) = %0.4f , p = %0.4f" % [@name, @df_num, @df_den, f, probability]
+        if @df_num.is_a? Integer and @df_den.is_a? Integer
+          builder.text "%s : F(%d, %d) = %0.4f , p = %0.4f" % [@name, @df_num, @df_den, f, probability]
+        else
+          builder.text "%s : F(%0.2f, %0.2f) = %0.4f , p = %0.4f" % [@name, @df_num, @df_den, f, probability]
+        end
       end
     end
   end

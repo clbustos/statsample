@@ -1,3 +1,4 @@
+$reliability_icc=nil
 require(File.dirname(__FILE__)+'/helpers_tests.rb')
 class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
   context Statsample::Reliability::ICC do
@@ -109,30 +110,74 @@ class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
     begin
       require 'rserve'
       require 'statsample/rserve_extension'
-      context "McGraw and Wong calculation" do
+      context "McGraw and Wong" do
         setup do
-          size=100
-          a=size.times.map {rand(10)}.to_scale
-          b=a.recode{|i|i+rand(4)-2}
-          c=a.recode{|i|i+rand(4)-2}
-          d=a.recode{|i|i+rand(4)-2}
-          @ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
-          @icc=Statsample::Reliability::ICC.new(@ds)
-          @r=Rserve::Connection.new
-          @r.assign('ds',@ds)
-          @r.void_eval("library(irr);
-            iccs=list(
-            icc_1=icc(ds,'o','c','s'),
-            icc_k=icc(ds,'o','c','a'),
-            icc_c_1=icc(ds,'t','c','s'),
-            icc_c_k=icc(ds,'t','c','a'),
-            icc_a_1=icc(ds,'t','a','s'),
-            icc_a_k=icc(ds,'t','a','a'))
-            ")
-          @iccs=@r.eval('iccs').to_ruby
+          if($reliability_icc.nil?)
+            size=100
+            a=size.times.map {rand(10)}.to_scale
+            b=a.recode{|i|i+rand(4)-2}
+            c=a.recode{|i|i+rand(4)-2}
+            d=a.recode{|i|i+rand(4)-2}
+            @ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
+            
+            
+            
+            @icc=Statsample::Reliability::ICC.new(@ds)
+            @r=Rserve::Connection.new
+            @r.assign('ds',@ds)
+            @r.void_eval("library(irr);
+              iccs=list(
+              icc_1=icc(ds,'o','c','s'),
+              icc_k=icc(ds,'o','c','a'),
+              icc_c_1=icc(ds,'t','c','s'),
+              icc_c_k=icc(ds,'t','c','a'),
+              icc_a_1=icc(ds,'t','a','s'),
+              icc_a_k=icc(ds,'t','a','a'))
+              ")
+            @iccs=@r.eval('iccs').to_ruby
+            $reliability_icc={ :icc=>@icc, :iccs=>@iccs
+            }
+          end
+          @icc=$reliability_icc[:icc]
+          @iccs=$reliability_icc[:iccs]
+          
         end
-        should "should be correct" do
-          p @iccs
+        [:icc_1, :icc_k, :icc_c_1, :icc_c_k, :icc_a_1, :icc_a_k].each do |t|
+          context "ICC Type #{t}" do
+            should "value be correct" do
+              @icc.type=t
+              @r_icc=@iccs[t.to_s]
+              assert_in_delta(@r_icc['value'],@icc.r)
+            end
+            should "fvalue be correct" do
+              @icc.type=t
+              @r_icc=@iccs[t.to_s]
+              assert_in_delta(@r_icc['Fvalue'],@icc.f.f)
+            end
+            should "num df be correct" do
+              @icc.type=t
+              @r_icc=@iccs[t.to_s]
+              assert_in_delta(@r_icc['df1'],@icc.f.df_num)
+            end
+            should "den df be correct" do
+              @icc.type=t
+              @r_icc=@iccs[t.to_s]
+              assert_in_delta(@r_icc['df2'],@icc.f.df_den)
+            end
+
+            should "f probability be correct" do
+              @icc.type=t
+              @r_icc=@iccs[t.to_s]
+              assert_in_delta(@r_icc['p.value'],@icc.f.probability)
+            end
+            should "bounds be equal" do
+              @icc.type=t
+              @r_icc=@iccs[t.to_s]
+              assert_in_delta(@r_icc['lbound'],@icc.lbound)
+              assert_in_delta(@r_icc['ubound'],@icc.ubound)
+              
+            end
+          end
         end
       end
     rescue

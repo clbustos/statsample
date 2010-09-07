@@ -55,23 +55,132 @@ module Statsample
       attr_reader :icc_a_k
       
       
-      
-      
-      
-      
       attr_reader :n, :k
-      
       attr_reader :total_mean
+      # Type of analysis, for easy summarization
+      # By default, set to :icc_1
+      # * Shrout & Fleiss(1979) denominations
+      #   * :icc_1_1
+      #   * :icc_2_1
+      #   * :icc_3_1
+      #   * :icc_1_k
+      #   * :icc_2_k
+      #   * :icc_3_k
+      # * McGraw & Wong (1996) denominations
+      #   * :icc_1
+      #   * :icc_k
+      #   * :icc_c_1
+      #   * :icc_c_k
+      #   * :icc_a_1
+      #   * :icc_a_k
+
+      attr_reader :type
+      # ICC value, set with :type
+      attr_reader :r
+      attr_reader :f
+      attr_reader :lbound
+      attr_reader :ubound
+      
+      attr_accessor :g_rho
+      attr_accessor :alpha
+      attr_accessor :name
       def initialize(ds, opts=Hash.new)
         @ds=ds.dup_only_valid
         @vectors=@ds.vectors.values
         @n=@ds.cases
         @k=@ds.fields.size
-        opts_default={:name=>"Intra-class correlation"}
+        compute
+        @g_rho=0
+        @alpha=0.05
+        @icc_name=nil
+        opts_default={:name=>"Intra-class correlation", :type=>:icc_1}
         @opts=opts_default.merge(opts)
         @opts.each{|k,v| self.send("#{k}=",v) if self.respond_to? k }
-        compute
-        
+      end
+      def type=(v)
+        case v
+          when :icc_1_1
+            @icc_name=_("Shrout & Fleiss ICC(1,1)")
+            @r=@icc_1_1
+            @f=icc_1_f
+            @lbound, @ubound=icc_1_1_ci(@alpha)            
+          when :icc_2_1
+            @icc_name=_("Shrout & Fleiss ICC(2,1)")
+            @r=@icc_2_1
+            @f=icc_2_f
+            @lbound, @ubound=icc_2_1_ci(@alpha)            
+            
+          when :icc_3_1
+            @icc_name=_("Shrout & Fleiss ICC(3,1)")
+            
+            @r=@icc_3_1
+            @f=icc_3_f
+            @lbound, @ubound=icc_3_1_ci(@alpha)            
+
+          when :icc_1_k
+            @icc_name=_("Shrout & Fleiss ICC(1,k)")
+            
+            @r=@icc_1_k
+            @f=icc_1_k_f
+            @lbound, @ubound=icc_1_k_ci(@alpha)            
+          when :icc_2_k
+            @icc_name=_("Shrout & Fleiss ICC(2,k)")
+            
+            @r=@icc_2_k
+            @f=icc_2_k_f
+            @lbound, @ubound=icc_2_k_ci(@alpha)            
+            
+          when :icc_3_k
+            @icc_name=_("Shrout & Fleiss ICC(3,k)")
+            
+            @r=@icc_3_k
+            @f=icc_3_k_f
+            @lbound, @ubound=icc_3_k_ci(@alpha)            
+            
+            
+          when :icc_1
+            @icc_name=_("McGraw & Wong ICC(1)")
+            
+            @r=@icc_1_1
+            @f=icc_1_f(@g_rho)
+            @lbound, @ubound=icc_1_1_ci(@alpha)
+          when :icc_k
+            @icc_name=_("McGraw & Wong ICC(K)")
+            
+            @r=@icc_1_k
+            @f=icc_1_k_f(@g_rho)
+            @lbound, @ubound=icc_1_k_ci(@alpha)
+          when :icc_c_1
+            @icc_name=_("McGraw & Wong ICC(C,1)")
+            
+            @r=@icc_3_1
+            @f=icc_c_1_f(@g_rho)
+            @lbound, @ubound=icc_3_1_ci(@alpha)
+
+          when :icc_c_k
+            @icc_name=_("McGraw & Wong ICC(C,K)")
+            
+            @r=@icc_3_k
+            @f=icc_c_k_f(@g_rho)
+            @lbound, @ubound=icc_c_k_ci(@alpha)
+
+          when :icc_a_1
+            @icc_name=_("McGraw & Wong ICC(A,1)")
+            
+            @r=@icc_2_1
+            @f=icc_a_1_f(@g_rho)
+            @lbound,@ubound = icc_2_1_ci(@alpha)
+
+          when :icc_a_k
+            @icc_name=_("McGraw & Wong ICC(A,K)")
+            
+            @r=@icc_2_k
+            @f=icc_a_k_f(@g_rho)
+            @lbound,@ubound=icc_2_k_ci(@alpha)
+
+          else
+            raise "Type #{v} doesn't exists" 
+        end
       end
       def compute
         @df_bt=n-1
@@ -117,7 +226,7 @@ module Statsample
         
       end
       
-      def icc_1_f(rho=0)
+      def icc_1_f(rho=0.0)
         num=msr*(1-rho)
         den=msw*(1+(k-1)*rho)
         Statsample::Test::F.new(num, den, @df_bt, @df_wt)
@@ -135,18 +244,19 @@ module Statsample
         Statsample::Test::F.new(num, den, @df_bt, @df_residual)
       end
       def icc_c_k_f(rho=0)
-        num=msr*(1-rho)
-        den=msw
+        num=(1-rho)
+        den=1-@icc_3_k
         Statsample::Test::F.new(num, den, @df_bt, @df_residual)
       end
+      
       def v(a,b)
-        ((a*mcs+b*mse)**2).quo(((a*msc)**2.quo(k-1))+((b*mse)**2.quo((n-1) * (k-1))))
+        ((a*msc+b*mse)**2).quo(((a*msc)**2.quo(k-1))+((b*mse)**2.quo( (n-1) * (k-1))))
       end
       def a(rho)
         (k*rho).quo(n*(1-rho))
       end
       def b(rho)
-        1+(k*rho*(n-1)).quo(n*(1-rho))
+        1+((k*rho*(n-1)).quo(n*(1-rho)))
       end
       def c(rho)
         rho.quo(n*(1-rho))
@@ -154,16 +264,31 @@ module Statsample
       def d(rho)
         1+((rho*(n-1)).quo(n*(1-rho)))
       end
-      
+      private :v, :a, :b, :c, :d
       def icc_a_1_f(rho=0)
+        fj=jms.quo(ems)
         num=msr
-        den=a*msc+b*mse
-        Statsample::Test::F.new(num, den, @df_bt,v(a(rho),b(rho)))        
+        den=a(rho)*msc+b(rho)*mse
+        pp = @icc_2_1
+        vn=(k-1)*(n-1)*((k*pp*fj+n*(1+(k-1)*pp)-k*pp)**2)
+        vd=(n-1)*(k**2)*(pp**2)*(fj**2)+((n*(1+(k-1)*pp)-k*pp)**2)
+        v=vn.quo(vd)
+        Statsample::Test::F.new(num, den, @df_bt, v)        
       end
+      
       def icc_a_k_f(rho=0)
         num=msr
-        den=c*msc+d*mse
-        Statsample::Test::F.new(num, den, @df_bt,v(c(rho),d(rho)))        
+        den=c(rho)*msc+d(rho)*mse
+        
+        fj=jms.quo(ems)
+        
+        pp = @icc_2_k
+        vn=(k-1)*(n-1)*((k*pp*fj+n*(1+(k-1)*pp)-k*pp)**2)
+        vd=(n-1)*(k**2)*(pp**2)*(fj**2)+((n*(1+(k-1)*pp)-k*pp)**2)
+        v=vn.quo(vd)
+        
+        
+        Statsample::Test::F.new(num, den, @df_bt,v)        
 
       end
       
@@ -181,6 +306,7 @@ module Statsample
         
         [(fl-1).quo(fl+k-1), (fu-1).quo(fu+k-1)]
       end
+      
       # Intervale of confidence for ICC (1,k)
       def icc_1_k_ci(alpha=0.05)
         per=1-(0.5*alpha)
@@ -251,11 +377,27 @@ module Statsample
         fu=icc_3_f.f*Distribution::F.p_value(per, @df_residual, @df_bt)
         [(fl-1).quo(fl+k-1), (fu-1).quo(fu+k-1)]
       end
+      
       def icc_3_k_ci(alpha=0.05)
         per=1-(0.5*alpha)
         fl=icc_3_f.f.quo(Distribution::F.p_value(per, @df_bt, @df_residual))
         fu=icc_3_f.f*Distribution::F.p_value(per, @df_residual, @df_bt)
         [1-1.quo(fl),1-1.quo(fu)]
+      end
+      
+      def icc_c_k_ci(alpha=0.05)
+        per=1-(0.5*alpha)
+        fl=icc_c_k_f.f.quo(Distribution::F.p_value(per, @df_bt, @df_residual))
+        fu=icc_c_k_f.f*Distribution::F.p_value(per, @df_residual, @df_bt)
+        [1-1.quo(fl),1-1.quo(fu)]
+      end
+      def report_building(b)
+         b.section(:name=>name) do |s|
+           s.text @icc_name
+           s.text _("ICC: %0.4f") % @r
+           s.parse_element(@f)
+           s.text _("CI (%0.2f): [%0.4f - %0.4f]") % [(1-@alpha)*100, @lbound, @ubound]
+         end
       end
     end
   end

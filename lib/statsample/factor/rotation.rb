@@ -4,7 +4,7 @@ module Factor
   #
   # == Reference:
   # * SPSS Manual
-  # * Johnny Lin code for IDL: [http://www.johnny-lin.com/idl_code/varimax_k58.pro]
+  # * Lin, J. (2007). VARIMAX_K58 [Source code]. [http://www.johnny-lin.com/idl_code/varimax_k58.pro]
   # 
   # Use subclasses Varimax, Equimax or Quartimax for desired type of rotation
   #   Use:

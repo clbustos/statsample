@@ -1,7 +1,7 @@
 module Statsample
 	# Several methods to estimate parameters for simple random sampling
   # == Reference: 
-  # * Cochran(1972)
+  # * Cochran, W.(1972). Sampling Techniques [spanish edition].
   # * http://stattrek.com/Lesson6/SRS.aspx
   
 	module SRS
