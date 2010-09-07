@@ -16,6 +16,7 @@ examples/correlation_matrix.rb
 examples/dataset.rb
 examples/dominance_analysis.rb
 examples/dominance_analysis_bootstrap.rb
+examples/icc.rb
 examples/levene.rb
 examples/multiple_regression.rb
 examples/multivariate_correlation.rb
@@ -29,6 +30,7 @@ examples/tetrachoric.rb
 examples/u_test.rb
 examples/vector.rb
 examples/velicer_map_test.rb
+grab_references.rb
 lib/distribution.rb
 lib/distribution/chisquare.rb
 lib/distribution/f.rb
@@ -101,6 +103,7 @@ lib/statsample/vector.rb
 po/es/statsample.mo
 po/es/statsample.po
 po/statsample.pot
+references.txt
 setup.rb
 test/fixtures/correlation_matrix.rb
 test/helpers_tests.rb

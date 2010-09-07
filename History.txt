@@ -1,3 +1,12 @@
+=== 0.15.0 / 2010-09-07
+* Added class Statsample::Reliability::ICC for calculation of Intra-class correlation (Shrout & Fleiss, 1979; McGraw & Wong, 1996). Tested with SPSS and R values.
+* References: Updated and standarized references on many classes. Added grab_references.rb script, to create a list of references for library
+* Added Spearman-Brown prophecy on Reliability module
+* Distribution::F uses Gsl when available
+* Added mean r.p.b. and item sd on Scale Analysis
+* Corrected bug on Vector.ary_method and example of Anova Two Way using vector.  
+
+
 === 0.14.1 / 2010-08-18
 
 * Added extra information on $DEBUG=true. 
