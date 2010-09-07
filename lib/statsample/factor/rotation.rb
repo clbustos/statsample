@@ -2,7 +2,7 @@ module Statsample
 module Factor
   # Base class for component matrix rotation.
   #
-  # == References: 
+  # == Reference:
   # * SPSS Manual
   # * Johnny Lin code for IDL: [http://www.johnny-lin.com/idl_code/varimax_k58.pro]
   # 

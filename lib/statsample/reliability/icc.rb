@@ -108,7 +108,7 @@ module Statsample
         @icc_1_k=(bms-wms).quo(bms) 
         # ICC(2,K) / ICC(A,k)
         @icc_2_k=(bms-ems).quo(bms+(jms-ems).quo(n))
-        # ICC(3,K) / ICC(C,k)
+        # ICC(3,K) / ICC(C,k) = Cronbach's alpha
         @icc_3_k=(bms-ems).quo(bms) 
         
         ###
@@ -116,10 +116,62 @@ module Statsample
         ###
         
       end
-      # F test for ICC Case 1
-      def icc_1_f
+      
+      def icc_1_f(rho=0)
+        num=msr*(1-rho)
+        den=msw*(1+(k-1)*rho)
+        Statsample::Test::F.new(num, den, @df_bt, @df_wt)
+      end
+      # One way random F, type k
+      def icc_1_k_f(rho=0)
+        num=msr*(1-rho)
+        den=msw
+        Statsample::Test::F.new(num, den, @df_bt, @df_wt)
+      end
+      
+      def icc_c_1_f(rho=0)
+        num=msr*(1-rho)
+        den=mse*(1+(k-1)*rho)
+        Statsample::Test::F.new(num, den, @df_bt, @df_residual)
+      end
+      def icc_c_k_f(rho=0)
+        num=msr*(1-rho)
+        den=msw
+        Statsample::Test::F.new(num, den, @df_bt, @df_residual)
+      end
+      def v(a,b)
+        ((a*mcs+b*mse)**2).quo(((a*msc)**2.quo(k-1))+((b*mse)**2.quo((n-1) * (k-1))))
+      end
+      def a(rho)
+        (k*rho).quo(n*(1-rho))
+      end
+      def b(rho)
+        1+(k*rho*(n-1)).quo(n*(1-rho))
+      end
+      def c(rho)
+        rho.quo(n*(1-rho))
+      end
+      def d(rho)
+        1+((rho*(n-1)).quo(n*(1-rho)))
+      end
+      
+      def icc_a_1_f(rho=0)
+        num=msr
+        den=a*msc+b*mse
+        Statsample::Test::F.new(num, den, @df_bt,v(a(rho),b(rho)))        
+      end
+      def icc_a_k_f(rho=0)
+        num=msr
+        den=c*msc+d*mse
+        Statsample::Test::F.new(num, den, @df_bt,v(c(rho),d(rho)))        
+
+      end
+      
+      # F test for ICC Case 1. Shrout and Fleiss
+      def icc_1_f_shrout
         Statsample::Test::F.new(bms, wms, @df_bt, @df_wt)
       end
+
       # Intervale of confidence for ICC (1,1)
       def icc_1_1_ci(alpha=0.05)
         per=1-(0.5*alpha)
@@ -141,6 +193,8 @@ module Statsample
       def icc_2_f
         Statsample::Test::F.new(bms, ems, @df_bt, @df_residual)
       end
+      
+      
       #
       # F* for ICC(2,1) and ICC(2,k)
       # 

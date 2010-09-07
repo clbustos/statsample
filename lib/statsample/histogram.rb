@@ -34,8 +34,8 @@ module Statsample
   #  add an extra bin to your histogram. 
   #
   #
-  # Reference:
-  # http://www.gnu.org/software/gsl/manual/html_node/The-histogram-struct.html
+  # == Reference:
+  # * http://www.gnu.org/software/gsl/manual/html_node/The-histogram-struct.html
   
     class Histogram
       class << self

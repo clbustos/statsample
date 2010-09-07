@@ -32,7 +32,6 @@ module Statsample
     extend self
     # Calculate chi square for two Matrix
     class << self
-      
       def chi_square(observed, expected=nil)
         case observed
           when Vector
@@ -41,7 +40,7 @@ module Statsample
             ChiSquare::WithMatrix.new(observed,expected)
           else
             raise "Not implemented for #{observed.class}"
-          end
+        end
       end
       # Shorthand for Statsample::Test::UMannWhitney.new
       # 

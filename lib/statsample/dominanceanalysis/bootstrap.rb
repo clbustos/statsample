@@ -63,7 +63,6 @@ module Statsample
     #  ---------------------------------------
     #
     # == References:
-    #
     # * Azen, R. & Budescu, D.V. (2003). The dominance analysis approach for comparing predictors in multiple regression. <em>Psychological Methods, 8</em>(2), 129-148.
     class Bootstrap
       include Writable

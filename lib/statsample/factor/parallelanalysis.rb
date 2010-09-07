@@ -15,9 +15,9 @@ module Statsample
     # *With number of cases and variables*
     #   pa=Statsample::Factor::ParallelAnalysis.with_random_data(100,8)
     # 
-    # == References:
+    # == Reference:
     # * Hayton, J., Allen, D. & Scarpello, V.(2004). Factor Retention Decisions in Exploratory Factor Analysis: a Tutorial on Parallel Analysis. <i>Organizational Research Methods, 7</i> (2), 191-205.
-    # * O'Connor, B. (2000). SPSS and SAS programs for determining the number of components using parallel analysis and Velicer’s MAP test. Behavior Research Methods, Instruments, & Computers, 32 (3), 396-402
+    # * O'Connor, B. (2000). SPSS and SAS programs for determining the number of components using parallel analysis and Velicer's MAP test. Behavior Research Methods, Instruments, & Computers, 32(3), 396-402.
     # * Liu, O., & Rijmen, F. (2008). A modified procedure for parallel analysis of ordered categorical data. Behavior Research Methods, 40(2), 556-562.
 
     class ParallelAnalysis

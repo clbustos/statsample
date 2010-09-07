@@ -102,15 +102,17 @@ end
 # * Interfaces to gdchart, gnuplot and SVG::Graph 
 #
 module Statsample
-  begin
-    require 'rbgsl'
-    def self.has_gsl?
-      true
+  @@has_gsl=nil
+  def self.has_gsl?
+    if @@has_gsl.nil?
+      begin
+        require 'rbgsl'
+        @@has_gsl=true
+      rescue LoadError
+        @@has_gsl=false
+      end
     end
-  rescue LoadError
-    def self.has_gsl?
-      false
-    end
+    @@has_gsl
   end
   
   VERSION = '0.14.1'

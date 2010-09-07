@@ -24,7 +24,6 @@ module Factor
   #   => [0.962964636346122, 0.962964636346122]
   #
   # == References:
-  #
   # * SPSS manual
   # * Smith, L. (2002). A tutorial on Principal Component Analysis. Available on http://courses.eas.ualberta.ca/eas570/pca_tutorial.pdf 
   # 

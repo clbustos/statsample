@@ -25,7 +25,7 @@ module Statsample
       # Parameters:
       # * <tt>n1</tt>: group 1 size
       # * <tt>n2</tt>: group 2 size 
-      # Reference: 
+      # == Reference: 
       # * Dinneen, L., & Blakesley, B. (1973). Algorithm AS 62: A Generator for the Sampling Distribution of the Mann- Whitney U Statistic. <em>Journal of the Royal Statistical Society, 22</em>(2), 269-273
       # 
       def self.u_sampling_distribution_as62(n1,n2)
@@ -169,7 +169,7 @@ module Statsample
       end
       # Adjunt for ties.
       # 
-      # Reference: 
+      # == Reference: 
       # * http://europe.isixsigma.com/library/content/c080806a.asp
       def adjust_for_ties(data)
         @t=data.frequencies.find_all{|k,v| v>1}.inject(0) {|a,v|
@@ -182,7 +182,7 @@ module Statsample
       # Z value for U, with adjust for ties.
       # For large samples, U is approximately normally distributed. 
       # In that case, you can use z to obtain probabily for U.
-      # Reference: 
+      # == Reference: 
       # * SPSS Manual
       def z
         mu=(@n1*@n2).quo(2)

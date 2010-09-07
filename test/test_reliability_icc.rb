@@ -88,9 +88,9 @@ class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
         assert_in_delta(0.929, @icc.icc_2_k_ci[1], 0.001)
 
       end
-      should "Shrout icc(2,k) and McGraw icc(a,k) ci be equal" do
-        assert_in_delta(@icc.icc_2_k_ci_shrout[0], @icc.icc_2_k_ci_mcgraw[0], 10e-5)
-      end
+      #should "Shrout icc(2,k) and McGraw icc(a,k) ci be equal" do
+      #  assert_in_delta(@icc.icc_2_k_ci_shrout[0], @icc.icc_2_k_ci_mcgraw[0], 10e-5)
+      #end
       
       should "icc(3,1) F be correct" do
         assert_in_delta(11.027, @icc.icc_3_f.f)
@@ -104,6 +104,39 @@ class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
         assert_in_delta(0.676, @icc.icc_3_k_ci[0], 0.001)
         assert_in_delta(0.986, @icc.icc_3_k_ci[1], 0.001)
       end
+    end
+    
+    begin
+      require 'rserve'
+      require 'statsample/rserve_extension'
+      context "McGraw and Wong calculation" do
+        setup do
+          size=100
+          a=size.times.map {rand(10)}.to_scale
+          b=a.recode{|i|i+rand(4)-2}
+          c=a.recode{|i|i+rand(4)-2}
+          d=a.recode{|i|i+rand(4)-2}
+          @ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
+          @icc=Statsample::Reliability::ICC.new(@ds)
+          @r=Rserve::Connection.new
+          @r.assign('ds',@ds)
+          @r.void_eval("library(irr);
+            iccs=list(
+            icc_1=icc(ds,'o','c','s'),
+            icc_k=icc(ds,'o','c','a'),
+            icc_c_1=icc(ds,'t','c','s'),
+            icc_c_k=icc(ds,'t','c','a'),
+            icc_a_1=icc(ds,'t','a','s'),
+            icc_a_k=icc(ds,'t','a','a'))
+            ")
+          @iccs=@r.eval('iccs').to_ruby
+        end
+        should "should be correct" do
+          p @iccs
+        end
+      end
+    rescue
+      puts "requires rserve"
     end
     
   end

@@ -1,6 +1,11 @@
 module Statsample
 	# Several methods to estimate parameters for simple random sampling
+  # == Reference: 
+  # * Cochran(1972)
+  # * http://stattrek.com/Lesson6/SRS.aspx
+  
 	module SRS
+
 		class << self
       ########################
       #
@@ -71,7 +76,6 @@ module Statsample
       # Know proportion, sample without replacement.
       #
       # Sources: 
-      # * http://stattrek.com/Lesson6/SRS.aspx
       # * Cochran(1972)
       def proportion_sd_kp_wor(p, sam, pop)
           fpc(sam,pop)*Math::sqrt(p*(1-p).quo(sam))

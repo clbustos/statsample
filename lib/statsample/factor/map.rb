@@ -31,7 +31,7 @@ module Statsample
   # Current algorithm is loosely based on SPSS O'Connor algorithm
   # 
   # == Reference
-  # * O'Connor, B. (2000). SPSS and SAS programs for determining the number of components using parallel analysis and Velicer’s MAP test. Behavior Research Methods, Instruments, & Computers, 32(3), 396-402.
+  # * O'Connor, B. (2000). SPSS and SAS programs for determining the number of components using parallel analysis and Velicer's MAP test. Behavior Research Methods, Instruments, & Computers, 32(3), 396-402.
   #
 
 

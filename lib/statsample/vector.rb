@@ -760,7 +760,6 @@ module Statsample
       m||=mean
       @scale_data.inject(0){|a,x| a+(x-m).square}
     end
-    alias :ss :sum_of_squares
     # Sum of squared deviation
     def sum_of_squared_deviation
       check_type :scale

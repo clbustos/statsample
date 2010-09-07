@@ -50,7 +50,7 @@ module Statsample
   #  | b - c | 1.0   | 1.0         | 1.0     |
   #  -----------------------------------------
   #
-  # == References:
+  # == Reference:
   # * Budescu, D. V. (1993). Dominance analysis: a new approach to the problem of relative importance of predictors in multiple regression. <em>Psychological Bulletin, 114</em>, 542-551.
   # * Azen, R. & Budescu, D.V. (2003). The dominance analysis approach for comparing predictors in multiple regression. <em>Psychological Methods, 8</em>(2), 129-148.
   # * Azen, R. & Budescu, D.V. (2006). Comparing predictors in Multivariate Regression Models: An extension of Dominance Analysis. <em>Journal of Educational and Behavioral Statistics, 31</em>(2), 157-180.
