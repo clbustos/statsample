@@ -9,6 +9,9 @@ class StatsampleRserveExtensionTestCase < MiniTest::Unit::TestCase
     setup do
       @r=Rserve::Connection.new
     end
+    teardown do
+      @r.close
+    end
     should "return a valid rexp for numeric vector" do
       a=100.times.map {|i| rand()>0.9 ? nil : i+rand() }.to_scale
       rexp=a.to_REXP

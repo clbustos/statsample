@@ -15,14 +15,26 @@ module Statsample
       attr_reader :ds,:mean, :sd,:valid_n, :alpha , :alpha_standarized, :variances_mean, :covariances_mean, :cov_m
       attr_accessor :name
       def initialize(ds, opts=Hash.new)
-        @ds=ds.dup_only_valid
-        @k=@ds.fields.size
+        @dumped=ds.fields.find_all {|f|
+          ds[f].variance==0
+        }
+        
+        @ods=ds
+        @ds=ds.dup_only_valid(ds.fields - @dumped)
+        
+        
+        @k=@ds.fields.size        
         @total=@ds.vector_sum
+
+        @o_total=@dumped.size > 0 ? @ods.vector_sum : nil
+        
         @vector_mean=@ds.vector_mean
         @item_mean=@vector_mean.mean
         @item_sd=@vector_mean.sd
+        
         @mean=@total.mean
         @median=@total.median
+        
         @skew=@total.skew
         @kurtosis=@total.kurtosis
         @sd = @total.sd
@@ -37,8 +49,8 @@ module Statsample
         @variances_mean=@variances.mean
         @covariances_mean=(@variance-@variances.sum).quo(@k**2-@k)
         begin
-          @alpha = Statsample::Reliability.cronbach_alpha(ds)
-          @alpha_standarized = Statsample::Reliability.cronbach_alpha_standarized(ds)
+          @alpha = Statsample::Reliability.cronbach_alpha(@ds)
+          @alpha_standarized = Statsample::Reliability.cronbach_alpha_standarized(@ds)
         rescue => e
           raise DatasetException.new(@ds,e), "Error calculating alpha"
         end
@@ -62,7 +74,7 @@ module Statsample
         end
         total.each do |f,var|
           var.each do |tot,v|
-            out[f][tot]=out[f][tot].to_f / total[f][tot]
+            out[f][tot]=out[f][tot].quo(total[f][tot])
           end
         end
         out
@@ -164,7 +176,7 @@ module Statsample
         @sif||=stats_if_deleted_intern
       end
       def stats_if_deleted_intern # :nodoc:
-        
+        return Hash.new if @ds.fields.size==1
         @ds.fields.inject({}) do |a,v|
           cov_2=@cov_m.submatrix(@ds.fields-[v])
           #ds2=@ds.clone
@@ -182,12 +194,33 @@ module Statsample
       end
       def report_building(builder) #:nodoc:
         builder.section(:name=>@name) do |s|
+          
+          
+          if @dumped.size>0
+            s.section(:name=>"Items with variance=0") do |s1|
+              s.table(:name=>_("Summary for %s with all items") % @name) do |t|
+                t.row [_("Items"), @ods.fields.size]
+                t.row [_("Sum mean"),     "%0.4f" % @o_total.mean]
+                t.row [_("S.d. mean"),     "%0.4f" % @o_total.sd]
+
+              end
+            
+              s.table(:name=>_("Deleted items"), :header=>['item','mean']) do |t|
+                @dumped.each do |f|
+                  t.row(["#{@ods[f].name}(#{f})", "%0.5f" % @ods[f].mean])
+                end
+              end
+            end
+          end
+          
+          
           s.table(:name=>_("Summary for %s") % @name) do |t|
-          t.row [_("Items"), @ds.fields.size]
+            t.row [_("Valid Items"), @ds.fields.size]
+          
           t.row [_("Valid cases"), @valid_n]
           t.row [_("Sum mean"),     "%0.4f" % @mean]
           t.row [_("Sum sd"),       "%0.4f" % @sd  ]
-          t.row [_("Sum variance"), "%0.4f" % @variance]
+#          t.row [_("Sum variance"), "%0.4f" % @variance]
           t.row [_("Sum median"),   @median]
           t.hr
           t.row [_("Item mean"),    "%0.4f" % @item_mean]
@@ -196,26 +229,51 @@ module Statsample
           t.row [_("Skewness"),     "%0.4f" % @skew]
           t.row [_("Kurtosis"),     "%0.4f" % @kurtosis]
           t.hr
-          t.row [_("Cronbach's alpha"), "%0.4f" % @alpha]
-          t.row [_("Standarized Cronbach's alpha"), "%0.4f" % @alpha_standarized]
+          t.row [_("Cronbach's alpha"), @alpha ? ("%0.4f" % @alpha) : "--"]
+          t.row [_("Standarized Cronbach's alpha"), @alpha_standarized ? ("%0.4f" % @alpha_standarized) : "--" ]
           t.row [_("Mean rpb"), "%0.4f" % mean_rpb]
           
           t.row [_("Variances mean"),  "%g" % @variances_mean]
           t.row [_("Covariances mean") , "%g" % @covariances_mean]
           end
-          s.text _("Items for obtain alpha(0.8) : %d" % Statsample::Reliability::n_for_desired_reliability(@alpha, 0.8, @ds.fields.size))
-          s.text _("Items for obtain alpha(0.9) : %d" % Statsample::Reliability::n_for_desired_reliability(@alpha, 0.9, @ds.fields.size))          
+          
+          if (@alpha)
+            s.text _("Items for obtain alpha(0.8) : %d" % Statsample::Reliability::n_for_desired_reliability(@alpha, 0.8, @ds.fields.size))
+            s.text _("Items for obtain alpha(0.9) : %d" % Statsample::Reliability::n_for_desired_reliability(@alpha, 0.9, @ds.fields.size))          
+          end
+          
           
           sid=stats_if_deleted
           is=item_statistics
           itc=item_total_correlation
           
-          
           s.table(:name=>_("Items report for %s") % @name, :header=>["item","mean","sd", "mean if deleted", "var if deleted", "sd if deleted"," item-total correl.", "alpha if deleted"]) do |t|
             @ds.fields.each do |f|
-              t.row(["#{@ds[f].name}(#{f})", sprintf("%0.5f",is[f][:mean]), sprintf("%0.5f",is[f][:sds]), sprintf("%0.5f",sid[f][:mean]), sprintf("%0.5f",sid[f][:variance_sample]), sprintf("%0.5f",sid[f][:sds]),  sprintf("%0.5f",itc[f]), (sid[f][:alpha].nil?) ?  "--" : sprintf("%0.5f",sid[f][:alpha])])
+              row=["#{@ds[f].name}(#{f})"]
+              if is[f]
+                row+=[sprintf("%0.5f",is[f][:mean]), sprintf("%0.5f", is[f][:sds])]
+              else
+                row+=["-","-"]
+              end
+              if sid[f]
+                row+= [sprintf("%0.5f",sid[f][:mean]), sprintf("%0.5f",sid[f][:variance_sample]), sprintf("%0.5f",sid[f][:sds])]
+              else
+                row+=%w{- - -}
+              end
+              if itc[f]
+                row+= [sprintf("%0.5f",itc[f])]
+              else 
+                row+=['-']
+              end
+              if sid[f] and !sid[f][:alpha].nil?
+                row+=[sprintf("%0.5f",sid[f][:alpha])]
+              else
+                row+=["-"]
+              end
+              t.row row
             end # end each
           end # table
+          
         end # section
       end # def
     end # class

@@ -6,9 +6,11 @@ module Statsample
       def cronbach_alpha(ods)
         ds=ods.dup_only_valid
         n_items=ds.fields.size
+        return nil if n_items<=1
         s2_items=ds.vectors.inject(0) {|ac,v|
         ac+v[1].variance }
         total=ds.vector_sum
+        
         (n_items.quo(n_items-1)) * (1-(s2_items.quo(total.variance)))
       end
       # Calculate Chonbach's alpha for a given dataset
@@ -33,6 +35,7 @@ module Statsample
       # from +r+ current reliability, achieved with
       # +n+ items
       def n_for_desired_reliability(r,r_d,n=1)
+        return nil if r.nil?
         (r_d*(1-r)).quo(r*(1-r_d))*n
       end
       

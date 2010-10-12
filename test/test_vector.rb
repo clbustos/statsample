@@ -30,10 +30,10 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       @correct_b=@correct_b.to_scale
       
       @common=lambda  do |av,bv|
-        assert_equal(@correct_a,av)
-        assert_equal(@correct_b,bv)
-        assert(!av.has_missing_data?)
-        assert(!bv.has_missing_data?)        
+        assert_equal(@correct_a, av, "A no es esperado")
+        assert_equal(@correct_b, bv, "B no es esperado")
+        assert(!av.has_missing_data?, "A tiene datos faltantes")
+        assert(!bv.has_missing_data?, "b tiene datos faltantes")        
       end
     end
     should "return correct only_valid" do
@@ -284,6 +284,10 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     assert_equal(expected, vs)
     assert_equal(0,vs.mean)
     assert_equal(1,vs.sds)
+  end
+  def test_vector_standarized_with_zero_variance
+    v1=100.times.map {|i| 1}.to_scale
+    assert(v1.standarized.nil?)
   end
 
   def test_add

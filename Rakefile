@@ -22,6 +22,7 @@ end
 task :release do
 system %{git push origin master}
 end
+
 desc "Update pot/po files."
 task "gettext:updatepo" do
   require 'gettext/tools'
@@ -48,14 +49,14 @@ h=Hoe.spec('statsample') do
 ***************************************************
 Thanks for installing statsample.
 
-On *nix, you should install statsample-optimization
+On *nix, you could install statsample-optimization
 to retrieve gems gsl, statistics2 and a C extension
 to speed some methods.
 
   $ sudo gem install statsample-optimization
 
 On Ubuntu, install  build-essential and libgsl0-dev 
-using apt-get and  compile ruby 1.8 or 1.9 from 
+using apt-get. Compile ruby 1.8 or 1.9 from 
 source code first.
 
   $ sudo apt-get install build-essential libgsl0-dev
@@ -106,4 +107,5 @@ task :publicar_docs => [:clean, :docs] do
   }
   sh %{rsync #{h.rsync_args} #{local_dir}/ #{host}:#{remote_dir}}
 end
+
 # vim: syntax=Ruby

@@ -105,12 +105,14 @@ module Statsample
     private :check_type
 
     # Return a vector usign the standarized values for data
-    # with sd with denominator n-1
+    # with sd with denominator n-1. With variance=0, returns nil
+    # 
     
     def vector_standarized(use_population=false)
       check_type :scale
       m=mean
       sd=use_population ? sdp : sds
+      return nil if sd==0.0
       @data_with_nils.collect{|x|
         if !x.nil?
           (x.to_f - m).quo(sd)
@@ -119,6 +121,7 @@ module Statsample
         end
       }.to_vector(:scale)
     end
+    
     alias_method :standarized, :vector_standarized
     # Return a vector with values replaced with the percentiles
     # of each values
@@ -623,7 +626,7 @@ module Statsample
         s.table(:name=>_("Distribution")) do |t|
           frequencies.sort.each do |k,v|
             key=labels.has_key?(k) ? labels[k]:k
-            t.row [key,v, ("%0.2f%%" % (v.quo(n_valid)*100))]
+            t.row [key, v , ("%0.2f%%" % (v.quo(n_valid)*100))]
           end
         end
         s.text _("median: %s") % median.to_s if(@type==:ordinal)

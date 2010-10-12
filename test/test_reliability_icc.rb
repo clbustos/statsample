@@ -105,12 +105,20 @@ class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
         assert_in_delta(0.676, @icc.icc_3_k_ci[0], 0.001)
         assert_in_delta(0.986, @icc.icc_3_k_ci[1], 0.001)
       end
+      should "incorrect type raises an error" do
+        assert_raise(::RuntimeError) do 
+          @icc.type=:nonexistant_type
+        end
+      end
     end
     
     begin
       require 'rserve'
       require 'statsample/rserve_extension'
       context "McGraw and Wong" do
+        teardown do
+          @r=$reliability_icc[:r].close
+        end
         setup do
           if($reliability_icc.nil?)
             size=100
@@ -135,15 +143,17 @@ class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
               icc_a_k=icc(ds,'t','a','a'))
               ")
             @iccs=@r.eval('iccs').to_ruby
-            $reliability_icc={ :icc=>@icc, :iccs=>@iccs
+            $reliability_icc={ :icc=>@icc, :iccs=>@iccs, :r=>@r
             }
+            
           end
           @icc=$reliability_icc[:icc]
           @iccs=$reliability_icc[:iccs]
-          
+          @r=$reliability_icc[:r]
+
         end
         [:icc_1, :icc_k, :icc_c_1, :icc_c_k, :icc_a_1, :icc_a_k].each do |t|
-          context "ICC Type #{t}" do
+          context "ICC Type #{t} " do
             should "value be correct" do
               @icc.type=t
               @r_icc=@iccs[t.to_s]
@@ -174,8 +184,10 @@ class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
               @icc.type=t
               @r_icc=@iccs[t.to_s]
               assert_in_delta(@r_icc['lbound'],@icc.lbound)
-              assert_in_delta(@r_icc['ubound'],@icc.ubound)
-              
+              assert_in_delta(@r_icc['ubound'],@icc.ubound)  
+            end
+            should "summary generated" do
+              assert(@icc.summary.size>0)
             end
           end
         end

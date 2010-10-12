@@ -86,8 +86,8 @@ module Statsample
           end
         }
 =end
-raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all {|c| c.nil?}.size>0
-        fields=row.to_a.collect{|c| c.downcase}
+        raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all {|c| c.nil?}.size>0
+        fields=row.to_a.collect{|c| c.to_s.downcase}
         fields.recode_repeated
       end
                                          
@@ -220,6 +220,9 @@ raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all
         end
         convert_to_scale_and_date(ds, fields)
         ds.update_valid_data
+        fields.each {|f|
+          ds[f].name=f
+        }
         ds
       end
     end

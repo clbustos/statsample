@@ -64,7 +64,7 @@ module Statsample
     # Ordered ids of vectors
     attr_reader :fields
     # Name of dataset
-    attr_accessor:name
+    attr_accessor :name
     # Number of cases
     attr_reader :cases
     # Location of pointer on enumerations methods (like #each)
@@ -157,24 +157,26 @@ module Statsample
 
     # Creates a copy of the given dataset, deleting all the cases with
     # missing data on one of the vectors
-    def dup_only_valid
-      if @vectors.any?{|field,vector| vector.has_missing_data?}
-        ds=dup_empty
-        each_array { |c|
-          ds.add_case_array(c) unless @fields.find{|f| @vectors[f].data_with_nils[@i].nil? }
+    def dup_only_valid(*fields_to_include)
+      if fields_to_include.size==1 and fields_to_include[0].is_a? Array
+        fields_to_include=fields_to_include[0]
+      end
+      fields_to_include=@fields if fields_to_include.size==0
+      if fields_to_include.any? {|f| @vectors[f].has_missing_data?}
+        ds=Dataset.new(fields_to_include)
+        fields_to_include.each {|f| ds[f].type=@vectors[f].type}
+        each {|row|
+          unless fields_to_include.any? {|f| @vectors[f].has_missing_data? and !@vectors[f].is_valid? row[f]}
+            row_2=fields_to_include.inject({}) {|ac,v| ac[v]=row[v]; ac}
+            ds.add_case(row_2)
+          end
         }
-        ds.update_valid_data
       else
-        ds=dup()
+        ds=dup fields_to_include
       end
       ds
     end
-    # Returns an array with the fields from first argumen to last argument
-    def from_to(from,to)
-      raise ArgumentError, "Field #{from} should be on dataset" if !@fields.include? from
-      raise ArgumentError, "Field #{to} should be on dataset" if !@fields.include? to
-      @fields.slice(@fields.index(from)..@fields.index(to))
-    end
+    
     # Returns a duplicate of the Database
     # If fields given, only include those vectors.
     # Every vector will be dup.
@@ -192,6 +194,15 @@ module Statsample
       }
       Dataset.new(vectors,fields)
     end
+    
+    
+    # Returns an array with the fields from first argumen to last argument
+    def from_to(from,to)
+      raise ArgumentError, "Field #{from} should be on dataset" if !@fields.include? from
+      raise ArgumentError, "Field #{to} should be on dataset" if !@fields.include? to
+      @fields.slice(@fields.index(from)..@fields.index(to))
+    end
+    
     # Returns (when possible) a cheap copy of dataset.
     # If no vector have missing values, returns original vectors.
     # If missing values presents, uses Dataset.dup_only_valid
@@ -337,9 +348,16 @@ module Statsample
       check_length
     end
     # Delete vector named <tt>name</tt>.
-    def delete_vector(name)
-      @fields.delete(name)
-      @vectors.delete(name)
+    def delete_vector(*args)
+      if args.size==1 and args[0].is_a? Array
+        names=args[0]
+      else
+        names=args
+      end
+      names.each do |name|
+        @fields.delete(name)
+        @vectors.delete(name)
+      end
     end
     
     def add_vectors_by_split_recode(name_,join='-',sep=Statsample::SPLIT_TOKEN)
@@ -640,16 +658,18 @@ module Statsample
     def to_multiset_by_split_one_field(field)
       raise ArgumentError,"Should use a correct field name" if !@fields.include? field
       factors=@vectors[field].factors
-      ms=Multiset.new_empty_vectors(@fields,factors)
+      ms=Multiset.new_empty_vectors(@fields, factors)
       each {|c|
         ms[c[field]].add_case(c,false)
       }
       #puts "Ingreso a los dataset"
       ms.datasets.each {|k,ds|
         ds.update_valid_data
+        ds.name=@vectors[field].labeling(k)
         ds.vectors.each{|k1,v1|
           #        puts "Vector #{k1}:"+v1.to_s
           v1.type=@vectors[k1].type
+          v1.name=@vectors[k1].name
         }
       }
       ms
@@ -675,7 +695,10 @@ module Statsample
       
       ms.datasets.each do |k,ds|
         ds.update_valid_data
-        ds.vectors.each{|k1,v1| v1.type=@vectors[k1].type }
+        ds.vectors.each{|k1,v1| 
+          v1.type=@vectors[k1].type
+          v1.name=@vectors[k1].name
+        }
       end
       ms
       
