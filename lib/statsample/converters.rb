@@ -76,18 +76,15 @@ module Statsample
   class SpreadsheetBase
     class << self
       def extract_fields(row)
-=begin
-        fields=[]
-        row.to_a.collect {|c|
+        i=0;
+        fields=row.to_a.collect{|c|
           if c.nil?
-            break
+            i+=1
+            "var%05d" % i 
           else
-            fields.push(c)
-          end
+            c.to_s.downcase
+          end        
         }
-=end
-        raise "Should'nt be empty headers: [#{row.to_a.join(",")}]" if row.to_a.find_all {|c| c.nil?}.size>0
-        fields=row.to_a.collect{|c| c.to_s.downcase}
         fields.recode_repeated
       end
                                          
@@ -132,6 +129,9 @@ module Statsample
           end
           convert_to_scale_and_date(ds,fields)
           ds.update_valid_data
+          fields.each {|f|
+            ds[f].name=f
+          }
           ds
         end
       end

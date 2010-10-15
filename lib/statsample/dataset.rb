@@ -157,6 +157,7 @@ module Statsample
 
     # Creates a copy of the given dataset, deleting all the cases with
     # missing data on one of the vectors
+    # @param array of fields to include. No value include all fields
     def dup_only_valid(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
         fields_to_include=fields_to_include[0]
@@ -179,7 +180,7 @@ module Statsample
     
     # Returns a duplicate of the Database
     # If fields given, only include those vectors.
-    # Every vector will be dup.
+    # @param array of fields to include. No value include all fields    
     def dup(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
         fields_to_include=fields_to_include[0]
@@ -206,7 +207,8 @@ module Statsample
     # Returns (when possible) a cheap copy of dataset.
     # If no vector have missing values, returns original vectors.
     # If missing values presents, uses Dataset.dup_only_valid
-    #
+    # @param array of fields to include. No value include all fields
+
     def clone_only_valid(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
         fields_to_include=fields_to_include[0]
@@ -220,6 +222,7 @@ module Statsample
     end
     # Returns a shallow copy of Dataset.
     # Object id will be distinct, but @vectors will be the same.
+    # @param array of fields to include. No value include all fields
     def clone(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
         fields_to_include=fields_to_include[0]
@@ -278,7 +281,7 @@ module Statsample
       }
       Matrix.rows(rows)
     end
-    # We have the same datasets if vectors and fields are the same
+    # We have the same datasets if +vectors+ and +fields+ are the same
     def ==(d2)
       @vectors==d2.vectors and @fields==d2.fields
     end
@@ -347,7 +350,7 @@ module Statsample
       @fields.each{|f| @vectors[f].set_valid_data}
       check_length
     end
-    # Delete vector named <tt>name</tt>.
+    # Delete vector named +name+. Multiple fields accepted.
     def delete_vector(*args)
       if args.size==1 and args[0].is_a? Array
         names=args[0]
@@ -511,6 +514,7 @@ module Statsample
         raise DatasetException.new(self, e)
       end
     end
+    
     # Returns each case as hash and index
     def each_with_index # :yield: |case, i|
       begin
@@ -548,11 +552,13 @@ module Statsample
       }
       @i=nil
     end
-    # Set fields order. If you omit one or more vectors,  
+    # Set fields order. If you omit one or more vectors, they are
+    # ordered by alphabetic order.
     def fields=(f)
       @fields=f
       check_order
     end
+    
     def check_order
       if(@vectors.keys.sort!=@fields.sort)
         @fields=@fields&@vectors.keys
