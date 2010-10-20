@@ -115,7 +115,7 @@ module Statsample
     @@has_gsl
   end
   
-  VERSION = '0.15.0'
+  VERSION = '0.15.1'
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')

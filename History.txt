@@ -1,3 +1,10 @@
+=== 0.15.1 / 2010-10-20
+* Statsample::Excel and Statsample::PlainText add name to vectors equal to field name 
+* Statsample::Dataset.delete_vector accept multiple fields.
+* Statsample::Dataset.dup_only_valid allows duplication of specific fields 
+* ScaleAnalysis doesn't crash on one-item scales 
+* Updated references
+
 === 0.15.0 / 2010-09-07
 * Added class Statsample::Reliability::ICC for calculation of Intra-class correlation (Shrout & Fleiss, 1979; McGraw & Wong, 1996). Tested with SPSS and R values.
 * References: Updated and standarized references on many classes. Added grab_references.rb script, to create a list of references for library
