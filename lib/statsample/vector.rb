@@ -783,6 +783,15 @@ module Statsample
       check_type :scale
       Math::sqrt( variance_population(m) )
     end
+
+    # Population average deviation (denominator N)
+    def average_deviation_population( m = nil )
+      check_type :scale
+
+      m ||= mean
+      ( @scale_data.inject( 0 ) { |a, x| ( x - m ).abs + a } ).quo( n_valid )
+    end
+
     # Sample Variance (denominator n-1)
     
     def variance_sample(m=nil)
@@ -898,6 +907,7 @@ module Statsample
     
     alias_method :sdp, :standard_deviation_population
     alias_method :sds, :standard_deviation_sample
+    alias_method :adp, :average_deviation_population
     alias_method :cov, :coefficient_of_variation
     alias_method :variance, :variance_sample    
     alias_method :sd, :standard_deviation_sample
