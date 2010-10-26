@@ -128,8 +128,6 @@ class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
             d=a.recode{|i|i+rand(4)-2}
             @ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
             
-            
-            
             @icc=Statsample::Reliability::ICC.new(@ds)
             @r=Rserve::Connection.new
             @r.assign('ds',@ds)

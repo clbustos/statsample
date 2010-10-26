@@ -787,13 +787,11 @@ module Statsample
     # Population average deviation (denominator N)
     def average_deviation_population( m = nil )
       check_type :scale
-
       m ||= mean
       ( @scale_data.inject( 0 ) { |a, x| ( x - m ).abs + a } ).quo( n_valid )
     end
 
     # Sample Variance (denominator n-1)
-    
     def variance_sample(m=nil)
       check_type :scale
       m||=mean
@@ -801,7 +799,6 @@ module Statsample
     end
     
     # Sample Standard deviation (denominator n-1)
-    
     def standard_deviation_sample(m=nil)
         check_type :scale
         

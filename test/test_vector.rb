@@ -326,6 +326,10 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     a=[1,2,3,4,5,6].to_vector(:scale)
     assert_equal(17.5, a.sum_of_squared_deviation)
   end
+  def test_average_deviation
+    a=[1,2,3,4,5,6,7,8,9].to_scale
+    assert_equal(20.quo(9), a.average_deviation_population)
+  end
   def test_samples
     srand(1)
     assert_equal(100,@c.sample_with_replacement(100).size)
