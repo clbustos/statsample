@@ -20,3 +20,4 @@ References
 * http://stattrek.com/Lesson6/SRS.aspx
 * http://www.cut-the-knot.org/do_you_know/AllPerm.shtml
 * http://www.gnu.org/software/gsl/manual/html_node/The-histogram-struct.html
+* http://www.taygeta.com/random/gaussian.html

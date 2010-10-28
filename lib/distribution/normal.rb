@@ -4,7 +4,7 @@ module Distribution
   module Normal
     class << self
       # Return a proc which return a random number within a gaussian distribution -> N(0,1)
-      # Reference:
+      # == Reference:
       # * http://www.taygeta.com/random/gaussian.html
       def rng_ugaussian
         if Distribution.has_gsl?
@@ -44,7 +44,7 @@ module Distribution
         Statistics2.normaldist(x)
       end
 
-      if false and Distribution.has_gsl?
+      if Distribution.has_gsl?
         alias :cdf_ruby :cdf 
         def cdf(x) # :nodoc:
           GSL::Cdf::gaussian_P(x)
