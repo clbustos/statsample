@@ -127,7 +127,7 @@ module Statsample
         @ds_eigenvalues=Statsample::Dataset.new((1..@n_variables).map{|v| "ev_%05d" % v})
         @ds_eigenvalues.fields.each {|f| @ds_eigenvalues[f].type=:scale}
         if bootstrap_method==:parameter or bootstrap_method==:random
-          rng = GSL::Rng.alloc(GSL::Rng::MT19937, rand(32000))
+          rng = Distribution::Normal.rng_ugaussian
         end
         
         @iterations.times do |i|
@@ -137,7 +137,7 @@ module Statsample
             ds_bootstrap=Statsample::Dataset.new(@ds.fields)
             @fields.each do |f|
               if bootstrap_method==:random
-                ds_bootstrap[f]=@n_cases.times.map {|c| rng.ugaussian()}.to_scale
+                ds_bootstrap[f]=@n_cases.times.map {|c| rng.call}.to_scale
               elsif bootstrap_method==:data
                 ds_bootstrap[f]=ds[f].sample_with_replacement(@n_cases).to_scale
               else

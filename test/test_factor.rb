@@ -28,33 +28,38 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
     }
   end
   def test_parallelanalysis_with_data
-    samples=100
-    variables=10
-    iterations=50
-    rng = GSL::Rng.alloc()
-    f1=samples.times.collect {rng.ugaussian()}.to_scale
-    f2=samples.times.collect {rng.ugaussian()}.to_scale    
-    vectors={}
-    variables.times do |i|
-      if i<5
-        vectors["v#{i}"]=samples.times.collect {|nv|
-          f1[nv]*5+f2[nv]*2+rng.ugaussian()
-        }.to_scale
-      else
-        vectors["v#{i}"]=samples.times.collect {|nv|
-          f2[nv]*5+f1[nv]*2+rng.ugaussian()
-        }.to_scale
+    if Statsample.has_gsl?
+      samples=100
+      variables=10
+      iterations=50
+      rng = Distribution::Normal.rng_ugaussian
+      f1=samples.times.collect {rng.call}.to_scale
+      f2=samples.times.collect {rng.call}.to_scale    
+      vectors={}
+      variables.times do |i|
+        if i<5
+          vectors["v#{i}"]=samples.times.collect {|nv|
+            f1[nv]*5+f2[nv]*2+rng.call
+          }.to_scale
+        else
+          vectors["v#{i}"]=samples.times.collect {|nv|
+            f2[nv]*5+f1[nv]*2+rng.call
+          }.to_scale
+        end
+        
       end
+      ds=vectors.to_dataset
       
+      pa1=Statsample::Factor::ParallelAnalysis.new(ds, :bootstrap_method=>:data, :iterations=>iterations)
+      pa2=Statsample::Factor::ParallelAnalysis.with_random_data(samples,variables,:iterations=>iterations,:percentil=>95)
+      3.times do |n|
+        var="ev_0000#{n+1}"
+        assert_in_delta(pa1.ds_eigenvalues[var].mean,pa2.ds_eigenvalues[var].mean,0.04)
+      end
+    else
+      skip("Too slow without GSL")
     end
-    ds=vectors.to_dataset
     
-    pa1=Statsample::Factor::ParallelAnalysis.new(ds, :bootstrap_method=>:data, :iterations=>iterations)
-    pa2=Statsample::Factor::ParallelAnalysis.with_random_data(samples,variables,:iterations=>iterations,:percentil=>95)
-    3.times do |n|
-      var="ev_0000#{n+1}"
-      assert_in_delta(pa1.ds_eigenvalues[var].mean,pa2.ds_eigenvalues[var].mean,0.04)
-    end
   end
   def test_parallelanalysis
     pa=Statsample::Factor::ParallelAnalysis.with_random_data(305,8,:iterations=>100,:percentil=>95)
