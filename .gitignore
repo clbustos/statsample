@@ -3,3 +3,6 @@ coverage
 agregar_adsense_a_doc.rb
 pkg
 doc
+.yardoc
+examples/images/*
+examples/*.html

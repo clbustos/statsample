@@ -1,5 +1,4 @@
 require 'statsample/bivariate/pearson'
-require 'statsample/bivariate/scatterplot'
 
 module Statsample
   # Diverse methods and classes to calculate bivariate relations

@@ -1,7 +1,7 @@
 require 'tmpdir'
 require 'rubyvis'
 module Statsample
-  module Bivariate
+  module Graph
     # = Scatterplot
     # 
     # From Wikipedia:
@@ -75,13 +75,15 @@ module Statsample
       end
       def report_building(builder)
         img_svg=create_svg
-        Dir.mktmpdir {|dir|
-          time=Time.new.to_f
-          File.open("#{dir}/image_#{time}.svg","w") {|fp|
-            fp.write img_svg
+        builder.section(:name=>name) do |b|
+          Dir.mktmpdir {|dir|
+            time=Time.new.to_f
+            File.open("#{dir}/image_#{time}.svg","w") {|fp|
+              fp.write img_svg
+            }
+            b.image("#{dir}/image_#{time}.svg", :width=>width, :height=>height)
           }
-          builder.image("#{dir}/image_#{time}.svg", :width=>width, :height=>height)
-        }
+        end
         
       end
     end
