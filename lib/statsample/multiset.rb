@@ -3,7 +3,10 @@ module Statsample
   # but with different number of cases. 
   # This is the base class for stratified and cluster sampling estimation
   class Multiset
-    attr_reader :fields, :datasets
+    # Name of fields
+    attr_reader :fields
+    # Array with Statsample::Dataset
+    attr_reader :datasets
     # To create a multiset
     # * Multiset.new(%w{f1 f2 f3}) # define only fields
     def initialize(fields)

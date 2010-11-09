@@ -9,7 +9,7 @@ c=sample.times.collect {rand}.to_scale
 d=sample.times.collect {rand}.to_scale
 
 ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
-ds['y']=ds.collect{|row| row['a']*5+row['b']*3+row['c']*2+row['d']+rand()}
+ds['y']=ds.collect{|row| row['a']*5 + row['b']*3 + row['c']*2 + row['d'] + rand()}
 rb=ReportBuilder.new(:name=>"Dominance Analysis")
 
 cm=Statsample::Bivariate.correlation_matrix(ds)
@@ -22,6 +22,5 @@ rb.add(lr)
 
 da=Statsample::DominanceAnalysis.new(ds,'y',:name=>"Dominance Analysis using group of predictors", :predictors=>['a', 'b', %w{c d}])
 rb.add(da)
-
 
 puts rb.to_text

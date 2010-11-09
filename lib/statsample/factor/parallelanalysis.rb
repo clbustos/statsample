@@ -10,7 +10,7 @@ module Statsample
     # == Usage
     # *With real dataset*
     #   # ds should be any valid dataset
-    #   pa=Statsample::Factor::ParallelAnalysis.new(ds, :iterations=>100, :bootstrap_method=>:raw_data)
+    #   pa=Statsample::Factor::ParallelAnalysis.new(ds, :iterations=>100, :bootstrap_method=>:data)
     #
     # *With number of cases and variables*
     #   pa=Statsample::Factor::ParallelAnalysis.with_random_data(100,8)

@@ -16,6 +16,7 @@ require 'mathn'
   [0.02,0.02,0.03,0,0.06,0.22,1,-0.01,-0.05],
   [-0.12,-0.1,-0.06,-0.02,0.18,-0.07,-0.01,1,-0.03],
   [0.08,0.15,0.12,-0.02,0.02,0.36,-0.05,-0.03,1]]
+  
   complete.extend Statsample::CovariateMatrix
   complete.fields=%w{adhd cd odd sex age monly mwork mage poverty}
   

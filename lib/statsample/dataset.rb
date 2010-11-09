@@ -89,8 +89,6 @@ module Statsample
     #    b  1   0
     #
     # Useful to process outputs from databases
-    #
-    
     def self.crosstab_by_asignation(rows,columns,values)
       raise "Three vectors should be equal size" if rows.size!=columns.size or rows.size!=values.size
       cols_values=columns.factors
@@ -125,8 +123,7 @@ module Statsample
     # a variable of the Dataset named as its key
     # [fields]  Array of names for vectors. Is only used for set the
     # order of variables. If empty, vectors keys on alfabethic order as
-    # used as fields
-    #
+    # used as fields.
     def initialize(vectors={}, fields=[])
       @@n_dataset||=0
       @@n_dataset+=1
@@ -154,10 +151,12 @@ module Statsample
       end
       matrix
     end
-
+    # 
     # Creates a copy of the given dataset, deleting all the cases with
-    # missing data on one of the vectors
+    # missing data on one of the vectors.
+    # 
     # @param array of fields to include. No value include all fields
+    #
     def dup_only_valid(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
         fields_to_include=fields_to_include[0]
@@ -177,10 +176,14 @@ module Statsample
       end
       ds
     end
-    
-    # Returns a duplicate of the Database
-    # If fields given, only include those vectors.
+    #
+    # Returns a duplicate of the Dataset. 
+    # All vectors are copied, so any modification on new
+    # dataset doesn't affect original dataset's vectors.
+    # If fields given as parameter, only include those vectors.
+    #
     # @param array of fields to include. No value include all fields    
+    # @return {Statsample::Dataset}
     def dup(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
         fields_to_include=fields_to_include[0]
@@ -206,9 +209,10 @@ module Statsample
     
     # Returns (when possible) a cheap copy of dataset.
     # If no vector have missing values, returns original vectors.
-    # If missing values presents, uses Dataset.dup_only_valid
+    # If missing values presents, uses Dataset.dup_only_valid.
+    #
     # @param array of fields to include. No value include all fields
-
+    # @return {Statsample::Dataset}
     def clone_only_valid(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
         fields_to_include=fields_to_include[0]
@@ -223,6 +227,7 @@ module Statsample
     # Returns a shallow copy of Dataset.
     # Object id will be distinct, but @vectors will be the same.
     # @param array of fields to include. No value include all fields
+    # @return {Statsample::Dataset}    
     def clone(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
         fields_to_include=fields_to_include[0]
@@ -238,6 +243,8 @@ module Statsample
       ds
     end
     # Creates a copy of the given dataset, without data on vectors
+    #
+    # @return {Statsample::Dataset}
     def dup_empty
       vectors=@vectors.inject({}) {|a,v|
         a[v[0]]=v[1].dup_empty
@@ -248,6 +255,8 @@ module Statsample
     # Merge vectors from two datasets
     # In case of name collition, the vectors names are changed to 
     # x_1, x_2 ....
+    #
+    # @return {Statsample::Dataset}
     def merge(other_ds)
       raise "Cases should be equal (this:#{@cases}; other:#{other_ds.cases}" unless @cases==other_ds.cases
       types = @fields.collect{|f| @vectors[f].type} + other_ds.fields.collect{|f| other_ds[f].type}
@@ -264,7 +273,9 @@ module Statsample
       ds_new.update_valid_data
       ds_new
     end
-    # Returns a dataset with standarized data
+    # Returns a dataset with standarized data.
+    #
+    # @return {Statsample::Dataset}
     def standarize
       ds=dup()
       ds.fields.each do |f|
@@ -273,6 +284,9 @@ module Statsample
       ds
     end
     # Generate a matrix, based on fields of dataset
+    #
+    # @return {::Matrix}
+    
     def collect_matrix
       rows=@fields.collect{|row|
         @fields.collect{|col|
@@ -281,27 +295,39 @@ module Statsample
       }
       Matrix.rows(rows)
     end
+    
     # We have the same datasets if +vectors+ and +fields+ are the same
+    #
+    # @return {Boolean}
     def ==(d2)
       @vectors==d2.vectors and @fields==d2.fields
     end
     # Returns vector <tt>c</tt>
+    # 
+    # @return {Statsample::Vector}
     def col(c)
       @vectors[c]
     end
     alias_method :vector, :col
     # Equal to Dataset[<tt>name</tt>]=<tt>vector</tt>
+    #
+    # @return self
     def add_vector(name, vector)
       raise ArgumentError, "Vector have different size" if vector.size!=@cases
       @vectors[name]=vector
       check_order
+      self
     end
-    # Returns true if dataset have vector <tt>v</tt>
+    # Returns true if dataset have vector <tt>v</tt>.
+    #
+    # @return {Boolean}
     def has_vector? (v)
       return @vectors.has_key?(v)
     end
     # Creates a dataset with the random data, of a n size
-    # If n not given, uses original number of cases
+    # If n not given, uses original number of cases.
+    #
+    # @return {Statsample::Dataset}
     def bootstrap(n=nil)
       n||=@cases
       ds_boot=dup_empty
@@ -314,6 +340,8 @@ module Statsample
     # Fast version of #add_case.
     # Can only add one case and no error check if performed
     # You SHOULD use #update_valid_data at the end of insertion cycle
+    #
+    # 
     def add_case_array(v)
       v.each_index {|i| d=@vectors[@fields[i]].data; d.push(v[i])}
     end
