@@ -1,3 +1,11 @@
+=== 0.16.0 / 2010-11-13
+* Works on ruby 1.9.2 and HEAD. Updated Rakefile and manifest
+* Removed all graph based on Svg::Graph. 
+* First operative version of Graph with Rubyvis
+* Corrected bug on Distribution::Normal.cdf. 
+* Added reference on references.txt
+* Ruby-based random gaussian distribution generator when gsl not available
+* Added population average deviation [Al Chou]
 === 0.15.1 / 2010-10-20
 * Statsample::Excel and Statsample::PlainText add name to vectors equal to field name 
 * Statsample::Dataset.delete_vector accept multiple fields.
