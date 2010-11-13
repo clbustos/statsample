@@ -1,4 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 class StatsampleAnovaOneWayTestCase < MiniTest::Unit::TestCase
   context(Statsample::Anova::OneWay) do
     setup do

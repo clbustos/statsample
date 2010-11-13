@@ -7,8 +7,6 @@ module Statsample
   # * Statsample::Bivariate::Tetrachoric : Tetrachoric correlation
   # * Statsample::Bivariate::Polychoric  : Polychoric correlation (using joint, two-step and polychoric series)
   module Bivariate
-    autoload(:Polychoric, "statsample/bivariate/polychoric")
-    autoload(:Tetrachoric, "statsample/bivariate/tetrachoric")
     
     class << self
       # Covariance between two vectors
@@ -336,4 +334,7 @@ module Statsample
     end
   end
 end
+
+require 'statsample/bivariate/polychoric'
+require 'statsample/bivariate/tetrachoric'
 

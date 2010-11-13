@@ -25,6 +25,7 @@ examples/parallel_analysis_tetrachoric.rb
 examples/polychoric.rb
 examples/principal_axis.rb
 examples/reliability.rb
+examples/scatterplot.rb
 examples/t_test.rb
 examples/tetrachoric.rb
 examples/u_test.rb
@@ -61,11 +62,7 @@ lib/statsample/factor/pca.rb
 lib/statsample/factor/principalaxis.rb
 lib/statsample/factor/rotation.rb
 lib/statsample/graph.rb
-lib/statsample/graph/gdchart.rb
-lib/statsample/graph/svgboxplot.rb
-lib/statsample/graph/svggraph.rb
-lib/statsample/graph/svghistogram.rb
-lib/statsample/graph/svgscatterplot.rb
+lib/statsample/graph/scatterplot.rb
 lib/statsample/histogram.rb
 lib/statsample/matrix.rb
 lib/statsample/mle.rb
@@ -139,7 +136,6 @@ test/test_srs.rb
 test/test_statistics.rb
 test/test_stest.rb
 test/test_stratified.rb
-test/test_svg_graph.rb
 test/test_test_f.rb
 test/test_test_t.rb
 test/test_umannwhitney.rb

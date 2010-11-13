@@ -89,7 +89,7 @@ module Statsample
       end
                                          
       def process_row(row,empty)
-        row.to_a.collect do |c|
+        row.to_a.map do |c|
           if empty.include?(c)
               nil
           else

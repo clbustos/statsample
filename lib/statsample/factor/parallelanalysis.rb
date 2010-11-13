@@ -153,7 +153,7 @@ module Statsample
             end
             ev=matrix.eigenvalues
             @ds_eigenvalues.add_case_array(ev)
-          rescue Tetrachoric::RequerimentNotMeet => e
+          rescue Statsample::Bivariate::Tetrachoric::RequerimentNotMeet => e
             puts "Error: #{e}" if $DEBUG
             redo
           end

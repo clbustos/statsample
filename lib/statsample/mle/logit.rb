@@ -57,9 +57,9 @@ module Statsample
     # x: Matrix (NxM)
     # y: Matrix (Nx1)
     # p: Matrix (Mx1)
-    def second_derivative(x,y,p)
+    def second_derivative(x,y,p2)
       raise "x.rows!=y.rows" if x.row_size!=y.row_size
-      raise "x.columns!=p.rows" if x.column_size!=p.row_size             
+      raise "x.columns!=p.rows" if x.column_size!=p2.row_size             
       n = x.row_size
       k = x.column_size
       sd = Array.new(k)
@@ -70,15 +70,16 @@ module Statsample
       end
       n.times do |i|
         row = x.row(i).to_a
-        p_m = p_minus(row,p)
+        p_m = p_minus(row,p2)
         k.times do |j|
           k.times do |l|
-          sd[j][l] -= p_m *(1-p_m)*row[j]*row[l]
+          sd[j][l] -= (p_m*(1-p_m)*row[j]*row[l])
           end
         end
       end
       Matrix.rows(sd, true)
     end
+    
     private
     def p_minus(x_row,p)
       value = 0.0;

@@ -1,22 +1,22 @@
-require 'extendmatrix'
-
-
 class ::Matrix
   def to_matrix
     self
   end
-  alias :eigenpairs_ruby :eigenpairs 
+  if defined? :eigenpairs
+    alias_method :eigenpairs_ruby, :eigenpairs
+  end
   
   if Statsample.has_gsl?
     # Optimize eigenpairs of extendmatrix module using gsl
     def eigenpairs
       eigval, eigvec= GSL::Eigen.symmv(self.to_gsl)
       ep=eigval.size.times.map {|i|
-        [eigval[i], eigvec.get_col(i)]
+        [eigval[i], eigvec.get_col(i).to_a]
       }
       ep.sort{|a,b| a[0]<=>b[0]}.reverse
     end
   end
+  
   def eigenvalues
     eigen[:eigenvalues]
   end
