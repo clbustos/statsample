@@ -89,7 +89,7 @@ module Statsample
         @range=range
       end
       def report_building_text(generator)
-        anchor=generator.toc_entry(_("Histogram %s") % [@name])
+        #anchor=generator.toc_entry(_("Histogram %s") % [@name])
         range.each_with_index do |r,i|
           next if i==@bin.size
           generator.text(sprintf("%4.2f : %d", r, @bin[i]))

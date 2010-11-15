@@ -66,7 +66,6 @@ class GslEngine < BaseEngine
   # Coefficients using a constant
   # Based on http://www.xycoon.com/ols1.htm
   def matrix_resolution
-    mse_p=mse
     columns=@dep_columns.dup.map {|xi| xi.map{|i| i.to_f}}
     columns.unshift([1.0]*@ds.cases)
     y=Matrix.columns([@dy.data.map  {|i| i.to_f}])

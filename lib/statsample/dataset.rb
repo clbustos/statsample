@@ -331,7 +331,7 @@ module Statsample
     def bootstrap(n=nil)
       n||=@cases
       ds_boot=dup_empty
-      for i in 1..n
+      n.times do
         ds_boot.add_case_array(case_as_array(rand(n)))
       end
       ds_boot.update_valid_data
@@ -418,7 +418,6 @@ module Statsample
     # Returns a vector with sumatory of fields
     # if fields parameter is empty, sum all fields 
     def vector_sum(fields=nil)
-      a=[]
       fields||=@fields
       collect_with_index do |row, i|
         if(fields.find{|f| !@vectors[f].data_with_nils[i]})
@@ -598,7 +597,7 @@ module Statsample
       if i.is_a? Range
         fields=from_to(i.begin,i.end)
         vectors=fields.inject({}) {|a,v| a[v]=@vectors[v];a}
-        ds=Dataset.new(vectors,fields)
+        Dataset.new(vectors,fields)
       else
         raise Exception,"Vector '#{i}' doesn't exists on dataset" unless @vectors.has_key?(i)
         @vectors[i]
@@ -831,7 +830,7 @@ module Statsample
     #      ]
     # 
     def one_to_many(parent_fields, pattern)
-      base_pattern=pattern.gsub(/%v|%n/,"")
+      #base_pattern=pattern.gsub(/%v|%n/,"")
       re=Regexp.new pattern.gsub("%v","(.+?)").gsub("%n","(\\d+?)")
       ds_vars=parent_fields
       vars=[]

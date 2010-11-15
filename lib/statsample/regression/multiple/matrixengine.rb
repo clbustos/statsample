@@ -157,7 +157,7 @@ class MatrixEngine < BaseEngine
   #
   def coeffs_se
     out={}
-    mse=sse.quo(df_e)
+    #mse=sse.quo(df_e)
     coeffs.each {|k,v|
       out[k]=@y_sd.quo(@x_sd[k])*Math::sqrt( 1.quo(tolerance(k)))*Math::sqrt((1-r2).quo(df_e))
     }

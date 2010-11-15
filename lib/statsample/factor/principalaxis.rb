@@ -132,7 +132,7 @@ module Factor
         @communalities=pca.communalities(m)
         @eigenvalues=pca.eigenvalues
         com_sum = @communalities.inject(0) {|ac,v| ac+v}
-        jump=true
+        #jump=true
         
         break if (com_sum-prev_sum).abs < @delta
         @communalities.each_with_index do |v2,i2|

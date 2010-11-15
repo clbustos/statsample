@@ -39,7 +39,7 @@ module Statsample
                 rows = Array.new(k+1)
                 k.times{|i| rows[i] = [xte[i,0] / sigma2]}
                 rows[k] = [ete[0,0] / (2*sigma4) - n / (2*sigma2)]
-                fd = Matrix.rows(rows, true)
+                Matrix.rows(rows, true)
             end
             
             # second derivative for normal model
@@ -48,7 +48,7 @@ module Statsample
                 raise "x.rows!=y.rows" if x.row_size!=y.row_size
                 raise "x.columns+1!=p.rows" if x.column_size+1!=p.row_size
 
-                n = x.row_size
+                #n = x.row_size
                 k = x.column_size
                 b = Array.new(k)
                 k.times{|i| b[i]=[p[i,0]]}
@@ -76,7 +76,7 @@ module Statsample
                 end
                 last_row[k] = 2*sigma4 - ete[0,0] / sigma6
                 rows[k] = last_row
-                sd = Matrix.rows(rows, true)
+                Matrix.rows(rows, true)
             end
         end
     end

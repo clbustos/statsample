@@ -268,7 +268,7 @@ module Statsample
     # Get all model of size k
     def md_k(k)
       out=[]
-      models=@models.each{|m| out.push(md(m)) if m.size==k }
+      @models.each{|m| out.push(md(m)) if m.size==k }
       out
     end
     

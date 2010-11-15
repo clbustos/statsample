@@ -41,7 +41,7 @@ module Statsample
         x.row_size.times{|i|
           xi=Matrix.rows([x.row(i).to_a.collect{|v| v.to_f}])
           y_val=y[i,0].to_f
-          fbx=f(b,x)
+          #fbx=f(b,x)
           prod=prod*likehood_i(xi, y_val ,b)
         }
         prod
@@ -62,7 +62,7 @@ module Statsample
       def set_default_parameters(x)
         fd=[0.0]*x.column_size
         fd.push(0.1)    if self.is_a? Statsample::MLE::Normal
-        parameters = Matrix.columns([fd])
+        Matrix.columns([fd])
       end
       
       # Newton Raphson with automatic stopping criteria.
@@ -80,8 +80,8 @@ module Statsample
             parameters = start_values.dup
         end
         k=parameters.row_size
-        cv=Matrix.rows([([1.0]*k)])
-        last_diff=nil
+        #cv=Matrix.rows([([1.0]*k)])
+        #last_diff=nil
         raise "n on y != n on x" if x.row_size!=y.row_size
         h=nil
         fd=nil

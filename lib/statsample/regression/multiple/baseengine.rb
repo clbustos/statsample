@@ -150,7 +150,7 @@ module Statsample
         # Estimated Variance-Covariance Matrix
         # Used for calculation of se of constant
         def estimated_variance_covariance_matrix
-          mse_p=mse
+          #mse_p=mse
           columns=[]
           @ds_valid.fields.each{|k|
             v=@ds_valid[k]

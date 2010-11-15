@@ -27,7 +27,7 @@ module Statsample
         ds.fields=vars.times.map {|i| "v#{i+1}"}
         ds.cases=cases
         opts=opts.merge({:bootstrap_method=> :random, :no_data=>true})
-        pa=new(ds, opts)
+        new(ds, opts)
       end
       include DirtyMemoize
       include Summarizable
