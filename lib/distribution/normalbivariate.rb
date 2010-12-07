@@ -220,7 +220,7 @@ module Distribution
             asr = Math::asin(r)
             (1..lg).each do |i|
               [-1,1].each do |is|
-                sn = Math::sin( asr *(  is * x[i][ng] + 1 ).quo(2) )
+                sn = Math::sin(asr*(is* x[i][ng]+1).quo(2) )
                 bvn = bvn + w[i][ng] * Math::exp( ( sn*hk-hs ).quo( 1-sn*sn ) )
               end # do
             end # do

@@ -152,15 +152,8 @@ module Statsample
         rp.to_svg
       end
       def report_building(builder) # :nodoc:
-        img_svg=to_svg
         builder.section(:name=>name) do |b|
-          Dir.mktmpdir {|dir|
-            time=Time.new.to_f
-            File.open("#{dir}/image_#{time}.svg","w") {|fp|
-              fp.write img_svg
-            }
-            b.image("#{dir}/image_#{time}.svg", :width=>width, :height=>height)
-          }
+          b.image(to_svg, :type=>'svg', :width=>width, :height=>height)
         end
         
       end

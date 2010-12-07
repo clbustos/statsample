@@ -31,9 +31,4 @@ class StatsampleGGobiTestCase < MiniTest::Unit::TestCase
     assert_equal({'variable 2'=>{'a'=>1,'b'=>2,'c'=>3,'d'=>4}},carrier.conversions)
     assert_equal(['variable 2'],carrier.categorials)
   end
-  def test_out
-    filename="/tmp/test_statsample_ggobi.xml"
-    go=Statsample::GGobi.out(@ds)
-
-  end
 end

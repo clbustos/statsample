@@ -122,8 +122,6 @@ module Statsample
   SPLIT_TOKEN = ","
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')
-  autoload(:Combination, 'statsample/combination')
-  autoload(:Permutation, 'statsample/permutation')
   autoload(:CSV, 'statsample/converters')
   autoload(:PlainText, 'statsample/converters')
   autoload(:Excel, 'statsample/converters')

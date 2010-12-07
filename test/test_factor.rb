@@ -72,7 +72,7 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
     #puts pa.summary
   end
   def test_map
-    fields=%w{height arm.span forearm lower.leg weight bitro.diameter chest.girth chest.width}
+    #fields=%w{height arm.span forearm lower.leg weight bitro.diameter chest.girth chest.width}
     m=Matrix[ 
           [ 1, 0.846, 0.805, 0.859, 0.473, 0.398, 0.301, 0.382],
           [ 0.846, 1, 0.881, 0.826, 0.376, 0.326, 0.277, 0.415],

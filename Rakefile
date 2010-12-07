@@ -41,7 +41,7 @@ h=Hoe.spec('statsample') do
   #self.testlib=:minitest
 	self.rubyforge_name = "ruby-statsample"
 	self.developer('Claudio Bustos', 'clbustos@gmail.com')
-	self.extra_deps << ["spreadsheet","~>0.6.0"] <<  ["reportbuilder", "~>1.0"] << ["minimization", "~>0.2.0"] << ["fastercsv"] << ["dirty-memoize", "~>0.0"] << ["extendmatrix","~>0.3.1"] << ["statsample-bivariate-extension", ">0"] << ["rserve-client", "~>0.2.5"] << ["rubyvis", "~>0.2.2"]
+	self.extra_deps << ["spreadsheet","~>0.6.0"] <<  ["reportbuilder", "~>1.4"] << ["minimization", "~>0.2.0"] << ["fastercsv", ">0"] << ["dirty-memoize", "~>0.0"] << ["extendmatrix","~>0.3.1"] << ["statsample-bivariate-extension", ">0"] << ["rserve-client", "~>0.2.5"] << ["rubyvis", "~>0.2.2"]
   
 	self.extra_dev_deps << ["shoulda"] << ["minitest", "~>2.0"]
   self.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"

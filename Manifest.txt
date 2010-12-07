@@ -47,7 +47,6 @@ lib/statsample/anova/twoway.rb
 lib/statsample/bivariate.rb
 lib/statsample/bivariate/pearson.rb
 lib/statsample/codification.rb
-lib/statsample/combination.rb
 lib/statsample/converter/csv.rb
 lib/statsample/converter/spss.rb
 lib/statsample/converters.rb
@@ -70,7 +69,6 @@ lib/statsample/mle/logit.rb
 lib/statsample/mle/normal.rb
 lib/statsample/mle/probit.rb
 lib/statsample/multiset.rb
-lib/statsample/permutation.rb
 lib/statsample/regression.rb
 lib/statsample/regression/binomial.rb
 lib/statsample/regression/binomial/logit.rb
@@ -111,7 +109,6 @@ test/test_anovawithvectors.rb
 test/test_bartlettsphericity.rb
 test/test_bivariate.rb
 test/test_codification.rb
-test/test_combination.rb
 test/test_crosstab.rb
 test/test_csv.csv
 test/test_csv.rb
@@ -126,7 +123,6 @@ test/test_logit.rb
 test/test_matrix.rb
 test/test_mle.rb
 test/test_multiset.rb
-test/test_permutation.rb
 test/test_regression.rb
 test/test_reliability.rb
 test/test_reliability_icc.rb

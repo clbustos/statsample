@@ -78,7 +78,7 @@ module Statsample
       def self.distribution_permutations(n1,n2)
         base=[0]*n1+[1]*n2
         po=Statsample::Permutation.new(base)
-        upper=0
+        
         total=n1*n2
         req={}
         po.each do |perm|

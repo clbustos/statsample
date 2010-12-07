@@ -158,8 +158,9 @@ module Statsample
         @samples_cd={}
         @samples_gd={}
         @pairs=[]
-        c=Statsample::Combination.new(2,@fields.size)
+        c=(0...@fields.size).to_a.combination(2)
         c.each do |data|
+          p data
           convert=data.collect {|i| @fields[i] }
           @pairs.push(convert)
           [@samples_td, @samples_cd, @samples_gd].each{|s|

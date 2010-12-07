@@ -156,8 +156,9 @@ module Statsample
       @models=[]
       @models_data={}
       for i in 1..@predictors.size
-        c=Statsample::Combination.new(i,@predictors.size)
+        c=(0...@predictors.size).to_a.combination(i)
         c.each  do |data|
+          
           independent=data.collect {|i1| @predictors[i1] }
           @models.push(independent)
           if (@build_from_dataset)

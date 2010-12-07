@@ -91,49 +91,5 @@ class StatsampleMLETestCase < MiniTest::Unit::TestCase
     }
     assert_equal(5,mle.iterations)
   end
-  def atest_logit_alglib
-    if(HAS_ALGIB)
-      ds=Statsample::CSV.read(@file_binomial)
-      constant=([1.0]*ds.cases).to_vector(:scale)
-
-      ds_indep={'constant'=>constant, 'a'=>ds['a'],'b'=>ds['b'], 'c'=>ds['c']}.to_dataset(%w{constant a b c} )
-
-      mat_x=ds_indep.to_matrix
-      mat_y=ds['y'].to_matrix(:vertical)
-      log=Alglib::Logit.build_from_matrix(ds.to_matrix)
-      coeffs=log.unpack[0]
-      b_alglib=Matrix.columns([[-coeffs[3], -coeffs[0], -coeffs[1], -coeffs[2]]])
-      mle=Statsample::MLE::Logit.new
-      ll_alglib=mle.log_likehood(mat_x,mat_y,b_alglib)
-      b_newton=mle.newton_raphson(mat_x,mat_y)
-      ll_pure_ruby=mle.log_likehood(mat_x,mat_y,b_newton)
-      #p b_alglib
-      #p b_newton
-
-      assert_in_delta(ll_alglib,ll_pure_ruby,1)
-    end
-
-  end
-  def atest_logit1
-    log=Alglib::Logit.build_from_matrix(@ds.to_matrix)
-    coeffs=log.unpack[0]
-    b=Matrix.columns([[-coeffs[3],-coeffs[0],-coeffs[1],-coeffs[2]]])
-    #        puts "Coeficientes beta alglib:"
-    #p b
-    mle_alglib=Statsample::MLE::ln_mle(Statsample::MLE::Logit, @mat_x,@mat_y,b)
-    #       puts "MLE Alglib:"
-    #p mle_alglib
-    #        Statsample::CSV.write(ds,"test_binomial.csv")
-
-
-
-    #        puts "iniciando newton"
-    coeffs_nr=Statsample::MLE.newton_raphson(@mat_x,@mat_y, Statsample::MLE::Logit)
-    #p coeffs_nr
-    mle_pure_ruby=Statsample::MLE::ln_mle(Statsample::MLE::Logit, @mat_x,@mat_y,coeffs_nr)
-    #p mle_pure_ruby
-
-    #puts "Malo: #{mle_malo} Bueno: #{mle_bueno} : #{mle_malo-mle_bueno}"
-  end
 end
 

@@ -35,7 +35,7 @@ class StatsampleStatisicsTestCase < MiniTest::Unit::TestCase
     v=([42]*23+[41]*4+[36]*1+[32]*1+[29]*1+[27]*2+[23]*1+[19]*1+[16]*2+[15]*2+[14,11,10,9,7]+ [6]*3+[5]*2+[4,3]).to_vector(:scale)
     assert_equal(50,v.size)
     assert_equal(1471,v.sum())
-    limits=Statsample::SRS.mean_confidence_interval_z(v.mean(), v.sds(), v.size,676,0.80)
+    #limits=Statsample::SRS.mean_confidence_interval_z(v.mean(), v.sds(), v.size,676,0.80)
   end
   def test_estimation_proportion
     # total
@@ -55,9 +55,9 @@ class StatsampleStatisicsTestCase < MiniTest::Unit::TestCase
   end
   def test_ml
     if(true)
-      real=[1,1,1,1].to_vector(:scale)
+      #real=[1,1,1,1].to_vector(:scale)
 
-      pred=[0.0001,0.0001,0.0001,0.0001].to_vector(:scale)
+      #pred=[0.0001,0.0001,0.0001,0.0001].to_vector(:scale)
       # puts  Statsample::Bivariate.maximum_likehood_dichotomic(pred,real)
 
     end

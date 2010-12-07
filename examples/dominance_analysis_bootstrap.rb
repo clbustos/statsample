@@ -8,6 +8,11 @@ b=100.times.collect {rand}.to_scale
 c=100.times.collect {rand}.to_scale
 d=100.times.collect {rand}.to_scale
 
+a.name="a"
+b.name="b"
+c.name="c"
+d.name="d"
+
 ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
 
 ds['y1']=ds.collect{|row| row['a']*5+row['b']*2+row['c']*2+row['d']*2+10*rand()}
