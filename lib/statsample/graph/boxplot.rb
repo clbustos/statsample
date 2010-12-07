@@ -33,14 +33,18 @@ module Statsample
       attr_accessor :margin_left
       # Right margin
       attr_accessor :margin_right
+      # Array with assignation to groups of bars
+      # For example, for four vectors, 
+      #   boxplot.groups=[1,2,1,3]
+      # Assign same color to first and third element, and different to
+      # second and fourth
       attr_accessor :groups
+      # Minimum value on y-axis. Automaticly defined from data
       attr_accessor :minimum
+      # Maximum value on y-axis. Automaticly defined from data
       attr_accessor :maximum
-      
-      
-      
-      attr_reader :data
-      attr_reader :vectors
+      # Vectors to box-ploting
+      attr_accessor :vectors
       
       attr_reader :x_scale, :y_scale
       # Create a new Boxplot.
@@ -154,7 +158,15 @@ module Statsample
               b.bottom {|v| y_scale.scale(v[:percentil_25])}
               b.height {|v| y_scale.scale(v[:percentil_75]) - y_scale.scale(v[:percentil_25]) }
               b.line_width 1
-              b.stroke_style "black"
+              b.stroke_style  {|v| 
+                if that.groups
+                  colors.scale(that.groups[parent.index]).darker
+                else
+                  colors.scale(index).darker
+                end
+              
+              
+              }
               b.fill_style {|v| 
                 if that.groups
                   colors.scale(that.groups[parent.index])
@@ -167,6 +179,7 @@ module Statsample
             bp.rule do |r|
               r.bottom {|v| y_scale.scale(v[:median])}
               r.width x_scale.range_band
+              r.line_width 2
             end
             
             # Whiskeys
@@ -196,7 +209,7 @@ module Statsample
               dot.shape_size 4
               dot.data {|v| v[:outliers]}
               dot.left {|v| x_scale.range_band / 2.0}
-              dot.bottom {|v| v}
+              dot.bottom {|v| y_scale.scale(v)}
               dot.title {|v| v}
             end
             

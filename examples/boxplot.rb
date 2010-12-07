@@ -14,4 +14,4 @@ a=a.to_scale
 sp=Statsample::Graph::Boxplot.new(:vectors=>[a,b,c],:width=>300, :height=>300, :groups=>%w{first first second}, :minimum=>0)
 rb=ReportBuilder.new
 rb.add(sp)
-rb.save_html("test.html")
+puts rb.to_text
