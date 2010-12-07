@@ -181,8 +181,20 @@ module Statsample
       # USE:
       #     ds = Statsample::Excel.read("test.xls")
       #
-      def read(filename, worksheet_id=0, ignore_lines=0, empty=[''])
+      def read(filename, opts=Hash.new)
         require 'spreadsheet'
+        opts_default={
+          :worksheet_id=>0, 
+          :ignore_lines=>0, 
+          :empty=>['']
+        }
+        
+        opts=opts_default.merge opts
+        
+        worksheet_id=opts[:worksheet_id]
+        ignore_lines=opts[:ignore_lines]
+        empty=opts[:empty]
+        
         first_row=true
         fields=[]
         fields_data={}

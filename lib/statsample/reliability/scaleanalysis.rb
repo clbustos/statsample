@@ -40,7 +40,7 @@ module Statsample
         @sd = @total.sd
         @variance=@total.variance
         @valid_n = @total.size
-        opts_default={:name=>"Reliability Analisis"}
+        opts_default={:name=>_("Reliability Analisis")}
         @opts=opts_default.merge(opts)
         @name=@opts[:name]
         @cov_m=Statsample::Bivariate.covariance_matrix(@ds)
@@ -78,56 +78,6 @@ module Statsample
           end
         end
         out
-      end
-      def gnuplot_item_characteristic_curve(directory, base="crd",options={})
-        require 'gnuplot'
-
-        crd=item_characteristic_curve
-        @ds.fields.each  do |f|
-          x=[]
-          y=[]
-          Gnuplot.open do |gp|
-            Gnuplot::Plot.new( gp ) do |plot|
-              crd[f].sort.each do |tot,prop|
-                x.push(tot)
-                y.push((prop*100).to_i.to_f/100)
-              end
-              plot.data << Gnuplot::DataSet.new( [x, y] ) do |ds|
-                ds.with = "linespoints"
-                ds.notitle
-              end
-
-            end
-          end
-        end
-      end
-      def svggraph_item_characteristic_curve(directory, base="icc",options={})
-        require 'statsample/graph/svggraph'
-        crd=ItemCharacteristicCurve.new(@ds)
-        @ds.fields.each do |f|
-          factors=@ds[f].factors.sort
-          options={
-            :height=>500,
-            :width=>800,
-            :key=>true
-          }.update(options)
-          graph = ::SVG::Graph::Plot.new(options)
-          factors.each do |factor|
-            factor=factor.to_s
-            dataset=[]
-            crd.curve_field(f, factor).each do |tot,prop|
-              dataset.push(tot)
-              dataset.push((prop*100).to_i.to_f/100)
-            end
-            graph.add_data({
-              :title=>"#{factor}",
-              :data=>dataset
-            })
-          end
-          File.open(directory+"/"+base+"_#{f}.svg","w") {|fp|
-            fp.puts(graph.burn())
-          }
-        end
       end
       # =Adjusted R.P.B. for each item
       # Adjusted RPB(Point biserial-correlation) for each item
@@ -172,9 +122,11 @@ module Statsample
         ds_new.update_valid_data
         ds_new
       end
+      
       def stats_if_deleted
         @sif||=stats_if_deleted_intern
       end
+      
       def stats_if_deleted_intern # :nodoc:
         return Hash.new if @ds.fields.size==1
         @ds.fields.inject({}) do |a,v|

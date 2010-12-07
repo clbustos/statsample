@@ -556,6 +556,7 @@ module Statsample
         raise DatasetException.new(self, e)
       end
     end
+    
     # Returns each case as an array, coding missing values as nils
     def each_array_with_nils
       m=fields.size
@@ -585,8 +586,9 @@ module Statsample
       @fields=f
       check_order
     end
-    
-    def check_order
+    # Check congruence between +fields+ attribute
+    # and keys on +vectors
+    def check_order #:nodoc:
       if(@vectors.keys.sort!=@fields.sort)
         @fields=@fields&@vectors.keys
         @fields+=@vectors.keys.sort-@fields
@@ -612,7 +614,7 @@ module Statsample
       }
       Statsample::Vector.new(data,type)
     end
-    # Same as #collect, but giving case index as second parameter on yield.
+    # Same as Statsample::Vector.collect, but giving case index as second parameter on yield.
     def collect_with_index(type=:scale)
       data=[]
       each_with_index {|row, i|
@@ -660,14 +662,7 @@ module Statsample
       end
     end
 		
-    def to_multiset_by_split(*fields)
-			require 'statsample/multiset'
-			if fields.size==1
-				to_multiset_by_split_one_field(fields[0])
-			else
-				to_multiset_by_split_multiple_fields(*fields)
-			end
-    end
+   
     
     # Create a new dataset with all cases which the block returns true
     def filter
@@ -687,6 +682,20 @@ module Statsample
       end
       a.to_vector(@vectors[field].type)
     end
+    
+    # Creates a Stastample::Multiset, using one or more fields
+    # to split the dataset.
+    
+   
+    def to_multiset_by_split(*fields)
+			require 'statsample/multiset'
+			if fields.size==1
+				to_multiset_by_split_one_field(fields[0])
+			else
+				to_multiset_by_split_multiple_fields(*fields)
+			end
+    end
+    # Creates a Statsample::Multiset, using one field
     
     def to_multiset_by_split_one_field(field)
       raise ArgumentError,"Should use a correct field name" if !@fields.include? field
