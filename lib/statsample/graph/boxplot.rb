@@ -1,0 +1,221 @@
+require 'rubyvis'
+module Statsample
+  module Graph
+    # = Boxplot
+    # 
+    # From Wikipedia:
+    # In descriptive statistics, a box plot or boxplot (also known as a box-and-whisker diagram or plot) is a convenient way of graphically depicting groups of numerical data through their five-number summaries: the smallest observation (sample minimum), lower quartile (Q1), median (Q2), upper quartile (Q3), and largest observation (sample maximum). A boxplot may also indicate which observations, if any, might be considered outliers.
+    # 
+    # == Usage
+    # === Svg output
+    #  a=[1,2,3,4].to_scale
+    #  b=[3,4,5,6].to_scale
+    #  puts Statsample::Graph::Boxplot.new(:vectors=>[a,b]).to_svg
+    # === Using ReportBuilder
+    #  a=[1,2,3,4].to_scale
+    #  b=[3,4,5,6].to_scale
+    #  rb=ReportBuilder.new
+    #  rb.add(Statsample::Graph::Boxplot.new(:vectors=>[a,b]))
+    #  rb.save_html('boxplot.html')
+    
+    class Boxplot
+      include Summarizable
+      attr_accessor :name
+      # Total width of Boxplot
+      attr_accessor :width
+      # Total height of Boxplot
+      attr_accessor :height
+      # Top margin
+      attr_accessor :margin_top
+      # Bottom margin
+      attr_accessor :margin_bottom
+      # Left margin
+      attr_accessor :margin_left
+      # Right margin
+      attr_accessor :margin_right
+      attr_accessor :groups
+      attr_accessor :minimum
+      attr_accessor :maximum
+      
+      
+      
+      attr_reader :data
+      attr_reader :vectors
+      
+      attr_reader :x_scale, :y_scale
+      # Create a new Boxplot.
+      # Parameters: Hash of options
+      # * :vectors: Array of vectors
+      # * :groups: Array of same size as :vectors:, with name of groups
+      #           to colorize vectors
+      def initialize(opts=Hash.new)
+        @vectors=opts.delete :vectors
+        raise "You should define vectors" if @vectors.nil?
+        
+        opts_default={
+          :name=>_("Boxplot"),
+          :groups=>nil,
+          :width=>400,
+          :height=>300,
+          :margin_top=>10,
+          :margin_bottom=>20,
+          :margin_left=>20,
+          :margin_right=>20,
+          :minimum=>nil,
+          :maximum=>nil
+        }
+        @opts=opts_default.merge(opts)
+        opts_default.keys.each {|k| send("#{k}=", @opts[k]) }
+      end
+      
+      # Returns a Rubyvis panel with scatterplot
+      def rubyvis_panel # :nodoc:
+        that=self
+        
+        min,max=@minimum, @maximum
+        
+        min||=@vectors.map {|v| v.min}.min
+        max||=@vectors.map {|v| v.max}.max
+        
+        
+        
+        margin_hor=margin_left + margin_right
+        margin_vert=margin_top  + margin_bottom
+        x_scale = pv.Scale.ordinal(@vectors.size.times.map.to_a).split_banded(0, width-margin_hor, 4.0/5)
+        y_scale=Rubyvis::Scale.linear(min,max).range(0,height-margin_vert)
+        y_scale.nice
+        # cache data
+        
+        colors=Rubyvis::Colors.category10
+        
+        data=@vectors.map {|v|
+          out={:percentil_25=>v.percentil(25), :median=>v.median, :percentil_75=>v.percentil(75), :name=>v.name}
+          out[:iqr]=out[:percentil_75]-out[:percentil_25]
+          
+          irq_max=out[:percentil_75]+out[:iqr]
+          irq_min=out[:percentil_25]-out[:iqr]
+          
+          # Find the last data inside the margin
+          min=out[:percentil_25]
+          max=out[:percentil_75]
+          
+          v.each {|d|
+            min=d if d<min and d>irq_min
+            max=d if d>max and d<irq_max
+          }
+          # Whiskers!
+          out[:low_whisker]=min
+          out[:high_whisker]=max
+          # And now, data outside whiskers
+          out[:outliers]=v.data_with_nils.find_all {|d| 
+            d<min or d>max
+          }
+          out
+        }
+        
+
+        
+        vis=Rubyvis::Panel.new do |pan| 
+          pan.width  width  - margin_hor
+          pan.height height - margin_vert
+          pan.bottom margin_bottom
+          pan.left   margin_left
+          pan.right  margin_right
+          pan.top    margin_top
+           # Y axis
+          pan.rule do
+            data y_scale.ticks
+            bottom y_scale
+            stroke_style {|d| d!=0 ? "#eee" : "#000"}
+            label(:anchor=>'left') do
+              visible {|d| true}
+              text y_scale.tick_format
+            end
+          end
+          pan.rule do
+            bottom 0
+            stroke_style 'black'
+          end
+          pan.label  do |l|
+            l.data data
+            l.left  {|v|  x_scale.scale(index)}
+            l.bottom -15
+            l.text {|v,x| v[:name]}
+          end
+          
+          pan.panel do |bp|
+            bp.data data
+            bp.left {|v|  x_scale.scale(index)}
+            bp.width x_scale.range_band
+            
+            
+            # Bar
+            bp.bar do |b|
+              b.bottom {|v| y_scale.scale(v[:percentil_25])}
+              b.height {|v| y_scale.scale(v[:percentil_75]) - y_scale.scale(v[:percentil_25]) }
+              b.line_width 1
+              b.stroke_style "black"
+              b.fill_style {|v| 
+                if that.groups
+                  colors.scale(that.groups[parent.index])
+                else
+                  colors.scale(index)
+                end
+              }
+            end
+            # Median
+            bp.rule do |r|
+              r.bottom {|v| y_scale.scale(v[:median])}
+              r.width x_scale.range_band
+            end
+            
+            # Whiskeys
+            bp.rule do |r|
+              r.visible {|v| v[:percentil_25]>v[:low_whisker]}
+              r.bottom {|v| y_scale.scale(v[:low_whisker])}              
+            end
+            bp.rule do |r|
+              r.visible {|v| v[:percentil_25]>v[:low_whisker]}
+              r.bottom {|v| y_scale.scale(v[:low_whisker])}              
+              r.left {|v| x_scale.range_band / 2.0}
+              r.height {|v| y_scale.scale(v[:percentil_25])-y_scale.scale(v[:low_whisker])}
+            end
+            bp.rule do |r|
+              r.visible {|v| v[:percentil_75]<v[:high_whisker]}
+              r.bottom {|v| y_scale.scale(v[:high_whisker])}              
+            end
+            
+             bp.rule do |r|
+              r.visible {|v| v[:percentil_75]<v[:high_whisker]}
+              r.bottom {|v| y_scale.scale(v[:percentil_75])}              
+              r.left {|v| x_scale.range_band / 2.0}
+              r.height {|v| y_scale.scale(v[:high_whisker])-y_scale.scale(v[:percentil_75])}
+            end
+            
+            bp.dot do |dot|
+              dot.shape_size 4
+              dot.data {|v| v[:outliers]}
+              dot.left {|v| x_scale.range_band / 2.0}
+              dot.bottom {|v| v}
+              dot.title {|v| v}
+            end
+            
+            
+          end          
+        end
+      end
+      # Returns SVG with scatterplot
+      def to_svg
+        rp=rubyvis_panel
+        rp.render
+        rp.to_svg
+      end
+      def report_building(builder) # :nodoc:
+        builder.section(:name=>name) do |b|
+          b.image(to_svg, :type=>'svg', :width=>width, :height=>height)
+        end
+        
+      end
+    end
+  end
+end

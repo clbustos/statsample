@@ -46,7 +46,7 @@ module Statsample
       def corrected_dataset
         if @cds.nil?
           @cds=@ds.dup_empty
-          @key.keys.each {|k| @cds[k].type=:scale}
+          @key.keys.each {|k| @cds[k].type=:scale; @cds[k].name=@ds[k].name}
           @ds.each do |row|
             out={}
             row.each do |k,v|
@@ -76,7 +76,10 @@ module Statsample
               sa.item_total_correlation.each do |k,v|
                 if v<summary_minimal_item_correlation
                   count+=1
-                  spi.parse_element(@ds[k])
+                  spi.section(:name=>_("Item: %s") % @ds[k].name) do |spii|
+                    spii.text _("Correct answer: %s") % @key[k]
+                    spii.parse_element(@ds[k])
+                  end
                 end
               end
               spi.text _("No problematic items") if count==0

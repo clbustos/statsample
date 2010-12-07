@@ -1,4 +1,3 @@
-require 'tmpdir'
 require 'rubyvis'
 module Statsample
   module Graph

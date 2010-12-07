@@ -154,12 +154,12 @@ module Statsample
     end
     
     def _dump(i) # :nodoc:
-    Marshal.dump({'data'=>@data,'missing_values'=>@missing_values, 'labels'=>@labels, 'type'=>@type})
+      Marshal.dump({'data'=>@data,'missing_values'=>@missing_values, 'labels'=>@labels, 'type'=>@type,'name'=>@name})
     end
     
     def self._load(data) # :nodoc:
     h=Marshal.load(data)
-    Vector.new(h['data'], h['type'],:missing_values=> h['missing_values'], :labels=>h['labels'])
+    Vector.new(h['data'], h['type'], :missing_values=> h['missing_values'], :labels=>h['labels'], :name=>h['name'])
     end
     # Returns a new vector, with data modified by block.
     # Equivalent to create a Vector after #collect on data 
