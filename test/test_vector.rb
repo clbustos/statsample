@@ -126,7 +126,15 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       end
     end
 
-    
+    should "return correct histogram" do
+      a=10.times.map {|v| v}.to_scale
+      hist=a.histogram(2)
+      assert_equal([5,5], hist.bin)
+      3.times do |i|
+        assert_in_delta(i*4.5, hist.get_range(i)[0], 1e-9)
+      end
+      
+    end
     should "have a name" do
       @c.name=="Test Vector"
     end
@@ -197,15 +205,12 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       assert_equal(e,h)
     end
     should "have a summary with name on it" do
-      
       assert_match(/#{@c.name}/, @c.summary)
     end
-    
-    
-  end
-  def test_split
-    a = Statsample::Vector.new(["a","a,b","c,d","a,d","d",10,nil],:nominal)
-    assert_equal([%w{a},%w{a b},%w{c d},%w{a d},%w{d},[10],nil], a.splitted)
+    should "split correctly" do
+      a = Statsample::Vector.new(["a","a,b","c,d","a,d","d",10,nil],:nominal)
+      assert_equal([%w{a},%w{a b},%w{c d},%w{a d},%w{d},[10],nil], a.splitted)      
+    end
   end
 
 

@@ -217,6 +217,21 @@ module Statsample
       end
       u
     end
+    
+    def self.nice(s,e) # :nodoc:
+      reverse = e<s
+      min = reverse ? e : s
+      max = reverse ? s : e
+      span=max-min
+      return [s, e] if (!span or (span.respond_to? :infinite? and span.infinite?))
+      
+      step=10**((Math::log(span).quo(Math::log(10))).round - 1).to_f  
+      out=[(min.quo(step)).floor * step, (max.quo(step)).ceil * step]
+      out.reverse! if reverse
+      out
+    end
+    
+    
   end
   
   

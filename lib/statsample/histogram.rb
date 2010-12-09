@@ -39,9 +39,23 @@ module Statsample
   
     class Histogram
       class << self
+        # Alloc +n_bins+, using +range+ as ranges of bins
         def alloc(n_bins, range=nil, opts=Hash.new)
-          Histogram.new(n_bins, range)
+          Histogram.new(n_bins, range, opts)
           
+        end
+        # Alloc +n_bins+ bins, using +p1+ as minimum and +p2+
+        # as maximum
+        def alloc_uniform(n_bins, p1=nil,p2=nil)
+          if p1.is_a? Array
+            min,max=p1
+          else
+            min,max=p1,p2
+          end
+          range=max - min
+          step=range / n_bins.to_f
+          range=(n_bins+1).times.map {|i| min + (step*i)}
+          Histogram.new(range)
         end
       end
       attr_accessor :name
@@ -53,25 +67,29 @@ module Statsample
         
         if p1.is_a? Array
           range=p1
-          n_bins=p1.size-1
+          @n_bins=p1.size-1
         elsif p1.is_a? Integer
-          n_bins=p1
+          @n_bins=p1
         end
         
-        @bin=[0.0]*(n_bins)
+        @bin=[0.0]*(@n_bins)
         if(min_max)
           min, max=min_max[0], min_max[1]
-          range=Array.new(n_bins+1)
-          (n_bins+1).times {|i| range[i]=min+(i*(max-min).quo(n_bins)) }
+          range=Array.new(@n_bins+1)
+          (@n_bins+1).times {|i| range[i]=min+(i*(max-min).quo(@n_bins)) }
         end
-        range||=[0.0]*(n_bins+1)
+        range||=[0.0]*(@n_bins+1)
         set_ranges(range)
         @name=""
         opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
         }
       end
-      
+      # Number of bins
+      def bins
+        @n_bins
+      end
+      # 
       def increment(x, w=1)
         if x.is_a? Array
           x.each{|y| increment(y,w) }
@@ -87,6 +105,21 @@ module Statsample
       def set_ranges(range)
         raise "Range size should be bin+1" if range.size!=@bin.size+1
         @range=range
+      end
+      def get_range(i)
+        [@range[i],@range[i+1]]
+      end
+      def max
+        @range.last
+      end
+      def min
+        @range.first
+      end
+      def max_val
+        @bin.max
+      end
+      def min_val
+        @bin.min
       end
       def report_building_text(generator)
         #anchor=generator.toc_entry(_("Histogram %s") % [@name])

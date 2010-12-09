@@ -570,32 +570,6 @@ module Statsample
       a
     }
     end
-    # Plot frequencies on a chart, using gnuplot
-      def plot_frequencies
-      require 'gnuplot'
-      x=[]
-      y=[]
-      self.frequencies.sort.each{|k,v|
-          x.push(k)
-          y.push(v) 
-      }
-      Gnuplot.open do |gp|
-        Gnuplot::Plot.new( gp ) do |plot|
-          plot.boxwidth("0.9 absolute")
-          plot.yrange("[0:#{y.max}]")
-          plot.style("fill  solid 1.00 border -1")
-          plot.set("xtics border in scale 1,0.5 nomirror rotate by -45  offset character 0, 0, 0")
-          plot.style("histogram")
-          plot.style("data histogram")
-          i=-1
-          plot.set("xtics","("+x.collect{|v| i+=1; sprintf("\"%s\" %d",v,i)}.join(",")+")")
-          plot.data << Gnuplot::DataSet.new( [y] ) do |ds|
-              end
-          end
-        end
-    
-      end
-    
     
     # Returns the most frequent item.
     def mode
@@ -878,21 +852,24 @@ module Statsample
         
         if bins.is_a? Array
           #h=Statsample::Histogram.new(self, bins)
-          h=GSL::Histogram.alloc(bins)                        
+          h=Statsample::Histogram.alloc(bins)                        
         else
           # ugly patch. The upper limit for a bin has the form
           # x < range
           #h=Statsample::Histogram.new(self, bins)
-          h=GSL::Histogram.alloc(bins,[@valid_data.min,@valid_data.max+0.0001])
+          min,max=Statsample::Util.nice(@valid_data.min,@valid_data.max)
+          # fix last data
+          if max==@valid_data.max
+            max+=1e-10
+          end
+          h=Statsample::Histogram.alloc(bins,[min,max])
+          # Fix last bin
+
         end
-        h.increment(@gsl)
+        h.increment(@valid_data)
         h
       end
-      def plot_histogram(bins=10,options="")
-          check_type :scale
-          self.histogram(bins).graph(options)
-      end
-    
+      
     end
       
     # Coefficient of variation
