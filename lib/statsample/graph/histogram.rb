@@ -53,9 +53,9 @@ module Statsample
         
         margin_hor=margin_left + margin_right
         margin_vert=margin_top  + margin_bottom
-
+      
         x_scale = pv.Scale.linear(@hist.min, @hist.max).range(0,width-margin_hor)
-
+      
         y_scale=Rubyvis::Scale.linear(0,max_bin).range(0, height-margin_vert)
         
         y_scale.nice
@@ -86,13 +86,13 @@ module Statsample
           end
           # X axis
           pan.rule do
-            data(bins+[{:low=>max_range}])
-            left {|v| x_scale.scale(v[:low])}
+            data x_scale.ticks
+            left x_scale
             stroke_style "black"
             height 5
             bottom -5
             label(:anchor=>'bottom') do
-              text {|v| x_scale.tick_format.call(v[:low])}
+              text x_scale.tick_format
             end
           end
           
@@ -117,21 +117,17 @@ module Statsample
         builder.section(:name=>name) do |b|
           b.image(to_svg, :type=>'svg', :width=>width, :height=>height)
         end
-        
       end
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+      def report_building_text(generator)
+        pre_vis
+        #anchor=generator.toc_entry(_("Histogram %s") % [@name])
+        step=  @hist.max_val > 40 ? ( @hist.max_val / 40).ceil : 1
+          
+        @hist.range.each_with_index do |r,i|
+          next if i==@hist.bins
+          generator.text(sprintf("%5.2f : %s", r, "*" * (@hist.bin[i] / step).floor ))
+        end
+      end
     end
   end
 end

@@ -121,11 +121,14 @@ module Statsample
       def min_val
         @bin.min
       end
+      def report_building(generator)
+        hg=Statsample::Graph::Histogram.new(self)
+        generator.parse_element(hg)
+      end
       def report_building_text(generator)
-        #anchor=generator.toc_entry(_("Histogram %s") % [@name])
-        range.each_with_index do |r,i|
+        @range.each_with_index do |r,i|
           next if i==@bin.size
-          generator.text(sprintf("%4.2f : %d", r, @bin[i]))
+          generator.text(sprintf("%5.2f : %d", r, @bin[i]))
         end
       end
     end
