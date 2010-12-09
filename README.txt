@@ -21,6 +21,7 @@ Include:
 * Sample calculation related formulas
 * Structural Equation Modeling (SEM), using R libraries +sem+ and +OpenMx+
 * Creates reports on text, html and rtf, using ReportBuilder gem
+* Graphics: Histogram, Boxplot and Scatterplot
 
 == FEATURES:
 
@@ -69,8 +70,11 @@ Include:
   * Statsample::Test::UMannWhitney
   * Statsample::Test::T
   * Statsample::Test::F  
+* Module Graph provides several classes to create beautiful graphs using rubyvis
+  * Statsample::Graph::Boxplot
+  * Statsample::Graph::Histogram
+  * Statsample::Graph::Scatterplot
 * Gem +statsample-sem+ provides a DSL to R libraries +sem+ and +OpenMx+
-* Interfaces to gdchart, gnuplot and SVG::Graph (experimental)
 * Close integration with gem <tt>reportbuilder</tt>, to easily create reports on text, html and rtf formats.
 
 == Examples of use:

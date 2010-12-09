@@ -12,10 +12,12 @@ data/test_binomial.csv
 data/tetmat_matrix.txt
 data/tetmat_test.txt
 doc_latex/manual/equations.tex
+examples/boxplot.rb
 examples/correlation_matrix.rb
 examples/dataset.rb
 examples/dominance_analysis.rb
 examples/dominance_analysis_bootstrap.rb
+examples/histogram.rb
 examples/icc.rb
 examples/levene.rb
 examples/multiple_regression.rb
@@ -61,6 +63,8 @@ lib/statsample/factor/pca.rb
 lib/statsample/factor/principalaxis.rb
 lib/statsample/factor/rotation.rb
 lib/statsample/graph.rb
+lib/statsample/graph/boxplot.rb
+lib/statsample/graph/histogram.rb
 lib/statsample/graph/scatterplot.rb
 lib/statsample/histogram.rb
 lib/statsample/matrix.rb
@@ -84,6 +88,7 @@ lib/statsample/reliability.rb
 lib/statsample/reliability/icc.rb
 lib/statsample/reliability/multiscaleanalysis.rb
 lib/statsample/reliability/scaleanalysis.rb
+lib/statsample/reliability/skillscaleanalysis.rb
 lib/statsample/resample.rb
 lib/statsample/rserve_extension.rb
 lib/statsample/srs.rb
@@ -126,6 +131,7 @@ test/test_multiset.rb
 test/test_regression.rb
 test/test_reliability.rb
 test/test_reliability_icc.rb
+test/test_reliability_skillscale.rb
 test/test_resample.rb
 test/test_rserve_extension.rb
 test/test_srs.rb

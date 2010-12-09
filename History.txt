@@ -1,3 +1,9 @@
+=== 0.17.0 / 2010-12-09
+* Added Statsample::Graph::Histogram and Statsample::Graph::Boxplot
+* Added Statsample::Reliability::SkillScaleAnalysis for analysis of skill based scales.
+* Delete combination and permutation clases. Backport for ruby 1.8.7 widely available
+* Deleted unused variables (thanks, ruby-head)
+
 === 0.16.0 / 2010-11-13
 * Works on ruby 1.9.2 and HEAD. Updated Rakefile and manifest
 * Removed all graph based on Svg::Graph. 
@@ -6,6 +12,7 @@
 * Added reference on references.txt
 * Ruby-based random gaussian distribution generator when gsl not available
 * Added population average deviation [Al Chou]
+
 === 0.15.1 / 2010-10-20
 * Statsample::Excel and Statsample::PlainText add name to vectors equal to field name 
 * Statsample::Dataset.delete_vector accept multiple fields.
