@@ -3,10 +3,11 @@ module Statsample
   module Graph
     class Histogram
       include Summarizable
+      # Histogram name
       attr_accessor :name
-      # Total width of Boxplot
+      # Total width
       attr_accessor :width
-      # Total height of Boxplot
+      # Total height
       attr_accessor :height
       # Top margin
       attr_accessor :margin_top
@@ -19,6 +20,15 @@ module Statsample
       attr_reader :hist
       # Could be an array of ranges or number of bins
       attr_accessor :bins
+      # Minimum value on x axis. Calculated automaticly from data if not set
+      attr_accessor :minimum_x
+      # Maximum value on x axis. Calculated automaticly from data if not set
+      attr_accessor :maximum_x
+      # Minimum value on y axis. Set to 0 if not set
+      attr_accessor :minimum_y
+      # Maximum value on y axis. Calculated automaticly from data if not set.
+      attr_accessor :maximum_y
+      
       # data could be a vector or a histogram
       def initialize(data,opts=Hash.new)
         prov_name=data.respond_to? :name ? data.name : ""
@@ -30,6 +40,10 @@ module Statsample
           :margin_bottom=>20,
           :margin_left=>20,
           :margin_right=>20,
+          :minimum_x=>nil,
+          :maximum_x=>nil,
+          :minimum_y=>nil,
+          :maximum_y=>nil,
           :bins=>nil
         }
         @opts=opts_default.merge(opts)
@@ -49,14 +63,17 @@ module Statsample
         pre_vis
         that=self
         
-        max_bin = @hist.max_val
+        @minimum_x||=@hist.min
+        @maximum_x||=@hist.max
+        @minimum_y||=0
+        @maximum_y||=@hist.max_val
         
         margin_hor=margin_left + margin_right
         margin_vert=margin_top  + margin_bottom
       
-        x_scale = pv.Scale.linear(@hist.min, @hist.max).range(0,width-margin_hor)
+        x_scale = pv.Scale.linear(@minimum_x, @maximum_x).range(0,width-margin_hor)
       
-        y_scale=Rubyvis::Scale.linear(0,max_bin).range(0, height-margin_vert)
+        y_scale=Rubyvis::Scale.linear(@minimum_y,@maximum_y).range(0, height-margin_vert)
         
         y_scale.nice
         max_range=@hist.max
