@@ -140,7 +140,6 @@ module Statsample
       end
       @i=nil
     end
-    
     #
     # Returns a GSL::matrix
     #
@@ -239,6 +238,7 @@ module Statsample
         ds[f]=@vectors[f]
       }
       ds.fields=fields_to_include
+      ds.name=@name
       ds.update_valid_data
       ds
     end
@@ -419,13 +419,15 @@ module Statsample
     # if fields parameter is empty, sum all fields 
     def vector_sum(fields=nil)
       fields||=@fields
-      collect_with_index do |row, i|
+      vector=collect_with_index do |row, i|
         if(fields.find{|f| !@vectors[f].data_with_nils[i]})
           nil
         else
           fields.inject(0) {|ac,v| ac + row[v].to_f}
         end
       end
+      vector.name=_("Sum from %s") % @name
+      vector
     end
     # Check if #fields attribute is correct, after inserting or deleting vectors
     def check_fields(fields)
@@ -476,7 +478,9 @@ module Statsample
           a.push(sum.quo(size-invalids))
         end
       end
-      a.to_vector(:scale)
+      a=a.to_vector(:scale)
+      a.name=_("Means from %s") % @name
+      a
     end
     # Check vectors for type and size.
     def check_length # :nodoc:
@@ -668,9 +672,10 @@ module Statsample
     def filter
       ds=self.dup_empty
       each {|c|
-        ds.add_case(c,false) if yield c
+        ds.add_case(c, false) if yield c
       }
       ds.update_valid_data
+      ds.name=_("%s(filtered)") % @name
       ds
     end
     
@@ -737,6 +742,11 @@ module Statsample
       
       ms.datasets.each do |k,ds|
         ds.update_valid_data
+        ds.name=fields.size.times.map {|i|
+          f=fields[i]
+          sk=k[i]
+          @vectors[f].labeling(sk)
+        }.join("-")
         ds.vectors.each{|k1,v1| 
           v1.type=@vectors[k1].type
           v1.name=@vectors[k1].name
@@ -805,7 +815,7 @@ module Statsample
       vr
     end
     def to_s
-      "#<"+self.class.to_s+":"+self.object_id.to_s+" @fields=["+@fields.join(",")+"] cases="+@vectors[@fields[0]].size.to_s
+      "#<"+self.class.to_s+":"+self.object_id.to_s+" @name=#{@name} @fields=["+@fields.join(",")+"] cases="+@vectors[@fields[0]].size.to_s
     end
     def inspect
       self.to_s

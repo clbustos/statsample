@@ -14,6 +14,7 @@ module Statsample
       include Summarizable
       attr_reader :ds,:mean, :sd,:valid_n, :alpha , :alpha_standarized, :variances_mean, :covariances_mean, :cov_m
       attr_accessor :name
+      attr_accessor :summary_histogram
       def initialize(ds, opts=Hash.new)
         @dumped=ds.fields.find_all {|f|
           ds[f].variance==0
@@ -40,9 +41,13 @@ module Statsample
         @sd = @total.sd
         @variance=@total.variance
         @valid_n = @total.size
-        opts_default={:name=>_("Reliability Analisis")}
+        opts_default={
+          :name=>_("Reliability Analisis"),
+          :summary_histogram=>true
+        }
         @opts=opts_default.merge(opts)
-        @name=@opts[:name]
+        @opts.each{|k,v| self.send("#{k}=",v) if self.respond_to? k }
+        
         @cov_m=Statsample::Bivariate.covariance_matrix(@ds)
         # Mean for covariances and variances
         @variances=@k.times.map {|i| @cov_m[i,i]}.to_scale
@@ -154,14 +159,13 @@ module Statsample
                 t.row [_("Items"), @ods.fields.size]
                 t.row [_("Sum mean"),     "%0.4f" % @o_total.mean]
                 t.row [_("S.d. mean"),     "%0.4f" % @o_total.sd]
-
               end
-            
               s.table(:name=>_("Deleted items"), :header=>['item','mean']) do |t|
                 @dumped.each do |f|
                   t.row(["#{@ods[f].name}(#{f})", "%0.5f" % @ods[f].mean])
                 end
               end
+              s.parse_element(Statsample::Graph::Histogram.new(@o_total)) if @summary_histogram
             end
           end
           
@@ -225,7 +229,7 @@ module Statsample
               t.row row
             end # end each
           end # table
-          
+          s.parse_element(Statsample::Graph::Histogram.new(@total)) if @summary_histogram
         end # section
       end # def
     end # class

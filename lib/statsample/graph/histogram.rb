@@ -28,23 +28,25 @@ module Statsample
       attr_accessor :minimum_y
       # Maximum value on y axis. Calculated automaticly from data if not set.
       attr_accessor :maximum_y
-      
+      # Add a line showing normal distribution
+      attr_accessor :line_normal_distribution
       # data could be a vector or a histogram
       def initialize(data,opts=Hash.new)
-        prov_name=data.respond_to? :name ? data.name : ""
+        prov_name=(data.respond_to?(:name)) ? data.name : ""
         opts_default={
           :name=>_("Histograma (%s)") % prov_name,
           :width=>400,
           :height=>300,
           :margin_top=>10,
           :margin_bottom=>20,
-          :margin_left=>20,
+          :margin_left=>30,
           :margin_right=>20,
           :minimum_x=>nil,
           :maximum_x=>nil,
           :minimum_y=>nil,
           :maximum_y=>nil,
-          :bins=>nil
+          :bins=>nil,
+          :line_normal_distribution=>false
         }
         @opts=opts_default.merge(opts)
         opts_default.keys.each {|k| send("#{k}=", @opts[k]) }
@@ -53,10 +55,39 @@ module Statsample
       def pre_vis
         if @data.is_a? Statsample::Histogram
           @hist=@data
+          @mean=@hist.estimated_mean
+          @sd=@hist.estimated_standard_deviation
         elsif @data.is_a? Statsample::Vector
+          @mean=@data.mean
+          @sd=@data.sd
           @bins||=Math::sqrt(@data.size).floor
           @hist=@data.histogram(@bins)
         end
+      end
+      def rubyvis_normal_distribution(pan)
+        x_scale=@x_scale
+        y_scale=@y_scale
+        
+        wob = @hist.get_range(0)[1] - @hist.get_range(0)[0]
+        
+        nob = ((@maximum_x-@minimum_x) / wob.to_f).floor
+        sum=@hist.sum
+        
+        data=nob.times.map {|i|
+          l=@minimum_x+i*wob
+          r=@minimum_x+(i+1)*wob          
+          middle=(l+r) / 2.0
+          pi=Distribution::Normal.cdf((r-@mean) / @sd) - Distribution::Normal.cdf((l-@mean) / @sd)
+          {:x=>middle, :y=>pi*sum}
+        }
+        pan.line do |l|
+          l.data data
+          l.interpolate "cardinal"
+          l.stroke_style "black"
+          l.bottom {|d| y_scale[d[:y]]}
+          l.left {|d| x_scale[d[:x]]}
+        end
+        
       end
       # Returns a Rubyvis panel with scatterplot
       def rubyvis_panel # :nodoc:
@@ -84,6 +115,8 @@ module Statsample
            :value=>@hist.bin[i]
           }
         }
+        @x_scale=x_scale
+        @y_scale=y_scale
         # cache data
         vis=Rubyvis::Panel.new do |pan| 
           pan.width  width  - margin_hor
@@ -107,12 +140,12 @@ module Statsample
             left x_scale
             stroke_style "black"
             height 5
-            bottom -5
+            bottom(-5)
             label(:anchor=>'bottom') do
               text x_scale.tick_format
             end
           end
-          
+         
           pan.bar do |bar|
             bar.data(bins)
             bar.left {|v| x_scale.scale(v[:low])}
@@ -122,6 +155,7 @@ module Statsample
             bar.stroke_style "black"
             bar.line_width 1
           end
+           rubyvis_normal_distribution(pan) if @line_normal_distribution
         end
       end
       # Returns SVG with scatterplot

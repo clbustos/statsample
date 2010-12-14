@@ -18,7 +18,7 @@ module Statsample
       attr_accessor :summary_show_problematic_items
       def initialize(ds,key,opts=Hash.new)
         opts_default={
-          :name=>_("Skill Scale Reliability Analysis"),
+          :name=>_("Skill Scale Reliability Analysis (%s)") % ds.name,
           :summary_minimal_item_correlation=>0.10,
           :summary_show_problematic_items=>true
         }
@@ -30,7 +30,14 @@ module Statsample
       end
       def corrected_dataset_minimal
         cds=corrected_dataset
-        @key.keys.inject({}) {|ac,v| ac[v]=cds[v];ac}.to_dataset
+        dsm=@key.keys.inject({}) {|ac,v| ac[v]=cds[v];ac}.to_dataset
+        @key.keys.each do |k|
+          dsm[k].name=_("%s(corrected)") % @ds[k].name
+          dsm[k].labels=@ds[k].labels
+        end
+        
+        dsm.name=_("Corrected dataset from %s") % @ds.name
+        dsm
       end
       def vector_sum
         corrected_dataset_minimal.vector_sum
@@ -74,11 +81,19 @@ module Statsample
             s.section(:name=>_("Problematic Items")) do |spi|
               count=0
               sa.item_total_correlation.each do |k,v|
-                if v<summary_minimal_item_correlation
+                if v < summary_minimal_item_correlation
                   count+=1
                   spi.section(:name=>_("Item: %s") % @ds[k].name) do |spii|
                     spii.text _("Correct answer: %s") % @key[k]
-                    spii.parse_element(@ds[k])
+                    spii.text _("p: %0.3f") % corrected_dataset[k].mean
+                    props=@ds[k].proportions.inject({}) {|ac,v| ac[v[0]] = v[1].to_f;ac}
+                    
+                    spi.table(:name=>"Proportions",:header=>[_("Value"), _("%")]) do |table|
+                      props.each do |k1,v|
+                        table.row [ @ds[k].labeling(k1), "%0.3f" % v]
+                      end
+                    end
+                    
                   end
                 end
               end

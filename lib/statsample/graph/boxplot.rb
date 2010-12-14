@@ -143,7 +143,7 @@ module Statsample
           pan.label  do |l|
             l.data data
             l.left  {|v|  x_scale.scale(index)}
-            l.bottom -15
+            l.bottom(-15)
             l.text {|v,x| v[:name]}
           end
           

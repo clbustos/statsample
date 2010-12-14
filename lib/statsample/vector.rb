@@ -91,12 +91,12 @@ module Statsample
     # Note: data, missing_values and labels are duplicated, so
     # changes on original vector doesn't propages to copies.
     def dup
-      Vector.new(@data.dup,@type, :missing_values => @missing_values.dup, :labels => @labels.dup, :name=>@name.dup)
+      Vector.new(@data.dup,@type, :missing_values => @missing_values.dup, :labels => @labels.dup, :name=>@name)
     end
     # Returns an empty duplicate of the vector. Maintains the type,
     # missing values and labels.
     def dup_empty
-      Vector.new([],@type, :missing_values => @missing_values.dup, :labels => @labels.dup, :name=>@name.dup)
+      Vector.new([],@type, :missing_values => @missing_values.dup, :labels => @labels.dup, :name=> @name)
     end
     # Raises an exception if type of vector is inferior to t type
     def check_type(t)
@@ -113,13 +113,15 @@ module Statsample
       m=mean
       sd=use_population ? sdp : sds
       return nil if sd==0.0
-      @data_with_nils.collect{|x|
+      vector=@data_with_nils.collect{|x|
         if !x.nil?
           (x.to_f - m).quo(sd)
         else
           nil
         end
       }.to_vector(:scale)
+      vector.name=_("%s(standarized)")  % @name
+      vector
     end
     
     alias_method :standarized, :vector_standarized
@@ -128,8 +130,9 @@ module Statsample
     def vector_percentil
       check_type :ordinal
       c=size
-      ranked.map {|i| (i.quo(c)*100).to_f }.to_vector(@type)
-      
+      vector=ranked.map {|i| (i.quo(c)*100).to_f }.to_vector(@type)
+      vector.name=_("%s(percentil)")  % @name
+      vector
     end
     def box_cox_transformation(lambda) # :nodoc:
     raise "Should be a scale" unless @type==:scale
@@ -553,22 +556,22 @@ module Statsample
     end
     end
     if Statsample::STATSAMPLE__.respond_to?(:frequencies)
-    # Returns a hash with the distribution of frecuencies for
-    # the sample                
-    def frequencies
-      Statsample::STATSAMPLE__.frequencies(@valid_data)
-    end
+      # Returns a hash with the distribution of frecuencies for
+      # the sample                
+      def frequencies
+        Statsample::STATSAMPLE__.frequencies(@valid_data)
+      end
     else
-    def frequencies #:nodoc:
-      _frequencies
-    end
+      def frequencies #:nodoc:
+        _frequencies
+      end
     end
     def _frequencies #:nodoc:
-    @valid_data.inject(Hash.new) {|a,x|
-      a[x]||=0
-      a[x]=a[x]+1
-      a
-    }
+      @valid_data.inject(Hash.new) {|a,x|
+        a[x]||=0
+        a[x]=a[x]+1
+        a
+      }
     end
     
     # Returns the most frequent item.

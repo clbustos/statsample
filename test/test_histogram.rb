@@ -76,7 +76,31 @@ class StatsampleHistogramTestCase < MiniTest::Unit::TestCase
        }
        assert_equal(min,h.min_val)
     end
-    
+    should "return correct estimated mean" do
+      a=[1.5,1.5,1.5,3.5,3.5,3.5].to_scale
+      h=Statsample::Histogram.alloc(5,[0,5])
+      h.increment(a)
+      assert_equal(2.5, h.estimated_mean)
+    end
+    should "return correct estimated standard deviation" do
+      a=[0.5,1.5,1.5,1.5,2.5, 3.5,3.5,3.5,4.5].to_scale
+      h=Statsample::Histogram.alloc(5,[0,5])
+      h.increment(a)
+      assert_equal(a.sd, h.estimated_standard_deviation)
+    end
+    should "return correct sum for all values" do
+      h=Statsample::Histogram.alloc(5,[0,5])
+      n=rand(100)
+      n.times { h.increment(1)}
+      assert_equal(n, h.sum)
+    end
+    should "return correct sum for a subset of values" do
+      h=Statsample::Histogram.alloc(5,[0,5])
+      h.increment([0.5,2.5,4.5])
+      assert_equal(1,h.sum(0,1))
+      assert_equal(2,h.sum(1,4))
+
+    end
     
   end
 end

@@ -6,8 +6,8 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: statsample 0.14.0\n"
-"POT-Creation-Date: 2010-08-17 18:46-0400\n"
+"Project-Id-Version: statsample 0.17.0\n"
+"POT-Creation-Date: 2010-12-13 12:43-0300\n"
 "PO-Revision-Date: 2009-08-04 15:36-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,7 +24,7 @@ msgstr ""
 msgid "Mean and standard deviation"
 msgstr ""
 
-#: lib/statsample/test/t.rb:209 lib/statsample/factor/pca.rb:163
+#: lib/statsample/test/t.rb:209 lib/statsample/factor/pca.rb:162
 #: lib/statsample/factor/principalaxis.rb:202
 msgid "Variable"
 msgstr ""
@@ -38,8 +38,8 @@ msgstr ""
 msgid "sd"
 msgstr ""
 
-#: lib/statsample/test/t.rb:209 lib/statsample/factor/parallelanalysis.rb:100
-#: lib/statsample/factor/parallelanalysis.rb:108
+#: lib/statsample/test/t.rb:209 lib/statsample/factor/parallelanalysis.rb:105
+#: lib/statsample/factor/parallelanalysis.rb:113
 msgid "n"
 msgstr ""
 
@@ -148,11 +148,11 @@ msgstr ""
 msgid "Multiple reggresion of %s on %s"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:116
+#: lib/statsample/dominanceanalysis/bootstrap.rb:115
 msgid "Bootstrap dominance Analysis:  %s over %s"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis/bootstrap.rb:139
+#: lib/statsample/dominanceanalysis/bootstrap.rb:138
 msgid "Bootstrap %d of %d"
 msgstr ""
 
@@ -231,19 +231,19 @@ msgstr ""
 #: lib/statsample/anova/twoway.rb:103 lib/statsample/anova/oneway.rb:60
 #: lib/statsample/crosstab.rb:101 lib/statsample/crosstab.rb:116
 #: lib/statsample/crosstab.rb:151 lib/statsample/crosstab.rb:173
-#: lib/statsample/dominanceanalysis.rb:353
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "Total"
 msgstr ""
 
-#: lib/statsample/anova/twoway.rb:178
+#: lib/statsample/anova/twoway.rb:172
 msgid "Anova Two-Way on %s"
 msgstr ""
 
-#: lib/statsample/anova/twoway.rb:190 lib/statsample/anova/oneway.rb:101
+#: lib/statsample/anova/twoway.rb:184 lib/statsample/anova/oneway.rb:101
 msgid "Test of Homogeneity of variances (Levene)"
 msgstr ""
 
-#: lib/statsample/anova/twoway.rb:195 lib/statsample/anova/twoway.rb:199
+#: lib/statsample/anova/twoway.rb:189 lib/statsample/anova/twoway.rb:193
 msgid "%s Mean"
 msgstr ""
 
@@ -271,6 +271,18 @@ msgstr ""
 msgid "Descriptives"
 msgstr ""
 
+#: lib/statsample/graph/scatterplot.rb:54
+msgid "Scatterplot (%s - %s)"
+msgstr ""
+
+#: lib/statsample/graph/histogram.rb:36
+msgid "Histograma (%s)"
+msgstr ""
+
+#: lib/statsample/graph/boxplot.rb:60
+msgid "Boxplot"
+msgstr ""
+
 #: lib/statsample/bivariate/pearson.rb:32
 msgid "Correlation (%s - %s)"
 msgstr ""
@@ -279,66 +291,62 @@ msgstr ""
 msgid "%s : r=%0.3f (t:%0.3f, g.l.=%d, p:%0.3f / %s tails)"
 msgstr ""
 
-#: lib/statsample/histogram.rb:92
-msgid "Histogram %s"
-msgstr ""
-
-#: lib/statsample/factor/parallelanalysis.rb:70
+#: lib/statsample/factor/parallelanalysis.rb:71
 msgid "Parallel Analysis"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:93
+#: lib/statsample/factor/parallelanalysis.rb:98
 msgid "Bootstrap Method: %s"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:94
+#: lib/statsample/factor/parallelanalysis.rb:99
 msgid "Uses SMC: %s"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:94
+#: lib/statsample/factor/parallelanalysis.rb:99
 msgid "Yes"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:94
+#: lib/statsample/factor/parallelanalysis.rb:99
 msgid "No"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:95
+#: lib/statsample/factor/parallelanalysis.rb:100
 msgid "Correlation Matrix type : %s"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:96
+#: lib/statsample/factor/parallelanalysis.rb:101
 msgid "Number of variables: %d"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:97
+#: lib/statsample/factor/parallelanalysis.rb:102
 msgid "Number of cases: %d"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:98
+#: lib/statsample/factor/parallelanalysis.rb:103
 msgid "Number of iterations: %d"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:100
-#: lib/statsample/factor/parallelanalysis.rb:108
-#: lib/statsample/factor/map.rb:90
+#: lib/statsample/factor/parallelanalysis.rb:105
+#: lib/statsample/factor/parallelanalysis.rb:113
+#: lib/statsample/factor/map.rb:91
 msgid "Eigenvalues"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:100
-#: lib/statsample/factor/parallelanalysis.rb:108
+#: lib/statsample/factor/parallelanalysis.rb:105
+#: lib/statsample/factor/parallelanalysis.rb:113
 msgid "generated eigenvalue"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:107
+#: lib/statsample/factor/parallelanalysis.rb:112
 msgid "Number or factors to preserve: %d"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:108
+#: lib/statsample/factor/parallelanalysis.rb:113
 msgid "data eigenvalue"
 msgstr ""
 
-#: lib/statsample/factor/parallelanalysis.rb:108
+#: lib/statsample/factor/parallelanalysis.rb:113
 msgid "preserve?"
 msgstr ""
 
@@ -346,79 +354,81 @@ msgstr ""
 msgid "Velicer's MAP"
 msgstr ""
 
-#: lib/statsample/factor/map.rb:90
+#: lib/statsample/factor/map.rb:91
+#: lib/statsample/reliability/skillscaleanalysis.rb:91
 msgid "Value"
 msgstr ""
 
-#: lib/statsample/factor/map.rb:95
+#: lib/statsample/factor/map.rb:96
 msgid "Velicer's Average Squared Correlations"
 msgstr ""
 
-#: lib/statsample/factor/map.rb:95
+#: lib/statsample/factor/map.rb:96
 msgid "number of components"
 msgstr ""
 
-#: lib/statsample/factor/map.rb:95
+#: lib/statsample/factor/map.rb:96
 msgid "average square correlation"
 msgstr ""
 
-#: lib/statsample/factor/map.rb:100
+#: lib/statsample/factor/map.rb:101
 msgid "The smallest average squared correlation is : %0.6f"
 msgstr ""
 
-#: lib/statsample/factor/map.rb:101
+#: lib/statsample/factor/map.rb:102
 msgid "The number of components is : %d"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:50
+#: lib/statsample/factor/pca.rb:49
 msgid "Principal Component Analysis"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:117
+#: lib/statsample/factor/pca.rb:116
 msgid "Component matrix"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:162 lib/statsample/factor/principalaxis.rb:200
+#: lib/statsample/factor/pca.rb:161 lib/statsample/factor/principalaxis.rb:200
 msgid "Number of factors: %d"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:163 lib/statsample/factor/principalaxis.rb:202
+#: lib/statsample/factor/pca.rb:162 lib/statsample/factor/principalaxis.rb:202
 msgid "Communalities"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:163 lib/statsample/factor/principalaxis.rb:202
+#: lib/statsample/factor/pca.rb:162 lib/statsample/factor/principalaxis.rb:202
 msgid "Initial"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:163 lib/statsample/factor/principalaxis.rb:202
+#: lib/statsample/factor/pca.rb:162 lib/statsample/factor/principalaxis.rb:202
 msgid "Extraction"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:169
+#: lib/statsample/factor/pca.rb:168
 msgid "Total Variance Explained"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:169
+#: lib/statsample/factor/pca.rb:168
 msgid "Component"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:169
+#: lib/statsample/factor/pca.rb:168
 msgid "E.Total"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:169
+#: lib/statsample/factor/pca.rb:168
+#: lib/statsample/reliability/skillscaleanalysis.rb:91
 msgid "%"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:169
+#: lib/statsample/factor/pca.rb:168
 msgid "Cum. %"
 msgstr ""
 
-#: lib/statsample/factor/pca.rb:173
+#: lib/statsample/factor/pca.rb:172
 msgid "Component %d"
 msgstr ""
 
-#: lib/statsample/factor/principalaxis.rb:71
+#: lib/statsample/factor/principalaxis.rb:70
 msgid "Variable %d"
 msgstr ""
 
@@ -506,72 +516,189 @@ msgstr ""
 msgid "Parallel Analysis for %s"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:177
-msgid "Summary for %s"
+#: lib/statsample/reliability/skillscaleanalysis.rb:21
+msgid "Skill Scale Reliability Analysis (%s)"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:178
+#: lib/statsample/reliability/skillscaleanalysis.rb:35
+msgid "%s(corrected)"
+msgstr ""
+
+#: lib/statsample/reliability/skillscaleanalysis.rb:39
+msgid "Corrected dataset from %s"
+msgstr ""
+
+#: lib/statsample/reliability/skillscaleanalysis.rb:50
+msgid "%s (Scale Analysis)"
+msgstr ""
+
+#: lib/statsample/reliability/skillscaleanalysis.rb:81
+msgid "Problematic Items"
+msgstr ""
+
+#: lib/statsample/reliability/skillscaleanalysis.rb:86
+msgid "Item: %s"
+msgstr ""
+
+#: lib/statsample/reliability/skillscaleanalysis.rb:87
+msgid "Correct answer: %s"
+msgstr ""
+
+#: lib/statsample/reliability/skillscaleanalysis.rb:88
+msgid "p: %0.3f"
+msgstr ""
+
+#: lib/statsample/reliability/skillscaleanalysis.rb:100
+msgid "No problematic items"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:45
+msgid "Reliability Analisis"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:158
+msgid "Summary for %s with all items"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:159
 msgid "Items"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:179
-msgid "Valid cases"
-msgstr ""
-
-#: lib/statsample/reliability/scaleanalysis.rb:180
+#: lib/statsample/reliability/scaleanalysis.rb:160
+#: lib/statsample/reliability/scaleanalysis.rb:177
 msgid "Sum mean"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:181
+#: lib/statsample/reliability/scaleanalysis.rb:161
+msgid "S.d. mean"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:163
+msgid "Deleted items"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:173
+msgid "Summary for %s"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:174
+msgid "Valid Items"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:176
+msgid "Valid cases"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:178
 msgid "Sum sd"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:182
-msgid "Sum variance"
-msgstr ""
-
-#: lib/statsample/reliability/scaleanalysis.rb:183
+#: lib/statsample/reliability/scaleanalysis.rb:180
 msgid "Sum median"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:185
+#: lib/statsample/reliability/scaleanalysis.rb:182
 msgid "Item mean"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:186
+#: lib/statsample/reliability/scaleanalysis.rb:183
+msgid "Item sd"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:185
 msgid "Skewness"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:187
+#: lib/statsample/reliability/scaleanalysis.rb:186
 msgid "Kurtosis"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:189
+#: lib/statsample/reliability/scaleanalysis.rb:188
 msgid "Cronbach's alpha"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:190
+#: lib/statsample/reliability/scaleanalysis.rb:189
 msgid "Standarized Cronbach's alpha"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:191
-msgid "Variances mean"
+#: lib/statsample/reliability/scaleanalysis.rb:190
+msgid "Mean rpb"
 msgstr ""
 
 #: lib/statsample/reliability/scaleanalysis.rb:192
+msgid "Variances mean"
+msgstr ""
+
+#: lib/statsample/reliability/scaleanalysis.rb:193
 msgid "Covariances mean"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:194
-msgid "items for obtain alpha(0.8) : %d"
+#: lib/statsample/reliability/scaleanalysis.rb:197
+msgid "Items for obtain alpha(0.8) : %d"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:195
-msgid "items for obtain alpha(0.9) : %d"
+#: lib/statsample/reliability/scaleanalysis.rb:198
+msgid "Items for obtain alpha(0.9) : %d"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:202
+#: lib/statsample/reliability/scaleanalysis.rb:206
 msgid "Items report for %s"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:114
+msgid "Shrout & Fleiss ICC(1,1)"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:119
+msgid "Shrout & Fleiss ICC(2,1)"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:125
+msgid "Shrout & Fleiss ICC(3,1)"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:132
+msgid "Shrout & Fleiss ICC(1,k)"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:138
+msgid "Shrout & Fleiss ICC(2,k)"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:145
+msgid "Shrout & Fleiss ICC(3,k)"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:153
+msgid "McGraw & Wong ICC(1)"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:159
+msgid "McGraw & Wong ICC(K)"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:165
+msgid "McGraw & Wong ICC(C,1)"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:172
+msgid "McGraw & Wong ICC(C,K)"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:179
+msgid "McGraw & Wong ICC(A,1)"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:186
+msgid "McGraw & Wong ICC(A,K)"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:408
+msgid "ICC: %0.4f"
+msgstr ""
+
+#: lib/statsample/reliability/icc.rb:410
+msgid "CI (%0.2f): [%0.4f - %0.4f]"
 msgstr ""
 
 #: lib/statsample/crosstab.rb:22
@@ -606,102 +733,122 @@ msgstr ""
 msgid "Dominance Analysis:  %s over %s"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:314
+#: lib/statsample/dominanceanalysis.rb:315
 msgid "sign"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:316
+#: lib/statsample/dominanceanalysis.rb:317
 msgid "Dominance Analysis result"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:317
+#: lib/statsample/dominanceanalysis.rb:318
 msgid "Model 0"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:332
+#: lib/statsample/dominanceanalysis.rb:333
 msgid "k=%d Average"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:344
+#: lib/statsample/dominanceanalysis.rb:345
 msgid "Overall averages"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:353
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "Pairwise dominance"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:353
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "Pairs"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:353
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "Conditional"
 msgstr ""
 
-#: lib/statsample/dominanceanalysis.rb:353
+#: lib/statsample/dominanceanalysis.rb:354
 msgid "General"
 msgstr ""
 
-#: lib/statsample/matrix.rb:96
+#: lib/statsample/matrix.rb:111
 msgid "X%d"
 msgstr ""
 
-#: lib/statsample/matrix.rb:99
+#: lib/statsample/matrix.rb:114
 msgid "Y%d"
 msgstr ""
 
-#: lib/statsample/matrix.rb:115
+#: lib/statsample/matrix.rb:130
 msgid "Covariate matrix %d"
 msgstr ""
 
-#: lib/statsample/matrix.rb:157
+#: lib/statsample/matrix.rb:172
 msgid "Correlation"
 msgstr ""
 
-#: lib/statsample/matrix.rb:157
+#: lib/statsample/matrix.rb:172
 msgid "Covariance"
 msgstr ""
 
-#: lib/statsample/matrix.rb:157
+#: lib/statsample/matrix.rb:172
 msgid " Matrix"
 msgstr ""
 
-#: lib/statsample/vector.rb:620
+#: lib/statsample/vector.rb:123
+msgid "%s(standarized)"
+msgstr ""
+
+#: lib/statsample/vector.rb:134
+msgid "%s(percentil)"
+msgstr ""
+
+#: lib/statsample/vector.rb:599
 msgid "n :%d"
 msgstr ""
 
-#: lib/statsample/vector.rb:621
+#: lib/statsample/vector.rb:600
 msgid "n valid:%d"
 msgstr ""
 
-#: lib/statsample/vector.rb:622
+#: lib/statsample/vector.rb:601
 msgid "factors:%s"
 msgstr ""
 
-#: lib/statsample/vector.rb:623
+#: lib/statsample/vector.rb:602
 msgid "mode: %s"
 msgstr ""
 
-#: lib/statsample/vector.rb:624
+#: lib/statsample/vector.rb:603
 msgid "Distribution"
 msgstr ""
 
-#: lib/statsample/vector.rb:630
+#: lib/statsample/vector.rb:609
 msgid "median: %s"
 msgstr ""
 
-#: lib/statsample/vector.rb:632
+#: lib/statsample/vector.rb:611
 msgid "mean: %0.4f"
 msgstr ""
 
-#: lib/statsample/vector.rb:633
+#: lib/statsample/vector.rb:612
 msgid "sd: %0.4f"
 msgstr ""
 
-#: lib/statsample/dataset.rb:133
+#: lib/statsample/dataset.rb:130
 msgid "Dataset %d"
 msgstr ""
 
-#: lib/statsample/dataset.rb:821
+#: lib/statsample/dataset.rb:429
+msgid "Sum from %s"
+msgstr ""
+
+#: lib/statsample/dataset.rb:482
+msgid "Means from %s"
+msgstr ""
+
+#: lib/statsample/dataset.rb:678
+msgid "%s(filtered)"
+msgstr ""
+
+#: lib/statsample/dataset.rb:896
 msgid "Cases: %d"
 msgstr ""

@@ -38,6 +38,7 @@ module Statsample
   # * http://www.gnu.org/software/gsl/manual/html_node/The-histogram-struct.html
   
     class Histogram
+      include Enumerable
       class << self
         # Alloc +n_bins+, using +range+ as ranges of bins
         def alloc(n_bins, range=nil, opts=Hash.new)
@@ -91,7 +92,7 @@ module Statsample
       end
       # 
       def increment(x, w=1)
-        if x.is_a? Array
+        if x.respond_to? :each
           x.each{|y| increment(y,w) }
         elsif x.is_a? Numeric
           (range.size-1).times do |i|
@@ -120,6 +121,41 @@ module Statsample
       end
       def min_val
         @bin.min
+      end
+      def each
+        bins.times.each do |i|
+          r=get_range(i)
+          arg={:i=>i, :low=>r[0],:high=>r[1], :middle=>(r[0]+r[1]) / 2.0,  :value=>@bin[i]}
+          yield arg
+        end
+      end
+      def estimated_variance
+        sum,n=0,0
+        mean=estimated_mean
+        each do |v|
+          sum+=v[:value]*(v[:middle]-mean)**2
+          n+=v[:value]
+        end
+        sum / (n-1)
+      end
+      def estimated_standard_deviation
+        Math::sqrt(estimated_variance)
+      end
+      def estimated_mean
+        sum,n=0,0
+        each do |v|
+          sum+= v[:value]* v[:middle]
+          n+=v[:value]
+        end
+        sum / n
+      end
+      alias :mean :estimated_mean
+      alias :sigma :estimated_standard_deviation
+      
+      def sum(start=nil,_end=nil)
+        start||=0
+        _end||=@n_bins-1
+        (start.._end).inject(0) {|ac,i| ac+@bin[i]}
       end
       def report_building(generator)
         hg=Statsample::Graph::Histogram.new(self)
