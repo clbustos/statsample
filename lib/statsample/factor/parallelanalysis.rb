@@ -39,15 +39,12 @@ module Statsample
       attr_reader :ds
       # Bootstrap method. <tt>:random</tt> used by default
       # * <tt>:random</tt>: uses number of variables and cases for the dataset
-      # * <tt>:data</tt> : sample with replacement from actual data.       
-
+      # * <tt>:data</tt> : sample with replacement from actual data.
       attr_accessor :bootstrap_method
       # Uses smc on diagonal of matrixes, to perform simulation
       # of a Principal Axis analysis.
       # By default, false.
-
       attr_accessor :smc
-
       # Percentil over bootstrap eigenvalue should be accepted. 95 by default
       attr_accessor :percentil
       # Correlation matrix used with :raw_data . <tt>:correlation_matrix</tt> used by default

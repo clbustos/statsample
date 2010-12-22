@@ -28,6 +28,7 @@ module Statsample
         @opts.each{|k,v| self.send("#{k}=",v) if self.respond_to? k }
         @cds=nil
       end
+      # Dataset only corrected vectors
       def corrected_dataset_minimal
         cds=corrected_dataset
         dsm=@key.keys.inject({}) {|ac,v| ac[v]=cds[v];ac}.to_dataset

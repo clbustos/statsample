@@ -48,6 +48,9 @@ module Statsample
       attr_reader :fm
       # Smallest average squared correlation
       attr_reader :minfm
+      def self.with_dataset(ds,opts=Hash.new)
+        new(ds.correlation_matrix,opts)
+      end
       def initialize(matrix, opts=Hash.new)
         @matrix=matrix
         opts_default={
@@ -76,10 +79,15 @@ module Statsample
         end
         minfm=fm[0]
         nfactors=0
+        @errors=[]
         fm.each_with_index do |v,s|
-          if v < minfm
-            minfm=v
-            nfactors=s
+          if v.is_a? Complex
+            @errors.push(s)
+          else
+            if v < minfm
+              minfm=v
+              nfactors=s
+            end
           end
         end
         @number_of_factors=nfactors
@@ -89,13 +97,13 @@ module Statsample
       def report_building(g) #:nodoc:
         g.section(:name=>@name) do |s|
           s.table(:name=>_("Eigenvalues"),:header=>[_("Value")]) do |t|
-            eigenvalues.each do |e|
-              t.row(["%0.6f" % e])
+            eigenvalues.each_with_index do |e,i|
+                t.row([@errors.include?(i) ? "*" : "%0.6f" % e])
             end
           end
           s.table(:name=>_("Velicer's Average Squared Correlations"), :header=>[_("number of components"),_("average square correlation")]) do |t|
             fm.each_with_index do |v,i|
-              t.row(["%d" % i, "%0.6f" % v])
+              t.row(["%d" % i, @errors.include?(i) ? "*" : "%0.6f" % v])
             end
           end
           s.text(_("The smallest average squared correlation is : %0.6f" % minfm))

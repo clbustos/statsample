@@ -32,23 +32,32 @@ module Statsample
       attr_accessor :summary_pca
       # Add Principal Axis to summary
       attr_accessor :summary_principal_axis
-      # Add Parallel Analysis to summary
-      attr_accessor :summary_parallel_analysis
       # Options for Factor::PCA object
       attr_accessor :pca_options
       # Options for Factor::PrincipalAxis 
       attr_accessor :principal_axis_options
+      
+      # Add Parallel Analysis to summary
+      attr_accessor :summary_parallel_analysis
       # Options for Parallel Analysis
       attr_accessor :parallel_analysis_options
+      
+      # Add MPA to summary
+      attr_accessor :summary_map
+      # Options for MAP
+      attr_accessor :map_options
+      
+      
       # Generates a new MultiScaleAnalysis
       # Opts could be any accessor of the class 
       # * :name, 
       # * :summary_correlation_matrix
       # * :summary_pca
       # * :summary_principal_axis
+      # * :summary_map
       # * :pca_options
       # * :factor_analysis_options
-      #
+      # * :map_options
       # If block given, all methods should be called
       # inside object environment.
       # 
@@ -60,9 +69,11 @@ module Statsample
                         :summary_pca=>false,
                         :summary_principal_axis=>false,
                         :summary_parallel_analysis=>false,
+                        :summary_map=>false,
                         :pca_options=>Hash.new,
                         :principal_axis_options=>Hash.new,
-                        :parallel_analysis_options=>Hash.new
+                        :parallel_analysis_options=>Hash.new,
+                        :map_options=>Hash.new
         }
         @opts=opts_default.merge(opts)
         @opts.each{|k,v|
@@ -98,6 +109,10 @@ module Statsample
       def pca(opts=nil)
         opts||=pca_options        
         Statsample::Factor::PCA.new(correlation_matrix, opts)
+      end
+      def map(opts=nil)
+        opts||=map_options
+        Statsample::Factor::MAP.new(correlation_matrix, opts)
       end
       # Retrieves a PrincipalAxis Analysis (Factor::PrincipalAxis)
       # using all scales, using <tt>opts</tt> a options.
@@ -151,7 +166,11 @@ module Statsample
               s2.parse_element(parallel_analysis)
             end
           end 
-          
+          if summary_map
+            s.section(:name=>_("MAP for %s") % name) do |s2|
+              s2.parse_element(map)
+            end
+          end           
         end
       end
     end

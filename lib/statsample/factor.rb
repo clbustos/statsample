@@ -13,7 +13,18 @@ module Statsample
   #   * Statsample::Factor::Varimax
   #   * Statsample::Factor::Equimax
   #   * Statsample::Factor::Quartimax
-  # See documentation of each class to use it
+  # * Classes for determining the number of components
+  #   * Statsample::Factor::MAP
+  #   * Statsample::Factor::ParallelAnalysis
+  #
+  # About number of components, O'Connor(2000) said:
+  #  The two procedures [PA and MAP ] complement each other nicely,
+  #  in that the MAP tends to err (when it does err) in the direction
+  #  of underextraction, whereas parallel analysis tends to err
+  #  (when it does err) in the direction of overextraction.
+  #  Optimal decisions are thus likely to be made after considering
+  #  the results of both analytic procedures. (p.10)
+
   module Factor
     # Anti-image covariance matrix.
     # Useful for inspection of desireability of data for factor analysis.
