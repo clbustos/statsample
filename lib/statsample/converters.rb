@@ -17,6 +17,7 @@ module Statsample
         fields=[]
         sth.column_info.each {|c|
             vectors[c['name']]=Statsample::Vector.new([])
+            vectors[c['name']].name=c['name']
             vectors[c['name']].type= (c['type_name']=='INTEGER' or c['type_name']=='DOUBLE') ? :scale : :nominal
             fields.push(c['name'])
         }
@@ -35,7 +36,7 @@ module Statsample
       #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
       #  Statsample::Database.insert(ds,dbh,"test")
       #
-      def insert(ds, dbh,table)
+      def insert(ds, dbh, table)
         require 'dbi'            
         query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"
         sth=dbh.prepare(query)
@@ -235,6 +236,7 @@ module Statsample
         fields.each {|f|
           ds[f].name=f
         }
+        ds.name=filename
         ds
       end
     end

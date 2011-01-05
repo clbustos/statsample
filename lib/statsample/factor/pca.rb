@@ -93,9 +93,10 @@ module Factor
       omega_m
     end
     # data_transformation
-    def data_transformation(data_matrix, m)
+    def data_transformation(input, m)
+      data_matrix=input.to_matrix
       m||=@m
-      raise "Data variables number should be equal to original variable number" if data_matrix.size2!=@n_variables
+      raise "Data variables number should be equal to original variable number" if data_matrix.column_size!=@n_variables
       fv=feature_vector(m)
       (fv.transpose*data_matrix.transpose).transpose
     end

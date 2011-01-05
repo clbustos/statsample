@@ -2,6 +2,21 @@ require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 class StatsampleFactorTestCase < MiniTest::Unit::TestCase
   include Statsample::Fixtures
+  
+  def test_data_transformation
+    ran=Distribution::Normal.rng_ugaussian
+    samples=100
+    vars=10
+    f1=samples.times.map { ran.call()}.to_scale
+    f2=samples.times.map { ran.call()}.to_scale
+    ds=vars.times.inject({}) {|ac,v|
+      ac["v#{v}"]=samples.times.map{|i| f1[i]*(10-v)+f2[i]*(v+1)}.to_scale;
+      ac
+    }.to_dataset
+    cm=ds.correlation_matrix
+    pca=Statsample::Factor::PCA.new(cm,:m=>2)
+    p pca.data_transformation(ds,2)
+  end
   def test_antiimage
     cor=Matrix[[1,0.964, 0.312],[0.964,1,0.411],[0.312,0.411,1]]
     expected=Matrix[[0.062,-0.057, 0.074],[-0.057, 0.057, -0.089], [0.074, -0.089, 0.729]]

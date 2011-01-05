@@ -1,12 +1,15 @@
-$:.unshift(File.dirname(__FILE__)+'/../lib/')
-$:.unshift(File.dirname(__FILE__)+'/')
+$:.unshift(File.expand_path(File.dirname(__FILE__)+'/../lib/'))
+$:.unshift(File.expand_path(File.dirname(__FILE__)+'/'))
 
-require 'statsample'
+
 require 'minitest/unit'
 require 'tempfile'
 require 'tmpdir'
 require 'shoulda'
 require 'fixtures/correlation_matrix'
+
+require 'statsample'
+
 
 module MiniTest
   class Unit

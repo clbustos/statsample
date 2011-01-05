@@ -25,7 +25,7 @@ module Statsample
     end
     def to_s
       m="Error on iteration: "+@exp.message+"\n"+@exp.backtrace.join("\n")
-      m+="\nRow: #{@ds.i}" unless @ds.i.nil?
+      m+="\nRow ##{@ds.i}:#{@ds.case_as_hash(@ds.i)}" unless @ds.i.nil?
       m
     end
   end
