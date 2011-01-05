@@ -1,6 +1,19 @@
 require 'rubyvis'
 module Statsample
   module Graph
+    
+    # In statistics, a histogram is a graphical representation, showing a visual impression of the distribution of experimental data. It is an estimate of the probability distribution of a continuous variable and was first introduced by Karl Pearson [1]. A histogram consists of tabular frequencies, shown as adjacent rectangles, erected over discrete intervals (bins), with an area equal to the frequency of the observations in the interval. The height of a rectangle is also equal to the frequency density of the interval, i.e., the frequency divided by the width of the interval. The total area of the histogram is equal to the number of data.
+    # 
+    # == Usage
+    # === Svg output
+    #  a=[1,2,3,4].to_scale
+    #  puts Statsample::Graph::Histogram.new(a).to_svg
+    # === Using ReportBuilder
+    #  a=[1,2,3,4].to_scale
+    #  rb=ReportBuilder.new
+    #  rb.add(Statsample::Graph::Histogram.new(a))
+    #  rb.save_html('histogram.html')
+    
     class Histogram
       include Summarizable
       # Histogram name
@@ -52,7 +65,7 @@ module Statsample
         opts_default.keys.each {|k| send("#{k}=", @opts[k]) }
         @data=data
       end
-      def pre_vis
+      def pre_vis # :nodoc:
         if @data.is_a? Statsample::Histogram
           @hist=@data
           @mean=@hist.estimated_mean
@@ -102,9 +115,9 @@ module Statsample
         margin_hor=margin_left + margin_right
         margin_vert=margin_top  + margin_bottom
       
-        x_scale = pv.Scale.linear(@minimum_x, @maximum_x).range(0,width-margin_hor)
+        x_scale = pv.Scale.linear(@minimum_x, @maximum_x).range(0, width - margin_hor)
       
-        y_scale=Rubyvis::Scale.linear(@minimum_y,@maximum_y).range(0, height-margin_vert)
+        y_scale=Rubyvis::Scale.linear(@minimum_y, @maximum_y).range(0, height - margin_vert)
         
         y_scale.nice
         max_range=@hist.max
@@ -148,10 +161,10 @@ module Statsample
          
           pan.bar do |bar|
             bar.data(bins)
-            bar.left {|v| x_scale.scale(v[:low])}
-            bar.width {|v| x_scale.scale(v[:high]) - x_scale.scale(v[:low])}
+            bar.left {|v| x_scale[v[:low]]}
+            bar.width {|v| x_scale[v[:high]] - x_scale[v[:low]]}
             bar.bottom 0
-            bar.height {|v| y_scale.scale(v[:value])}
+            bar.height {|v| y_scale[v[:value]]}
             bar.stroke_style "black"
             bar.line_width 1
           end

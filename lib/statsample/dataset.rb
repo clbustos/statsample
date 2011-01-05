@@ -25,7 +25,7 @@ module Statsample
     end
     def to_s
       m="Error on iteration: "+@exp.message+"\n"+@exp.backtrace.join("\n")
-      m+="\nRow: #{@ds.i}" unless @ds.i.nil?
+      m+="\nRow ##{@ds.i}:#{@ds.case_as_hash(@ds.i)}" unless @ds.i.nil?
       m
     end
   end
@@ -602,8 +602,7 @@ module Statsample
     def[](i)
       if i.is_a? Range
         fields=from_to(i.begin,i.end)
-        vectors=fields.inject({}) {|a,v| a[v]=@vectors[v];a}
-        Dataset.new(vectors,fields)
+        clone(*fields)
       else
         raise Exception,"Vector '#{i}' doesn't exists on dataset" unless @vectors.has_key?(i)
         @vectors[i]
@@ -665,7 +664,16 @@ module Statsample
       GSL::Matrix.alloc(*rows)
       end
     end
-		
+    # Return a correlation matrix for fields included as parameters.
+    # By default, uses all fields of dataset
+		def correlation_matrix(fields=nil)
+      if fields
+        ds=clone(fields)
+      else
+        ds=self
+      end
+      Statsample::Bivariate.correlation_matrix(ds)
+    end
    
     
     # Create a new dataset with all cases which the block returns true

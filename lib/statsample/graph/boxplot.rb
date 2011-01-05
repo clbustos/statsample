@@ -94,26 +94,24 @@ module Statsample
         
         data=@vectors.map {|v|
           out={:percentil_25=>v.percentil(25), :median=>v.median, :percentil_75=>v.percentil(75), :name=>v.name}
-          out[:iqr]=out[:percentil_75]-out[:percentil_25]
+          out[:iqr]=out[:percentil_75] - out[:percentil_25]
           
-          irq_max=out[:percentil_75]+out[:iqr]
-          irq_min=out[:percentil_25]-out[:iqr]
+          irq_max=out[:percentil_75] + out[:iqr]
+          irq_min=out[:percentil_25] - out[:iqr]
           
           # Find the last data inside the margin
-          min=out[:percentil_25]
-          max=out[:percentil_75]
+          min = out[:percentil_25]
+          max = out[:percentil_75]
           
           v.each {|d|
-            min=d if d<min and d>irq_min
-            max=d if d>max and d<irq_max
+            min=d if d < min and d > irq_min
+            max=d if d > max and d < irq_max
           }
           # Whiskers!
           out[:low_whisker]=min
           out[:high_whisker]=max
           # And now, data outside whiskers
-          out[:outliers]=v.data_with_nils.find_all {|d| 
-            d<min or d>max
-          }
+          out[:outliers]=v.data_with_nils.find_all {|d| d < min or d > max }
           out
         }
         
@@ -132,7 +130,6 @@ module Statsample
             bottom y_scale
             stroke_style {|d| d!=0 ? "#eee" : "#000"}
             label(:anchor=>'left') do
-              visible {|d| true}
               text y_scale.tick_format
             end
           end
@@ -142,7 +139,7 @@ module Statsample
           end
           pan.label  do |l|
             l.data data
-            l.left  {|v|  x_scale.scale(index)}
+            l.left  {|v| x_scale.scale(index) }
             l.bottom(-15)
             l.text {|v,x| v[:name]}
           end
@@ -184,25 +181,25 @@ module Statsample
             
             # Whiskeys
             bp.rule do |r|
-              r.visible {|v| v[:percentil_25]>v[:low_whisker]}
+              r.visible {|v| v[:percentil_25] > v[:low_whisker]}
               r.bottom {|v| y_scale.scale(v[:low_whisker])}              
             end
             bp.rule do |r|
-              r.visible {|v| v[:percentil_25]>v[:low_whisker]}
+              r.visible {|v| v[:percentil_25] > v[:low_whisker]}
               r.bottom {|v| y_scale.scale(v[:low_whisker])}              
               r.left {|v| x_scale.range_band / 2.0}
-              r.height {|v| y_scale.scale(v[:percentil_25])-y_scale.scale(v[:low_whisker])}
+              r.height {|v| y_scale.scale(v[:percentil_25]) - y_scale.scale(v[:low_whisker])}
             end
             bp.rule do |r|
-              r.visible {|v| v[:percentil_75]<v[:high_whisker]}
+              r.visible {|v| v[:percentil_75] < v[:high_whisker]}
               r.bottom {|v| y_scale.scale(v[:high_whisker])}              
             end
             
              bp.rule do |r|
-              r.visible {|v| v[:percentil_75]<v[:high_whisker]}
+              r.visible {|v| v[:percentil_75] < v[:high_whisker]}
               r.bottom {|v| y_scale.scale(v[:percentil_75])}              
               r.left {|v| x_scale.range_band / 2.0}
-              r.height {|v| y_scale.scale(v[:high_whisker])-y_scale.scale(v[:percentil_75])}
+              r.height {|v| y_scale.scale(v[:high_whisker]) - y_scale.scale(v[:percentil_75])}
             end
             
             bp.dot do |dot|

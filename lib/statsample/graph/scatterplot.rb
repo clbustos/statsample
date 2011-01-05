@@ -66,7 +66,7 @@ module Statsample
         opts_default.keys.each {|k| send("#{k}=", @opts[k]) }
         @data=[]
         @v1.each_with_index {|d1,i|
-          @data.push({:x=>d1,:y=>@v2[i]})
+          @data.push({:x=>d1, :y=>@v2[i]})
         }
       end
       # Add a rule on median of X and Y axis
@@ -98,8 +98,8 @@ module Statsample
       def rubyvis_panel # :nodoc:
         that=self
         #p @v1.map {|v| v}
-        x=Rubyvis::Scale.linear(@v1.to_a).range(0,width)
-        y=Rubyvis::Scale.linear(@v2.to_a).range(0,height)
+        x=Rubyvis::Scale.linear(@v1.to_a).range(0, width)
+        y=Rubyvis::Scale.linear(@v2.to_a).range(0, height)
         @x_scale=x
         @y_scale=y
         vis=Rubyvis::Panel.new do |pan| 
@@ -115,7 +115,7 @@ module Statsample
             bottom y
             stroke_style {|d| d!=0 ? "#eee" : "#000"}
             label(:anchor=>'left') do
-              visible {|d| d>0 and d<that.width}
+              visible {|d| d > 0 and d < that.width}
               text y.tick_format
             end
           end
@@ -136,8 +136,8 @@ module Statsample
           pan.panel do
             data(that.data)
             dot do
-              left {|d| x.scale(d[:x])}
-              bottom {|d| y.scale(d[:y])}
+              left   {|d| x[d[:x]]}
+              bottom {|d| y[d[:y]]}
               stroke_style Rubyvis.color("red").alpha(that.dot_alpha)
               shape_radius 2
             end
