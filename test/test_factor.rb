@@ -15,7 +15,7 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
     }.to_dataset
     cm=ds.correlation_matrix
     pca=Statsample::Factor::PCA.new(cm,:m=>2)
-    p pca.data_transformation(ds,2)
+    # p pca.data_transformation(ds,2)
   end
   def test_antiimage
     cor=Matrix[[1,0.964, 0.312],[0.964,1,0.411],[0.312,0.411,1]]
@@ -139,8 +139,8 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
 
       expected_fm_1=::Matrix[[0.677], [0.735]]
       expected_fm_2=::Matrix[[0.677,0.735], [0.735, -0.677]]
-      _test_matrix(expected_fm_1,pca.feature_vector(1))
-      _test_matrix(expected_fm_2,pca.feature_vector(2))
+      _test_matrix(expected_fm_1,pca.feature_matrix(1))
+      _test_matrix(expected_fm_2,pca.feature_matrix(2))
       assert(pca.summary)
   end
 

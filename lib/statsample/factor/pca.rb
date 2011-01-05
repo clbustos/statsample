@@ -83,8 +83,9 @@ module Factor
       @ds=h.to_dataset
     end
     
-    # Feature vector for m factors
-    def feature_vector(m=nil)
+    # Feature matrix for +m+ factors
+    # Returns +m+ eigenvectors as columns
+    def feature_matrix(m=nil)
       m||=@m
       omega_m=::Matrix.build(@n_variables, m) {0}
       m.times do |i|
@@ -92,12 +93,14 @@ module Factor
       end
       omega_m
     end
-    # data_transformation
-    def data_transformation(input, m)
+    # Returns Principal Components for +input+ matrix or dataset
+    # The number of PC to return is equal to parameter +m+. 
+    # If not set, used the number of PCs selected at object creation. 
+    def principal_components(input, m=nil)
       data_matrix=input.to_matrix
       m||=@m
       raise "Data variables number should be equal to original variable number" if data_matrix.column_size!=@n_variables
-      fv=feature_vector(m)
+      fv=feature_matrix(m)
       (fv.transpose*data_matrix.transpose).transpose
     end
     # Component matrix for m factors
