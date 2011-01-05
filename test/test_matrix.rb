@@ -3,7 +3,23 @@ require(File.dirname(__FILE__)+'/helpers_tests.rb')
 
 class StatsampleMatrixTestCase < MiniTest::Unit::TestCase
   
-  
+  def test_to_dataset
+    m=Matrix[[1,4],[2,5],[3,6]]
+    m.extend Statsample::NamedMatrix
+    m.fields_y=%w{x1 x2}
+    m.name="test"
+    samples=100
+    x1=[1,2,3].to_scale
+    x2=[4,5,6].to_scale
+    ds={'x1'=>x1,'x2'=>x2}.to_dataset
+    ds.name="test"
+    obs=m.to_dataset
+    assert_equal(ds['x1'],obs['x1'])
+    assert_equal(ds['x2'],obs['x2'])
+    assert_equal(ds['x1'].mean,obs['x1'].mean)
+    
+    
+  end
   def test_covariate
     a=Matrix[[1.0, 0.3, 0.2], [0.3, 1.0, 0.5], [0.2, 0.5, 1.0]]
     a.extend Statsample::CovariateMatrix

@@ -1,6 +1,24 @@
+class ::Vector
+  def to_matrix
+    ::Matrix.columns([self.to_a])
+  end
+end
 class ::Matrix
   def to_matrix
     self
+  end
+  def to_dataset
+    f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map {|i| _("VAR_%d") % (i+1) }
+    ds=Statsample::Dataset.new(f)
+    f.each do |ff|
+      ds[ff].type=:scale
+    end
+    row_size.times {|i|
+      ds.add_case_array(self.row(i).to_a)
+    }
+    ds.update_valid_data
+    ds.name=self.name if self.respond_to? :name
+    ds
   end
   if defined? :eigenpairs
     alias_method :eigenpairs_ruby, :eigenpairs
@@ -31,6 +49,13 @@ class ::Matrix
 end
 
 module GSL
+  class Vector
+    class Col
+      def to_matrix
+      ::Matrix.columns([self.size.times.map {|i| self[i]}])
+      end
+    end
+  end
   class Matrix
     def to_gsl
       self
@@ -45,12 +70,46 @@ module GSL
 end
 
 module Statsample
+  # Module to add names to X and Y fields
+  module NamedMatrix
+    def fields
+    raise "Should be square" if !square?
+    fields_x
+    end
+    def fields=(v)
+    raise "Matrix should be square" if !square?
+    @fields_x=v
+    @fields_y=v
+    end
+    def fields_x=(v)
+    raise "Size of fields != row_size" if v.size!=row_size
+    @fields_x=v
+    end
+    def fields_y=(v)
+    raise "Size of fields != column_size" if v.size!=column_size
+    @fields_y=v
+    end
+    def fields_x
+    @fields_x||=row_size.times.collect {|i| _("X%d") % i} 
+    end
+    def fields_y
+    @fields_y||=column_size.times.collect {|i| _("Y%d") % i} 
+    end
+
+    def name=(v)
+    @name=v
+    end
+    def name
+    @name
+    end
+  end
   # Module to add method for variance/covariance and correlation matrices
   # == Usage
   #  matrix=Matrix[[1,2],[2,3]]
   #  matrix.extend CovariateMatrix
   # 
   module CovariateMatrix
+    include NamedMatrix
     include Summarizable
     @@covariatematrix=0
 
@@ -89,33 +148,6 @@ module Statsample
       else
         self
       end
-    end
-    def fields
-      raise "Should be square" if !square?
-      fields_x
-    end
-    def fields=(v)
-      raise "Matrix should be square" if !square?
-      @fields_x=v
-      @fields_y=v
-    end
-    def fields_x=(v)
-      raise "Size of fields != row_size" if v.size!=row_size
-      @fields_x=v
-    end
-    def fields_y=(v)
-      raise "Size of fields != column_size" if v.size!=column_size
-      @fields_y=v
-    end
-    def fields_x
-      @fields_x||=row_size.times.collect {|i| _("X%d") % i} 
-    end
-    def fields_y
-      @fields_y||=column_size.times.collect {|i| _("Y%d") % i} 
-    end
-    
-    def name=(v)
-      @name=v
     end
     def name
       @name||=get_new_name

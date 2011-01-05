@@ -195,17 +195,17 @@ module Statsample
     # If parameter if defined, this value and lower
     # will be 0 and higher, 1
     def dichotomize(low=nil)
-    fs=factors
-    low||=factors.min
-    @data_with_nils.collect{|x|
-      if x.nil?
-        nil
-      elsif x>low
-        1
-      else
-        0
-      end
-    }.to_scale
+      fs=factors
+      low||=factors.min
+      @data_with_nils.collect{|x|
+        if x.nil?
+          nil
+        elsif x>low
+          1
+        else
+          0
+        end
+      }.to_scale
     end
     # Iterate on each item.
     # Equivalent to
@@ -318,22 +318,22 @@ module Statsample
     # if update_valid = false, you should use
     # set_valid_data after all changes
     def missing_values=(vals)
-    @missing_values = vals
-    set_valid_data
+      @missing_values = vals
+      set_valid_data
     end
     # Set data considered as "today" on data vectors
     def today_values=(vals)
-    @today_values = vals
-    set_valid_data
+      @today_values = vals
+      set_valid_data
     end
     # Set level of measurement. 
     def type=(t)
-    @type=t	
-    set_scale_data if(t==:scale)
-    set_date_data if (t==:date)
+      @type=t	
+      set_scale_data if(t==:scale)
+      set_date_data if (t==:date)
     end
     def to_a
-    @data.dup
+      @data.dup
     end
     alias_method :to_ary, :to_a 
     
@@ -546,12 +546,12 @@ module Statsample
     # Ugly name. Really, create a Vector for standard 'matrix' package.
     # <tt>dir</tt> could be :horizontal or :vertical
     def to_matrix(dir=:horizontal)
-    case dir
-    when :horizontal
-      Matrix[@data]
-    when :vertical
-      Matrix.columns([@data])
-    end
+      case dir
+      when :horizontal
+        Matrix[@data]
+      when :vertical
+        Matrix.columns([@data])
+      end
     end
     def inspect
       self.to_s

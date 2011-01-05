@@ -2,20 +2,68 @@ require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 class StatsampleFactorTestCase < MiniTest::Unit::TestCase
   include Statsample::Fixtures
-  
-  def test_data_transformation
+  # Based on Hardle and Simar
+  def setup
+  @fixtures_dir=File.expand_path(File.dirname(__FILE__)+"/fixtures")
+  end
+  def test_principalcomponents_ruby_gsl
     ran=Distribution::Normal.rng_ugaussian
-    samples=100
-    vars=10
-    f1=samples.times.map { ran.call()}.to_scale
-    f2=samples.times.map { ran.call()}.to_scale
-    ds=vars.times.inject({}) {|ac,v|
-      ac["v#{v}"]=samples.times.map{|i| f1[i]*(10-v)+f2[i]*(v+1)}.to_scale;
-      ac
-    }.to_dataset
+    samples=20
+    (3..7).each {|k|
+      v={}
+      v["x0"]=samples.times.map { ran.call()}.to_scale
+      (1...k).each {|i|
+        v["x#{i}"]=samples.times.map {|ii| ran.call()*0.5+v["x#{i-1}"][ii]*0.5}.to_scale
+      }
+      ds=v.to_dataset
+      cm=ds.correlation_matrix
+      
+      pca_ruby=Statsample::Factor::PCA.new( cm, :m=>k, :use_gsl=>false )
+      pca_gsl =Statsample::Factor::PCA.new( cm, :m=>k, :use_gsl=>true  )
+      pc_ruby = pca_ruby.principal_components(ds)
+      pc_gsl  = pca_gsl.principal_components(ds)
+            
+      k.times {|i|
+        pc_id="PC_#{i+1}"
+        assert_in_delta(pca_ruby.eigenvalues[i], pca_gsl.eigenvalues[i],1e-10)
+        # Revert gsl component values
+        pc_gsl_data= (pc_gsl[pc_id][0]-pc_ruby[pc_id][0]).abs>1e-6 ? pc_gsl[pc_id].recode {|v| -v} : pc_gsl[pc_id] 
+        assert_similar_vector(pc_gsl_data, pc_ruby[pc_id], 1e-6,"PC for #{k} variables")
+      }
+    }
+  end
+  def test_principalcomponents()
+  principalcomponents(true)
+  principalcomponents(false)
+  
+  end  
+  def principalcomponents(gsl)
+    ran=Distribution::Normal.rng_ugaussian
+    samples=50
+    x1=samples.times.map { ran.call()}.to_scale
+    x2=samples.times.map {|i| ran.call()*0.5+x1[i]*0.5}.to_scale
+    ds={'x1'=>x1,'x2'=>x2}.to_dataset
+    
     cm=ds.correlation_matrix
-    pca=Statsample::Factor::PCA.new(cm,:m=>2)
-    # p pca.data_transformation(ds,2)
+    r=cm[0,1]
+    pca=Statsample::Factor::PCA.new(cm,:m=>2,:use_gsl=>gsl)
+    assert_in_delta(1+r,pca.eigenvalues[0],1e-10)
+    assert_in_delta(1-r,pca.eigenvalues[1],1e-10)
+    hs=1.0 / Math.sqrt(2)
+    assert_equal_matrix(hs*Matrix[[1],[1]],pca.eigenvectors[0])
+    m_1=gsl ? Matrix[[-1],[1]] : Matrix[[1],[-1]]
+    assert_equal_matrix(hs*m_1, pca.eigenvectors[1])    
+    
+    pcs=pca.principal_components(ds)
+    exp_pc_1=ds.collect_with_index {|row,i|
+      hs*(row['x1']+row['x2'])
+    }
+    exp_pc_2=ds.collect_with_index {|row,i|
+      gsl ? hs*(row['x2']-row['x1']) : hs*(row['x1']-row['x2'])
+
+    }
+    assert_similar_vector(exp_pc_1, pcs["PC_1"])
+    assert_similar_vector(exp_pc_2, pcs["PC_2"])
   end
   def test_antiimage
     cor=Matrix[[1,0.964, 0.312],[0.964,1,0.411],[0.312,0.411,1]]
@@ -115,14 +163,14 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
       cov_matrix=Statsample::Bivariate.covariance_matrix(ds)
       if Statsample.has_gsl?
         pca=Statsample::Factor::PCA.new(cov_matrix,:use_gsl=>true)
-        pca_set(pca)
+        pca_set(pca,"gsl")
       else
         skip("Eigenvalues could be calculated with GSL (requires gsl)")
       end
       pca=Statsample::Factor::PCA.new(cov_matrix,:use_gsl=>false)
-      pca_set(pca)
+      pca_set(pca,"ruby")
   end
-  def pca_set(pca)
+  def pca_set(pca,type)
       expected_eigenvalues=[1.284, 0.0490]
       expected_eigenvalues.each_with_index{|ev,i|
         assert_in_delta(ev,pca.eigenvalues[i],0.001)
@@ -137,10 +185,6 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
         assert_in_delta(ev,obs[i],0.001)
       }
 
-      expected_fm_1=::Matrix[[0.677], [0.735]]
-      expected_fm_2=::Matrix[[0.677,0.735], [0.735, -0.677]]
-      _test_matrix(expected_fm_1,pca.feature_matrix(1))
-      _test_matrix(expected_fm_2,pca.feature_matrix(2))
       assert(pca.summary)
   end
 
@@ -154,7 +198,7 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
 
       cm=::Matrix[[0.923],[0.912],[0.507],[0.483]]
       
-      _test_matrix(cm,fa.component_matrix)
+      assert_equal_matrix(cm,fa.component_matrix,0.001)
       
       h2=[0.852,0.832,0.257,0.233]
       h2.each_with_index{|ev,i|
@@ -187,14 +231,9 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
     assert(!varimax.component_transformation_matrix.nil?, "Component matrix shouldn't be empty")
     assert(!varimax.h2.nil?, "H2 shouldn't be empty")
     
-    _test_matrix(expected,varimax.rotated)
+    assert_equal_matrix(expected,varimax.rotated,1e-6)
     assert(varimax.summary.size>0)
   end
-  def _test_matrix(a,b)
-    a.row_size.times {|i|
-      a.column_size.times {|j|
-        assert_in_delta(a[i,j], b[i,j],0.001)
-      }
-    }
-  end
+  
+
 end

@@ -48,7 +48,10 @@ module Factor
       @use_gsl=nil
       @name=_("Principal Component Analysis")
       @matrix=matrix
-      @n_variables=@matrix.column_size
+      @n_variables=@matrix.column_size      
+      @variables_names=(@matrix.respond_to? :fields) ? @matrix.fields : @n_variables.times.map {|i| _("VAR_%d") % (i+1)}
+
+      
       @m=nil
       
       @rotation_type=Statsample::Factor::Varimax
@@ -95,13 +98,20 @@ module Factor
     end
     # Returns Principal Components for +input+ matrix or dataset
     # The number of PC to return is equal to parameter +m+. 
-    # If not set, used the number of PCs selected at object creation. 
+    # If +m+ isn't set, m set to number of PCs selected at object creation. 
     def principal_components(input, m=nil)
       data_matrix=input.to_matrix
+      var_names=(data_matrix.respond_to? :fields_y) ? data_matrix.fields_y : data_matrix.column_size.times.map {|i| "VAR_%d" % (i+1)}
       m||=@m
-      raise "Data variables number should be equal to original variable number" if data_matrix.column_size!=@n_variables
+      
+      raise "data matrix variables<>pca variables" if data_matrix.column_size!=@n_variables
+      
       fv=feature_matrix(m)
-      (fv.transpose*data_matrix.transpose).transpose
+      pcs=(fv.transpose*data_matrix.transpose).transpose
+      pcs.extend Statsample::NamedMatrix
+      pcs.fields_y=m.times.map {|i| "PC_%d" % (i+1)}
+      
+      pcs.to_dataset
     end
     # Component matrix for m factors
     def component_matrix(m=nil)
@@ -139,7 +149,11 @@ module Factor
     def eigenvalues
       @eigenpairs.collect {|c| c[0] }
     end
-    
+    def eigenvectors
+      @eigenpairs.collect {|c| 
+        c[1].to_matrix
+      }
+    end
     def calculate_eigenpairs
       if @use_gsl
         calculate_eigenpairs_gsl
@@ -148,14 +162,18 @@ module Factor
       end
     end
   
-    def calculate_eigenpairs_ruby
+    def calculate_eigenpairs_ruby #:nodoc:
       @eigenpairs = @matrix.eigenpairs_ruby
     end
-    def calculate_eigenpairs_gsl
+    # Eigenvectors calculated with gsl
+    # Note: The signs of some vectors could be different of
+    # ruby generated
+    def calculate_eigenpairs_gsl #:nodoc:
       eigval, eigvec= GSL::Eigen.symmv(@matrix.to_gsl)
-      
+      #puts "***"
       ep=eigval.size.times.map {|i|
-        [eigval[i], eigvec.get_col(i)]
+        ev=eigvec.get_col(i)
+        [eigval[i], ev]
       }
       @eigenpairs=ep.sort{|a,b| a[0]<=>b[0]}.reverse
     end

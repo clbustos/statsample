@@ -58,13 +58,6 @@ module Statsample
         # Calculate sum of squares
         ss=sum_of_squares(v1a,v2a)
         ss.quo(Math::sqrt(v1a.sum_of_squares) * Math::sqrt(v2a.sum_of_squares))
-=begin        
-        v1s,v2s=v1a.vector_standarized,v2a.vector_standarized
-        t=0
-        siz=v1s.size
-        (0...v1s.size).each {|i| t+=(v1s[i]*v2s[i]) }
-        t.quo(v2s.size-1)
-=end
       end
       alias :correlation :pearson
       # Retrieves the value for t test for a pearson correlation
