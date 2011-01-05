@@ -123,8 +123,19 @@ module Statsample
       vector.name=_("%s(standarized)")  % @name
       vector
     end
+    # Return a centered vector
+    def vector_centered
+      check_type :scale
+      m=mean
+      vector=@data_with_nils.collect {|x|
+        x.nil? ? nil : x.to_f-m
+      }.to_scale
+      vector.name=_("%s(centered)") % @name
+      vector
+    end
     
     alias_method :standarized, :vector_standarized
+    alias_method  :centered, :vector_centered
     # Return a vector with values replaced with the percentiles
     # of each values
     def vector_percentil

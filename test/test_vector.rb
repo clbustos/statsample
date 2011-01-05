@@ -281,6 +281,16 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       i+=1
     }
   end
+  def test_vector_centered
+    mean=rand()
+    samples=11
+    centered=samples.times.map {|i| i-((samples/2).floor).to_i}.to_scale
+    not_centered=centered.recode {|v| v+mean}
+    obs=not_centered.centered
+    centered.each_with_index do |v,i|
+      assert_in_delta(v,obs[i],0.0001)
+    end
+  end
   def test_vector_standarized
     v1=[1,2,3,4,nil].to_vector(:scale)
     sds=v1.sds
