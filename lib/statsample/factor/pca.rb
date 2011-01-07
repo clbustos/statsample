@@ -1,8 +1,14 @@
+# encoding: UTF-8
 module Statsample
 module Factor
-  # Principal Component Analysis (PCA) of a 
-  # covariance or correlation matrix. 
+  # Principal Component Analysis (PCA) of a covariance or 
+  # correlation matrix.. 
   #
+  # NOTE: Sign of second and later eigenvalues could be different
+  # using Ruby or GSL, so values for PCs and component matrix
+  # should differ, because extendmatrix and gsl's methods to calculate
+  # eigenvectors are different. Using R is worse, cause first 
+  # eigenvector could have negative values!
   # For Principal Axis Analysis, use Statsample::Factor::PrincipalAxis
   # 
   # == Usage:
@@ -26,6 +32,7 @@ module Factor
   # == References:
   # * SPSS Manual
   # * Smith, L. (2002). A tutorial on Principal Component Analysis. Available on http://courses.eas.ualberta.ca/eas570/pca_tutorial.pdf 
+  # * Härdle, W. & Simar, L. (2003). Applied Multivariate Statistical Analysis. Springer
   # 
   class PCA
     include Summarizable
@@ -43,14 +50,15 @@ module Factor
     attr_accessor :summary_parallel_analysis
     # Type of rotation. By default, Statsample::Factor::Rotation::Varimax
     attr_accessor :rotation_type
-
+    attr_accessor :type
     def initialize(matrix, opts=Hash.new)
       @use_gsl=nil
       @name=_("Principal Component Analysis")
       @matrix=matrix
       @n_variables=@matrix.column_size      
       @variables_names=(@matrix.respond_to? :fields) ? @matrix.fields : @n_variables.times.map {|i| _("VAR_%d") % (i+1)}
-
+      
+      @type = @matrix.respond_to?(:type) ? @matrix.type : :correlation
       
       @m=nil
       
@@ -68,14 +76,18 @@ module Factor
         @variables_names=@n_variables.times.map {|i| "V#{i+1}"}
       end
       calculate_eigenpairs
+      
       if @m.nil?
         # Set number of factors with eigenvalues > 1
         @m=@eigenpairs.find_all {|ev,ec| ev>=1.0}.size
       end
-
+      
     end
     def rotation
       @rotation_type.new(component_matrix)
+    end
+    def total_eigenvalues
+      eigenvalues.inject(0) {|ac,v| ac+v}
     end
     def create_centered_ds
       h={}
@@ -87,7 +99,8 @@ module Factor
     end
     
     # Feature matrix for +m+ factors
-    # Returns +m+ eigenvectors as columns
+    # Returns +m+ eigenvectors as columns.
+    # So, i=variable, j=component
     def feature_matrix(m=nil)
       m||=@m
       omega_m=::Matrix.build(@n_variables, m) {0}
@@ -110,11 +123,34 @@ module Factor
       pcs=(fv.transpose*data_matrix.transpose).transpose
       pcs.extend Statsample::NamedMatrix
       pcs.fields_y=m.times.map {|i| "PC_%d" % (i+1)}
-      
       pcs.to_dataset
     end
-    # Component matrix for m factors
     def component_matrix(m=nil)
+      var="component_matrix_#{type}"
+      send(var,m)
+    end
+    # Matrix with correlations between components and
+    # variables. Based on Härdle & Simar (2003, p.243)
+    def component_matrix_covariance(m=nil)
+      m||=@m
+      raise "m should be > 0" if m<1
+      ff=feature_matrix(m)
+      cm=::Matrix.build(@n_variables, m) {0}
+      @n_variables.times {|i|
+        m.times {|j|
+          cm[i,j]=ff[i,j] * Math.sqrt(eigenvalues[j] / @matrix[i,i])
+        }
+      }
+      cm.extend CovariateMatrix
+      cm.name=_("Component matrix (from covariance)")
+      cm.fields_x = @variables_names
+      cm.fields_y = m.times.map {|i| "PC_%d" % (i+1)}
+      
+      cm
+    end
+    # Matrix with correlations between components and
+    # variables
+    def component_matrix_correlation(m=nil)
       m||=@m
       raise "m should be > 0" if m<1
       omega_m=::Matrix.build(@n_variables, m) {0}
@@ -129,17 +165,17 @@ module Factor
       cm.extend CovariateMatrix
       cm.name=_("Component matrix")
       cm.fields_x = @variables_names
-      cm.fields_y = m.times.map {|i| "component_#{i+1}"}
+      cm.fields_y = m.times.map {|i| "PC_%d" % (i+1)}
       cm
     end
-    # Communalities for all variables given m factors
     def communalities(m=nil)
+      
       m||=@m
       h=[]
       @n_variables.times do |i|
         sum=0
         m.times do |j|
-          sum+=@eigenpairs[j][0].abs*@eigenpairs[j][1][i]**2
+          sum+=(@eigenpairs[j][0].abs*@eigenpairs[j][1][i]**2)
         end
         h.push(sum)
       end
@@ -181,20 +217,23 @@ module Factor
     def report_building(builder) # :nodoc:
       builder.section(:name=>@name) do |generator|
         generator.text _("Number of factors: %d") % m
-        generator.table(:name=>_("Communalities"), :header=>[_("Variable"),_("Initial"),_("Extraction")]) do |t|
+        generator.table(:name=>_("Communalities"), :header=>[_("Variable"),_("Initial"),_("Extraction"), _("%")]) do |t|
           communalities(m).each_with_index {|com, i|
-            t.row([@variables_names[i], 1.0, sprintf("%0.3f", com)])
+            perc=com*100.quo(@matrix[i,i])
+            t.row([@variables_names[i], "%0.3f" % @matrix[i,i]  , "%0.3f" % com, "%0.3f" % perc])
           }
         end
-        
+        te=total_eigenvalues
         generator.table(:name=>_("Total Variance Explained"), :header=>[_("Component"), _("E.Total"), _("%"), _("Cum. %")]) do |t|
           ac_eigen=0
           eigenvalues.each_with_index {|eigenvalue,i|
             ac_eigen+=eigenvalue
-            t.row([_("Component %d") % (i+1), sprintf("%0.3f",eigenvalue), sprintf("%0.3f%%", eigenvalue*100.quo(@n_variables)), sprintf("%0.3f",ac_eigen*100.quo(@n_variables))])
+            t.row([_("Component %d") % (i+1), sprintf("%0.3f",eigenvalue), sprintf("%0.3f%%", eigenvalue*100.quo(te)), sprintf("%0.3f",ac_eigen*100.quo(te))])
           }
         end
+        
         generator.parse_element(component_matrix(m))
+                  
         if (summary_rotation)
           generator.parse_element(rotation)
         end

@@ -45,6 +45,10 @@ module Statsample
       attr_accessor :maximum
       # Vectors to box-ploting
       attr_accessor :vectors
+      # The rotation angle, in radians. Text is rotated clockwise relative 
+      # to the anchor location. For example, with the default left alignment, 
+      # an angle of Math.PI / 2 causes text to proceed downwards. The default angle is zero.      
+      attr_accessor :label_angle
       
       attr_reader :x_scale, :y_scale
       # Create a new Boxplot.
@@ -66,7 +70,8 @@ module Statsample
           :margin_left=>20,
           :margin_right=>20,
           :minimum=>nil,
-          :maximum=>nil
+          :maximum=>nil,
+          :label_angle=>0
         }
         @opts=opts_default.merge(opts)
         opts_default.keys.each {|k| send("#{k}=", @opts[k]) }
@@ -137,23 +142,27 @@ module Statsample
             bottom 0
             stroke_style 'black'
           end
+          
+          # Labels
+          
           pan.label  do |l|
             l.data data
-            l.left  {|v| x_scale.scale(index) }
+            l.text_angle that.label_angle
+            l.left  {|v| x_scale[index] }
             l.bottom(-15)
             l.text {|v,x| v[:name]}
           end
           
           pan.panel do |bp|
             bp.data data
-            bp.left {|v|  x_scale.scale(index)}
+            bp.left {|v|  x_scale[index]}
             bp.width x_scale.range_band
             
             
             # Bar
             bp.bar do |b|
-              b.bottom {|v| y_scale.scale(v[:percentil_25])}
-              b.height {|v| y_scale.scale(v[:percentil_75]) - y_scale.scale(v[:percentil_25]) }
+              b.bottom {|v| y_scale[v[:percentil_25]]}
+              b.height {|v| y_scale[v[:percentil_75]] - y_scale[v[:percentil_25]] }
               b.line_width 1
               b.stroke_style  {|v| 
                 if that.groups
@@ -174,22 +183,27 @@ module Statsample
             end
             # Median
             bp.rule do |r|
-              r.bottom {|v| y_scale.scale(v[:median])}
+              r.bottom {|v| y_scale[v[:median]]}
               r.width x_scale.range_band
               r.line_width 2
             end
-            
+            ##
             # Whiskeys
+            ##
+            # Low whiskey
             bp.rule do |r|
               r.visible {|v| v[:percentil_25] > v[:low_whisker]}
-              r.bottom {|v| y_scale.scale(v[:low_whisker])}              
+              r.bottom {|v| y_scale[v[:low_whisker]]}              
             end
+            
             bp.rule do |r|
               r.visible {|v| v[:percentil_25] > v[:low_whisker]}
-              r.bottom {|v| y_scale.scale(v[:low_whisker])}              
+              r.bottom {|v| y_scale[v[:low_whisker]]}              
               r.left {|v| x_scale.range_band / 2.0}
               r.height {|v| y_scale.scale(v[:percentil_25]) - y_scale.scale(v[:low_whisker])}
             end
+            # High whiskey
+
             bp.rule do |r|
               r.visible {|v| v[:percentil_75] < v[:high_whisker]}
               r.bottom {|v| y_scale.scale(v[:high_whisker])}              
@@ -201,7 +215,7 @@ module Statsample
               r.left {|v| x_scale.range_band / 2.0}
               r.height {|v| y_scale.scale(v[:high_whisker]) - y_scale.scale(v[:percentil_75])}
             end
-            
+            # Outliers
             bp.dot do |dot|
               dot.shape_size 4
               dot.data {|v| v[:outliers]}

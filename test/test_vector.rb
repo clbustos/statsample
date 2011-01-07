@@ -1,4 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 class StatsampleTestVector < MiniTest::Unit::TestCase
   def setup
@@ -250,6 +250,11 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     a=[1,2,2,3,4,5,5,5,6,10].to_scale
     expected=[10,25,25,40,50,70,70,70,90,100].to_scale
     assert_equal(expected, a.vector_percentil)
+    a=[1,nil,nil,2,2,3,4,nil,nil,5,5,5,6,10].to_scale
+    expected=[10,nil,nil,25,25,40,50,nil,nil,70,70,70,90,100].to_scale
+    assert_equal(expected, a.vector_percentil)
+    
+    
   end
   def test_ordinal
     @c.type=:ordinal
@@ -268,6 +273,9 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
   def test_ranked
     v1=[0.8,1.2,1.2,2.3,18].to_vector(:ordinal)
     expected=[1,2.5,2.5,4,5].to_vector(:ordinal)
+    assert_equal(expected,v1.ranked)
+    v1=[nil,0.8,1.2,1.2,2.3,18,nil].to_vector(:ordinal)
+    expected=[nil,1,2.5,2.5,4,5,nil].to_vector(:ordinal)
     assert_equal(expected,v1.ranked)
   end
   def test_scale
@@ -302,7 +310,8 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
   end
   def test_vector_standarized_with_zero_variance
     v1=100.times.map {|i| 1}.to_scale
-    assert(v1.standarized.nil?)
+    exp=100.times.map {nil}.to_scale
+    assert_equal(exp,v1.standarized)
   end
 
   def test_add

@@ -105,14 +105,16 @@ module Statsample
     private :check_type
 
     # Return a vector usign the standarized values for data
-    # with sd with denominator n-1. With variance=0, returns nil
+    # with sd with denominator n-1. With variance=0 or mean nil,
+    # returns a vector of equal size full of nils
     # 
     
     def vector_standarized(use_population=false)
       check_type :scale
+      return ([nil]*size).to_scale if mean.nil?
       m=mean
       sd=use_population ? sdp : sds
-      return nil if sd==0.0
+      return ([nil]*size).to_scale if sd==0.0
       vector=@data_with_nils.collect{|x|
         if !x.nil?
           (x.to_f - m).quo(sd)
@@ -140,8 +142,8 @@ module Statsample
     # of each values
     def vector_percentil
       check_type :ordinal
-      c=size
-      vector=ranked.map {|i| (i.quo(c)*100).to_f }.to_vector(@type)
+      c=@valid_data.size
+      vector=ranked.map {|i| i.nil? ? nil : (i.quo(c)*100).to_f }.to_vector(@type)
       vector.name=_("%s(percentil)")  % @name
       vector
     end
@@ -282,7 +284,7 @@ module Statsample
     # Retrieves label for value x. Retrieves x if
     # no label defined.
     def labeling(x)
-    @labels.has_key?(x) ? @labels[x].to_s : x.to_s
+      @labels.has_key?(x) ? @labels[x].to_s : x.to_s
     end
     # Returns a Vector with data with labels replaced by the label.
     def vector_labeled
@@ -826,8 +828,7 @@ module Statsample
       end
       def mean # :nodoc:
       check_type :scale
-          
-          @gsl.mean
+        @gsl.nil? ? nil : @gsl.mean
       end				
       def variance_sample(m=nil) # :nodoc:
           check_type :scale
@@ -836,6 +837,7 @@ module Statsample
       end
       def standard_deviation_sample(m=nil) # :nodoc:
           check_type :scale
+          return nil if @gsl.nil?
           m||=mean
           @gsl.sd(m)
       end

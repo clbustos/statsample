@@ -41,7 +41,25 @@ module Statsample
       
       attr_reader   :data
       attr_reader :v1,:v2
+      
+      # Array with assignation to groups of bars
+      # For example, for four vectors, 
+      #   boxplot.groups=[1,2,1,3]
+      # Assign same color to first and third element, and different to
+      # second and fourth
+      attr_accessor :groups
+
+      
       attr_reader :x_scale, :y_scale
+      # Minimum value on x axis. Calculated automaticly from data if not set
+      attr_accessor :minimum_x
+      # Maximum value on x axis. Calculated automaticly from data if not set
+      attr_accessor :maximum_x
+      # Minimum value on y axis. Set to 0 if not set
+      attr_accessor :minimum_y
+      # Maximum value on y axis. Calculated automaticly from data if not set.
+      attr_accessor :maximum_y
+
       # Create a new Scatterplot.
       # Params:
       # * v1: Vector on X axis
@@ -59,8 +77,12 @@ module Statsample
           :margin_top=>10,
           :margin_bottom=>20,
           :margin_left=>20,
-          :margin_right=>20
-          
+          :margin_right=>20,
+          :minimum_x=>nil,
+          :maximum_x=>nil,
+          :minimum_y=>nil,
+          :maximum_y=>nil,
+          :groups=>nil
         }
         @opts=opts_default.merge(opts)
         opts_default.keys.each {|k| send("#{k}=", @opts[k]) }
@@ -98,13 +120,24 @@ module Statsample
       def rubyvis_panel # :nodoc:
         that=self
         #p @v1.map {|v| v}
-        x=Rubyvis::Scale.linear(@v1.to_a).range(0, width)
-        y=Rubyvis::Scale.linear(@v2.to_a).range(0, height)
+        
+        @minimum_x||=@v1.min
+        @maximum_x||=@v1.max
+        @minimum_y||=@v2.min
+        @maximum_y||=@v2.max
+        
+        colors=Rubyvis::Colors.category10
+        
+        margin_hor=margin_left + margin_right
+        margin_vert=margin_top  + margin_bottom
+        
+        x=Rubyvis::Scale.linear(@minimum_x, @maximum_x).range(0, width - margin_hor)
+        y=Rubyvis::Scale.linear(@minimum_y, @maximum_y).range(0, height - margin_vert)
         @x_scale=x
         @y_scale=y
         vis=Rubyvis::Panel.new do |pan| 
-          pan.width  width  - (margin_left + margin_right)
-          pan.height height - (margin_top  + margin_bottom)
+          pan.width  width  - margin_hor
+          pan.height height - margin_vert
           pan.bottom margin_bottom
           pan.left   margin_left
           pan.right  margin_right
@@ -115,7 +148,7 @@ module Statsample
             bottom y
             stroke_style {|d| d!=0 ? "#eee" : "#000"}
             label(:anchor=>'left') do
-              visible {|d| d > 0 and d < that.width}
+              visible {|d| d!=0 and  d < that.width}
               text y.tick_format
             end
           end
@@ -138,7 +171,24 @@ module Statsample
             dot do
               left   {|d| x[d[:x]]}
               bottom {|d| y[d[:y]]}
-              stroke_style Rubyvis.color("red").alpha(that.dot_alpha)
+              
+              fill_style {|v| 
+                alpha=(that.dot_alpha-0.3<=0) ? 0.1 : that.dot_alpha-0.3
+                if that.groups
+                  
+                  colors.scale(that.groups[index]).alpha(alpha)
+                else
+                  colors.scale(0).alpha(alpha)
+                end
+              }
+              
+              stroke_style {|v|
+                if that.groups
+                  colors.scale(that.groups[parent.index]).alpha(that.dot_alpha)
+                else
+                  colors.scale(0).alpha(that.dot_alpha)
+                end
+              }
               shape_radius 2
             end
           end

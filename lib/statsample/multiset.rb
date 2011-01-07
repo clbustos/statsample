@@ -20,6 +20,36 @@ module Statsample
         }
         ms
     end
+    # Generate a new dataset as a union of partial dataset
+    # If block given, this is applied to each dataset before union
+    def union(&block)
+      union_field={}
+      types={}
+      names={}
+      labels={}
+      each do |k,ds|
+        if block
+          ds=ds.dup
+          yield k,ds
+        end
+        @fields.each do |f|
+          union_field[f]||=Array.new
+          union_field[f].concat(ds[f].data)
+          types[f]||=ds[f].type
+          names[f]||=ds[f].name
+          labels[f]||=ds[f].labels
+        end
+      end
+      
+      @fields.each do |f|
+        union_field[f]=union_field[f].to_vector(types[f])
+        union_field[f].name=names[f]
+        union_field[f].labels=labels[f]
+      end
+      ds_union=union_field.to_dataset
+      ds_union.fields=@fields
+      ds_union
+    end
     def datasets_names
         @datasets.keys.sort
     end
@@ -54,6 +84,12 @@ module Statsample
     end
     def[](i)
       @datasets[i]
+    end
+    def each(&block)
+      @datasets.each {|k,ds|
+        next if ds.cases==0
+        block.call(k,ds)
+      }
     end
   end
   class StratifiedSample

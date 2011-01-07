@@ -1,36 +1,80 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
+#require 'rserve'
+#require 'statsample/rserve_extension'
 
 class StatsampleFactorTestCase < MiniTest::Unit::TestCase
   include Statsample::Fixtures
   # Based on Hardle and Simar
   def setup
-  @fixtures_dir=File.expand_path(File.dirname(__FILE__)+"/fixtures")
+    @fixtures_dir=File.expand_path(File.dirname(__FILE__)+"/fixtures")
+  end
+  # Based on Hurdle example
+  def test_covariance_matrix
+    ds=Statsample::PlainText.read(@fixtures_dir+"/bank2.dat", %w{v1 v2 v3 v4 v5 v6})
+    ds.fields.each {|f|
+      ds[f]=ds[f].centered
+    }
+    cm=ds.covariance_matrix
+    pca =Statsample::Factor::PCA.new( cm, :m=>6)
+    #puts pca.summary
+    #puts pca.feature_matrix
+    exp_eig=[2.985, 0.931,0.242, 0.194, 0.085, 0.035].to_scale
+    assert_similar_vector(exp_eig, pca.eigenvalues.to_scale, 0.1)
+    pcs=pca.principal_components(ds)
+    k=6
+    comp_matrix=pca.component_matrix()
+    k.times {|i|
+      pc_id="PC_#{i+1}"
+      k.times {|j| # variable
+          ds_id="v#{j+1}"
+          r= Statsample::Bivariate.correlation(ds[ds_id], pcs[pc_id])
+          assert_in_delta( r, comp_matrix[j,i]) 
+        }
+    }
+    
   end
   def test_principalcomponents_ruby_gsl
+    
     ran=Distribution::Normal.rng_ugaussian
+    
+#    @r=::Rserve::Connection.new
+
     samples=20
     (3..7).each {|k|
       v={}
-      v["x0"]=samples.times.map { ran.call()}.to_scale
+      v["x0"]=samples.times.map { ran.call()}.to_scale.centered
       (1...k).each {|i|
-        v["x#{i}"]=samples.times.map {|ii| ran.call()*0.5+v["x#{i-1}"][ii]*0.5}.to_scale
+        v["x#{i}"]=samples.times.map {|ii| ran.call()*0.5+v["x#{i-1}"][ii]*0.5}.to_scale.centered
       }
       ds=v.to_dataset
-      cm=ds.correlation_matrix
-      
+      cm=ds.covariance_matrix
+#      @r.assign('ds',ds)
+#      @r.eval('cm<-cor(ds);sm<-eigen(cm, sym=TRUE);v<-sm$vectors')
+#      puts "eigenvalues"
+#      puts @r.eval('v').to_ruby.to_s
       pca_ruby=Statsample::Factor::PCA.new( cm, :m=>k, :use_gsl=>false )
       pca_gsl =Statsample::Factor::PCA.new( cm, :m=>k, :use_gsl=>true  )
       pc_ruby = pca_ruby.principal_components(ds)
       pc_gsl  = pca_gsl.principal_components(ds)
-            
+      # Test component matrix correlation!
+      cm_ruby=pca_ruby.component_matrix
+      #puts cm_ruby.summary
       k.times {|i|
         pc_id="PC_#{i+1}"
         assert_in_delta(pca_ruby.eigenvalues[i], pca_gsl.eigenvalues[i],1e-10)
         # Revert gsl component values
         pc_gsl_data= (pc_gsl[pc_id][0]-pc_ruby[pc_id][0]).abs>1e-6 ? pc_gsl[pc_id].recode {|v| -v} : pc_gsl[pc_id] 
         assert_similar_vector(pc_gsl_data, pc_ruby[pc_id], 1e-6,"PC for #{k} variables")
+        if false
+        k.times {|j| # variable
+          ds_id="x#{j}"
+          r= Statsample::Bivariate.correlation(ds[ds_id],pc_ruby[pc_id])
+          puts "#{pc_id}-#{ds_id}:#{r}"
+        }
+        end
       }
     }
+    #@r.close
   end
   def test_principalcomponents()
   principalcomponents(true)
@@ -180,7 +224,7 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
         assert_in_delta(ev,pca.communalities[i],0.001)
       }
       expected_cm=[0.768, 0.833]
-      obs=pca.component_matrix(1).column(0).to_a
+      obs=pca.component_matrix_correlation(1).column(0).to_a
       expected_cm.each_with_index{|ev,i|
         assert_in_delta(ev,obs[i],0.001)
       }

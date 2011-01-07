@@ -158,7 +158,7 @@ module Statsample
       end
     end
     # Import an Excel file. Cache result by default
-    def load_excel(filename, cache=true)
+    def load_excel(filename, opts=Hash.new, cache=true)
       file_ds=filename+".ds"
       if cache and (File.exists? file_ds and File.mtime(file_ds)>File.mtime(filename))
         ds=Statsample.load(file_ds)
@@ -168,6 +168,20 @@ module Statsample
       end
       ds
     end
+    
+    # Import an Excel file. Cache result by default
+    def load_csv(filename, opts=Hash.new, cache=true)
+      file_ds=filename+".ds"
+      if cache and (File.exists? file_ds and File.mtime(file_ds)>File.mtime(filename))
+        ds=Statsample.load(file_ds)
+      else
+        ds=Statsample::CSV.read(filename,opts)
+        ds.save(file_ds) if cache
+      end
+      ds
+    end
+    
+    
     # Create a matrix using vectors as columns.
     # Use:
     #

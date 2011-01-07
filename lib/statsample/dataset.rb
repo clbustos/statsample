@@ -603,6 +603,8 @@ module Statsample
       if i.is_a? Range
         fields=from_to(i.begin,i.end)
         clone(*fields)
+      elsif i.is_a? Array
+        clone(i)
       else
         raise Exception,"Vector '#{i}' doesn't exists on dataset" unless @vectors.has_key?(i)
         @vectors[i]
@@ -664,6 +666,7 @@ module Statsample
       GSL::Matrix.alloc(*rows)
       end
     end
+    
     # Return a correlation matrix for fields included as parameters.
     # By default, uses all fields of dataset
 		def correlation_matrix(fields=nil)
@@ -674,7 +677,16 @@ module Statsample
       end
       Statsample::Bivariate.correlation_matrix(ds)
     end
-   
+   # Return a correlation matrix for fields included as parameters.
+    # By default, uses all fields of dataset
+		def covariance_matrix(fields=nil)
+      if fields
+        ds=clone(fields)
+      else
+        ds=self
+      end
+      Statsample::Bivariate.covariance_matrix(ds)
+    end
     
     # Create a new dataset with all cases which the block returns true
     def filter
@@ -725,6 +737,8 @@ module Statsample
           #        puts "Vector #{k1}:"+v1.to_s
           v1.type=@vectors[k1].type
           v1.name=@vectors[k1].name
+          v1.labels=@vectors[k1].labels
+          
         }
       }
       ms
@@ -758,6 +772,8 @@ module Statsample
         ds.vectors.each{|k1,v1| 
           v1.type=@vectors[k1].type
           v1.name=@vectors[k1].name
+          v1.labels=@vectors[k1].labels
+          
         }
       end
       ms

@@ -12,6 +12,7 @@ class ::Matrix
     ds=Statsample::Dataset.new(f)
     f.each do |ff|
       ds[ff].type=:scale
+      ds[ff].name=ff
     end
     row_size.times {|i|
       ds.add_case_array(self.row(i).to_a)
@@ -72,6 +73,8 @@ end
 module Statsample
   # Module to add names to X and Y fields
   module NamedMatrix
+    include Summarizable  
+
     def fields
     raise "Should be square" if !square?
     fields_x
@@ -96,12 +99,18 @@ module Statsample
     @fields_y||=column_size.times.collect {|i| _("Y%d") % i} 
     end
 
-    def name=(v)
-    @name=v
-    end
     def name
-    @name
+      @name||=get_new_name
     end
+    def name=(v)
+      @name=v
+    end
+    def get_new_name
+      @@named_matrix||=0
+      @@named_matrix+=1
+      _("Matrix %d") % @@named_matrix
+    end
+    
   end
   # Module to add method for variance/covariance and correlation matrices
   # == Usage
@@ -110,7 +119,6 @@ module Statsample
   # 
   module CovariateMatrix
     include NamedMatrix
-    include Summarizable
     @@covariatematrix=0
 
     # Get type of covariate matrix. Could be :covariance or :correlation
@@ -149,18 +157,19 @@ module Statsample
         self
       end
     end
-    def name
-      @name||=get_new_name
-    end
+    
+    
     # Get variance for field k
     # 
     def variance(k)
       submatrix([k])[0,0]
     end
+    
     def get_new_name
       @@covariatematrix+=1
       _("Covariate matrix %d") % @@covariatematrix
     end
+    
     # Select a submatrix of factors. If you have a correlation matrix
     # with a, b and c, you could obtain a submatrix of correlations of
     # a and b, b and c or a and b
@@ -204,7 +213,9 @@ module Statsample
       @name||= (type==:correlation ? _("Correlation"):_("Covariance"))+_(" Matrix")
       generator.table(:name=>@name, :header=>[""]+fields_y) do |t|
         row_size.times {|i|
-          t.row([fields_x[i]]+@rows[i].collect {|i1| sprintf("%0.3f",i1).gsub("0.",".")})
+          t.row([fields_x[i]]+@rows[i].collect {|i1|
+              i1.nil? ? "--" : sprintf("%0.3f",i1).gsub("0.",".")
+          })
         }
       end
     end

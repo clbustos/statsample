@@ -1,7 +1,14 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 
 class StatsampleMultisetTestCase < MiniTest::Unit::TestCase
+  def setup
+    @x=%w{a a a a b b b b}.to_vector
+    @y=[1,2,3,4,5,6,7,8].to_scale
+    @z=[10,11,12,13,14,15,16,17].to_scale
+    @ds={'x'=>@x,'y'=>@y,'z'=>@z}.to_dataset
+    @ms=@ds.to_multiset_by_split('x')
+  end
   def test_creation
     v1a=[1,2,3,4,5].to_vector
     v2b=[11,21,31,41,51].to_vector
@@ -88,7 +95,64 @@ class StatsampleMultisetTestCase < MiniTest::Unit::TestCase
     assert_equal(75,ss.mean('test'))
     assert_in_delta(1.45,ss.standard_error_wor('test'),0.01)
     assert_in_delta(ss.standard_error_wor('test'), ss.standard_error_wor_2('test'),0.00001)
+  end
+  def test_each
+    xpe={
+      'a'=>%w{a a a a}.to_vector,
+      'b'=>%w{b b b b}.to_vector
+    }
+    ype={
+      'a'=>[1,2,3,4].to_scale,
+      'b'=>[5,6,7,8].to_scale,
+    }
+    zpe={
+      'a'=>[10,11,12,13].to_scale,
+      'b'=>[14,15,16,17].to_scale,
+    }
+    xp,yp,zp=Hash.new(),Hash.new(),Hash.new()
+    @ms.each {|k,ds|
+      xp[k]=ds['x']
+      yp[k]=ds['y']
+      zp[k]=ds['z']
+    }
+    assert_equal(xpe,xp)
+    assert_equal(ype,yp)
+    assert_equal(zpe,zp)
 
-
+  end
+  def test_multiset_union_with_block
+    
+    r1=rand()
+    r2=rand()
+    ye=[1*r1,2*r1,3*r1,4*r1,5*r2,6*r2,7*r2,8*r2].to_scale
+    
+    ze=[10*r1,11*r1,12*r1,13*r1, 14*r2,15*r2,16*r2,17*r2].to_scale
+    
+    ds2=@ms.union {|k,ds|
+      ds['y'].recode!{|v| 
+      k=='a' ? v*r1 : v*r2}
+      ds['z'].recode!{|v| 
+      k=='a' ? v*r1 : v*r2}
+    }
+    assert_equal(ye,ds2['y'])
+    assert_equal(ze,ds2['z'])
+  end
+  def test_multiset_union
+    r1=rand()
+    r2=rand()
+    ye=[1*r1,2*r1,3*r1,4*r1,5*r2,6*r2,7*r2,8*r2].to_scale
+    
+    ze=[10*r1,11*r1,12*r1,13*r1, 14*r2,15*r2,16*r2,17*r2].to_scale
+    @ms.each {|k,ds|
+      ds['y'].recode!{|v| 
+      k=='a' ? v*r1 : v*r2}
+      ds['z'].recode!{|v| 
+      k=='a' ? v*r1 : v*r2}
+      
+    }
+    ds2=@ms.union
+    assert_equal(ye,ds2['y'])
+    assert_equal(ze,ds2['z'])
+    
   end
 end
