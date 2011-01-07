@@ -1,3 +1,30 @@
+=== 0.18.0 / 2011-01-07
+* New Statsample.load_excel 
+* New Statsample.load_csv
+* Statsample::Dataset#[] accepts an array of fields and uses clone
+* New Dataset#correlation_matrix  and Statsample::Dataset#covariance_matrix
+* Statsample::Dataset.filter add labels to vectors
+* Principal Components generation complete on PCA (covariance matrix prefered)
+* Added note on Statsample::Factor::PCA about erratic signs on eigenvalues,
+* Statsample::Factor::PCA.component_matrix calculated different for covariance matrix
+* Improved summary for PCA using covariance matrix
+* New attribute :label_angle for Statsample::Graph::Boxplot
+* Fixed Scatterplots scaling problems
+* New attributes for Scatterplots: groups, minimum_x, minimum_y, maximum_x, 
+* New Statsample::Multiset#union allows to create a new dataset based on a m
+* New Statsample::Multiset#each to traverse through datasets
+* Bug fix: Vector#standarized and Vector#percentile crash on nil data
+* Bug fix: Vector#mean and Vector#sd crash on data without valid values
+* Modified methods names on Statsample::Factor::PCA : feature_vector to feature_matrix, data_transformation to principal_components
+* Added Statsample::Vector.vector_centered
+* Factor::MAP.with_dataset() implemented 
+* Bug fix: Factor::MAP with correlation matrix with non-real eigenvalues crashes * Added documentation for Graph::Histogram 
+* Added MPA to Reliability::MultiScaleAnalysis
+* Added custom names for returned vectors and datasets 
+* Updated spanish traslation 
+* Graph::Histogram updated. Custom x and y max and min, optional normal distribution drawing 
+* Updated Histogram class, with several new methods compatibles with GSL::Histogram
+
 === 0.17.0 / 2010-12-09
 * Added Statsample::Graph::Histogram and Statsample::Graph::Boxplot
 * Added Statsample::Reliability::SkillScaleAnalysis for analysis of skill based scales.

@@ -105,6 +105,7 @@ po/es/statsample.po
 po/statsample.pot
 references.txt
 setup.rb
+test/fixtures/bank2.dat
 test/fixtures/correlation_matrix.rb
 test/helpers_tests.rb
 test/test_anovaoneway.rb
