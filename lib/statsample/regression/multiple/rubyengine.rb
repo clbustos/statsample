@@ -17,7 +17,7 @@ module Multiple
 
 class RubyEngine < MatrixEngine
   def initialize(ds,y_var, opts=Hash.new)
-    matrix=Statsample::Bivariate.correlation_matrix(ds)
+    matrix=ds.correlation_matrix
     fields_indep=ds.fields-[y_var]
     default={
       :y_mean=>ds[y_var].mean,

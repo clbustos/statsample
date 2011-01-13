@@ -1,6 +1,5 @@
 #!/usr/bin/ruby
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
-$:.unshift('/home/cdx/dev/reportbuilder/lib/')
 require 'statsample'
 n=3000
 rng=Distribution::Normal.rng_ugaussian

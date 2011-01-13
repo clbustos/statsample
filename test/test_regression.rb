@@ -1,4 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
   context "Example with missing data" do
@@ -20,6 +20,22 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
       assert_in_delta(0.195, @lr.coeffs_se['x'],0.001,"coeff x se")
       assert_in_delta(0.064, @lr.constant_se,0.001,"constant se")
   end
+  end
+  should "return an error if data is linearly dependent" do 
+    samples=100
+    
+    a,b=rand,rand
+    
+    x1=samples.times.map { rand}.to_scale
+    x2=samples.times.map {rand}.to_scale
+    x3=samples.times.map {|i| x1[i]*(1+a)+x2[i]*(1+b)}.to_scale
+    y=samples.times.map {|i| x1[i]+x2[i]+x3[i]+rand}.to_scale
+
+    ds={'x1'=>x1,'x2'=>x2,'x3'=>x3,'y'=>y}.to_dataset
+
+    assert_raise(Statsample::Regression::LinearDependency) {
+        Statsample::Regression::Multiple::RubyEngine.new(ds,'y')
+    }
   end
   def test_parameters
     @x=[13,20,10,33,15].to_vector(:scale)

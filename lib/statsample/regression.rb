@@ -22,6 +22,9 @@ module Statsample
     # * Logit Regression:    Statsample::Regression::Binomial::Logit
     # * Probit Regression:    Statsample::Regression::Binomial::Probit
     module Regression
+      
+      LinearDependency=Class.new(Exception)
+      
       # Create a Statsample::Regression::Simple object, for simple regression
       # * x: independent Vector
       # * y: dependent Vector

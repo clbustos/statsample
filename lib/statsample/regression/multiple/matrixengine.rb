@@ -53,6 +53,8 @@ class MatrixEngine < BaseEngine
     @predictors_n=@n_predictors
     @matrix_x= @matrix_cor.submatrix(@fields)
     @matrix_x_cov= @matrix_cov.submatrix(@fields)
+    raise LinearDependency, "Regressors are linearly dependent" if @matrix_x.determinant<1e-15
+
     
     @matrix_y = @matrix_cor.submatrix(@fields, [y_var])
     @matrix_y_cov = @matrix_cov.submatrix(@fields, [y_var])
@@ -141,7 +143,7 @@ class MatrixEngine < BaseEngine
   # Tolerance for a given variable
   # defined as (1-R^2) of regression of other independent variables
   # over the selected
-  # Reference:
+  # == Reference:
   # * http://talkstats.com/showthread.php?t=5056
   def tolerance(var)
     return 1 if @matrix_x.column_size==1
