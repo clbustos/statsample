@@ -84,6 +84,10 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
         @data=(10.times.map{rand(100)})+[nil]
         @original=Statsample::Vector.new(@data, :scale)
       end
+      should "be the sample using []" do
+        second=Statsample::Vector[*@data]
+        assert_equal(@original, second)
+      end
       should "be the same usign #to_vector" do
         lazy1=@data.to_vector(:scale)
         assert_equal(@original,lazy1)
@@ -94,6 +98,24 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
         assert_equal(:scale,lazy2.type)
         assert_equal(@data.find_all{|v| !v.nil?},lazy2.valid_data)
       end
+      should "could use new_scale with size only" do
+        v1=10.times.map {nil}.to_scale
+        v2=Statsample::Vector.new_scale(10)
+        assert_equal(v1,v2)
+        
+      end
+      should "could use new_scale with size and value" do
+        a=rand
+        v1=10.times.map {a}.to_scale
+        v2=Statsample::Vector.new_scale(10,a)
+        assert_equal(v1,v2)
+      end
+      should "could use new_scale with func" do
+        v1=10.times.map {|i| i*2}.to_scale
+        v2=Statsample::Vector.new_scale(10) {|i| i*2}
+        assert_equal(v1,v2)
+      end
+      
     end
     
     context "#split_by_separator" do

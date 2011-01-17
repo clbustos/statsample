@@ -1,5 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
-
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 begin
   require 'rserve'
   require 'statsample/rserve_extension'

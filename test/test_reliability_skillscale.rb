@@ -1,6 +1,5 @@
 $reliability_icc=nil
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
-class StatsampleReliabilitySkillScaleTestCase < MiniTest::Unit::TestCase
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))class StatsampleReliabilitySkillScaleTestCase < MiniTest::Unit::TestCase
   context Statsample::Reliability::SkillScaleAnalysis do
     setup do
       options=%w{a b c d e}

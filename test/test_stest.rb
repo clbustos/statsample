@@ -1,5 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
-
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 class StatsampleTestTestCase < MiniTest::Unit::TestCase
   def test_chi_square_matrix_with_expected

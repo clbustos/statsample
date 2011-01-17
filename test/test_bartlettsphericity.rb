@@ -1,5 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
-
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 class StatsampleBartlettSphericityTestCase < MiniTest::Unit::TestCase
   include Statsample::Test

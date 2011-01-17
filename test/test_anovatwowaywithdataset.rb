@@ -1,5 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
-# Reference:
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))# Reference:
 # * http://www.uwsp.edu/psych/Stat/13/anova-2w.htm#III
 class StatsampleAnovaTwoWayWithVectorsTestCase < MiniTest::Unit::TestCase
   context(Statsample::Anova::TwoWayWithVectors) do

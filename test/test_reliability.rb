@@ -1,5 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
-class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
   context Statsample::Reliability do
     should "return correct r according to Spearman-Brown prophecy" do
       r=0.6849

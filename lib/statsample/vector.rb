@@ -87,6 +87,21 @@ module Statsample
       set_valid_data_intern
       self.type=type
     end
+    def self.[](*v)
+      vector=new(v)
+      vector.type=:scale if vector.can_be_scale?
+      vector
+    end
+    def self.new_scale(n,val=nil, &block)
+      if block
+        vector=n.times.map {|i| block.call(i)}.to_scale
+      else
+        vector=n.times.map { val}.to_scale
+      end
+      
+      vector.type=:scale
+      vector
+    end
     # Creates a duplicate of the Vector.
     # Note: data, missing_values and labels are duplicated, so
     # changes on original vector doesn't propages to copies.
@@ -535,11 +550,11 @@ module Statsample
     end
     # Return true if all data is Numeric or nil
     def can_be_scale?
-    if @data.find {|v| !v.nil? and !v.is_a? Numeric and !@missing_values.include? v}
-      false
-    else
-      true
-    end
+      if @data.find {|v| !v.nil? and !v.is_a? Numeric and !@missing_values.include? v}
+        false
+      else
+        true
+      end
     end
     
     def to_s

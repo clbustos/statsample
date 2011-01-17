@@ -1,5 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
-class StatsampleAnovaTwoWayTestCase < MiniTest::Unit::TestCase
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))class StatsampleAnovaTwoWayTestCase < MiniTest::Unit::TestCase
   context(Statsample::Anova::TwoWay) do
     setup do
       @ss_a=192.2

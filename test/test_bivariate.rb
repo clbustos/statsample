@@ -1,5 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
-
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
   should "method sum of squares should be correct" do
     v1=[1,2,3,4,5,6].to_vector(:scale)

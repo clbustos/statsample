@@ -49,7 +49,7 @@ module Statsample
         end
         # Constant standard error
         def constant_se
-          i=@fields.index :_constant
+          i=@fields.index "_constant"
           Math::sqrt(@var_cov_matrix[i,i])
         end
         # Regression coefficients

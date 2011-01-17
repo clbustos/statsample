@@ -1,5 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
-
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
   def setup
     @ds=Statsample::Dataset.new({'id' => Statsample::Vector.new([1,2,3,4,5]), 'name'=>Statsample::Vector.new(%w{Alex Claude Peter Franz George}), 'age'=>Statsample::Vector.new([20,23,25,27,5]),

@@ -1,6 +1,5 @@
 $reliability_icc=nil
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
-class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
   context Statsample::Reliability::ICC do
     setup do
       a=[9,6,8,7,10,6].to_scale

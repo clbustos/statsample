@@ -1,5 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
-
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 class StatsampleTestFTestCase < MiniTest::Unit::TestCase
   context(Statsample::Test::F) do 
     setup do

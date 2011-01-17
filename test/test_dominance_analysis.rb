@@ -1,5 +1,4 @@
-require(File.dirname(__FILE__)+'/helpers_tests.rb')
-
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 class StatsampleDominanceAnalysisTestCase < MiniTest::Unit::TestCase
   def test_dominance_univariate
     # Example from Budescu (1993)
