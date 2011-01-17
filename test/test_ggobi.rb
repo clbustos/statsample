@@ -1,4 +1,5 @@
-require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))require 'ostruct'
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
+require 'ostruct'
 class StatsampleGGobiTestCase < MiniTest::Unit::TestCase
 
   def setup
