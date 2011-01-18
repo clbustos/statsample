@@ -1,8 +1,8 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 class StatsampleMLETestCase < MiniTest::Unit::TestCase
   def setup
-    @file_binomial=File.dirname(__FILE__)+'/../data/test_binomial.csv'
-    @crime=File.dirname(__FILE__)+'/../data/crime.txt'
+    @file_binomial=File.dirname(__FILE__)+'/fixtures/test_binomial.csv'
+    @crime=File.dirname(__FILE__)+'/fixtures/crime.txt'
     @cases=100
     a=Array.new()
     b=Array.new()

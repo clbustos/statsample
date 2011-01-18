@@ -111,10 +111,11 @@ module Factor
     end
     # Returns Principal Components for +input+ matrix or dataset
     # The number of PC to return is equal to parameter +m+. 
-    # If +m+ isn't set, m set to number of PCs selected at object creation. 
+    # If +m+ isn't set, m set to number of PCs selected at object creation.
+    # Use covariance matrix
+    
     def principal_components(input, m=nil)
-      data_matrix=input.to_matrix
-      var_names=(data_matrix.respond_to? :fields_y) ? data_matrix.fields_y : data_matrix.column_size.times.map {|i| "VAR_%d" % (i+1)}
+      data_matrix=input.to_matrix      
       m||=@m
       
       raise "data matrix variables<>pca variables" if data_matrix.column_size!=@n_variables
@@ -141,7 +142,7 @@ module Factor
           cm[i,j]=ff[i,j] * Math.sqrt(eigenvalues[j] / @matrix[i,i])
         }
       }
-      cm.extend CovariateMatrix
+      cm.extend NamedMatrix
       cm.name=_("Component matrix (from covariance)")
       cm.fields_x = @variables_names
       cm.fields_y = m.times.map {|i| "PC_%d" % (i+1)}

@@ -61,11 +61,44 @@ module GSL
     def to_gsl
       self
     end
+    def row_size
+      size1
+    end
+    def column_size
+      size2
+    end
+    def determinant
+      det
+    end
+    def inverse
+      GSL::Linalg::LU.invert(self)
+    end
+    def eigenpairs
+      self.to_matrix.eigenpairs
+    end
+    def eigenvalues
+      self.to_matrix.eigenvalues
+    end
+    def eigenpairs_ruby
+      self.to_matrix.eigenpairs_ruby
+    end
+    def square?
+      size1==size2
+    end
     def to_matrix
       rows=self.size1
       cols=self.size2
       out=(0...rows).collect{|i| (0...cols).collect {|j| self[i,j]} }
       ::Matrix.rows(out)
+    end
+    def total_sum
+      sum=0
+      size1.times {|i|
+        size2.times {|j|
+          sum+=self[i,j]
+        }
+      }
+      sum
     end
   end
 end

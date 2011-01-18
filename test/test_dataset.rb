@@ -18,7 +18,15 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     a=Statsample.load(outfile.path)
     assert_equal(@ds,a)
   end
-
+  def test_gsl
+    if Statsample.has_gsl?
+      matrix=GSL::Matrix[[1,2],[3,4],[5,6]]
+      ds=Statsample::Dataset.new('v1'=>[1,3,5].to_vector,'v2'=>[2,4,6].to_vector)
+      assert_equal(matrix,ds.to_gsl)
+    else
+      skip("Gsl needed")
+    end
+  end
   def test_matrix
     matrix=Matrix[[1,2],[3,4],[5,6]]
     ds=Statsample::Dataset.new('v1'=>[1,3,5].to_vector,'v2'=>[2,4,6].to_vector)
@@ -123,6 +131,20 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     mva=[2,3,0,1,0,1].to_vector(:scale)
     assert_equal(mva,ds.vector_missing_values)
   end
+  
+  def test_has_missing_values
+    a1=[1  ,nil ,3 ,4  , 5,nil].to_vector(:scale)
+    a2=[10 ,nil ,20,20 ,20,30].to_vector(:scale)
+    b1=[nil,nil ,1 ,1  ,1 ,2].to_vector(:scale)
+    b2=[2  ,2   ,2 ,nil,2 ,3].to_vector(:scale)
+    c= [nil,2   , 4,2   ,2 ,2].to_vector(:scale)
+    ds={'a1'=>a1,'a2'=>a2,'b1'=>b1,'b2'=>b2,'c'=>c}.to_dataset
+    assert(ds.has_missing_data?)
+    clean=ds.dup_only_valid
+    assert(!clean.has_missing_data?)
+  end
+  
+  
   def test_vector_count_characters
     a1=[1  ,"abcde"  ,3  ,4  , 5,nil].to_vector(:scale)
     a2=[10 ,20.3     ,20 ,20 ,20,30].to_vector(:scale)

@@ -3,7 +3,7 @@ $:.unshift("/home/cdx/dev/rserve-client/lib")
 class StatsampleLogitTestCase < MiniTest::Unit::TestCase
   context Statsample::Regression::Binomial::Logit do
     should "return correct values for example" do
-      crime=File.dirname(__FILE__)+'/../data/test_binomial.csv'
+      crime=File.dirname(__FILE__)+'/fixtures/test_binomial.csv'
       ds=Statsample::CSV.read(crime)
       lr=Statsample::Regression::Binomial::Logit.new(ds,'y')
       assert_in_delta(-38.8669,lr.log_likehood,0.001)

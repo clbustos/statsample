@@ -115,6 +115,10 @@ module Statsample
       ds.update_valid_data
       ds
     end
+    # Return true if any vector has missing data
+    def has_missing_data?
+      @vectors.any? {|k,v| v.has_missing_data?}
+    end
     # Creates a new dataset. A dataset is a set of ordered named vectors
     # of the same size.
     #
@@ -138,17 +142,8 @@ module Statsample
         check_order
         check_length
       end
+      @gsl=nil
       @i=nil
-    end
-    #
-    # Returns a GSL::matrix
-    #
-    def to_gsl_matrix
-      matrix=GSL::Matrix.alloc(cases,@vectors.size)
-      each_array do |row|
-        row.each_index{|y| matrix.set(@i,y,row[y]) }
-      end
-      matrix
     end
     # 
     # Creates a copy of the given dataset, deleting all the cases with
@@ -375,6 +370,7 @@ module Statsample
     # Check vectors and fields after inserting data. Use only 
     # after  #add_case_array or #add_case with second parameter to false
     def update_valid_data
+      @gsl=nil
       @fields.each{|f| @vectors[f].set_valid_data}
       check_length
     end
@@ -491,7 +487,6 @@ module Statsample
           size=v.size
         else
           if v.size!=size
-            p v.to_a.size
             raise Exception, "Vector #{k} have size #{v.size} and dataset have size #{size}"
           end
         end
@@ -629,7 +624,6 @@ module Statsample
     end
     # Recode a vector based on a block
     def recode!(vector_name)
-      
       0.upto(@cases-1) {|i|
         @vectors[vector_name].data[i]=yield case_as_hash(i)
       }
@@ -658,13 +652,23 @@ module Statsample
     end
     
     if Statsample.has_gsl?
-      def to_matrix_gsl
-      rows=[]
-      self.each_array{|c|
-        rows.push(c)
-      }
-      GSL::Matrix.alloc(*rows)
+      def clear_gsl
+        @gsl=nil
       end
+      
+      def to_gsl
+        if @gsl.nil?
+          if cases.nil?
+            update_valid_data
+          end
+          @gsl=GSL::Matrix.alloc(cases,fields.size)
+          self.each_array{|c|
+            @gsl.set_row(@i,c)
+          }
+        end
+        @gsl
+      end
+      
     end
     
     # Return a correlation matrix for fields included as parameters.

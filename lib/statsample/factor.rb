@@ -41,8 +41,10 @@ module Statsample
       aicm
     end
     def self.anti_image_correlation_matrix(matrix)
+      matrix=matrix.to_matrix
       s=Matrix.diag(*(matrix.inverse.diagonal)).sqrt.inverse
       aicm=s*matrix.inverse*s
+      
       aicm.extend(Statsample::CovariateMatrix)
       aicm.fields=matrix.fields if matrix.respond_to? :fields
       aicm

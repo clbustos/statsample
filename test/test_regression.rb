@@ -182,8 +182,8 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
     @c=[11,22,30,40,50,65,78,79,99,100].to_vector(:scale)
     @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
     ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
-
     cor=Statsample::Bivariate.correlation_matrix(ds)
+    
     lr=Statsample::Regression::Multiple::MatrixEngine.new(cor,'y', :y_mean=>@y.mean, :x_mean=>{'a'=>ds['a'].mean, 'b'=>ds['b'].mean, 'c'=>ds['c'].mean}, :cases=>@a.size, :y_sd=>@y.sd , :x_sd=>{'a' => @a.sd, 'b' => @b.sd, 'c' => @c.sd})
     assert_nil(lr.constant_se)
     assert_nil(lr.constant_t)

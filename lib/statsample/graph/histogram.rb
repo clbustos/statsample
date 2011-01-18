@@ -120,7 +120,7 @@ module Statsample
         y_scale=Rubyvis::Scale.linear(@minimum_y, @maximum_y).range(0, height - margin_vert)
         
         y_scale.nice
-        max_range=@hist.max
+        
         bins=@hist.bins.times.map {|i|
           {
            :low =>@hist.get_range(i)[0],
@@ -170,6 +170,7 @@ module Statsample
           end
            rubyvis_normal_distribution(pan) if @line_normal_distribution
         end
+        vis
       end
       # Returns SVG with scatterplot
       def to_svg

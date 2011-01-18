@@ -101,6 +101,20 @@ module Statsample
           cdf*n_tails
         end
       end
+      
+      
+      # Predicted time for pairwise correlation matrix, in miliseconds
+      # See benchmarks/correlation_matrix.rb to see mode of calculation
+      
+      def prediction_pairwise(vars,cases)
+        (-2.192+0.007*cases+1.392*vars)**2
+      end
+      # Predicted time for optimized correlation matrix, in miliseconds
+      # See benchmarks/correlation_matrix.rb to see mode of calculation
+      
+      def prediction_optimized(vars,cases)
+        (0.897+0.030*cases+0.515*vars)**2
+      end
       # Returns residual score after delete variance
       # from another variable
       # 
@@ -128,10 +142,36 @@ module Statsample
         
       end
       
+      def covariance_matrix_optimized(ds)
+        x=ds.to_gsl
+        n=x.row_size
+        m=x.column_size
+        means=((1/n.to_f)*GSL::Matrix.ones(1,n)*x).row(0)
+        centered=x-(GSL::Matrix.ones(n,m)*GSL::Matrix.diag(means))
+        ss=centered.transpose*centered
+        s=((1/(n-1).to_f))*ss
+        s
+      end
+      
       # Covariance matrix.
       # Order of rows and columns depends on Dataset#fields order
       
       def covariance_matrix(ds)
+        vars,cases=ds.fields.size,ds.cases
+        
+        if !ds.has_missing_data? and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
+          cm=covariance_matrix_optimized(ds)
+        else
+          cm=covariance_matrix_pairwise(ds)
+          
+        end
+        cm.extend(Statsample::CovariateMatrix)
+        cm.fields=ds.fields
+        cm
+      end
+      
+      
+      def covariance_matrix_pairwise(ds)
         cache={}
         matrix=ds.collect_matrix do |row,col|
           if (ds[row].type!=:scale or ds[col].type!=:scale)
@@ -148,15 +188,35 @@ module Statsample
             end
           end
         end
-        matrix.extend CovariateMatrix
-        matrix.fields=ds.fields
         matrix
       end
       
       # Correlation matrix.
       # Order of rows and columns depends on Dataset#fields order
-      
       def correlation_matrix(ds)
+        vars,cases=ds.fields.size,ds.cases
+        if !ds.has_missing_data? and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
+          cm=correlation_matrix_optimized(ds)
+        else
+          cm=correlation_matrix_pairwise(ds)
+          
+        end
+        cm.extend(Statsample::CovariateMatrix)
+        cm.fields=ds.fields
+        cm
+      end
+
+      def correlation_matrix_optimized(ds)
+        s=covariance_matrix_optimized(ds)
+        sds=GSL::Matrix.diagonal(s.diagonal.sqrt.pow(-1))
+        cm=sds*s*sds
+        # Fix diagonal
+        s.row_size.times {|i|
+          cm[i,i]=1.0
+        }
+        cm
+      end
+      def correlation_matrix_pairwise(ds)
         cache={}
         cm=ds.collect_matrix do |row,col|
           if row==col
@@ -173,9 +233,6 @@ module Statsample
             end 
           end
         end
-        cm.extend(Statsample::CovariateMatrix)
-        cm.fields=ds.fields
-        cm
       end
       
       # Retrieves the n valid pairwise.

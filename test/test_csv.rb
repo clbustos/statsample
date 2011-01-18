@@ -1,7 +1,7 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 class StatsampleCSVTestCase < MiniTest::Unit::TestCase
   def setup
-    @ds=Statsample::CSV.read(File.dirname(__FILE__)+"/test_csv.csv")
+    @ds=Statsample::CSV.read(File.dirname(__FILE__)+"/fixtures/test_csv.csv")
   end
   def test_read
     assert_equal(6,@ds.cases)
@@ -21,7 +21,7 @@ class StatsampleCSVTestCase < MiniTest::Unit::TestCase
     assert_equal(nil,@ds['age'][5])
   end
   def test_repeated
-    ds=Statsample::CSV.read(File.dirname(__FILE__)+"/../data/repeated_fields.csv")
+    ds=Statsample::CSV.read(File.dirname(__FILE__)+"/fixtures/repeated_fields.csv")
     assert_equal(%w{id name_1 age_1 city a1 name_2 age_2},ds.fields)
     age=[3,4,5,6,nil,8].to_vector(:scale)
     assert_equal(age,ds['age_2'])

@@ -48,7 +48,7 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
     assert_in_delta(Statsample::Bivariate.prop_pearson(r.t,8,:both), r.probability, 0.001)
     assert(r.summary.size>0)
   end
-  should "return correct correlation_matrix" do
+  should "return correct correlation_matrix with nils values" do
     v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
     v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
     v3=[6,2,  1000,1000,5,4,7,8].to_vector(:scale)
@@ -68,6 +68,60 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
     end
     #assert_equal(expected,obt)
   end
+  should "return same values for optimized and pairwise covariance matrix" do
+    cases=100
+    v1=Statsample::Vector.new_scale(cases) {rand()}
+    v2=Statsample::Vector.new_scale(cases) {rand()}
+    v3=Statsample::Vector.new_scale(cases) {rand()}
+    v4=Statsample::Vector.new_scale(cases) {rand()}
+    v5=Statsample::Vector.new_scale(cases) {rand()}
+
+    ds={'v1'=>v1,'v2'=>v2,'v3'=>v3,'v4'=>v4,'v5'=>v5}.to_dataset
+    
+    cor_opt=Statsample::Bivariate.covariance_matrix_optimized(ds)
+    
+    cor_pw =Statsample::Bivariate.covariance_matrix_pairwise(ds)
+    assert_equal_matrix(cor_opt,cor_pw,1e-15)
+    
+  end
+  should "return same values for optimized and pairwise correlation matrix" do
+    cases=100
+    v1=Statsample::Vector.new_scale(cases) {rand()}
+    v2=Statsample::Vector.new_scale(cases) {rand()}
+    v3=Statsample::Vector.new_scale(cases) {rand()}
+    v4=Statsample::Vector.new_scale(cases) {rand()}
+    v5=Statsample::Vector.new_scale(cases) {rand()}
+
+    ds={'v1'=>v1,'v2'=>v2,'v3'=>v3,'v4'=>v4,'v5'=>v5}.to_dataset
+    
+    cor_opt=Statsample::Bivariate.correlation_matrix_optimized(ds)
+    
+    cor_pw =Statsample::Bivariate.correlation_matrix_pairwise(ds)
+    assert_equal_matrix(cor_opt,cor_pw,1e-15)
+    
+  end
+  should "return correct correlation_matrix without nils values" do
+    v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
+    v2=[2,3,7,8,6,4,3,2].to_vector(:scale)
+    v3=[6,2,  1000,1000,5,4,7,8].to_vector(:scale)
+    v4=[2,4,6,7,  3,7,8,6].to_vector(:scale)
+    ds={'v1'=>v1,'v2'=>v2,'v3'=>v3,'v4'=>v4}.to_dataset
+    c=Proc.new {|n1,n2|Statsample::Bivariate.pearson(n1,n2)}
+    expected=Matrix[ [c.call(v1,v1),c.call(v1,v2),c.call(v1,v3),c.call(v1,v4)], [c.call(v2,v1),c.call(v2,v2),c.call(v2,v3),c.call(v2,v4)], [c.call(v3,v1),c.call(v3,v2),c.call(v3,v3),c.call(v3,v4)],
+      [c.call(v4,v1),c.call(v4,v2),c.call(v4,v3),c.call(v4,v4)]
+    ]
+    obt=Statsample::Bivariate.correlation_matrix(ds)
+    for i in 0...expected.row_size
+      for j in 0...expected.column_size
+        #puts expected[i,j].inspect
+        #puts obt[i,j].inspect
+        assert_in_delta(expected[i,j], obt[i,j],0.0001, "#{expected[i,j].class}!=#{obt[i,j].class}  ")
+      end
+    end
+    #assert_equal(expected,obt)
+  end
+
+  
   should "return correct value for prop pearson" do
     assert_in_delta(0.42, Statsample::Bivariate.prop_pearson(Statsample::Bivariate.t_r(0.084,94), 94),0.01)
     assert_in_delta(0.65, Statsample::Bivariate.prop_pearson(Statsample::Bivariate.t_r(0.046,95), 95),0.01)

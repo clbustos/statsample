@@ -197,8 +197,8 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         assert_in_delta(var_mean, @ia.variances_mean)
         assert_equal(@x1.mean, @ia.item_statistics['x1'][:mean])
         assert_equal(@x4.mean, @ia.item_statistics['x4'][:mean])
-        assert_equal(@x1.sds, @ia.item_statistics['x1'][:sds])
-        assert_equal(@x4.sds, @ia.item_statistics['x4'][:sds])
+        assert_in_delta(@x1.sds, @ia.item_statistics['x1'][:sds],1e-14)
+        assert_in_delta(@x4.sds, @ia.item_statistics['x4'][:sds],1e-14)
         ds2=@ds.clone
         ds2.delete_vector('x1')
         vector_sum=ds2.vector_sum

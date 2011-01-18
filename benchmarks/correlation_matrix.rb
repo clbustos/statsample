@@ -1,0 +1,70 @@
+# This test create a database to adjust the best algorithm
+# to use on correlation matrix
+require(File.expand_path(File.dirname(__FILE__)+'/helpers_benchmark.rb'))
+require 'statsample'
+require 'benchmark'
+
+def create_dataset(vars,cases) 
+  ran=Distribution::Normal.rng_ugaussian
+  ds=vars.times.inject({}) {|ac,v|
+    ac["x#{v}"]=Statsample::Vector.new_scale(cases) {ran.call}
+  ac
+  }.to_dataset
+end
+
+def prediction_pairwise(vars,cases)
+  ((-2.192+0.007*cases+1.392*vars)**2) / 1000.0
+end
+def prediction_optimized(vars,cases)
+  ((0.897+0.030*cases+0.515*vars)**2) / 1000.0
+end
+
+
+if File.mtime(__FILE__)>File.mtime("results.ds")
+  
+  reps=100 #number of repetitions
+  
+  
+  ds_sizes=[5,10,30,50,100,150,200,500,1000]
+  ds_vars=[2,3,4,5,10,20,30]
+  rs=Statsample::Dataset.new(%w{cases vars time_optimized time_pairwise})
+  ds_sizes.each do |cases|
+    ds_vars.each do |vars|
+      ds=create_dataset(vars,cases)
+      time_optimized= Benchmark.realtime do
+        reps.times { 
+        Statsample::Bivariate.correlation_matrix_optimized(ds) 
+        ds.clear_gsl
+        }
+      end
+      
+      time_pairwise= Benchmark.realtime do
+        reps.times { 
+        Statsample::Bivariate.correlation_matrix_pairwise(ds)
+        }
+      end
+      
+      puts "Cases:#{cases}, vars:#{vars} -> opt:%0.3f (%0.3f) | pair: %0.3f (%0.3f)" % [time_optimized, prediction_optimized(vars,cases), time_pairwise, prediction_pairwise(vars,cases)]
+      
+      rs.add_case({'cases'=>cases,'vars'=>vars,'time_optimized'=>Math.sqrt(time_optimized*1000),'time_pairwise'=>Math.sqrt(time_pairwise*1000)})
+    end
+  end
+  
+  rs.update_valid_data
+  rs.save("results.ds")
+  Statsample::Excel.write(rs,"correlation_matrix.xls")
+else
+  rs=Statsample.load("results.ds")
+end
+
+
+rs.fields.each {|f| rs[f].type=:scale}
+
+
+rb=ReportBuilder.new(:name=>"Correlation matrix analysis")
+
+rb.add(Statsample::Regression.multiple(rs[['cases','vars','time_optimized']],'time_optimized'))
+rb.add(Statsample::Regression.multiple(rs[['cases','vars','time_pairwise']],'time_pairwise'))
+
+
+rb.save_html("correlation_matrix.html")

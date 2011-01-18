@@ -2,7 +2,7 @@ require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 class StatsampleExcelTestCase < MiniTest::Unit::TestCase
   context "Excel reader" do
     setup do 
-      @ds=Statsample::Excel.read(File.dirname(__FILE__)+"/test_xls.xls")
+      @ds=Statsample::Excel.read(File.dirname(__FILE__)+"/fixtures/test_xls.xls")
     end
     should "set the number of cases" do
       assert_equal(6,@ds.cases)

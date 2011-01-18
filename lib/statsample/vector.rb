@@ -848,7 +848,7 @@ module Statsample
       def variance_sample(m=nil) # :nodoc:
           check_type :scale
           m||=mean
-          @gsl.variance_m
+          @gsl.nil? ? nil : @gsl.variance_m
       end
       def standard_deviation_sample(m=nil) # :nodoc:
           check_type :scale

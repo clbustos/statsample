@@ -132,6 +132,7 @@ module Statsample
             puts "#{@name}: Iteration #{i}" if $DEBUG or debug
             # Create a dataset of dummy values
             ds_bootstrap=Statsample::Dataset.new(@ds.fields)
+            
             @fields.each do |f|
               if bootstrap_method==:random
                 ds_bootstrap[f]=@n_cases.times.map {|c| rng.call}.to_scale
@@ -141,6 +142,8 @@ module Statsample
                 raise "bootstrap_method doesn't recogniced"
               end
             end
+            ds_bootstrap.update_valid_data
+            
             matrix=Statsample::Bivariate.send(matrix_method, ds_bootstrap)
             if smc
                 smc_v=matrix.inverse.diagonal.map{|ii| 1-(1.quo(ii))}

@@ -223,11 +223,11 @@ module Statsample
               dot.bottom {|v| y_scale.scale(v)}
               dot.title {|v| v}
             end
-            
-            
-          end          
+          end
         end
+        vis
       end
+      
       # Returns SVG with scatterplot
       def to_svg
         rp=rubyvis_panel
