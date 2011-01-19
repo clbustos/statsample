@@ -30,7 +30,7 @@ class MatrixEngine < BaseEngine
   
   # Number of cases
   attr_writer :cases
-  
+  attr_writer :digits
   # Create object
   #
   def initialize(matrix,y_var, opts=Hash.new)
@@ -77,7 +77,8 @@ class MatrixEngine < BaseEngine
     @y_mean=0.0
     @name=_("Multiple reggresion of %s on %s") % [@fields.join(","), @y_var]
     
-    
+    opts_default={:digits=>3}
+    opts=opts_default.merge opts
     opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
     }

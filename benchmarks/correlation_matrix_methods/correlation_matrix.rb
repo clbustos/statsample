@@ -1,6 +1,6 @@
 # This test create a database to adjust the best algorithm
 # to use on correlation matrix
-require(File.expand_path(File.dirname(__FILE__)+'/helpers_benchmark.rb'))
+require(File.expand_path(File.dirname(__FILE__)+'/../helpers_benchmark.rb'))
 require 'statsample'
 require 'benchmark'
 
@@ -13,23 +13,24 @@ def create_dataset(vars,cases)
 end
 
 def prediction_pairwise(vars,cases)
-  ((-2.192+0.007*cases+1.392*vars)**2) / 1000.0
+	Statsample::Bivariate.prediction_pairwise(vars,cases) / 10
 end
 def prediction_optimized(vars,cases)
-  ((0.897+0.030*cases+0.515*vars)**2) / 1000.0
+	Statsample::Bivariate.prediction_optimized(vars,cases) / 10
 end
 
 
-if File.mtime(__FILE__)>File.mtime("results.ds")
-  
-  reps=100 #number of repetitions
-  
-  
-  ds_sizes=[5,10,30,50,100,150,200,500,1000]
-  ds_vars=[2,3,4,5,10,20,30]
-  rs=Statsample::Dataset.new(%w{cases vars time_optimized time_pairwise})
-  ds_sizes.each do |cases|
-    ds_vars.each do |vars|
+
+if !File.exists?("correlation_matrix.ds") or File.mtime(__FILE__) > File.mtime("correlation_matrix.ds")
+reps=100 #number of repetitions
+ds_sizes=[5,10,30,50,100,150,200,500,1000]
+ds_vars=[3,4,5,10,20,30,40]
+#ds_sizes=[5,10]
+#ds_vars=[3,5,20]
+rs=Statsample::Dataset.new(%w{cases vars time_optimized time_pairwise})
+
+ds_sizes.each do |cases|
+  ds_vars.each do |vars|
       ds=create_dataset(vars,cases)
       time_optimized= Benchmark.realtime do
         reps.times { 
@@ -50,21 +51,25 @@ if File.mtime(__FILE__)>File.mtime("results.ds")
     end
   end
   
-  rs.update_valid_data
-  rs.save("results.ds")
-  Statsample::Excel.write(rs,"correlation_matrix.xls")
 else
-  rs=Statsample.load("results.ds")
+  rs=Statsample.load("correlation_matrix.ds")
 end
 
 
 rs.fields.each {|f| rs[f].type=:scale}
 
+rs['c_v']=rs.collect {|row| row['cases']*row['vars']}
+
+rs.update_valid_data
+rs.save("correlation_matrix.ds")
+Statsample::Excel.write(rs,"correlation_matrix.xls")
+
+
 
 rb=ReportBuilder.new(:name=>"Correlation matrix analysis")
 
-rb.add(Statsample::Regression.multiple(rs[['cases','vars','time_optimized']],'time_optimized'))
-rb.add(Statsample::Regression.multiple(rs[['cases','vars','time_pairwise']],'time_pairwise'))
+rb.add(Statsample::Regression.multiple(rs[['cases','vars','time_optimized','c_v']],'time_optimized', :digits=>6))
+rb.add(Statsample::Regression.multiple(rs[['cases','vars','time_pairwise','c_v']],'time_pairwise', :digits=>6))
 
 
 rb.save_html("correlation_matrix.html")

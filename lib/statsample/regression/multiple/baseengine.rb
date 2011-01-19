@@ -12,6 +12,8 @@ module Statsample
         attr_reader :valid_cases
         # Number of total cases (dataset.cases)
         attr_reader :total_cases
+        
+        attr_accessor :digits
         def self.univariate?
           true
         end
@@ -23,9 +25,15 @@ module Statsample
           @y_var=y_var
           @r2=nil
           @name=_("Multiple Regression:  %s over %s") % [ ds.fields.join(",") , @y_var]
-          opts.each{|k,v|
+          
+          
+          opts_default={:digits=>3}
+          @opts=opts_default.merge opts
+          
+          @opts.each{|k,v|
             self.send("#{k}=",v) if self.respond_to? k
           }
+          
         end
         # Calculate F Test
         def anova
@@ -159,7 +167,7 @@ module Statsample
           columns.unshift([1.0]*@valid_cases)
           x=Matrix.columns(columns)
           matrix=((x.t*x)).inverse * mse
-          matrix.collect {|i| Math::sqrt(i) if i>0 }
+          matrix.collect {|i| Math::sqrt(i) if i>=0 }
         end
         # T for constant
         def constant_t
@@ -170,24 +178,26 @@ module Statsample
           estimated_variance_covariance_matrix[0,0]
         end
         def report_building(b)
+          di="%0.#{digits}f"
           b.section(:name=>@name) do |g|
             c=coeffs
             g.text _("Engine: %s") % self.class
             g.text(_("Cases(listwise)=%d(%d)") % [@total_cases, @valid_cases])
-            g.text _("R=%0.3f") % r
-            g.text _("R^2=%0.3f") % r2
-            g.text _"R^2 Adj=%0.3f" % r2_adjusted
-            g.text _("Std.Error R=%0.3f") % se_estimate
+            g.text _("R=#{di}") % r
+            g.text _("R^2=#{di}") % r2
+            g.text _"R^2 Adj=#{di}" % r2_adjusted
+            g.text _("Std.Error R=#{di}") % se_estimate
             
-            g.text(_("Equation")+"="+ sprintf('%0.3f',constant) +" + "+ @fields.collect {|k| sprintf('%0.3f%s',c[k],k)}.join(' + ') )
+            g.text(_("Equation")+"="+ sprintf(di,constant) +" + "+ @fields.collect {|k| sprintf("#{di}%s",c[k],k)}.join(' + ') )
             
             g.parse_element(anova)
             sc=standarized_coeffs
+            
             cse=coeffs_se
             g.table(:name=>_("Beta coefficients"), :header=>%w{coeff b beta se t}.collect{|field| _(field)} ) do |t|
-				t.row([_("Constant"), sprintf("%0.3f", constant), "-", constant_se.nil? ? "": sprintf("%0.3f", constant_se), constant_t.nil? ? "" : sprintf("%0.3f", constant_t)])
+				t.row([_("Constant"), sprintf(di, constant), "-", constant_se.nil? ? "": sprintf(di, constant_se), constant_t.nil? ? "" : sprintf(di, constant_t)])
               @fields.each do |f|
-                t.row([f, sprintf("%0.3f", c[f]), sprintf("%0.3f", sc[f]), sprintf("%0.3f", cse[f]), sprintf("%0.3f", c[f].quo(cse[f]))])
+                t.row([f, sprintf(di, c[f]), sprintf(di, sc[f]), sprintf(di, cse[f]), sprintf(di, c[f].quo(cse[f]))])
               end  
             end
           end

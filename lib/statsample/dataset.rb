@@ -132,6 +132,10 @@ module Statsample
       @@n_dataset||=0
       @@n_dataset+=1
       @name=_("Dataset %d") % @@n_dataset
+      @cases=0
+      @gsl=nil
+      @i=nil
+      
       if vectors.instance_of? Array
         @fields=vectors.dup
         @vectors=vectors.inject({}){|a,x| a[x]=Statsample::Vector.new(); a}
@@ -142,8 +146,6 @@ module Statsample
         check_order
         check_length
       end
-      @gsl=nil
-      @i=nil
     end
     # 
     # Creates a copy of the given dataset, deleting all the cases with

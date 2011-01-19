@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>Correlation matrix analysis</title>
+        <style>
+        body {
+          margin:0;
+          padding:1em;
+        }
+        table {
+          border-collapse: collapse;
+
+        }
+        table td {
+          border: 1px solid black;
+        }
+        .section {
+          margin:0.5em;
+        }
+        </style>
+
+</head><body>
+<h1>Correlation matrix analysis</h1><div id='toc'><div class='title'>List of contents</div>
+<ul>
+<li><a href='#toc_1'>Multiple reggresion of cases,vars,c_v on time_optimized</a></li>
+<ul>
+<li><a href='#toc_2'>ANOVA</a></li>
+</ul>
+<li><a href='#toc_3'>Multiple reggresion of cases,vars,c_v on time_pairwise</a></li>
+<ul>
+<li><a href='#toc_4'>ANOVA</a></li>
+</ul>
+</ul>
+</div>
+<div class='tot'><div class='title'>List of tables</div><ul><li><a href='#table_1'>ANOVA Table</a></li><li><a href='#table_2'>Beta coefficients</a></li><li><a href='#table_3'>ANOVA Table</a></li><li><a href='#table_4'>Beta coefficients</a></li></ul></div>
+  <div class='section'><h2>Multiple reggresion of cases,vars,c_v on time_optimized</h2><a name='toc_1'></a>
+    <p>Engine: Statsample::Regression::Multiple::RubyEngine</p>
+    <p>Cases(listwise)=63(63)</p>
+    <p>R=0.978844</p>
+    <p>R^2=0.958137</p>
+    <p>R^2 Adj=0.956008</p>
+    <p>Std.Error R=3.092024</p>
+    <p>Equation=4.031667 + 0.018039cases + 0.244790vars + 0.001197c_v</p>
+    <div class='section'><h3>ANOVA</h3><a name='toc_2'></a>
+      <a name='table_1'></a><table><caption>ANOVA Table</caption><thead><th>source</th><th>ss</th><th>df</th><th>ms</th><th>f</th><th>p</th></thead>
+<tbody>
+<tr><td>Regression</td><td>12910.098</td><td>3</td><td>4303.366</td><td>450.114</td><td>0.000</td></tr>
+<tr><td>Error</td><td>564.076</td><td>59</td><td>9.561</td><td></td><td></td></tr>
+<tr><td>Total</td><td>13474.174</td><td>62</td><td>4312.927</td><td></td><td></td></tr>
+</tbody>
+</table>
+
+    </div>
+    <a name='table_2'></a><table><caption>Beta coefficients</caption><thead><th>coeff</th><th>b</th><th>beta</th><th>se</th><th>t</th></thead>
+<tbody>
+<tr><td>Constant</td><td>4.031667</td><td>-</td><td>0.752604</td><td>5.356953</td></tr>
+<tr><td>cases</td><td>0.018039</td><td>0.381587</td><td>0.001961</td><td>9.200093</td></tr>
+<tr><td>vars</td><td>0.244790</td><td>0.224390</td><td>0.036055</td><td>6.789335</td></tr>
+<tr><td>c_v</td><td>0.001197</td><td>0.584174</td><td>0.000094</td><td>12.738410</td></tr>
+</tbody>
+</table>
+
+  </div>
+  <div class='section'><h2>Multiple reggresion of cases,vars,c_v on time_pairwise</h2><a name='toc_3'></a>
+    <p>Engine: Statsample::Regression::Multiple::RubyEngine</p>
+    <p>Cases(listwise)=63(63)</p>
+    <p>R=0.999637</p>
+    <p>R^2=0.999275</p>
+    <p>R^2 Adj=0.999238</p>
+    <p>Std.Error R=0.538365</p>
+    <p>Equation=-0.520303 + -0.000708cases + 1.234451vars + 0.000735c_v</p>
+    <div class='section'><h3>ANOVA</h3><a name='toc_4'></a>
+      <a name='table_3'></a><table><caption>ANOVA Table</caption><thead><th>source</th><th>ss</th><th>df</th><th>ms</th><th>f</th><th>p</th></thead>
+<tbody>
+<tr><td>Regression</td><td>23554.271</td><td>3</td><td>7851.424</td><td>27089.134</td><td>0.000</td></tr>
+<tr><td>Error</td><td>17.100</td><td>59</td><td>0.290</td><td></td><td></td></tr>
+<tr><td>Total</td><td>23571.372</td><td>62</td><td>7851.714</td><td></td><td></td></tr>
+</tbody>
+</table>
+
+    </div>
+    <a name='table_4'></a><table><caption>Beta coefficients</caption><thead><th>coeff</th><th>b</th><th>beta</th><th>se</th><th>t</th></thead>
+<tbody>
+<tr><td>Constant</td><td>-0.520303</td><td>-</td><td>0.131039</td><td>-3.970594</td></tr>
+<tr><td>cases</td><td>-0.000708</td><td>-0.011324</td><td>0.000341</td><td>-2.074007</td></tr>
+<tr><td>vars</td><td>1.234451</td><td>0.855546</td><td>0.006278</td><td>196.641087</td></tr>
+<tr><td>c_v</td><td>0.000735</td><td>0.271138</td><td>0.000016</td><td>44.912972</td></tr>
+</tbody>
+</table>
+
+  </div>
+</body></html>

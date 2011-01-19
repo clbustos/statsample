@@ -107,13 +107,13 @@ module Statsample
       # See benchmarks/correlation_matrix.rb to see mode of calculation
       
       def prediction_pairwise(vars,cases)
-        (-2.192+0.007*cases+1.392*vars)**2
+        ((-0.518111-0.000746*cases+1.235608*vars+0.000740*cases*vars)**2) / 100
       end
       # Predicted time for optimized correlation matrix, in miliseconds
       # See benchmarks/correlation_matrix.rb to see mode of calculation
       
       def prediction_optimized(vars,cases)
-        (0.897+0.030*cases+0.515*vars)**2
+        ((4+0.018128*cases+0.246871*vars+0.001169*vars*cases)**2) / 100
       end
       # Returns residual score after delete variance
       # from another variable

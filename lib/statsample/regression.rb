@@ -81,7 +81,7 @@ module Statsample
         if missing_data==:pairwise
            Statsample::Regression::Multiple::RubyEngine.new(ds,y_var, opts)
         else
-          if Statsample.has_gsl?
+          if Statsample.has_gsl? and false
             Statsample::Regression::Multiple::GslEngine.new(ds, y_var, opts)
           else
             ds2=ds.dup_only_valid
