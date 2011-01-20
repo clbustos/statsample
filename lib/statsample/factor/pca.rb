@@ -192,28 +192,9 @@ module Factor
       }
     end
     def calculate_eigenpairs
-      if @use_gsl
-        calculate_eigenpairs_gsl
-      else
-        calculate_eigenpairs_ruby
-      end
+      @eigenpairs= @use_gsl ? @matrix.to_gsl.eigenpairs : @matrix.to_matrix.eigenpairs_ruby 
     end
   
-    def calculate_eigenpairs_ruby #:nodoc:
-      @eigenpairs = @matrix.eigenpairs_ruby
-    end
-    # Eigenvectors calculated with gsl
-    # Note: The signs of some vectors could be different of
-    # ruby generated
-    def calculate_eigenpairs_gsl #:nodoc:
-      eigval, eigvec= GSL::Eigen.symmv(@matrix.to_gsl)
-      #puts "***"
-      ep=eigval.size.times.map {|i|
-        ev=eigvec.get_col(i)
-        [eigval[i], ev]
-      }
-      @eigenpairs=ep.sort{|a,b| a[0]<=>b[0]}.reverse
-    end
     
     def report_building(builder) # :nodoc:
       builder.section(:name=>@name) do |generator|

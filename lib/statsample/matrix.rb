@@ -28,11 +28,7 @@ class ::Matrix
   if Statsample.has_gsl?
     # Optimize eigenpairs of extendmatrix module using gsl
     def eigenpairs
-      eigval, eigvec= GSL::Eigen.symmv(self.to_gsl)
-      ep=eigval.size.times.map {|i|
-        [eigval[i], eigvec.get_col(i).to_a]
-      }
-      ep.sort{|a,b| a[0]<=>b[0]}.reverse
+      to_gsl.eigenpairs
     end
   end
   
@@ -55,6 +51,9 @@ module GSL
       def to_matrix
       ::Matrix.columns([self.size.times.map {|i| self[i]}])
       end
+      def to_ary
+        to_a
+      end
     end
   end
   class Matrix
@@ -73,15 +72,21 @@ module GSL
     def inverse
       GSL::Linalg::LU.invert(self)
     end
-    def eigenpairs
-      self.to_matrix.eigenpairs
-    end
     def eigenvalues
-      self.to_matrix.eigenvalues
+      eigenpairs.collect {|v| v[0]}
     end
-    def eigenpairs_ruby
-      self.to_matrix.eigenpairs_ruby
+    
+    def eigenpairs
+      eigval, eigvec= GSL::Eigen.symmv(self)
+      GSL::Eigen::symmv_sort(eigval, eigvec, GSL::Eigen::SORT_VAL_DESC)
+      @eigenpairs=eigval.size.times.map {|i|
+        [eigval[i],eigvec.get_col(i)]
+      }
     end
+    
+    #def eigenpairs_ruby
+    #  self.to_matrix.eigenpairs_ruby
+    #end
     def square?
       size1==size2
     end
@@ -246,7 +251,7 @@ module Statsample
       @name||= (type==:correlation ? _("Correlation"):_("Covariance"))+_(" Matrix")
       generator.table(:name=>@name, :header=>[""]+fields_y) do |t|
         row_size.times {|i|
-          t.row([fields_x[i]]+@rows[i].collect {|i1|
+          t.row([fields_x[i]]+row(i).to_a.collect {|i1|
               i1.nil? ? "--" : sprintf("%0.3f",i1).gsub("0.",".")
           })
         }

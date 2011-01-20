@@ -27,8 +27,8 @@ module Statsample
       def maximum_likehood_dichotomic(pred,real)
         preda,reala=Statsample.only_valid_clone(pred,real)                
         sum=0
-        pred.each_index{|i|
-           sum+=(real[i]*Math::log(pred[i])) + ((1-real[i])*Math::log(1-pred[i]))
+        preda.each_index{|i|
+           sum+=(reala[i]*Math::log(preda[i])) + ((1-reala[i])*Math::log(1-preda[i]))
         }
         sum
       end

@@ -193,6 +193,7 @@ module Statsample
             end
           end
         end
+        vis
       end
       # Returns SVG with scatterplot
       def to_svg
