@@ -145,7 +145,6 @@ module Statsample
   autoload(:Test, 'statsample/test')
   autoload(:Factor, 'statsample/factor')
   autoload(:Graph, 'statsample/graph')
-  autoload(:Example, 'statsample/example')
   
   
   class << self
