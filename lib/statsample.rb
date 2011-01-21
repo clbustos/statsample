@@ -120,6 +120,7 @@ module Statsample
   
   VERSION = '0.18.0'
   SPLIT_TOKEN = ","
+  autoload(:Analysis, 'statsample/analysis')
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')
   autoload(:CSV, 'statsample/converters')
