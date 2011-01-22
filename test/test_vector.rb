@@ -88,6 +88,16 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
         second=Statsample::Vector[*@data]
         assert_equal(@original, second)
       end
+      should "[] returns same results as R-c()" do
+        reference=[0,4,5,6,10].to_scale
+        assert_equal(reference, Statsample::Vector[0,4,5,6,10])
+        assert_equal(reference, Statsample::Vector[0,4..6,10])
+        assert_equal(reference, Statsample::Vector[[0],[4,5,6],[10]])
+        assert_equal(reference, Statsample::Vector[[0],[4,[5,[6]]],[10]])
+        
+        assert_equal(reference, Statsample::Vector[[0],[4,5,6].to_vector,[10]])
+        
+      end
       should "be the same usign #to_vector" do
         lazy1=@data.to_vector(:scale)
         assert_equal(@original,lazy1)
@@ -233,6 +243,20 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       a = Statsample::Vector.new(["a","a,b","c,d","a,d","d",10,nil],:nominal)
       assert_equal([%w{a},%w{a b},%w{c d},%w{a d},%w{d},[10],nil], a.splitted)      
     end
+    should "multiply correct for scalar" do
+      a = [1,2,3].to_scale
+      assert_equal([5,10,15].to_scale, a*5)
+    end
+    should "multiply correct with other vector" do
+      a = [1,2,3].to_scale
+      b = [2,4,6].to_scale
+      
+      assert_equal([2,8,18].to_scale, a*b)
+    end
+    should "sum correct for scalar" do
+      a = [1,2,3].to_scale
+      assert_equal([11,12,13].to_scale, a+10)
+    end
   end
 
 
@@ -336,6 +360,34 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     assert_equal(exp,v1.standarized)
   end
 
+    def test_check_type
+    v=Statsample::Vector.new
+    v.type=:nominal
+    assert_raise(NoMethodError) { v.check_type(:scale)}
+    assert_raise(NoMethodError) { v.check_type(:ordinal)}
+    assert(v.check_type(:nominal).nil?)
+    
+    v.type=:ordinal
+    
+    assert_raise(NoMethodError) { v.check_type(:scale)}
+    
+    assert(v.check_type(:ordinal).nil?)
+    assert(v.check_type(:nominal).nil?)
+    
+
+    v.type=:scale
+    assert(v.check_type(:scale).nil?)
+    assert(v.check_type(:ordinal).nil?)
+    assert(v.check_type(:nominal).nil?)
+
+    v.type=:date
+    assert_raise(NoMethodError) { v.check_type(:scale)}
+    assert_raise(NoMethodError) { v.check_type(:ordinal)}
+    assert_raise(NoMethodError) { v.check_type(:nominal)}
+    
+  end
+  
+  
   def test_add
     a=Statsample::Vector.new([1,2,3,4,5], :scale)
     b=Statsample::Vector.new([11,12,13,14,15], :scale)

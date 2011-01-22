@@ -1,7 +1,4 @@
 require 'statsample/bivariate/pearson'
-
-
-
 module Statsample
   # Diverse methods and classes to calculate bivariate relations
   # Specific classes: 
@@ -11,7 +8,6 @@ module Statsample
   module Bivariate
     autoload(:Polychoric, 'statsample/bivariate/polychoric')
     autoload(:Tetrachoric, 'statsample/bivariate/tetrachoric')
-    
     class << self
       # Covariance between two vectors
       def covariance(v1,v2)

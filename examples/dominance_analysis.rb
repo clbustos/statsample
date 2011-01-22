@@ -4,29 +4,29 @@ $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 
 
-ex=Statsample::Example.of(Statsample::DominanceAnalysis) do
+Statsample::Analysis.store(Statsample::DominanceAnalysis) do
   sample=300
-  a=Statsample::Vector.new_scale(sample) {rand}
-  b=Statsample::Vector.new_scale(sample) {rand}
-  c=Statsample::Vector.new_scale(sample) {rand}
-  d=Statsample::Vector.new_scale(sample) {rand}
+  a=rnorm(sample)
+  b=rnorm(sample)
+  c=rnorm(sample)
+  d=rnorm(sample)
   
-  ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
-  ds['y']=ds.collect{|row| row['a']*5 + row['b']*3 + row['c']*2 + row['d'] + rand()}
+  ds={'a'=>a,'b'=>b,'cc'=>c,'d'=>d}.to_dataset
+  attach(ds)
+  ds['y']=a*5+b*3+cc*2+d+rnorm(300)  
+  cm=cor(ds)
+  summary(cm)
+  lr=lr(ds,'y')
+  summary(lr)
+  da=dominance_analysis(ds,'y')
+  summary(da)
   
-  cm=Statsample::Bivariate.correlation_matrix(ds)
-  rb.add(cm)
-  lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y')
-  rb.add(lr)
-  da=Statsample::DominanceAnalysis.new(ds,'y')
-  rb.add(da)
-  
-  da=Statsample::DominanceAnalysis.new(ds,'y',:name=>"Dominance Analysis using group of predictors", :predictors=>['a', 'b', %w{c d}])
-  rb.add(da)
+  da=dominance_analysis(ds,'y',:name=>"Dominance Analysis using group of predictors", :predictors=>['a', 'b', %w{cc d}])
+  summary(da)
 end
 
 
 if __FILE__==$0
-  puts ex.rb.to_text
+  Statsample::Analysis.run_batch
 end
 

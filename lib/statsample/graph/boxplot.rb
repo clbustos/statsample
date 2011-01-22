@@ -49,7 +49,6 @@ module Statsample
       # to the anchor location. For example, with the default left alignment, 
       # an angle of Math.PI / 2 causes text to proceed downwards. The default angle is zero.      
       attr_accessor :label_angle
-      
       attr_reader :x_scale, :y_scale
       # Create a new Boxplot.
       # Parameters: Hash of options

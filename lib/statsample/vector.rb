@@ -48,7 +48,6 @@ module Statsample
     # Name of vector. Should be used for output by many classes
     attr_accessor :name
     
-    #
     # Creates a new Vector object.
     # * <tt>data</tt> Array of data.
     # * <tt>type</tt> Level of meausurement. See Vector#type
@@ -87,11 +86,34 @@ module Statsample
       set_valid_data_intern
       self.type=type
     end
-    def self.[](*v)
-      vector=new(v)
+    # Create a vector using (almost) any object
+    # * Array: flattened
+    # * Range: transformed using to_a
+    # * Statsample::Vector
+    # * Numeric and string values
+    def self.[](*args)
+      values=[]
+      args.each do |a|
+        case a
+        when Array
+          values.concat a.flatten
+        when Statsample::Vector
+          values.concat a.to_a
+        when Range
+          values.concat  a.to_a
+        else
+          values << a
+        end
+      end
+      vector=new(values)
       vector.type=:scale if vector.can_be_scale?
       vector
     end
+    # Create a new scale type vector
+    # Parameters
+    # [n]      Size
+    # [val]    Value of each value
+    # [&block] If block provided, is used to set the values of vector 
     def self.new_scale(n,val=nil, &block)
       if block
         vector=n.times.map {|i| block.call(i)}.to_scale
@@ -113,11 +135,22 @@ module Statsample
     def dup_empty
       Vector.new([],@type, :missing_values => @missing_values.dup, :labels => @labels.dup, :name=> @name)
     end
-    # Raises an exception if type of vector is inferior to t type
-    def check_type(t)
-      raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal) or (t==:date)
+    
+    if Statsample::STATSAMPLE__.respond_to?(:check_type)
+      # Raises an exception if type of vector is inferior to t type
+      def check_type(t)
+        Statsample::STATSAMPLE__.check_type(self,t)
+      end
+    else
+      def check_type(t) #:nodoc:
+        _check_type(t)
+      end
     end
-    private :check_type
+    
+    
+    def _check_type(t) #:nodoc:
+      raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal) or (t==:date) or (:date==@type)
+    end
 
     # Return a vector usign the standarized values for data
     # with sd with denominator n-1. With variance=0 or mean nil,
@@ -207,6 +240,10 @@ module Statsample
       yield x
     }
     set_valid_data
+    end
+    def push(v)
+      @data.push(v)
+      set_valid_data
     end
     # Dicotomize the vector with 0 and 1, based on lowest value
     # If parameter if defined, this value and lower
@@ -372,6 +409,10 @@ module Statsample
     def -(v)
     _vector_ari("-",v)
     end
+    
+    def *(v)
+      _vector_ari("*",v)
+    end
     # Reports all values that doesn't comply with a condition.
     # Returns a hash with the index of data and the invalid data.
     def verify
@@ -397,7 +438,7 @@ module Statsample
       }
       Statsample::Vector.new(sum, :scale  )
       else
-      raise ArgumentError, "The array/vector parameter should be of the same size of the original vector"
+        raise ArgumentError, "The array/vector parameter (#{v.size}) should be of the same size of the original vector (#{@data.size})"
       end
     elsif(v.respond_to? method )
       Statsample::Vector.new(
@@ -594,6 +635,8 @@ module Statsample
         _frequencies
       end
     end
+    
+    
     def _frequencies #:nodoc:
       @valid_data.inject(Hash.new) {|a,x|
         a[x]||=0

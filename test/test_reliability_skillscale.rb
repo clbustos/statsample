@@ -11,9 +11,12 @@ class StatsampleReliabilitySkillScaleTestCase < MiniTest::Unit::TestCase
       @b=cases.times.map {options[rand(5)]}.to_vector
       @c=cases.times.map {options[rand(5)]}.to_vector
       @d=cases.times.map {options[rand(5)]}.to_vector
-      @e=cases.times.map {rand()>0.8 ? nil : options[rand(5)]}.to_vector
+      @e=cases.times.map {|i|
+        i==0 ? options[rand(0)] : 
+          rand()>0.8 ? nil : options[rand(5)]
+      }.to_vector
       @ds={'id'=>@id,'a'=>@a,'b'=>@b,'c'=>@c,'d'=>@d,'e'=>@e}.to_dataset
-      @key={'a'=>options[rand(5)], 'b'=>options[rand(5)], 'c'=>options[rand(5)], 'd'=>options[rand(5)],'e'=>options[rand(5)]}
+      @key={'a'=>"a", 'b'=>options[rand(5)], 'c'=>options[rand(5)], 'd'=>options[rand(5)],'e'=>options[rand(5)]}
       @ssa=Statsample::Reliability::SkillScaleAnalysis.new(@ds, @key)
       @ac=@a.map {|v| v==@key['a'] ? 1 : 0}.to_scale
       @bc=@b.map {|v| v==@key['b'] ? 1 : 0}.to_scale

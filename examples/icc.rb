@@ -3,23 +3,23 @@ $:.unshift(File.dirname(__FILE__)+'/../lib/')
 
 require 'statsample'
 
-ex=Statsample::Example.of(Statsample::Reliability::ICC) do
+Statsample::Analysis.store(Statsample::Reliability::ICC) do
 
   size=1000
-  a=size.times.map {rand(10)}.to_scale
+  a=Statsample::Vector.new_scale(size) {rand(10)}
   b=a.recode{|i|i+rand(4)-2}
   c=a.recode{|i|i+rand(4)-2}
   d=a.recode{|i|i+rand(4)-2}
   @ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
   @icc=Statsample::Reliability::ICC.new(@ds)
-  rb.add(@icc)
+  summary(@icc)
   @icc.type=:icc_3_1
-  rb.add(@icc)
+  summary(@icc)
   @icc.type=:icc_a_k
-  rb.add(@icc)
+  summary(@icc)
   
 end
 
 if __FILE__==$0
-  puts ex.rb.to_text
+  Statsample::Analysis.run_batch
 end

@@ -120,6 +120,7 @@ module Statsample
   
   VERSION = '0.18.0'
   SPLIT_TOKEN = ","
+  autoload(:Analysis, 'statsample/analysis')
   autoload(:Database, 'statsample/converters')
   autoload(:Anova, 'statsample/anova')
   autoload(:CSV, 'statsample/converters')
@@ -144,7 +145,6 @@ module Statsample
   autoload(:Test, 'statsample/test')
   autoload(:Factor, 'statsample/factor')
   autoload(:Graph, 'statsample/graph')
-  autoload(:Example, 'statsample/example')
   
   
   class << self
@@ -295,3 +295,5 @@ require 'statsample/vector'
 require 'statsample/dataset'
 require 'statsample/crosstab'
 require 'statsample/matrix'
+require 'statsample/shorthand'
+
