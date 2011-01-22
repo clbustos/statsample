@@ -38,6 +38,18 @@ class StatsampleReliabilitySkillScaleTestCase < MiniTest::Unit::TestCase
       assert_equal(cdsm.vector_sum, @ssa.vector_sum)
       assert_equal(cdsm.vector_mean, @ssa.vector_mean)
     end
+    should "not crash on rare case" do
+      a=Statsample::Vector["c","c","a","a","c","a","b","c","c","b","a","d","a","d","a","a","d","e","c","d"]
+      b=Statsample::Vector["e","b","e","b","c","d","a","e","e","c","b","e","e","b","d","c","e","b","b","d"]
+      c=Statsample::Vector["e","b","e","c","e","c","b","d","e","c","a","a","b","d","e","c","b","a","a","e"]
+      d=Statsample::Vector["a","b","d","d","e","b","e","b","d","c","e","a","c","d","c","c","e","d","d","b"]
+      e=Statsample::Vector["a","b",nil,"d","c","c","d",nil,"d","d","e","e",nil,nil,nil,"d","c",nil,"e","d"]
+      key={"a"=>"a", "b"=>"e", "c"=>"d", "d"=>"c", "e"=>"d"}
+      ds=Statsample::Dataset.new("a"=>a,"b"=>b,"c"=>c,"d"=>d,"e"=>e)
+      ssa=Statsample::Reliability::SkillScaleAnalysis.new(ds, key)
+      assert(ssa.summary)
+    end
+    
     should "return valid summary" do
       assert(@ssa.summary.size>0)
     end

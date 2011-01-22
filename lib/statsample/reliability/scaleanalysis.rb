@@ -53,12 +53,12 @@ module Statsample
         @variances=@k.times.map {|i| @cov_m[i,i]}.to_scale
         @variances_mean=@variances.mean
         @covariances_mean=(@variance-@variances.sum).quo(@k**2-@k)
-        begin
+        #begin
           @alpha = Statsample::Reliability.cronbach_alpha(@ds)
           @alpha_standarized = Statsample::Reliability.cronbach_alpha_standarized(@ds)
-        rescue => e
-          raise DatasetException.new(@ds,e), "Error calculating alpha"
-        end
+        #rescue => e
+        #  raise DatasetException.new(@ds,e), "Error calculating alpha"
+        #end
       end
       # Returns a hash with structure
       def item_characteristic_curve

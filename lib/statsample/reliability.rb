@@ -5,6 +5,7 @@ module Statsample
       # only uses tuples without missing data
       def cronbach_alpha(ods)
         ds=ods.dup_only_valid
+        return nil if ds.vectors.any? {|k,v| v.variance==0}
         n_items=ds.fields.size
         return nil if n_items<=1
         s2_items=ds.vectors.inject(0) {|ac,v|
@@ -16,11 +17,18 @@ module Statsample
       # Calculate Chonbach's alpha for a given dataset
       # using standarized values for every vector.
       # Only uses tuples without missing data
-
+      # Return nil if one or more vectors has 0 variance
       def cronbach_alpha_standarized(ods)
-        ds=ods.dup_only_valid.fields.inject({}){|a,f|
-          a[f]=ods[f].standarized; a
+        
+        ds=ods.dup_only_valid
+        
+        return nil if ds.vectors.any? {|k,v| v.variance==0}
+        
+        ds=ds.fields.inject({}){|a,f|
+          a[f]=ods[f].standarized; 
+          a
         }.to_dataset
+        
         cronbach_alpha(ds)
       end
       # Predicted reliability of a test by replicating
