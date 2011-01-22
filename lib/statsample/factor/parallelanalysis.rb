@@ -58,7 +58,7 @@ module Statsample
       attr_accessor :no_data
       # Show extra information if true
       attr_accessor :debug
-
+      attr_accessor :use_gsl
       def initialize(ds, opts=Hash.new)
         @ds=ds
         @fields=@ds.fields
@@ -74,6 +74,7 @@ module Statsample
           :no_data=>false,
           :matrix_method=>:correlation_matrix
         }
+        @use_gsl=Statsample.has_gsl?
         @opts=opts_default.merge(opts)
         @opts[:matrix_method]==:correlation_matrix if @opts[:bootstrap_method]==:parameters
         opts_default.keys.each {|k| send("#{k}=", @opts[k]) }
@@ -120,6 +121,7 @@ module Statsample
       # Perform calculation. Shouldn't be called directly for the user
       def compute
         
+        
         @original=Statsample::Bivariate.send(matrix_method, @ds).eigenvalues unless no_data        
         @ds_eigenvalues=Statsample::Dataset.new((1..@n_variables).map{|v| "ev_%05d" % v})
         @ds_eigenvalues.fields.each {|f| @ds_eigenvalues[f].type=:scale}
@@ -145,6 +147,7 @@ module Statsample
             ds_bootstrap.update_valid_data
             
             matrix=Statsample::Bivariate.send(matrix_method, ds_bootstrap)
+            matrix=matrix.to_gsl if @use_gsl
             if smc
                 smc_v=matrix.inverse.diagonal.map{|ii| 1-(1.quo(ii))}
                 smc_v.each_with_index do |v,ii| 

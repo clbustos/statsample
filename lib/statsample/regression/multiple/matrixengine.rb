@@ -36,7 +36,7 @@ class MatrixEngine < BaseEngine
   def initialize(matrix,y_var, opts=Hash.new)
     matrix.extend Statsample::CovariateMatrix
     raise "#{y_var} variable should be on data" unless matrix.fields.include? y_var
-    if matrix.type==:covariance
+    if matrix._type==:covariance
       @matrix_cov=matrix
       @matrix_cor=matrix.correlation
       @no_covariance=false
@@ -84,7 +84,7 @@ class MatrixEngine < BaseEngine
     }
       result_matrix=@matrix_x_cov.inverse * @matrix_y_cov
 
-    if matrix.type==:covariance
+    if matrix._type==:covariance
       @coeffs=result_matrix.column(0).to_a
       @coeffs_stan=coeffs.collect {|k,v|
         coeffs[k]*@x_sd[k].quo(@y_sd)

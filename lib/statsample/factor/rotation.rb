@@ -27,7 +27,7 @@ module Factor
     attr_accessor :max_iterations
     # Maximum precision    
     attr_accessor :epsilon
-    
+    attr_accessor :use_gsl
     dirty_writer :max_iterations, :epsilon
     dirty_memoize :iterations, :rotated, :component_transformation_matrix, :h2
     
@@ -41,6 +41,7 @@ module Factor
       @epsilon=EPSILON
       @rotated=nil
       @h2=(@matrix.collect {|c| c**2} * Matrix.column_vector([1]*@m)).column(0).to_a
+      @use_gsl=Statsample.has_gsl?
       opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
       }
@@ -58,11 +59,12 @@ module Factor
     end
     # Start iteration 
     def iterate
-      t=Matrix.identity(@m)
-      b=@matrix.dup
-      h=Matrix.diagonal(*@h2).collect {|c| Math::sqrt(c)}
+      k_matrix=@use_gsl ? GSL::Matrix : ::Matrix
+      t=k_matrix.identity(@m)
+      b=(@use_gsl ? @matrix.to_gsl : @matrix.dup)
+      h=k_matrix.diagonal(*@h2).collect {|c| Math::sqrt(c)}
       h_inverse=h.collect {|c| c!=0 ? 1/c : 0 }
-      bh=h_inverse*b
+      bh=h_inverse * b
       @not_converged=true
       @iterations=0
       while @not_converged
@@ -110,9 +112,14 @@ module Factor
                 t[row_i][i]=tx_rot[row_i]
                 t[row_i][j]=ty_rot[row_i]
               }
-              
-              bh=Matrix.rows(bh)
-              t=Matrix.rows(t)
+              #if @use_gsl
+                bh=k_matrix.[](*bh)
+                t=k_matrix.[](*t)
+              #else
+              #  bh=Matrix.rows(bh)
+              #  t=Matrix.rows(t)
+                
+              #end
             else
               num_pairs=num_pairs-1
               @not_converged=false if num_pairs==0

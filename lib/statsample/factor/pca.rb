@@ -50,7 +50,7 @@ module Factor
     attr_accessor :summary_parallel_analysis
     # Type of rotation. By default, Statsample::Factor::Rotation::Varimax
     attr_accessor :rotation_type
-    attr_accessor :type
+    attr_accessor :matrix_type
     def initialize(matrix, opts=Hash.new)
       @use_gsl=nil
       @name=_("Principal Component Analysis")
@@ -58,7 +58,7 @@ module Factor
       @n_variables=@matrix.column_size      
       @variables_names=(@matrix.respond_to? :fields) ? @matrix.fields : @n_variables.times.map {|i| _("VAR_%d") % (i+1)}
       
-      @type = @matrix.respond_to?(:type) ? @matrix.type : :correlation
+      @matrix_type = @matrix.respond_to?(:_type) ? @matrix._type : :correlation
       
       @m=nil
       
@@ -103,11 +103,20 @@ module Factor
     # So, i=variable, j=component
     def feature_matrix(m=nil)
       m||=@m
-      omega_m=::Matrix.build(@n_variables, m) {0}
-      m.times do |i|
-        omega_m.column= i, @eigenpairs[i][1]
+      if @use_gsl
+        omega_m=GSL::Matrix.zeros(@n_variables,m)
+        ev=eigenvectors
+        m.times do |i|
+          omega_m.set_column(i,ev[i])
+        end
+        omega_m
+      else
+        omega_m=::Matrix.build(@n_variables, m) {0}
+        m.times do |i|
+          omega_m.column= i, @eigenpairs[i][1]
+        end
+        omega_m
       end
-      omega_m
     end
     # Returns Principal Components for +input+ matrix or dataset
     # The number of PC to return is equal to parameter +m+. 
@@ -115,19 +124,24 @@ module Factor
     # Use covariance matrix
     
     def principal_components(input, m=nil)
-      data_matrix=input.to_matrix      
+      if @use_gsl
+        data_matrix=input.to_gsl
+      else
+        data_matrix=input.to_matrix
+      end
       m||=@m
       
       raise "data matrix variables<>pca variables" if data_matrix.column_size!=@n_variables
       
       fv=feature_matrix(m)
       pcs=(fv.transpose*data_matrix.transpose).transpose
+      
       pcs.extend Statsample::NamedMatrix
       pcs.fields_y=m.times.map {|i| "PC_%d" % (i+1)}
       pcs.to_dataset
     end
     def component_matrix(m=nil)
-      var="component_matrix_#{type}"
+      var="component_matrix_#{matrix_type}"
       send(var,m)
     end
     # Matrix with correlations between components and
@@ -188,7 +202,7 @@ module Factor
     end
     def eigenvectors
       @eigenpairs.collect {|c| 
-        c[1].to_matrix
+        @use_gsl ? c[1].to_gsl : c[1].to_vector
       }
     end
     def calculate_eigenpairs

@@ -2,6 +2,9 @@ class ::Vector
   def to_matrix
     ::Matrix.columns([self.to_a])
   end
+  def to_vector
+    self
+  end
 end
 class ::Matrix
   def to_matrix
@@ -64,12 +67,31 @@ module GSL
       def to_ary
         to_a
       end
+      def to_gsl
+        self
+      end
     end
   end
   class Matrix
     def to_gsl
       self
     end
+    
+    def to_dataset
+      f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map {|i| _("VAR_%d") % (i+1) }
+      ds=Statsample::Dataset.new(f)
+      f.each do |ff|
+        ds[ff].type=:scale
+        ds[ff].name=ff
+      end
+      row_size.times {|i|
+        ds.add_case_array(self.row(i).to_a)
+      }
+      ds.update_valid_data
+      ds.name=self.name if self.respond_to? :name
+      ds
+    end
+    
     def row_size
       size1
     end
@@ -185,7 +207,7 @@ module Statsample
     @@covariatematrix=0
 
     # Get type of covariate matrix. Could be :covariance or :correlation
-    def type
+    def _type
       if row_size==column_size
         if row_size.times.find {|i| self[i,i]!=1.0}
           :covariance
@@ -197,11 +219,11 @@ module Statsample
       end
       
     end
-    def type=(t)
+    def _type=(t)
       @type=t
     end
     def correlation
-      if(type==:covariance)
+      if(_type==:covariance)
         matrix=Matrix.rows(row_size.times.collect { |i|
           column_size.times.collect { |j|
             if i==j
@@ -214,7 +236,7 @@ module Statsample
         matrix.extend CovariateMatrix 
         matrix.fields_x=fields_x
         matrix.fields_y=fields_y
-        matrix.type=:correlation
+        matrix._type=:correlation
         matrix
       else
         self
@@ -274,11 +296,11 @@ module Statsample
       matrix.extend CovariateMatrix 
       matrix.fields_x=fx
       matrix.fields_y=fy
-      matrix.type=type
+      matrix._type=_type
       matrix
     end
     def report_building(generator)
-      @name||= (type==:correlation ? _("Correlation"):_("Covariance"))+_(" Matrix")
+      @name||= (_type==:correlation ? _("Correlation"):_("Covariance"))+_(" Matrix")
       generator.table(:name=>@name, :header=>[""]+fields_y) do |t|
         row_size.times {|i|
           t.row([fields_x[i]]+row(i).to_a.collect {|i1|

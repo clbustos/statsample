@@ -23,17 +23,17 @@ class StatsampleMatrixTestCase < MiniTest::Unit::TestCase
     a=Matrix[[1.0, 0.3, 0.2], [0.3, 1.0, 0.5], [0.2, 0.5, 1.0]]
     a.extend Statsample::CovariateMatrix
     a.fields=%w{a b c}
-    assert_equal(:correlation, a.type)
+    assert_equal(:correlation, a._type)
 
     assert_equal(Matrix[[0.5],[0.3]], a.submatrix(%w{c a}, %w{b}))
     assert_equal(Matrix[[1.0, 0.2] , [0.2, 1.0]], a.submatrix(%w{c a}))
-    assert_equal(:correlation, a.submatrix(%w{c a}).type)
+    assert_equal(:correlation, a.submatrix(%w{c a})._type)
 
     a=Matrix[[20,30,10], [30,60,50], [10,50,50]]
 
     a.extend Statsample::CovariateMatrix
 
-    assert_equal(:covariance, a.type)
+    assert_equal(:covariance, a._type)
 
     a=50.times.collect {rand()}.to_scale
     b=50.times.collect {rand()}.to_scale

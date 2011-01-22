@@ -29,6 +29,12 @@ module MiniTest
         assert_in_delta(v,obs[i],delta)
       }
     end
+    def assert_equal_vector(exp,obs,delta=1e-10,msg=nil)
+      assert_equal(exp.size, obs.size, "Different size.#{msg}")
+      exp.size.times {|i|
+        assert_in_delta(exp[i],obs[i],delta, "Different element #{i}. \nExpected:\n#{exp}\nObserved:\n#{obs}.#{msg}")
+      }
+    end
     def assert_equal_matrix(exp,obs,delta=1e-10,msg=nil)
        assert_equal(exp.row_size, obs.row_size, "Different row size.#{msg}")
        assert_equal(exp.column_size, obs.column_size, "Different column size.#{msg}")
