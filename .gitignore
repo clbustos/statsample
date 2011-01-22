@@ -6,3 +6,4 @@ doc
 .yardoc
 examples/images/*
 examples/*.html
+web/upload_task.rb
