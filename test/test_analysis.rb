@@ -16,12 +16,12 @@ class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
       assert_equal(an,Statsample::Analysis.last)
     end
     context(Statsample::Analysis::Suite) do
-      should "puts() redirect output to puts output with same arguments" do
+      should "echo() uses output#puts with same arguments" do
         an=Statsample::Analysis::Suite.new(:output)
         obj=mock()
         obj.expects(:puts).with(:first,:second).once
         an.output=obj
-        an.puts(:first,:second)
+        an.echo(:first,:second)
       end
       should "summary() should call object.summary" do
         an=Statsample::Analysis::Suite.new(:summary)
@@ -87,25 +87,25 @@ class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
         an=Statsample::Analysis.store(:simple, :output=>output) do
           ds=data_frame(:x=>c(1..10),:y=>c(1..10))
           attach(ds)
-          puts x.mean
+          echo x.mean
         end
         an.run
       end
       should "rnorm returns a random normal distribution vector" do
         an=Statsample::Analysis::Suite.new(:simple)
         v=an.rnorm(1000)
-        assert_in_delta(0,v.mean,0.05)
-        assert_in_delta(1,v.sd,0.05)
+        assert_in_delta(0,v.mean,0.09)
+        assert_in_delta(1,v.sd,0.09)
         v=an.rnorm(1000,5,10)
-        assert_in_delta(5,v.mean,0.5)
-        assert_in_delta(10,v.sd,0.5)
+        assert_in_delta(5,v.mean,0.9)
+        assert_in_delta(10,v.sd,0.9)
       end
     end
     context(Statsample::Analysis::SuiteReportBuilder) do
-      should "puts() use add on rb object" do
+      should "echo() use add on rb object" do
         an=Statsample::Analysis::SuiteReportBuilder.new(:puts_to_add)
         an.rb.expects(:add).with(:first).twice
-        an.puts(:first, :first)
+        an.echo(:first, :first)
       end
       should "summary() uses add on rb object" do
         an=Statsample::Analysis::SuiteReportBuilder.new(:summary_to_add)

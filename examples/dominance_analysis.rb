@@ -11,9 +11,9 @@ Statsample::Analysis.store(Statsample::DominanceAnalysis) do
   c=rnorm(sample)
   d=rnorm(sample)
   
-  ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
+  ds={'a'=>a,'b'=>b,'cc'=>c,'d'=>d}.to_dataset
   attach(ds)
-  ds['y']=a*5+b*3+c*2+d+rnorm(300)  
+  ds['y']=a*5+b*3+cc*2+d+rnorm(300)  
   cm=cor(ds)
   summary(cm)
   lr=lr(ds,'y')
@@ -21,7 +21,7 @@ Statsample::Analysis.store(Statsample::DominanceAnalysis) do
   da=dominance_analysis(ds,'y')
   summary(da)
   
-  da=dominance_analysis(ds,'y',:name=>"Dominance Analysis using group of predictors", :predictors=>['a', 'b', %w{c d}])
+  da=dominance_analysis(ds,'y',:name=>"Dominance Analysis using group of predictors", :predictors=>['a', 'b', %w{cc d}])
   summary(da)
 end
 

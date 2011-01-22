@@ -14,9 +14,9 @@ Statsample::Analysis.store(Statsample::DominanceAnalysis::Bootstrap) do
   c.name="c"
   d.name="d"
   
-  ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
+  ds={'a'=>a,'b'=>b,'cc'=>c,'d'=>d}.to_dataset
   attach(ds)
-  ds['y1']=a*5+b*2+c*2+d*2+rnorm(sample,0,10)
+  ds['y1']=a*5+b*2+cc*2+d*2+rnorm(sample,0,10)
   ds['y2']=a*10+rnorm(sample)
   
   dab=dominance_analysis_bootstrap(ds, ['y1','y2'], :debug=>true)

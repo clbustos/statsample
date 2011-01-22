@@ -107,8 +107,8 @@ module Statsample
       else
         @regression_class= UNIVARIATE_REGRESSION_CLASS
         @method_association=:r2
-        
       end
+      
       @name=nil
       opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
@@ -117,7 +117,7 @@ module Statsample
       @dependent=[@dependent] unless @dependent.is_a? Array
       
       @predictors ||= input.fields-@dependent
-
+      
       @name=_("Dominance Analysis:  %s over %s") % [ @predictors.flatten.join(",") , @dependent.join(",")] if @name.nil?
       
       if input.is_a? Statsample::Dataset

@@ -360,6 +360,34 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     assert_equal(exp,v1.standarized)
   end
 
+    def test_check_type
+    v=Statsample::Vector.new
+    v.type=:nominal
+    assert_raise(NoMethodError) { v.check_type(:scale)}
+    assert_raise(NoMethodError) { v.check_type(:ordinal)}
+    assert(v.check_type(:nominal).nil?)
+    
+    v.type=:ordinal
+    
+    assert_raise(NoMethodError) { v.check_type(:scale)}
+    
+    assert(v.check_type(:ordinal).nil?)
+    assert(v.check_type(:nominal).nil?)
+    
+
+    v.type=:scale
+    assert(v.check_type(:scale).nil?)
+    assert(v.check_type(:ordinal).nil?)
+    assert(v.check_type(:nominal).nil?)
+
+    v.type=:date
+    assert_raise(NoMethodError) { v.check_type(:scale)}
+    assert_raise(NoMethodError) { v.check_type(:ordinal)}
+    assert_raise(NoMethodError) { v.check_type(:nominal)}
+    
+  end
+  
+  
   def test_add
     a=Statsample::Vector.new([1,2,3,4,5], :scale)
     b=Statsample::Vector.new([11,12,13,14,15], :scale)

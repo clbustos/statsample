@@ -2,12 +2,12 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 
 require 'statsample'
-samples=100
+samples=150
 variables=30
 iterations=50
 Statsample::Analysis.store(Statsample::Factor::ParallelAnalysis) do 
   
-rng = GSL::Rng.alloc()
+rng = Distribution::Normal.rng_ugaussian()
 f1=rnorm(samples)
 f2=rnorm(samples)
 f3=rnorm(samples)
@@ -15,7 +15,7 @@ f3=rnorm(samples)
 vectors={}
 
 variables.times do |i|
-  vectors["v#{i}"]=samples.times.collect {|nv| f1[nv]*i+(f2[nv]*(15-i))+((f3[nv]*(30-i))*1.5)*rng.ugaussian()}.to_scale
+  vectors["v#{i}"]=samples.times.collect {|nv| f1[nv]*i+(f2[nv]*(15-i))+((f3[nv]*(30-i))*1.5)*rng.call}.to_scale
   vectors["v#{i}"].name="Vector #{i}"
 end
 

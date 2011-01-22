@@ -33,9 +33,19 @@ class ::Matrix
   end
   
   def eigenvalues
-    eigen[:eigenvalues]
+    eigenpairs.collect {|v| v[0]}
   end
+  def eigenvectors
+    eigenpairs.collect {|v| v[1]}
+  end
+  def eigenvectors_matrix
+    Matrix.columns(eigenvectors)
+  end
+  
+  
 
+  
+  
   def to_gsl
     out=[]
     self.row_size.times{|i|
@@ -75,7 +85,22 @@ module GSL
     def eigenvalues
       eigenpairs.collect {|v| v[0]}
     end
+    def eigenvectors
+      eigenpairs.collect {|v| v[1]}
+    end
     
+    # Matrix sum of squares
+    def mssq
+      sum=0
+      to_v.each {|i| sum+=i**2}
+      sum
+    end
+    
+    def eigenvectors_matrix
+      eigval, eigvec= GSL::Eigen.symmv(self)
+      GSL::Eigen::symmv_sort(eigval, eigvec, GSL::Eigen::SORT_VAL_DESC)
+      eigvec 
+    end
     def eigenpairs
       eigval, eigvec= GSL::Eigen.symmv(self)
       GSL::Eigen::symmv_sort(eigval, eigvec, GSL::Eigen::SORT_VAL_DESC)
@@ -230,12 +255,17 @@ module Statsample
       columns||=rows
       # Convert all labels on index
       row_index=rows.collect {|v| 
-        v.is_a?(Numeric) ? v : fields_x.index(v)
+        r=v.is_a?(Numeric) ? v : fields_x.index(v)
+        raise "Index #{v} doesn't exists on matrix" if r.nil?
+        r
       }
       column_index=columns.collect {|v| 
-        v.is_a?(Numeric) ? v : fields_y.index(v)
+        r=v.is_a?(Numeric) ? v : fields_y.index(v)
+        raise "Index #{v} doesn't exists on matrix" if r.nil?
+        r
       }
-
+      
+      
       fx=row_index.collect {|v| fields_x[v]}
       fy=column_index.collect {|v| fields_y[v]}
         

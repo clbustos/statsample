@@ -1,36 +1,17 @@
 #!/usr/bin/ruby
-#$:.unshift(File.dirname(__FILE__)+'/../lib/')
+$:.unshift(File.dirname(__FILE__)+'/../lib/')
 
 require 'statsample'
-require 'benchmark'
-samples=1000
-a=samples.times.collect {rand}.to_scale
-b=samples.times.collect {rand}.to_scale
-c=samples.times.collect {rand}.to_scale
-d=samples.times.collect {rand}.to_scale
 
-ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
-ds['y']=ds.collect{|row| row['a']*5+row['b']*3+row['c']*2+row['d']*1+rand()}
+Statsample::Analysis.store(Statsample::Regression::Multiple) do
 
-Benchmark.bm(7) do |x|
-
-
-rb=ReportBuilder.new(:name=>"Multiple Regression Engines")
-
-if Statsample.has_gsl?
-  x.report("GSL:") {
-  lr=Statsample::Regression::Multiple::GslEngine.new(ds,'y',:name=>"Multiple Regression using GSL")
-  rb.add(lr.summary)
-  }
+  samples=2000
+  ds=dataset('a'=>rnorm(samples),'b'=>rnorm(samples),'cc'=>rnorm(samples),'d'=>rnorm(samples))
+  attach(ds)
+  ds['y']=a*5+b*3+cc*2+d+rnorm(samples)
+  summary lr(ds,'y')
 end
 
-
-  x.report("Ruby:") {
-  lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y',:name=>"Multiple Regression using RubyEngine")
-  rb.add(lr.summary)
-  }
-  puts rb.to_text
+if __FILE__==$0
+   Statsample::Analysis.run_batch
 end
-
-
-

@@ -2,9 +2,16 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 
 require 'statsample'
+
+Statsample::Analysis.store(Statsample::Bivariate::Tetrachoric) do
+  
 a=40
 b=10
 c=20
 d=30
-tetra=Statsample::Bivariate::Tetrachoric.new(a,b,c,d)
-puts tetra.summary
+summary tetrachoric(a,b,c,d)
+end
+
+if __FILE__==$0
+  Statsample::Analysis.run_batch
+end

@@ -295,3 +295,5 @@ require 'statsample/vector'
 require 'statsample/dataset'
 require 'statsample/crosstab'
 require 'statsample/matrix'
+require 'statsample/shorthand'
+

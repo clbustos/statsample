@@ -5,9 +5,13 @@ $:.unshift('/home/cdx/dev/reportbuilder/lib/')
 require 'benchmark'
 require 'statsample'
 n=100
-a=n.times.map {|i| rand(10)+i}.to_scale
-b=n.times.map {|i| rand(10)+i}.to_scale
-sp=Statsample::Graph::Scatterplot.new(a,b, :width=>200, :height=>200)
-rb=ReportBuilder.new
-rb.add(sp)
-puts rb.to_text
+
+Statsample::Analysis.store(Statsample::Graph::Scatterplot) do
+  x=rnorm(n)
+  y=x+rnorm(n,0.5,0.2)
+  scatterplot(x,y)
+end
+
+if __FILE__==$0
+  Statsample::Analysis.run
+end

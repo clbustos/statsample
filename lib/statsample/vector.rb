@@ -135,11 +135,22 @@ module Statsample
     def dup_empty
       Vector.new([],@type, :missing_values => @missing_values.dup, :labels => @labels.dup, :name=> @name)
     end
-    # Raises an exception if type of vector is inferior to t type
-    def check_type(t)
-      raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal) or (t==:date)
+    
+    if Statsample::STATSAMPLE__.respond_to?(:check_type)
+      # Raises an exception if type of vector is inferior to t type
+      def check_type(t)
+        Statsample::STATSAMPLE__.check_type(self,t)
+      end
+    else
+      def check_type(t) #:nodoc:
+        _check_type(t)
+      end
     end
-    private :check_type
+    
+    
+    def _check_type(t) #:nodoc:
+      raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal) or (t==:date) or (:date==@type)
+    end
 
     # Return a vector usign the standarized values for data
     # with sd with denominator n-1. With variance=0 or mean nil,
@@ -427,7 +438,7 @@ module Statsample
       }
       Statsample::Vector.new(sum, :scale  )
       else
-      raise ArgumentError, "The array/vector parameter should be of the same size of the original vector"
+        raise ArgumentError, "The array/vector parameter (#{v.size}) should be of the same size of the original vector (#{@data.size})"
       end
     elsif(v.respond_to? method )
       Statsample::Vector.new(
@@ -624,6 +635,8 @@ module Statsample
         _frequencies
       end
     end
+    
+    
     def _frequencies #:nodoc:
       @valid_data.inject(Hash.new) {|a,x|
         a[x]||=0

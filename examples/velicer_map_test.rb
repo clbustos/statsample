@@ -2,34 +2,41 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 
 require 'statsample'
-samples=100
-variables=10
-rng = GSL::Rng.alloc()
-f1=samples.times.collect {rng.ugaussian()}.to_scale
-f2=samples.times.collect {rng.ugaussian()}.to_scale
 
-vectors={}
-
-variables.times do |i|
+Statsample::Analysis.store(Statsample::Factor::MAP) do
+  
+  rng=Distribution::Normal.rng_ugaussian
+  samples=100
+  variables=10
+  
+  f1=rnorm(samples)
+  f2=rnorm(samples)
+  
+  vectors={}
+  
+  variables.times do |i|
   vectors["v#{i}"]=samples.times.collect {|nv|    
-    if i<5
-      f1[nv]*5 + f2[nv] *2 +rng.ugaussian()
-    else
-      f1[nv]*2 + f2[nv] *3 +rng.ugaussian()
-    end
+  if i<5
+    f1[nv]*5 + f2[nv] *2 +rng.call
+  else
+    f1[nv]*2 + f2[nv] *3 +rng.call
+  end
   }.to_scale
+  end
+  
+  
+  ds=vectors.to_dataset
+  cor=cor(ds)
+  pca=pca(cor)
+  
+  map=Statsample::Factor::MAP.new(cor)
+  
+  echo ("There are 2 real factors on data")
+  summary(pca)
+  echo("Traditional Kaiser criterion (k>1) returns #{pca.m} factors")
+  summary(map)
+  echo("Velicer's MAP Test returns #{map.number_of_factors} factors to preserve")
 end
-ds=vectors.to_dataset
-cor=Statsample::Bivariate.correlation_matrix(ds)
-map=Statsample::Factor::MAP.new(cor)
-pca=Statsample::Factor::PCA.new(cor)
-
-rb=ReportBuilder.new(:name=>"Velicer's MAP test") do |g|
-  g.text("There are 2 real factors on data")
-  g.parse_element(pca)
-  g.text("Traditional Kaiser criterion (k>1) returns #{pca.m} factors")
-  g.parse_element(map)
-  g.text("Velicer's MAP Test returns #{map.number_of_factors} factors to preserve")
+if __FILE__==$0
+  Statsample::Analysis.run_batch
 end
-
-puts rb.to_text

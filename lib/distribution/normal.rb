@@ -3,10 +3,13 @@ module Distribution
   # Uses Statistics2 module
   module Normal
     class << self
+      def rng_ugaussian
+        rng_gaussian(0,1,nil)
+      end
       # Return a proc which return a random number within a gaussian distribution -> N(+mean+,+sigma+)
       # == Reference:
       # * http://www.taygeta.com/random/gaussian.html
-      def rng_ugaussian(mean=0,sigma=1,seed=nil)
+      def rng_gaussian(mean=0,sigma=1,seed=nil)
         seed||=rand(1e8)
         if Distribution.has_gsl?
           rng=GSL::Rng.alloc(GSL::Rng::MT19937,seed)

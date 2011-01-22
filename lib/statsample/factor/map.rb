@@ -48,20 +48,64 @@ module Statsample
       attr_reader :fm
       # Smallest average squared correlation
       attr_reader :minfm
+      
+      attr_accessor :use_gsl
       def self.with_dataset(ds,opts=Hash.new)
         new(ds.correlation_matrix,opts)
       end
       def initialize(matrix, opts=Hash.new)
         @matrix=matrix
         opts_default={
+          :use_gsl=>true,
           :name=>_("Velicer's MAP")
         }
         @opts=opts_default.merge(opts)
          opts_default.keys.each {|k| send("#{k}=", @opts[k]) }
       end
       def compute
-        eigen=@matrix.eigen
+        gsl_m=(use_gsl and Statsample.has_gsl?) ? @matrix.to_gsl : @matrix
+        klass_m=gsl_m.class
+        eigvect,@eigenvalues=gsl_m.eigenvectors_matrix, gsl_m.eigenvalues
+        eigenvalues_sqrt=@eigenvalues.collect {|v| Math.sqrt(v)}
+        loadings=eigvect*(klass_m.diagonal(*eigenvalues_sqrt))
+        fm=Array.new(@matrix.row_size)
+        ncol=@matrix.column_size
+        
+        fm[0]=(gsl_m.mssq - ncol).quo(ncol*(ncol-1))
+        
+        (ncol-1).times do |m|
+          puts "MAP:Eigenvalue #{m+1}" if $DEBUG
+          a=loadings[0..(loadings.row_size-1),0..m]
+          partcov= gsl_m - (a*a.transpose)
+          pc_prediag=partcov.row_size.times.map{|i|
+            1.quo(Math::sqrt(partcov[i,i]))
+          }
+          d=klass_m.diagonal(*pc_prediag)
+          pr=d*partcov*d
+          fm[m+1]=(pr.mssq-ncol).quo(ncol*(ncol-1))
+        end
+        minfm=fm[0]
+        nfactors=0
+        @errors=[]
+        fm.each_with_index do |v,s|
+          if v.is_a? Complex
+            @errors.push(s)
+          else
+            if v < minfm
+              minfm=v
+              nfactors=s
+            end
+          end
+        end
+        @number_of_factors=nfactors
+        @fm=fm
+        @minfm=minfm
+        
+      end
+      def compute_ruby
+        eigen=@matrix.to_matrix.eigen
         eigvect,@eigenvalues=eigen[:eigenvectors], eigen[:eigenvalues]
+
         loadings=eigvect*(Matrix.diag(*@eigenvalues).sqrt)
         fm=Array.new(@matrix.row_size)
         ncol=@matrix.column_size

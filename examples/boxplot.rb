@@ -12,5 +12,5 @@ Statsample::Analysis.store(Statsample::Graph::Boxplot) do
 end
 
 if __FILE__==$0
-  Statsample::Analysis.run_batch
+  Statsample::Analysis.run
 end
