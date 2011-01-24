@@ -46,7 +46,7 @@ class StatsampleLogitTestCase < MiniTest::Unit::TestCase
         ruby_logit=Statsample::Regression::Binomial::Logit.new(ds,'y')
 
         assert_in_delta(r_coeffs[0,0],  ruby_logit.constant,1e-4)
-        assert_in_delta(r_coeffs[0,1],  ruby_logit.constant_se,1e-4)
+        assert_in_delta(r_coeffs[0,1],  ruby_logit.constant_se,2e-4)
         
         %w{x1 x2 x3}.each_with_index do |f,i|
           assert_in_delta(r_coeffs[i+1,0], ruby_logit.coeffs[f],1e-4)

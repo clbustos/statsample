@@ -333,11 +333,14 @@ module Statsample
     def has_missing_data?
       @has_missing_data
     end
+    alias :flawed? :has_missing_data? 
+    
     # Retrieves label for value x. Retrieves x if
     # no label defined.
     def labeling(x)
       @labels.has_key?(x) ? @labels[x].to_s : x.to_s
     end
+    alias :label :labeling 
     # Returns a Vector with data with labels replaced by the label.
     def vector_labeled
       d=@data.collect{|x|
@@ -369,8 +372,7 @@ module Statsample
       !(x.nil? or @missing_values.include? x)
     end
     # Set missing_values.
-    # if update_valid = false, you should use
-    # set_valid_data after all changes
+    # set_valid_data is called after changes
     def missing_values=(vals)
       @missing_values = vals
       set_valid_data
@@ -507,10 +509,10 @@ module Statsample
     }
     end
     def split_by_separator_freq(sep=Statsample::SPLIT_TOKEN)
-    split_by_separator(sep).inject({}) {|a,v|
-      a[v[0]]=v[1].inject {|s,x| s+x.to_i}
-      a
-    }
+      split_by_separator(sep).inject({}) {|a,v|
+        a[v[0]]=v[1].inject {|s,x| s+x.to_i}
+        a
+      }
     end
     
     # Returns an random sample of size n, with replacement,
@@ -616,13 +618,13 @@ module Statsample
     end
     # Retrieves uniques values for data.
     def factors
-    if @type==:scale
-      @scale_data.uniq.sort
-    elsif @type==:date
-      @date_data_with_nils.uniq.sort
-    else
-      @valid_data.uniq.sort
-    end
+      if @type==:scale
+        @scale_data.uniq.sort
+      elsif @type==:date
+        @date_data_with_nils.uniq.sort
+      else
+        @valid_data.uniq.sort
+      end
     end
     if Statsample::STATSAMPLE__.respond_to?(:frequencies)
       # Returns a hash with the distribution of frecuencies for
@@ -647,7 +649,7 @@ module Statsample
     
     # Returns the most frequent item.
     def mode
-      frequencies.max{|a,b| a[1]<=>b[1]}[0]
+      frequencies.max{|a,b| a[1]<=>b[1]}.first
     end
     # The numbers of item with valid data.
     def n_valid
@@ -849,7 +851,6 @@ module Statsample
     # Sample Standard deviation (denominator n-1)
     def standard_deviation_sample(m=nil)
         check_type :scale
-        
         m||=mean
         Math::sqrt(variance_sample(m))
     end
