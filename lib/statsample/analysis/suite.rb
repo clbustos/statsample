@@ -17,7 +17,7 @@ module Statsample
          @block.arity<1 ? instance_eval(&@block) : @block.call(self)
       end
       def echo(*args)
-        @output.puts *args
+        @output.puts(*args)
       end
       def summary(obj)
         obj.summary

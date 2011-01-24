@@ -1,7 +1,6 @@
 $:.unshift(File.expand_path(File.dirname(__FILE__)+'/../lib/'))
 $:.unshift(File.expand_path(File.dirname(__FILE__)+'/'))
 
-
 require 'minitest/unit'
 require 'tempfile'
 require 'tmpdir'
@@ -17,6 +16,18 @@ module MiniTest
       include Shoulda::InstanceMethods
       extend Shoulda::ClassMethods
       include Shoulda::Assertions
+      
+      def self.should_with_gsl(name,&block)
+        should(name) do
+          if Statsample.has_gsl?
+            instance_eval(&block)
+          else
+            skip("Requires GSL")
+          end
+         
+        end
+      end
+      
     end
   end
 

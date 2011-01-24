@@ -1,10 +1,6 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-
 class StatsampleGSLTestCase < MiniTest::Unit::TestCase
-    
-  
-  def test_matrix_to_gsl
-  if Statsample.has_gsl?
+  should_with_gsl "matrix with gsl" do
     a=[1,2,3,4,20].to_vector(:scale)
     b=[3,2,3,4,50].to_vector(:scale)
     c=[6,2,3,4,3].to_vector(:scale)
@@ -15,9 +11,6 @@ class StatsampleGSLTestCase < MiniTest::Unit::TestCase
     matrix=gsl.to_matrix
     assert_equal(5,matrix.row_size)
     assert_equal(3,matrix.column_size)
-  else
-    skip("Needs GSL extension")
-  end
   end
 end
 

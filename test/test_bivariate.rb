@@ -5,26 +5,17 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
     v2=[6,2,4,10,12,8].to_vector(:scale)
     assert_equal(23.0, Statsample::Bivariate.sum_of_squares(v1,v2))
   end
-  should "return same covariance with ruby and gls implementation" do
-    if Statsample.has_gsl?
-      v1=20.times.collect {|a| rand()}.to_scale
-      v2=20.times.collect {|a| rand()}.to_scale
-      assert_in_delta(Statsample::Bivariate.covariance(v1,v2), Statsample::Bivariate.covariance_slow(v1,v2), 0.001)
-    else
-      skip "Bivariate::covariance not tested (needs GSL)"
-    end
-
+  should_with_gsl "return same covariance with ruby and gls implementation" do
+    v1=20.times.collect {|a| rand()}.to_scale
+    v2=20.times.collect {|a| rand()}.to_scale
+    assert_in_delta(Statsample::Bivariate.covariance(v1,v2), Statsample::Bivariate.covariance_slow(v1,v2), 0.001)
   end
 
-  should "return same correlation with ruby and gls implementation" do
-    if Statsample.has_gsl?
-      v1=20.times.collect {|a| rand()}.to_scale
-      v2=20.times.collect {|a| rand()}.to_scale
+  should_with_gsl "return same correlation with ruby and gls implementation" do
+    v1=20.times.collect {|a| rand()}.to_scale
+    v2=20.times.collect {|a| rand()}.to_scale
 
-      assert_in_delta(GSL::Stats::correlation(v1.gsl, v2.gsl), Statsample::Bivariate.pearson_slow(v1,v2), 1e-10)
-    else
-      skip "Not tested gsl versus ruby correlation (needs GSL)"
-    end
+    assert_in_delta(GSL::Stats::correlation(v1.gsl, v2.gsl), Statsample::Bivariate.pearson_slow(v1,v2), 1e-10)
   end
   should "return correct pearson correlation" do
     v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
@@ -68,23 +59,23 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
     end
     #assert_equal(expected,obt)
   end
-  should "return same values for optimized and pairwise covariance matrix" do
-    cases=100
-    v1=Statsample::Vector.new_scale(cases) {rand()}
-    v2=Statsample::Vector.new_scale(cases) {rand()}
-    v3=Statsample::Vector.new_scale(cases) {rand()}
-    v4=Statsample::Vector.new_scale(cases) {rand()}
-    v5=Statsample::Vector.new_scale(cases) {rand()}
+  should_with_gsl "return same values for optimized and pairwise covariance matrix" do
+      cases=100
+      v1=Statsample::Vector.new_scale(cases) {rand()}
+      v2=Statsample::Vector.new_scale(cases) {rand()}
+      v3=Statsample::Vector.new_scale(cases) {rand()}
+      v4=Statsample::Vector.new_scale(cases) {rand()}
+      v5=Statsample::Vector.new_scale(cases) {rand()}
 
-    ds={'v1'=>v1,'v2'=>v2,'v3'=>v3,'v4'=>v4,'v5'=>v5}.to_dataset
-    
-    cor_opt=Statsample::Bivariate.covariance_matrix_optimized(ds)
-    
-    cor_pw =Statsample::Bivariate.covariance_matrix_pairwise(ds)
-    assert_equal_matrix(cor_opt,cor_pw,1e-15)
-    
+      ds={'v1'=>v1,'v2'=>v2,'v3'=>v3,'v4'=>v4,'v5'=>v5}.to_dataset
+      
+      cor_opt=Statsample::Bivariate.covariance_matrix_optimized(ds)
+      
+      cor_pw =Statsample::Bivariate.covariance_matrix_pairwise(ds)
+      assert_equal_matrix(cor_opt,cor_pw,1e-15)
   end
-  should "return same values for optimized and pairwise correlation matrix" do
+  should_with_gsl "return same values for optimized and pairwise correlation matrix" do
+    
     cases=100
     v1=Statsample::Vector.new_scale(cases) {rand()}
     v2=Statsample::Vector.new_scale(cases) {rand()}
@@ -168,7 +159,5 @@ class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
     assert_in_delta(0.636,Statsample::Bivariate.gamma(m),0.001)
     m2=Matrix[[15,12,6,5],[12,8,10,8],[4,6,9,10]]
     assert_in_delta(0.349,Statsample::Bivariate.gamma(m2),0.001)
-
-
   end
 end

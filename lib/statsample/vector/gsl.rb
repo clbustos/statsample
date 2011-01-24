@@ -5,11 +5,11 @@ module Statsample
         @gsl=nil
       end
       
-      def set_scale_data
-        set_scale_data_ruby
+      def set_valid_data
         clear_gsl
+        set_valid_data_ruby        
       end
-      def push_(v)
+      def push(v)
         # If data is GSL::Vector, should be converted first to an Array
         if @data.is_a? GSL::Vector
           @data=@data.to_a
@@ -22,7 +22,7 @@ module Statsample
       end
       
       alias :to_gsl :gsl
-      def vector_standarized_compute_(m,sd)
+      def vector_standarized_compute(m,sd)
         if flawed?
           vector_standarized_compute_ruby(m,sd)
         else
@@ -30,7 +30,7 @@ module Statsample
         end
       end
       
-      def vector_centered_compute_(m)
+      def vector_centered_compute(m)
         if flawed?
           vector_centered_compute_ruby(m)
         else

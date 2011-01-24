@@ -108,6 +108,7 @@ lib/statsample/test/levene.rb
 lib/statsample/test/t.rb
 lib/statsample/test/umannwhitney.rb
 lib/statsample/vector.rb
+lib/statsample/vector/gsl.rb
 po/es/statsample.mo
 po/es/statsample.po
 po/statsample.pot
@@ -139,6 +140,7 @@ test/test_distribution.rb
 test/test_dominance_analysis.rb
 test/test_factor.rb
 test/test_factor_map.rb
+test/test_factor_pa.rb
 test/test_ggobi.rb
 test/test_gsl.rb
 test/test_histogram.rb
@@ -161,3 +163,4 @@ test/test_test_t.rb
 test/test_umannwhitney.rb
 test/test_vector.rb
 test/test_xls.rb
+web/Rakefile

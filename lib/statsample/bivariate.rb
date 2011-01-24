@@ -154,7 +154,6 @@ module Statsample
       
       def covariance_matrix(ds)
         vars,cases=ds.fields.size,ds.cases
-        
         if !ds.has_missing_data? and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
           cm=covariance_matrix_optimized(ds)
         else
@@ -195,7 +194,6 @@ module Statsample
           cm=correlation_matrix_optimized(ds)
         else
           cm=correlation_matrix_pairwise(ds)
-          
         end
         cm.extend(Statsample::CovariateMatrix)
         cm.fields=ds.fields

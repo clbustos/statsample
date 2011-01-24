@@ -226,11 +226,12 @@ module Statsample
       ds=Statsample::Dataset.new(h).dup_only_valid
       ds.vectors.values
     end
+    
     # Cheap version of #only_valid. 
     # If any vectors have missing_values, return only valid.
-    # If not, return the vectors it self
+    # If not, return the vectors itself
     def only_valid_clone(*vs)
-      if vs.any? {|v| v.has_missing_data?}
+      if vs.any? {|v| v.flawed?}
         only_valid(*vs)
       else
         vs

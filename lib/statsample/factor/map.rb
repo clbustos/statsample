@@ -77,10 +77,8 @@ module Statsample
           puts "MAP:Eigenvalue #{m+1}" if $DEBUG
           a=loadings[0..(loadings.row_size-1),0..m]
           partcov= gsl_m - (a*a.transpose)
-          pc_prediag=partcov.row_size.times.map{|i|
-            1.quo(Math::sqrt(partcov[i,i]))
-          }
-          d=klass_m.diagonal(*pc_prediag)
+          
+          d=klass_m.diagonal(*(partcov.diagonal.collect {|v| Math::sqrt(1/v)}))
           pr=d*partcov*d
           fm[m+1]=(pr.mssq-ncol).quo(ncol*(ncol-1))
         end
@@ -88,7 +86,7 @@ module Statsample
         nfactors=0
         @errors=[]
         fm.each_with_index do |v,s|
-          if v.is_a? Complex
+          if defined?(Complex) and v.is_a? ::Complex
             @errors.push(s)
           else
             if v < minfm
@@ -101,42 +99,6 @@ module Statsample
         @fm=fm
         @minfm=minfm
         
-      end
-      def compute_ruby
-        eigen=@matrix.to_matrix.eigen
-        eigvect,@eigenvalues=eigen[:eigenvectors], eigen[:eigenvalues]
-
-        loadings=eigvect*(Matrix.diag(*@eigenvalues).sqrt)
-        fm=Array.new(@matrix.row_size)
-        ncol=@matrix.column_size
-        fm[0]=(@matrix.mssq - ncol).quo(ncol*(ncol-1))
-        (ncol-1).times do |m|
-          puts "MAP:Eigenvalue #{m+1}" if $DEBUG
-          a=loadings[0..(loadings.row_size-1),0..m]
-          partcov= @matrix - (a*a.t)
-          pc_prediag=partcov.row_size.times.map{|i|
-            1.quo(Math::sqrt(partcov[i,i]))
-          }
-          d=Matrix.diag(*pc_prediag)
-          pr=d*partcov*d
-          fm[m+1]=(pr.mssq-ncol).quo(ncol*(ncol-1))
-        end
-        minfm=fm[0]
-        nfactors=0
-        @errors=[]
-        fm.each_with_index do |v,s|
-          if v.is_a? Complex
-            @errors.push(s)
-          else
-            if v < minfm
-              minfm=v
-              nfactors=s
-            end
-          end
-        end
-        @number_of_factors=nfactors
-        @fm=fm
-        @minfm=minfm
       end
       def report_building(g) #:nodoc:
         g.section(:name=>@name) do |s|

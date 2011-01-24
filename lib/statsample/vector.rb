@@ -902,6 +902,6 @@ module Statsample
     alias_method :variance, :variance_sample    
     alias_method :sd, :standard_deviation_sample
     alias_method :ss, :sum_of_squares
-    include_aliasing Statsample::Vector::GSL_
+    include_aliasing Statsample::Vector::GSL_ if Statsample.has_gsl?
   end
 end
