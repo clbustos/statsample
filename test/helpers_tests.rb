@@ -17,7 +17,6 @@ module MiniTest
       include Shoulda::InstanceMethods
       extend Shoulda::ClassMethods
       include Shoulda::Assertions
-
     end
   end
 

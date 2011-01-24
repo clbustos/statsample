@@ -1,17 +1,31 @@
 require 'date'
-class Array
-    # Creates a new Statsample::Vector object
-    # Argument should be equal to Vector.new
-	def to_vector(*args)
+require 'statsample/vector/gsl'
+
+module Statsample::VectorShorthands
+  # Creates a new Statsample::Vector object
+  # Argument should be equal to Vector.new
+  def to_vector(*args)
 		Statsample::Vector.new(self,*args)
 	end
-    # Creates a new Statsample::Vector object of type :scale
-    def to_scale(*args)
-        Statsample::Vector.new(self, :scale,*args)
-    end
+  # Creates a new Statsample::Vector object of type :scale
+  def to_scale(*args)
+    Statsample::Vector.new(self, :scale, *args)
+  end
 end
 
+class Array
+  include Statsample::VectorShorthands
+end
+
+if Statsample.has_gsl?
+  module GSL
+    class Vector
+      include Statsample::VectorShorthands
+    end
+  end
+end
 module Statsample
+
  
   # Collection of values on one dimension. Works as a column on a Spreadsheet.
   # 
@@ -41,8 +55,6 @@ module Statsample
     attr_reader :data_with_nils
     # Date date, with all missing values replaced by nils
     attr_reader :date_data_with_nils
-    # GSL Object, only available with rbgsl extension and type==:scale
-    attr_reader :gsl
     # Change label for specific values
     attr_accessor :labels
     # Name of vector. Should be used for output by many classes
@@ -58,8 +70,7 @@ module Statsample
     #   * <tt>:name</tt> Name of vector
     #
     def initialize(data=[], type=:nominal, opts=Hash.new)
-      raise "Data should be an array" unless data.is_a? Array
-      @data=data
+      @data=data.is_a?(Array) ? data : data.to_a 
       @type=type
       opts_default={
         :missing_values=>[],
@@ -120,7 +131,6 @@ module Statsample
       else
         vector=n.times.map { val}.to_scale
       end
-      
       vector.type=:scale
       vector
     end
@@ -152,34 +162,31 @@ module Statsample
       raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal) or (t==:date) or (:date==@type)
     end
 
+    def vector_standarized_compute(m,sd) # :nodoc:
+      @data_with_nils.collect{|x| x.nil? ? nil : (x.to_f - m).quo(sd) }.to_vector(:scale)
+    end
     # Return a vector usign the standarized values for data
     # with sd with denominator n-1. With variance=0 or mean nil,
     # returns a vector of equal size full of nils
     # 
-    
     def vector_standarized(use_population=false)
       check_type :scale
-      return ([nil]*size).to_scale if mean.nil?
       m=mean
       sd=use_population ? sdp : sds
-      return ([nil]*size).to_scale if sd==0.0
-      vector=@data_with_nils.collect{|x|
-        if !x.nil?
-          (x.to_f - m).quo(sd)
-        else
-          nil
-        end
-      }.to_vector(:scale)
+      return ([nil]*size).to_scale if mean.nil? or sd==0.0 
+      vector=vector_standarized_compute(m,sd)
       vector.name=_("%s(standarized)")  % @name
       vector
+    end
+    def vector_centered_compute(m) #:nodoc:
+      @data_with_nils.collect {|x| x.nil? ? nil : x.to_f-m }.to_scale
     end
     # Return a centered vector
     def vector_centered
       check_type :scale
       m=mean
-      vector=@data_with_nils.collect {|x|
-        x.nil? ? nil : x.to_f-m
-      }.to_scale
+      return ([nil]*size).to_scale if mean.nil?
+      vector=vector_centered_compute(m)
       vector.name=_("%s(centered)") % @name
       vector
     end
@@ -196,18 +203,18 @@ module Statsample
       vector
     end
     def box_cox_transformation(lambda) # :nodoc:
-    raise "Should be a scale" unless @type==:scale
-    @data_with_nils.collect{|x|
-    if !x.nil?
-      if(lambda==0)
-        Math.log(x)
+      raise "Should be a scale" unless @type==:scale
+      @data_with_nils.collect{|x|
+      if !x.nil?
+        if(lambda==0)
+          Math.log(x)
+        else
+          (x**lambda-1).quo(lambda)
+        end
       else
-        (x**lambda-1).quo(lambda)
+        nil
       end
-    else
-      nil
-    end
-    }.to_vector(:scale)
+      }.to_vector(:scale)
     end
     
     # Vector equality.
@@ -302,7 +309,6 @@ module Statsample
       @missing_data.clear
       @data_with_nils.clear
       @date_data_with_nils.clear
-      @gsl=nil
       set_valid_data_intern
       set_scale_data if(@type==:scale)
       set_date_data if(@type==:date)
@@ -389,7 +395,11 @@ module Statsample
       set_date_data if (t==:date)
     end
     def to_a
-      @data.dup
+      if @data.is_a? Array
+        @data.dup
+      else
+        @data.to_a
+      end
     end
     alias_method :to_ary, :to_a 
     
@@ -428,20 +438,16 @@ module Statsample
     end
     def _vector_ari(method,v) # :nodoc:
     if(v.is_a? Vector or v.is_a? Array)
-      if v.size==@data.size
-      #                    i=0
+      raise ArgumentError, "The array/vector parameter (#{v.size}) should be of the same size of the original vector (#{@data.size})" unless v.size==@data.size
       sum=[]
-      0.upto(v.size-1) {|i|
+      v.size.times {|i|
           if((v.is_a? Vector and v.is_valid?(v[i]) and is_valid?(@data[i])) or (v.is_a? Array and !v[i].nil? and !data[i].nil?))
               sum.push(@data[i].send(method,v[i]))
           else
               sum.push(nil)
           end
       }
-      Statsample::Vector.new(sum, :scale  )
-      else
-        raise ArgumentError, "The array/vector parameter (#{v.size}) should be of the same size of the original vector (#{@data.size})"
-      end
+      Statsample::Vector.new(sum, :scale)
     elsif(v.respond_to? method )
       Statsample::Vector.new(
         @data.collect  {|x|
@@ -521,13 +527,8 @@ module Statsample
     # In all the trails, every item have the same probability
     # of been selected.
     def sample_with_replacement(sample=1)
-      if(@type!=:scale or !Statsample.has_gsl?)
-        vds=@valid_data.size
-        (0...sample).collect{ @valid_data[rand(vds)] }
-      else
-        r = GSL::Rng.alloc(GSL::Rng::MT19937,rand(10000))
-        r.sample(@gsl, sample).to_a
-      end
+      vds=@valid_data.size
+      (0...sample).collect{ @valid_data[rand(vds)] }
     end
     # Returns an random sample of size n, without replacement,
     # only with valid data.
@@ -537,7 +538,6 @@ module Statsample
     # A sample of the same size of the vector is the vector itself.
       
     def sample_without_replacement(sample=1)
-    if(@type!=:scale or !Statsample.has_gsl?)
       raise ArgumentError, "Sample size couldn't be greater than n" if sample>@valid_data.size
       out=[]
       size=@valid_data.size
@@ -545,11 +545,7 @@ module Statsample
         value=rand(size)
         out.push(value) if !out.include?value
       end
-      out.collect{|i|@data[i]}
-    else
-      r = GSL::Rng.alloc(GSL::Rng::MT19937,rand(10000))
-      r.choose(@gsl, sample).to_a
-    end
+      out.collect{|i| @data[i]}
     end
     # Retrieves number of cases which comply condition.
     # If block given, retrieves number of instances where
@@ -738,22 +734,17 @@ module Statsample
       # Return the median (percentil 50)
       def median
         check_type :ordinal
-        if Statsample.has_gsl? and @type==:scale
-          sorted=GSL::Vector.alloc(@scale_data.sort)
-          GSL::Stats::median_from_sorted_data(sorted)
-        else
-          percentil(50)
-        end
+        percentil(50)
       end
       # Minimun value
       def min 
         check_type :ordinal
-        @valid_data.min;
+        @valid_data.min
       end
         # Maximum value
       def max
         check_type :ordinal
-        @valid_data.max;
+        @valid_data.max
       end
     
     def set_date_data
@@ -781,9 +772,6 @@ module Statsample
         else
           x.to_f
         end
-      end
-      if Statsample.has_gsl?
-        @gsl=GSL::Vector.alloc(@scale_data) if @scale_data.size>0
       end
     end
     
@@ -875,76 +863,30 @@ module Statsample
         check_type :scale
         @scale_data.inject(1){|a,x| a*x }
     end
-    if Statsample.has_gsl?
-      %w{skew kurtosis variance_sample standard_deviation_sample variance_population standard_deviation_population mean sum}.each{|m|
-          m_nuevo=(m+"_slow").intern
-          alias_method m_nuevo, m.intern
-      }
-      def sum # :nodoc:
+    
+    # With a fixnum, creates X bins within the range of data
+    # With an Array, each value will be a cut point
+    def histogram(bins=10)
       check_type :scale
-          
-          @gsl.sum
-      end
-      def mean # :nodoc:
-      check_type :scale
-        @gsl.nil? ? nil : @gsl.mean
-      end				
-      def variance_sample(m=nil) # :nodoc:
-          check_type :scale
-          m||=mean
-          @gsl.nil? ? nil : @gsl.variance_m
-      end
-      def standard_deviation_sample(m=nil) # :nodoc:
-          check_type :scale
-          return nil if @gsl.nil?
-          m||=mean
-          @gsl.sd(m)
-      end
       
-      def variance_population(m=nil) # :nodoc:
-      check_type :scale    
-          m||=mean
-          @gsl.variance_with_fixed_mean(m)
-      end
-      def standard_deviation_population(m=nil) # :nodoc:
-          check_type :scale
-          m||=mean
-          @gsl.sd_with_fixed_mean(m)
-      end
-      def skew # :nodoc:
-          check_type :scale
-          @gsl.skew
-      end
-      def kurtosis # :nodoc:
-          check_type :scale
-          @gsl.kurtosis
-      end
-      # Create a GSL::Histogram
-      # With a fixnum, creates X bins within the range of data
-      # With an Array, each value will be a cut point
-      def histogram(bins=10)
-        check_type :scale
-        
-        if bins.is_a? Array
-          #h=Statsample::Histogram.new(self, bins)
-          h=Statsample::Histogram.alloc(bins)                        
-        else
-          # ugly patch. The upper limit for a bin has the form
-          # x < range
-          #h=Statsample::Histogram.new(self, bins)
-          min,max=Statsample::Util.nice(@valid_data.min,@valid_data.max)
-          # fix last data
-          if max==@valid_data.max
-            max+=1e-10
-          end
-          h=Statsample::Histogram.alloc(bins,[min,max])
-          # Fix last bin
-
+      if bins.is_a? Array
+        #h=Statsample::Histogram.new(self, bins)
+        h=Statsample::Histogram.alloc(bins)                        
+      else
+        # ugly patch. The upper limit for a bin has the form
+        # x < range
+        #h=Statsample::Histogram.new(self, bins)
+        min,max=Statsample::Util.nice(@valid_data.min,@valid_data.max)
+        # fix last data
+        if max==@valid_data.max
+          max+=1e-10
         end
-        h.increment(@valid_data)
-        h
+        h=Statsample::Histogram.alloc(bins,[min,max])
+        # Fix last bin
+
       end
-      
+      h.increment(@valid_data)
+      h
     end
       
     # Coefficient of variation
@@ -953,7 +895,6 @@ module Statsample
         check_type :scale
         standard_deviation_sample.quo(mean)
     end
-    
     alias_method :sdp, :standard_deviation_population
     alias_method :sds, :standard_deviation_sample
     alias_method :adp, :average_deviation_population
@@ -961,5 +902,6 @@ module Statsample
     alias_method :variance, :variance_sample    
     alias_method :sd, :standard_deviation_sample
     alias_method :ss, :sum_of_squares
+    include_aliasing Statsample::Vector::GSL_
   end
 end

@@ -41,6 +41,17 @@ class String
   end
 end
 
+class Module
+  def include_aliasing(m, suffix="ruby")
+    m.instance_methods.each do |f|
+      if instance_methods.include? f
+        alias_method("#{f}_#{suffix}",f) 
+        remove_method f
+      end
+    end
+    include m
+  end
+end
 
 class Array
   # Recode repeated values on an array, adding the number of repetition

@@ -3,6 +3,7 @@ begin
 rescue LoadError
   puts "You should install statistics2"
 end
+
 # Several distributions modules to calculate cdf, inverse cdf and pdf
 # See Distribution::Pdf for interface.
 # 

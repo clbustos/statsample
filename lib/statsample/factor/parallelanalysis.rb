@@ -139,7 +139,7 @@ module Statsample
               if bootstrap_method==:random
                 ds_bootstrap[f]=@n_cases.times.map {|c| rng.call}.to_scale
               elsif bootstrap_method==:data
-                ds_bootstrap[f]=ds[f].sample_with_replacement(@n_cases).to_scale
+                ds_bootstrap[f]=ds[f].sample_with_replacement(@n_cases)
               else
                 raise "bootstrap_method doesn't recogniced"
               end

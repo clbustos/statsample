@@ -51,8 +51,7 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       assert_equal(av,av2)
       assert_same(av,av2)
       assert_same(bv,bv2)
-    end
-    
+    end 
   end
   context Statsample::Vector do
     setup do 
@@ -60,6 +59,17 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       @c.name="Test Vector"
       @c.missing_values=[-99]
     end
+    should "be created with GSL::Vector" do
+     if Statsample.has_gsl?
+        gsl=GSL::Vector[1,2,3,4,5]
+        v=Statsample::Vector.new(gsl)
+        assert_equal([1,2,3,4,5], v.to_a)
+        refute(v.flawed?)
+     else
+       skip("Requires GSL")
+     end
+    end
+
     context "using matrix operations" do
       setup do
         @a=[1,2,3,4,5].to_scale
@@ -239,6 +249,19 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     should "have a summary with name on it" do
       assert_match(/#{@c.name}/, @c.summary)
     end
+    
+    should "GSL::Vector based should push correcty" do
+      if Statsample.has_gsl?
+        v=GSL::Vector[1,2,3,4,5].to_scale
+        v.push(nil)
+        assert_equal([1,2,3,4,5,nil], v.to_a)
+        assert(v.flawed?)
+      else
+        skip("Requires GSL")
+      end
+    end
+
+    
     should "split correctly" do
       a = Statsample::Vector.new(["a","a,b","c,d","a,d","d",10,nil],:nominal)
       assert_equal([%w{a},%w{a b},%w{c d},%w{a d},%w{d},[10],nil], a.splitted)      
@@ -257,19 +280,22 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       a = [1,2,3].to_scale
       assert_equal([11,12,13].to_scale, a+10)
     end
+    
+    should "raise NoMethodError when method requires ordinal and vector is nominal" do
+      @c.type=:nominal
+      assert_raise(::NoMethodError) { @c.median }
+    end
+    
+    should "raise NoMethodError when method requires scalar and vector is ordinal" do      
+      @c.type=:ordinal
+      assert_raise(::NoMethodError) { @c.mean }
+    end
+
+    
   end
 
 
-  def test_types
-    @c.type=:nominal
-    assert_raise NoMethodError do
-      @c.median
-    end
-    @c.type=:ordinal
-    assert_raise NoMethodError do
-      @c.mean
-    end
-  end
+
   def test_nominal
     assert_equal(@c[1],5)
     assert_equal({ 1=>1,2=>1,3=>1,4=>1,5=>5,6=>2,7=>1,8=>1, 9=>1,10=>1},@c.frequencies)
@@ -354,6 +380,7 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     assert_equal(0,vs.mean)
     assert_equal(1,vs.sds)
   end
+  
   def test_vector_standarized_with_zero_variance
     v1=100.times.map {|i| 1}.to_scale
     exp=100.times.map {nil}.to_scale
@@ -465,11 +492,12 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
   def test_gsl
     if Statsample.has_gsl?
       a=Statsample::Vector.new([1,2,3,4,"STRING"], :scale)
+      
       assert_equal(2,a.mean)
-      assert_equal(a.variance_sample_slow,a.variance_sample)
-      assert_equal(a.standard_deviation_sample_slow,a.sds)
-      assert_equal(a.variance_population_slow,a.variance_population)
-      assert_equal(a.standard_deviation_population_slow,a.standard_deviation_population)
+      assert_equal(a.variance_sample_ruby,a.variance_sample)
+      assert_equal(a.standard_deviation_sample_ruby,a.sds)
+      assert_equal(a.variance_population_ruby,a.variance_population)
+      assert_equal(a.standard_deviation_population_ruby,a.standard_deviation_population)
       assert_nothing_raised do
         a=[].to_vector(:scale)
       end
@@ -482,8 +510,8 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       assert_equal(3.5, b.mean)
       assert_equal(6,b.gsl.size)
       c=[10,20,30,40,50,100,1000,2000,5000].to_scale
-      assert_in_delta(c.skew,     c.skew_slow     ,0.0001)
-      assert_in_delta(c.kurtosis, c.kurtosis_slow ,0.0001)
+      assert_in_delta(c.skew,     c.skew_ruby     ,0.0001)
+      assert_in_delta(c.kurtosis, c.kurtosis_ruby ,0.0001)
     end
   end
   def test_vector_matrix
