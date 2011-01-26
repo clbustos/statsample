@@ -50,10 +50,13 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
 
   end
   def _test_simple_regression(reg)
+  
     assert_in_delta(40.009, reg.a,0.001)
     assert_in_delta(-0.957, reg.b,0.001)
     assert_in_delta(4.248,reg.standard_error,0.002)
+    assert(reg.summary)
   end
+  
   def test_summaries
     a=10.times.map{rand(100)}.to_scale
     b=10.times.map{rand(100)}.to_scale

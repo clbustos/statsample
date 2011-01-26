@@ -116,18 +116,23 @@ end
 # * Interfaces to gdchart, gnuplot and SVG::Graph 
 #
 module Statsample
-  @@has_gsl=nil
-  def self.has_gsl?
-    if @@has_gsl.nil?
-      begin
-        require 'rbgsl'
-        @@has_gsl=true
-      rescue LoadError
-        @@has_gsl=false
+  
+  def self.create_has_library(library)
+    define_singleton_method("has_#{library}?") do
+      cv="@@#{library}"
+      if !class_variable_defined? cv
+        begin 
+          require library.to_s
+          class_variable_set(cv,true)
+        rescue LoadError
+          class_variable_set(cv,false)
+        end
       end
+      class_variable_get(cv)
     end
-    @@has_gsl
   end
+  
+  create_has_library :gsl
   
   VERSION = '0.18.0'
   SPLIT_TOKEN = ","

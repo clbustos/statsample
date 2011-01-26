@@ -61,16 +61,15 @@ module Statsample
     attr_accessor :name
     
     # Creates a new Vector object.
-    # * <tt>data</tt> Array of data.
+    # * <tt>data</tt> Any data which can be converted on Array
     # * <tt>type</tt> Level of meausurement. See Vector#type
     # * <tt>opts</tt> Hash of options
     #   * <tt>:missing_values</tt>  Array of missing values. See Vector#missing_values
     #   * <tt>:today_values</tt> Array of 'today' values. See Vector#today_values
     #   * <tt>:labels</tt> Labels for data values
     #   * <tt>:name</tt> Name of vector
-    #
     def initialize(data=[], type=:nominal, opts=Hash.new)
-      @data=data.is_a?(Array) ? data : data.to_a 
+      @data=data.is_a?(Array) ? data : data.to_a
       @type=type
       opts_default={
         :missing_values=>[],
@@ -94,7 +93,7 @@ module Statsample
       @missing_data=[]
       @has_missing_data=nil
       @scale_data=nil
-      set_valid_data_intern
+      set_valid_data
       self.type=type
     end
     # Create a vector using (almost) any object

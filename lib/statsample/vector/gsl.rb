@@ -7,7 +7,7 @@ module Statsample
       
       def set_valid_data
         clear_gsl
-        set_valid_data_ruby        
+        set_valid_data_ruby
       end
       def push(v)
         # If data is GSL::Vector, should be converted first to an Array

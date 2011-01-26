@@ -8,8 +8,10 @@ module Statsample
     # * <tt> SimpleRegression.new_from_gsl(gsl) </tt>
     #
     class Simple
+      include Summarizable
       attr_accessor :a,:b,:cov00, :cov01, :covx1, :chisq, :status
-
+      attr_accessor :name
+      attr_accessor :digits
       def initialize(init_method, *argv)
         self.send(init_method, *argv)
       end
@@ -61,15 +63,15 @@ module Statsample
           new(:init_gsl, *ar)
         end
         # Create a simple regression using two vectors
-        def new_from_vectors(vx,vy)
-          new(:init_vectors,vx,vy)
+        def new_from_vectors(vx,vy, opts=Hash.new)
+          new(:init_vectors,vx,vy, opts)
         end
         # Create a simple regression using a dataset and two vector names.
-        def new_from_dataset(ds,x,y)
-          new(:init_vectors,ds[x],ds[y])
+        def new_from_dataset(ds,x,y, opts=Hash.new)
+          new(:init_vectors,ds[x],ds[y], opts)
         end
       end
-      def init_vectors(vx,vy)
+      def init_vectors(vx,vy, opts=Hash.new)
         @vx,@vy=Statsample.only_valid_clone(vx,vy)
         x_m=@vx.mean
         y_m=@vy.mean
@@ -80,6 +82,17 @@ module Statsample
         }
         @b=num.to_f/den
         @a=y_m - @b*x_m
+        
+        opts_default={
+        :digits=>3, 
+        :name=>_("Regression of %s over %s") % [@vx.name, @vy.name]
+         }
+        @opts=opts_default.merge opts
+
+        @opts.each{|k,v|
+          self.send("#{k}=",v) if self.respond_to? k
+        }
+        
       end
       def init_gsl(a,b,cov00, cov01, covx1, chisq, status)
         @a=a
@@ -89,6 +102,18 @@ module Statsample
         @covx1=covx1
         @chisq=chisq
         @status=status
+      end
+      def report_building(gen)
+      f="%0.#{digits}f"
+        gen.section(:name=>name) do |s|
+          s.table(:header=>[_("Variable"), _("Value")]) do |t|
+            t.row [_("r"), f % r]
+            t.row [_("r^2"), f % r2]
+            t.row [_("a"), f % a]
+            t.row [_("b"), f % a]
+            t.row [_("s.e"), f % standard_error]
+          end
+        end
       end
       private :init_vectors, :init_gsl
     end

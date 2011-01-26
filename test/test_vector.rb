@@ -59,15 +59,12 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       @c.name="Test Vector"
       @c.missing_values=[-99]
     end
-    should "be created with GSL::Vector" do
-     if Statsample.has_gsl?
-        gsl=GSL::Vector[1,2,3,4,5]
-        v=Statsample::Vector.new(gsl)
-        assert_equal([1,2,3,4,5], v.to_a)
-        refute(v.flawed?)
-     else
-       skip("Requires GSL")
-     end
+    should_with_gsl "be created with GSL::Vector" do
+      gsl=GSL::Vector[1,2,3,4,5]
+      v=Statsample::Vector.new(gsl)
+      assert_equal([1,2,3,4,5], v.to_a)
+      refute(v.flawed?)
+      
     end
 
     context "using matrix operations" do

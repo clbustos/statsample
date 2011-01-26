@@ -271,7 +271,7 @@ module Statsample
         m1=ds.filter_field('c') {|c| c['d']!=f0}
         ((m1.mean-m0.mean).to_f / ds['c'].sdp) * Math::sqrt(m0.size*m1.size.to_f / ds.cases**2)
       end
-      # Kendall Rank Correlation Coefficient.
+      # Kendall Rank Correlation Coefficient (Tau a)
       # Based on Hervé Adbi article
       def tau_a(v1,v2)
         v1a,v2a=Statsample.only_valid_clone(v1,v2)
@@ -282,12 +282,15 @@ module Statsample
         delta= o1.size*2-(o2  & o1).size*2
         1-(delta * 2 / (n*(n-1)).to_f)
       end
-      # Calculates Tau b correlation.
-      #
+      # Calculates Goodman and Kruskal’s Tau b correlation.
+      # Tb is an asymmetric P-R-E measure of association for nominal scales 
+      # (Mielke, X)
+      # 
       # Tau-b defines perfect association as strict monotonicity. Although it
       # requires strict monotonicity to reach 1.0, it does not penalize ties as
       # much as some other measures.
-      #
+      # == Reference
+      # Mielke, P. GOODMAN–KRUSKAL TAU AND GAMMA. 
       # Source: http://faculty.chass.ncsu.edu/garson/PA765/assocordinal.htm
       def tau_b(matrix)
         v=pairs(matrix)
