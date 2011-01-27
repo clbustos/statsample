@@ -1,3 +1,26 @@
+=== 1.0.0 / 2011-01-27
+
+* Added Statsample::Analysis, a beautiful DSL to perform fast statistical analysis using statsample. See directory /examples
+* Created benchmarks directory 
+* Removed Distribution module from statsample and moved to a gem. Changes on code to reflect new API
+* Optimized simple regression.  Better library detection
+* New 'should_with_gsl' to test methods with gsl. Refactored Factor::MAP
+* Almost complete GSL cleanup on Vector
+* Updated some doc on Vector
+* Used GSL::Matrix on Factor classes when available
+* SkillScaleAnalysis doesn't crash with one or more vectors with 0 variance
+* Modified examples using Statsample::Analysis
+* Simplified eigen calculations
+* Updated some examples. Added correlation matrix speed suite
+* Correlation matrix optimized. Better specs 
+* Optimized correlation matrix. Use gsl matrix algebra or pairwise correlations depending on empiric calculated equations. See benchmarks/correlation_matrix.rb to see implementation of calculation 
+* Moved tests fixtures from data to test/fixtures
+* Fixed some errors on tests
+* Bug fix: constant_se on binomial regression have an error 
+* All test should work on ruby 1.9.3 
+* New Vector.[] and Vector.new_scale
+* Detect linearly dependent predictors on OLS. 
+
 === 0.18.0 / 2011-01-07
 * New Statsample.load_excel 
 * New Statsample.load_csv

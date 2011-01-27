@@ -134,7 +134,7 @@ module Statsample
   
   create_has_library :gsl
   
-  VERSION = '0.18.0'
+  VERSION = '1.0.0'
   SPLIT_TOKEN = ","
   autoload(:Analysis, 'statsample/analysis')
   autoload(:Database, 'statsample/converters')
