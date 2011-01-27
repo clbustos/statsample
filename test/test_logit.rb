@@ -26,7 +26,7 @@ class StatsampleLogitTestCase < MiniTest::Unit::TestCase
       should "return same similat values to as R gml" do
        
         r=Rserve::Connection.new
-        ran=Distribution::Normal.rng_ugaussian
+        ran=Distribution::Normal.rng
         samples=100
         a,b,c=ran.call,ran.call,ran.call
         logit=lambda {|x| Math.exp(x) / (1+Math.exp(x))}

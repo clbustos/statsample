@@ -7,7 +7,7 @@ variables=30
 iterations=50
 Statsample::Analysis.store(Statsample::Factor::ParallelAnalysis) do 
   
-rng = Distribution::Normal.rng_ugaussian()
+rng = Distribution::Normal.rng()
 f1=rnorm(samples)
 f2=rnorm(samples)
 f3=rnorm(samples)

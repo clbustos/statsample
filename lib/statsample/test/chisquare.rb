@@ -26,7 +26,7 @@ module Statsample
           @value
         end
         def probability
-          1-Distribution::ChiSquare.cdf(@value,@df)
+          1-Distribution::ChiSquare.cdf(@value.to_f,@df)
         end
         def compute_chi
             sum=0

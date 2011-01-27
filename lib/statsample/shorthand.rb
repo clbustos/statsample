@@ -24,7 +24,7 @@ module Statsample
     end
     # Random generation for the normal distribution
     def rnorm(n,mean=0,sd=1)
-      rng=Distribution::Normal.rng_gaussian(mean,sd)
+      rng=Distribution::Normal.rng(mean,sd)
       Statsample::Vector.new_scale(n) { rng.call}
     end
     # Creates a new Statsample::Dataset

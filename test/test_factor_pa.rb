@@ -13,7 +13,7 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
       samples=100
       variables=10
       iterations=50
-      rng = Distribution::Normal.rng_ugaussian
+      rng = Distribution::Normal.rng
       f1=samples.times.collect {rng.call}.to_scale
       f2=samples.times.collect {rng.call}.to_scale    
       vectors={}

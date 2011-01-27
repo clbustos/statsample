@@ -35,7 +35,7 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
   end
   def test_principalcomponents_ruby_gsl
     
-    ran=Distribution::Normal.rng_ugaussian
+    ran=Distribution::Normal.rng
     
 #    @r=::Rserve::Connection.new
 
@@ -83,7 +83,7 @@ class StatsampleFactorTestCase < MiniTest::Unit::TestCase
   
   end  
   def principalcomponents(gsl)
-    ran=Distribution::Normal.rng_ugaussian
+    ran=Distribution::Normal.rng
     samples=50
     x1=samples.times.map { ran.call()}.to_scale
     x2=samples.times.map {|i| ran.call()*0.5+x1[i]*0.5}.to_scale

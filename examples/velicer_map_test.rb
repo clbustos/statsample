@@ -5,7 +5,7 @@ require 'statsample'
 
 Statsample::Analysis.store(Statsample::Factor::MAP) do
   
-  rng=Distribution::Normal.rng_ugaussian
+  rng=Distribution::Normal.rng
   samples=100
   variables=10
   

@@ -126,7 +126,7 @@ module Statsample
         @ds_eigenvalues=Statsample::Dataset.new((1..@n_variables).map{|v| "ev_%05d" % v})
         @ds_eigenvalues.fields.each {|f| @ds_eigenvalues[f].type=:scale}
         if bootstrap_method==:parameter or bootstrap_method==:random
-          rng = Distribution::Normal.rng_ugaussian
+          rng = Distribution::Normal.rng
         end
         
         @iterations.times do |i|

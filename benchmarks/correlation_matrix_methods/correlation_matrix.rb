@@ -5,7 +5,7 @@ require 'statsample'
 require 'benchmark'
 
 def create_dataset(vars,cases) 
-  ran=Distribution::Normal.rng_ugaussian
+  ran=Distribution::Normal.rng
   ds=vars.times.inject({}) {|ac,v|
     ac["x#{v}"]=Statsample::Vector.new_scale(cases) {ran.call}
   ac
