@@ -183,10 +183,10 @@ module Statsample
             c=coeffs
             g.text _("Engine: %s") % self.class
             g.text(_("Cases(listwise)=%d(%d)") % [@total_cases, @valid_cases])
-            g.text _("R=#{di}") % r
-            g.text _("R^2=#{di}") % r2
-            g.text _"R^2 Adj=#{di}" % r2_adjusted
-            g.text _("Std.Error R=#{di}") % se_estimate
+            g.text _("R=")+(di % r)
+            g.text _("R^2=")+(di % r2)
+            g.text _("R^2 Adj=")+(di % r2_adjusted)
+            g.text _("Std.Error R=")+ (di % se_estimate)
             
             g.text(_("Equation")+"="+ sprintf(di,constant) +" + "+ @fields.collect {|k| sprintf("#{di}%s",c[k],k)}.join(' + ') )
             
