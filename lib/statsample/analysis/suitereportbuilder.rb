@@ -2,9 +2,12 @@ module Statsample
   module Analysis
     class SuiteReportBuilder < Suite
       attr_accessor :rb
-      def initialize(name,&block)
-        super(name,&block)
-        @rb=ReportBuilder.new(:name=>name)
+      def initialize(opts=Hash.new,&block)
+        if !opts.is_a? Hash
+          opts={:name=>opts}
+        end        
+        super(opts,&block)
+        @rb=opts[:rb] || ReportBuilder.new(:name=>name)
       end
       def generate(filename)
         run if @block

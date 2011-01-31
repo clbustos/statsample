@@ -1,7 +1,10 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-require 'mocha'
+
 class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
   context(Statsample::Analysis) do
+    setup do
+      Statsample::Analysis.clear_analysis
+    end
     should "store() should create and store Statsample::Analysis::Suite" do
       Statsample::Analysis.store(:first) do
         a=1
@@ -9,12 +12,77 @@ class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
       assert(Statsample::Analysis.stored_analysis[:first])
       assert(Statsample::Analysis.stored_analysis[:first].is_a? Statsample::Analysis::Suite)
     end
+    
+    should "ss_analysis should create an Statsample::Analysis" do
+      ss_analysis(:first) {a=1}
+    end
     should "store last created analysis" do
       an=Statsample::Analysis.store(:first) do
         a=1
       end
       assert_equal(an,Statsample::Analysis.last)
     end
+    
+    should "add_to_reportbuilder() add sections to reportbuilder object" do
+      rb=mock()
+      rb.expects(:add).with {|value| value.is_a? ReportBuilder::Section and value.name==:first}
+      rb.expects(:add).with {|value| value.is_a? ReportBuilder::Section and value.name==:second}
+      
+      Statsample::Analysis.store(:first) do
+        echo "first","second"
+      end
+      Statsample::Analysis.store(:second) do
+        echo "third"
+      end
+      Statsample::Analysis.add_to_reportbuilder(rb,:first,:second)
+    end
+    should "to_text returns the same as a normal ReportBuilder object" do
+      rb=ReportBuilder.new(:name=>:test)
+      section=ReportBuilder::Section.new(:name=>"first")
+      a=[1,2,3].to_scale
+      section.add("first")
+      section.add(a)
+      rb.add(section)
+      exp=rb.to_text
+      an=ss_analysis(:first) {
+        echo 'first'
+        summary(a)
+      }
+      obs=Statsample::Analysis.to_text(:first)
+      
+      assert_equal(exp.split("\n")[1,exp.size], obs.split("\n")[1,obs.size])
+    end
+    
+    should "run() execute all analysis by default" do
+      m1=mock()
+      m1.expects(:run).once
+      m1.expects(:hide).once
+      
+      Statsample::Analysis.store(:first) do
+        m1.run
+      end
+      Statsample::Analysis.store(:second) do
+        m1.hide
+      end
+      
+      # Should run all test
+      Statsample::Analysis.run
+    end
+    
+    should "run() execute blocks specificed on parameters" do
+      m1=mock()
+      m1.expects(:run).once   
+      m1.expects(:hide).never
+      Statsample::Analysis.store(:first) do
+        m1.run
+      end
+      Statsample::Analysis.store(:second) do
+        m1.hide
+      end
+      # Should run all test
+      Statsample::Analysis.run(:first)
+    end
+   
     context(Statsample::Analysis::Suite) do
       should "echo() uses output#puts with same arguments" do
         an=Statsample::Analysis::Suite.new(:output)

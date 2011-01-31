@@ -1,3 +1,4 @@
+*.rbc
 coverage
 *~
 agregar_adsense_a_doc.rb

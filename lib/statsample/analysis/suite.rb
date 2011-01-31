@@ -5,9 +5,13 @@ module Statsample
       attr_accessor :output
       attr_accessor :name
       attr_reader :block
-      def initialize(name,opts=Hash.new(),&block)
-        @name=name
+      def initialize(opts=Hash.new(), &block)
+        if !opts.is_a? Hash
+          opts={:name=>opts}
+        end
+         
         @block=block
+        @name=opts[:name] || "Analysis #{Time.now}"
         @attached=[]
         @output=opts[:output] || ::STDOUT
         
@@ -22,12 +26,16 @@ module Statsample
       def summary(obj)
         obj.summary
       end
+      def add_to_reportbuilder(rb)
+        SuiteReportBuilder.new({:name=>name, :rb=>rb}, &block)
+      end
+      
       def generate(filename)
-        ar=SuiteReportBuilder.new(name,&block)
+        ar=SuiteReportBuilder.new({:name=>name}, &block)
         ar.generate(filename)
       end
       def to_text
-        ar=SuiteReportBuilder.new(name, &block)
+        ar=SuiteReportBuilder.new({:name=>name}, &block)
         ar.to_text
       end
       

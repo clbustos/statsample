@@ -1,3 +1,10 @@
+class Object
+  # Shorthand for Statsample::Analysis.store(*args,&block)
+  def ss_analysis(*args,&block)
+    Statsample::Analysis.store(*args,&block)
+  end
+end
+
 module Statsample
   # Module which provide shorthands for many methods.
   module Shorthand
@@ -76,6 +83,15 @@ module Statsample
     end
     def dominance_analysis_bootstrap(*args)
       Statsample::DominanceAnalysis::Bootstrap.new(*args)
+    end
+    def scale_analysis(*args)
+      Statsample::Reliability::ScaleAnalysis.new(*args)
+    end
+    def skill_scale_analysis(*args)
+      Statsample::Reliability::SkillScaleAnalysis.new(*args)
+    end
+    def multiscale_analysis(*args,&block)
+      Statsample::Reliability::MultiScaleAnalysis.new(*args,&block)
     end
   end
 end
