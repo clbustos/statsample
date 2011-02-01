@@ -520,6 +520,107 @@ module Statsample
       }
     end
     
+    # == Bootstrap
+    # Generate +nr+ resamples (with replacement) of size  +s+
+    # from vector, computing each estimate from +estimators+
+    # over each resample. 
+    # +estimators+ could be
+    # a) Hash with keys as name variables and values as lambdas
+    #   a.jacknife(:log_s2=>lambda {|v| Math.log(v.variance)})
+    # b) Array with names of method to jacknife
+    #   a.jacknife([:mean, :sd])
+    # c) A single method to jacknife
+    #   a.jacknife(:mean)
+    # If s is nil, is set to vector size by default
+    # Returns a dataset where each vector is an vector
+    # of length +nr+ containing the computed resample estimates.
+    def bootstrap(estimators, nr, s=nil)
+      s||=n
+      h_est=estimators
+      
+      h_est=[h_est] unless h_est.is_a? Array or h_est.is_a? Hash
+      if h_est.is_a? Array
+        h_est=h_est.inject({}) {|h,est|
+          h[est]=lambda {|v| v.send(est)}
+          h
+        }
+      end
+      
+      es=h_est.keys
+      
+      bss=es.inject({}) {|h,v| h[v]=[];h}
+      nr.times do |i|
+        bs=sample_with_replacement(s)
+        es.each do |estimator|          
+          # Add bootstrap
+          bss[estimator].push(h_est[estimator].call(bs))
+        end
+      end
+      
+      es.each do |est|
+        bss[est]=bss[est].to_scale
+        bss[est].type=:scale
+      end
+      bss.to_dataset
+      
+    end
+    # == Jacknife
+    # Returns a dataset with jacknife delete-+k+ +estimators+ 
+    # +estimators+ could be:
+    # a) Hash with keys as name variables and values as lambdas
+    #   a.jacknife(:log_s2=>lambda {|v| Math.log(v.variance)})
+    # b) Array with names of method to jacknife
+    #   a.jacknife([:mean, :sd])
+    # c) A single method to jacknife
+    #   a.jacknife(:mean)
+    # +k+ represent the block size for block jacknife. By default
+    # is set to 1, for classic delete-one jacknife.
+    #
+    # Returns a dataset where each vector is an vector
+    # of length +cases+/+k+ containing the computed jacknife estimates.
+    # 
+    # == Reference:
+    # * Sawyer, S. (2005). Resampling Data: Using a Statistical Jacknife.
+    def jacknife(estimators, k=1)
+      raise "n should be divisible by k:#{k}" unless n%k==0
+      
+      nb=(n / k).to_i
+      
+      h_est=estimators
+      
+      h_est=[h_est] unless h_est.is_a? Array or h_est.is_a? Hash
+      if h_est.is_a? Array
+        h_est=h_est.inject({}) {|h,est|
+          h[est]=lambda {|v| v.send(est)}
+          h
+        }
+      end
+      es=h_est.keys
+      ps=es.inject({}) {|h,v| h[v]=[];h}
+      est_n=es.inject({}) {|h,v|
+        h[v]=h_est[v].call(self)
+        h
+      }
+      
+      
+      nb.times do |i|
+        other=@data_with_nils.dup
+        other.slice!(i*k,k)
+        other=other.to_scale
+        es.each do |estimator|
+          # Add pseudovalue
+          ps[estimator].push( nb * est_n[estimator] - (nb-1) * h_est[estimator].call(other))
+        end
+      end
+      
+      
+      es.each do |est|
+        ps[est]=ps[est].to_scale
+        ps[est].type=:scale
+      end
+      ps.to_dataset
+    end
+    
     # Returns an random sample of size n, with replacement,
     # only with valid data.
     #

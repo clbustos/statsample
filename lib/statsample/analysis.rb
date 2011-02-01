@@ -48,19 +48,20 @@ module Statsample
       @@stored_analysis[name]=Suite.new(opts,&block)
     end
     # Run analysis +*args+
-    # Withoud arguments, run all stored analysis
+    # Without arguments, run all stored analysis
     # Only 'echo' will be returned to screen
     def self.run(*args)
       args=stored_analysis.keys if args.size==0
-      raise "Analysis #{name} doesn't exists" if (args - stored_analysis.keys).size>0
+      raise "Analysis #{args} doesn't exists" if (args - stored_analysis.keys).size>0
       args.each do |name|
         stored_analysis[name].run
       end
     end
 
-    # Add analysis to an reportbuilder object.
+    # Add analysis +*args+ to an reportbuilder object.
+    # Without arguments, add all stored analysis
     # Each analysis is wrapped inside a ReportBuilder::Section object
-    # This is the method used by Analysis.save()
+    # This is the method is used by save() and to_text()
     
     def self.add_to_reportbuilder(rb, *args)
       args=stored_analysis.keys if args.size==0
@@ -74,6 +75,7 @@ module Statsample
     end
     
     # Save the analysis on a file
+    # Without arguments, add all stored analysis    
     def self.save(filename, *args)
       rb=ReportBuilder.new(filename)
       add_to_reportbuilder(rb, *args)
@@ -82,6 +84,8 @@ module Statsample
     
     # Run analysis and return as string
     # output of echo callings
+    # Without arguments, add all stored analysis
+    
     def self.to_text(*args)
       rb=ReportBuilder.new(:name=>"Analysis #{Time.now}")
       add_to_reportbuilder(rb, *args)

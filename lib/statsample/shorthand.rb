@@ -93,5 +93,9 @@ module Statsample
     def multiscale_analysis(*args,&block)
       Statsample::Reliability::MultiScaleAnalysis.new(*args,&block)
     end
+    def test_u(*args)
+      Statsample::Test::UMannWhitney.new(*args)
+    end
+    module_function :test_u, :rnorm
   end
 end

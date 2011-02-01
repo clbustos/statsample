@@ -1,6 +1,8 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 class StatsampleTestVector < MiniTest::Unit::TestCase
+  include Statsample::Shorthand
+
   def setup
     @c = Statsample::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :nominal)
     @c.name="Test Vector"
@@ -286,6 +288,39 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     should "raise NoMethodError when method requires scalar and vector is ordinal" do      
       @c.type=:ordinal
       assert_raise(::NoMethodError) { @c.mean }
+    end
+    should "jacknife correctly with named method" do
+      # First example
+      a=[1,2,3,4].to_scale
+      ds=a.jacknife(:mean)
+      assert_equal(a.mean, ds[:mean].mean)
+      ds=a.jacknife([:mean,:sd])
+      assert_equal(a.mean, ds[:mean].mean)
+      assert_equal(a.sd, ds[:mean].sd)
+    end
+    should "jacknife correctly with custom method" do
+      # Second example
+      a=[17.23, 18.71,13.93,18.81,15.78,11.29,14.91,13.39, 18.21, 11.57, 14.28, 10.94, 18.83, 15.52,13.45,15.25].to_scale
+      ds=a.jacknife(:log_s2=>lambda {|v|  Math.log(v.variance) })
+      exp=[1.605, 2.972, 1.151, 3.097, 0.998, 3.308, 0.942, 1.393, 2.416, 2.951, 1.043, 3.806, 3.122, 0.958, 1.362, 0.937].to_scale
+
+      assert_similar_vector(exp, ds[:log_s2], 0.001)
+      assert_in_delta(2.00389, ds[:log_s2].mean, 0.00001)
+      assert_in_delta(1.091, ds[:log_s2].variance, 0.001)
+    end
+    should "jacknife correctly with k>1" do
+      a=rnorm(6)
+      ds=a.jacknife(:mean,2)
+      mean=a.mean
+      exp=[3*mean-2*(a[2]+a[3]+a[4]+a[5]) / 4, 3*mean-2*(a[0]+a[1]+a[4]+a[5]) / 4, 3*mean-2*(a[0]+a[1]+a[2]+a[3]) / 4].to_scale
+      assert_similar_vector(exp, ds[:mean], 1e-13)
+    end
+    should "bootstrap correctly" do
+      a=rnorm(100)
+      ds=a.bootstrap([:mean,:sd],200)
+      se=1/Math.sqrt(a.size)
+      assert_in_delta(0, ds[:mean].mean, 0.3)
+      assert_in_delta(se, ds[:mean].sd, 0.01)
     end
 
     
