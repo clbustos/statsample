@@ -159,15 +159,6 @@ class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
         end
         an.run
       end
-      should "rnorm returns a random normal distribution vector" do
-        an=Statsample::Analysis::Suite.new(:simple)
-        v=an.rnorm(1000)
-        assert_in_delta(0,v.mean,0.09)
-        assert_in_delta(1,v.sd,0.09)
-        v=an.rnorm(1000,5,10)
-        assert_in_delta(5,v.mean,0.9)
-        assert_in_delta(10,v.sd,0.9)
-      end
     end
     context(Statsample::Analysis::SuiteReportBuilder) do
       should "echo() use add on rb object" do
