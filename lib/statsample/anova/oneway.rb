@@ -35,10 +35,10 @@ module Statsample
                       :name_denominator=>_("Explained variance"),
                       :name_numerator=>_("Unexplained variance")}
         @opts=opts_default.merge(opts)
-        opts_default.keys.each {|k|
-          send("#{k}=", @opts[k])
+        opts.keys.each {|k|
+          send("#{k}=", @opts[k]) if self.respond_to? "#{k}="
         }
-        @f_object=Statsample::Test::F.new(@ms_num,@ms_den,@df_num,@df_den)
+        @f_object=Statsample::Test::F.new(@ms_num, @ms_den, @df_num,@df_den)
       end
       # F value
       def f
@@ -62,6 +62,7 @@ module Statsample
       end
 
     end
+    
     # One Way Anova with vectors
     # Example:
     #   v1=[2,3,4,5,6].to_scale
@@ -80,6 +81,11 @@ module Statsample
       attr_accessor :summary_levene
       # Show on summary descriptives for vectors
       attr_accessor :summary_descriptives
+      # Show on summary of contrasts
+      attr_accessor :summary_contrasts
+      # Array with stored contrasts
+      attr_reader :contrasts
+      
       def initialize(*args)
         if args[0].is_a? Array
           @vectors=args.shift
@@ -92,11 +98,31 @@ module Statsample
                       :name_numerator=>_("Between Groups"),
                       :name_denominator=>_("Within Groups"),
                       :summary_descriptives=>false,
-                      :summary_levene=>true}
+                      :summary_levene=>true,
+                      :summary_contrasts=>true
+        }
         @opts=opts_default.merge(opts).merge(:ss_num=>ssbg, :ss_den=>sswg, :df_num=>df_bg, :df_den=>df_wg)
+        @contrasts=[]
         super(@opts)
       end
-      alias  :sst :ss_total 
+      alias :sst :ss_total 
+      alias :msb :ms_num
+      alias :msw :ms_den
+      
+      # Generates and store a contrast.
+      # Options should be provided as a hash
+      # [:c]=>contrast vector
+      # [:c1 - :c2]=>index for automatic construction of contrast
+      # [:name]=>contrast name
+      
+      def contrast(opts=Hash.new)
+        name=opts[:name] || _("Contrast for %s") % @name
+        opts=opts.merge({:vectors=>@vectors, :name=>name})
+        c=Statsample::Anova::Contrast.new(opts)
+        @contrasts.push(c)
+        c
+      end
+      
       def levene
         Statsample::Test.levene(@vectors, :name=>_("Test of Homogeneity of variances (Levene)"))
       end
@@ -140,10 +166,18 @@ module Statsample
               end
             end
           end
+          
           if summary_levene
             s.parse_element(levene)
           end
           report_building_table(s)
+          if summary_contrasts and @contrasts.size>0
+
+            @contrasts.each do |c|
+              s.parse_element(c)
+            end
+          end
+          
         end
       end
     end

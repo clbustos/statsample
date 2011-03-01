@@ -525,30 +525,22 @@ module Statsample
     # from vector, computing each estimate from +estimators+
     # over each resample. 
     # +estimators+ could be
-    # a) Hash with keys as name variables and values as lambdas
-    #   a.jacknife(:log_s2=>lambda {|v| Math.log(v.variance)})
-    # b) Array with names of method to jacknife
-    #   a.jacknife([:mean, :sd])
-    # c) A single method to jacknife
-    #   a.jacknife(:mean)
-    # If s is nil, is set to vector size by default
+    # a) Hash with variable names as keys and lambdas as  values
+    #   a.bootstrap(:log_s2=>lambda {|v| Math.log(v.variance)},1000)
+    # b) Array with names of method to bootstrap
+    #   a.bootstrap([:mean, :sd],1000)
+    # c) A single method to bootstrap
+    #   a.jacknife(:mean, 1000)
+    # If s is nil, is set to vector size by default.
+    # 
     # Returns a dataset where each vector is an vector
     # of length +nr+ containing the computed resample estimates.
     def bootstrap(estimators, nr, s=nil)
       s||=n
-      h_est=estimators
       
-      h_est=[h_est] unless h_est.is_a? Array or h_est.is_a? Hash
-      if h_est.is_a? Array
-        h_est=h_est.inject({}) {|h,est|
-          h[est]=lambda {|v| v.send(est)}
-          h
-        }
-      end
+      h_est, es, bss= prepare_bootstrap(estimators)
       
-      es=h_est.keys
-      
-      bss=es.inject({}) {|h,v| h[v]=[];h}
+     
       nr.times do |i|
         bs=sample_with_replacement(s)
         es.each do |estimator|          
@@ -564,12 +556,35 @@ module Statsample
       bss.to_dataset
       
     end
+    # For an array or hash of estimators methods, returns
+    # an array with three elements
+    # 1.- A hash with estimators names as keys and lambdas as values
+    # 2.- An array with estimators names
+    # 3.- A Hash with estimators names as keys and empty arrays as values
+    def prepare_bootstrap(estimators)
+      h_est=estimators
+      
+      h_est=[h_est] unless h_est.is_a? Array or h_est.is_a? Hash
+      
+      if h_est.is_a? Array
+        h_est=h_est.inject({}) {|h,est|
+          h[est]=lambda {|v| v.send(est)}
+          h
+        }
+      end
+      
+      bss=h_est.keys.inject({}) {|h,v| h[v]=[];h}
+      
+      [h_est,h_est.keys, bss]
+      
+    end
+    private :prepare_bootstrap
     # == Jacknife
     # Returns a dataset with jacknife delete-+k+ +estimators+ 
     # +estimators+ could be:
-    # a) Hash with keys as name variables and values as lambdas
+    # a) Hash with variable names as keys and lambdas as values
     #   a.jacknife(:log_s2=>lambda {|v| Math.log(v.variance)})
-    # b) Array with names of method to jacknife
+    # b) Array with method names to jacknife
     #   a.jacknife([:mean, :sd])
     # c) A single method to jacknife
     #   a.jacknife(:mean)
@@ -586,17 +601,9 @@ module Statsample
       
       nb=(n / k).to_i
       
-      h_est=estimators
       
-      h_est=[h_est] unless h_est.is_a? Array or h_est.is_a? Hash
-      if h_est.is_a? Array
-        h_est=h_est.inject({}) {|h,est|
-          h[est]=lambda {|v| v.send(est)}
-          h
-        }
-      end
-      es=h_est.keys
-      ps=es.inject({}) {|h,v| h[v]=[];h}
+      h_est, es, ps= prepare_bootstrap(estimators)
+
       est_n=es.inject({}) {|h,v|
         h[v]=h_est[v].call(self)
         h

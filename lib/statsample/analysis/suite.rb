@@ -14,11 +14,16 @@ module Statsample
         @name=opts[:name] || "Analysis #{Time.now}"
         @attached=[]
         @output=opts[:output] || ::STDOUT
-        
       end
       # Run the analysis, putting output on 
       def run
          @block.arity<1 ? instance_eval(&@block) : @block.call(self)
+      end
+      # Provides a description of the procedure. Only appears as a commentary on 
+      # SuiteReportBuilder outputs
+      def desc(d)
+        @output.puts("Description:")
+        @output.puts("  #{d}") 
       end
       def echo(*args)
         @output.puts(*args)

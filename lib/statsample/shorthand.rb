@@ -11,6 +11,26 @@ module Statsample
     ###
     # :section: R like methods
     ###
+    def read_with_cache(klass, filename,opts=Hash.new, cache=true)
+      file_ds=filename+".ds"
+      if cache and (File.exists? file_ds and File.mtime(file_ds)>File.mtime(filename))
+        ds=Statsample.load(file_ds)
+      else
+        ds=klass.read(filename)
+        ds.save(file_ds) if cache
+      end
+      ds
+    end
+    # Import an Excel file. Cache result by default
+    def read_excel(filename, opts=Hash.new, cache=true)
+      read_with_cache(Statsample::Excel, filename, opts, cache)
+
+    end
+    # Import an CSV file. Cache result by default
+
+    def read_csv
+      read_with_cache(Statsample::CSV, filename, opts, cache)
+    end
     
     # Retrieve names (fields) from dataset
     def names(ds)
@@ -26,7 +46,7 @@ module Statsample
     end
     # Create a Statsample::Vector
     # Analog to R's c
-    def c(*args)
+    def vector(*args)
       Statsample::Vector[*args]
     end
     # Random generation for the normal distribution

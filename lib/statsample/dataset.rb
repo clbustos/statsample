@@ -119,6 +119,33 @@ module Statsample
     def has_missing_data?
       @vectors.any? {|k,v| v.has_missing_data?}
     end
+    # Return a nested hash using fields as keys and
+    # an array constructed of hashes with other values.
+    # If block provided, is used to provide the 
+    # values, with parameters +row+ of dataset, 
+    # +current+ last hash on hierarchy and
+    # +name+ of the key to include
+    def nest(*tree_keys,&block)
+      tree_keys=tree_keys[0] if tree_keys[0].is_a? Array
+      out=Hash.new      
+      each do |row|
+        current=out        
+        # Create tree
+        tree_keys[0,tree_keys.size-1].each do |f|
+          root=row[f]
+          current[root]||=Hash.new
+          current=current[root]
+        end
+        name=row[tree_keys.last]
+        if !block
+          current[name]||=Array.new
+          current[name].push(row.delete_if{|key,value| tree_keys.include? key})
+        else
+          current[name]=block.call(row, current,name)
+        end
+      end
+      out
+    end
     # Creates a new dataset. A dataset is a set of ordered named vectors
     # of the same size.
     #
@@ -170,6 +197,7 @@ module Statsample
       else
         ds=dup fields_to_include
       end
+      ds.name= self.name
       ds
     end
     #
@@ -192,7 +220,9 @@ module Statsample
         vectors[f]=@vectors[f].dup
         fields.push(f)
       }
-      Dataset.new(vectors,fields)
+      ds=Dataset.new(vectors,fields)
+      ds.name= self.name
+      ds
     end
     
     

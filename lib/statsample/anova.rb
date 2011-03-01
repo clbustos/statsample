@@ -18,5 +18,7 @@ module Statsample
     end
   end
 end
+
 require 'statsample/anova/oneway'
+require 'statsample/anova/contrast'
 require 'statsample/anova/twoway'

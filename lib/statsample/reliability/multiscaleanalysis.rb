@@ -110,6 +110,8 @@ module Statsample
         opts||=pca_options        
         Statsample::Factor::PCA.new(correlation_matrix, opts)
       end
+      # Retrieve Velicer's MAP
+      # using all scales.
       def map(opts=nil)
         opts||=map_options
         Statsample::Factor::MAP.new(correlation_matrix, opts)
@@ -141,7 +143,7 @@ module Statsample
       def report_building(b) # :nodoc:
         b.section(:name=>name) do |s|
           s.section(:name=>_("Reliability analysis of scales")) do |s2|
-            @scales.each_pair do |k,scale|
+            @scales.each_pair do |k, scale|
               s2.parse_element(scale)
             end
           end

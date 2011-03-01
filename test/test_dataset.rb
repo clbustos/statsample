@@ -5,6 +5,18 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
       'city'=>Statsample::Vector.new(['New York','London','London','Paris','Tome']),
     'a1'=>Statsample::Vector.new(['a,b','b,c','a',nil,'a,b,c'])}, ['id','name','age','city','a1'])
   end
+  def test_nest
+    ds={
+      'a'=>%w{a a a b b b}.to_vector,
+      'b'=>%w{c c d d e e}.to_vector,
+      'c'=>%w{f g h i j k}.to_vector
+    }.to_dataset
+    nest=ds.nest('a','b')
+    assert_equal([{'c'=>'f'},{'c'=>'g'}], nest['a']['c'])
+    assert_equal([{'c'=>'h'}], nest['a']['d'])
+    assert_equal([{'c'=>'j'},{'c'=>'k'}], nest['b']['e'])
+   
+  end
   def test_should_have_summary
     assert(@ds.summary.size>0)
   end

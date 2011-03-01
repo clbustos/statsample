@@ -13,6 +13,12 @@ class StatsampleTestTTestCase < MiniTest::Unit::TestCase
       @n1=@a.n
       @n2=@b.n
     end
+    should "calculate correctly standard t" do
+      t=Statsample::Test::T.new(@x1, @s1.quo(Math.sqrt(@a.n)), @a.n-1)
+      assert_equal((@x1).quo(@s1.quo(Math.sqrt(@a.n))), t.t)
+      assert_equal(@a.n-1, t.df)
+      assert(t.summary.size>0)
+    end
     should "calculate correctly t for two samples" do
       assert_in_delta(1.959, T.two_sample_independent(@x1, @x2, @s1, @s2, @n1, @n2),0.001)
       assert_in_delta(1.959, T.two_sample_independent(@x1, @x2, @s1, @s2, @n1, @n2,true),0.001)

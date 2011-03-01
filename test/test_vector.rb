@@ -315,12 +315,12 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       exp=[3*mean-2*(a[2]+a[3]+a[4]+a[5]) / 4, 3*mean-2*(a[0]+a[1]+a[4]+a[5]) / 4, 3*mean-2*(a[0]+a[1]+a[2]+a[3]) / 4].to_scale
       assert_similar_vector(exp, ds[:mean], 1e-13)
     end
-    should "bootstrap correctly" do
+    should "bootstrap should return a vector with mean=mu and sd=se" do
       a=rnorm(100)
       ds=a.bootstrap([:mean,:sd],200)
       se=1/Math.sqrt(a.size)
       assert_in_delta(0, ds[:mean].mean, 0.3)
-      assert_in_delta(se, ds[:mean].sd, 0.01)
+      assert_in_delta(se, ds[:mean].sd, 0.02)
     end
 
     

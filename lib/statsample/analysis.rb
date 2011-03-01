@@ -77,7 +77,7 @@ module Statsample
     # Save the analysis on a file
     # Without arguments, add all stored analysis    
     def self.save(filename, *args)
-      rb=ReportBuilder.new(filename)
+      rb=ReportBuilder.new(:name=>filename)
       add_to_reportbuilder(rb, *args)
       rb.save(filename)
     end

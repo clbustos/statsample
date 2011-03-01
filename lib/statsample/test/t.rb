@@ -1,6 +1,12 @@
 module Statsample
   module Test
-    module T
+    
+    
+    
+    
+    # A t-test is any statistical hypothesis test in which the test statistic follows a Student's t distribution, if the null hypothesis is supported
+    class T
+      
       class << self
         include Math
         # Test the null hypothesis that the population mean is equal to a specified value u, one uses the statistic.
@@ -50,6 +56,50 @@ module Statsample
           num.quo(den)
         end        
       end
+      
+      include Statsample::Test
+      include Summarizable
+      attr_reader :num, :den, :df
+      # Tails for probability (:both, :left or :right). Default :both
+      attr_accessor :tails
+      # Name of F analysis
+      attr_accessor :name
+      attr_reader :t
+      # Creates a generic t test. Use OneSample or TwoSamplesIndependent
+      # classes for better summaries.
+      # Parameters:
+      # * num: numerator
+      # * den: denominator
+      # * df: degrees of freedom
+      def initialize(num, den, df, opts=Hash.new)
+        @num=num
+        @den=den
+        @df=df
+        @t=num / den.to_f
+        opts_default={:tails=>:both, :name=>_("T Test")}
+        @opts=opts_default.merge(opts)
+        opts_default.keys.each {|k|
+          send("#{k}=", @opts[k])
+        }
+      end
+      def to_f
+        t
+      end
+      # probability
+      def probability
+        p_using_cdf(Distribution::T.cdf(t, df),  tails)
+      end
+      
+      def report_building(builder) #:nodoc:
+        if @df.is_a? Integer
+          builder.text "%s : t(%d) = %0.4f , p = %0.4f (%s tails)" % [@name, @df, t, probability, tails]
+        else
+          builder.text "%s : t(%0.2f) = %0.4f , p = %0.4f (%s tails)" % [@name, @df, t, probability, tails]
+        end
+      end
+      
+      
+      
       # One Sample t-test
       # == Usage
       #   a=1000.times.map {rand(100)}.to_scale
@@ -106,7 +156,7 @@ module Statsample
             s.text "Sample mean: #{@vector.mean}"
             s.text "Population mean:#{u}"
             s.text "Tails: #{tails}"
-            s.text sprintf("t = %0.4f, p=%0.4f, d.f=%d", t, probability, df)
+            s.text "t = %0.4f, p=%0.4f, d.f=%d" % [t, probability, df]
           }
         end
       end

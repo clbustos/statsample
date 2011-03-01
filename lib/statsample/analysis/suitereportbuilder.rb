@@ -20,6 +20,9 @@ module Statsample
       def summary(o)
         @rb.add(o)
       end
+      def desc(d)
+        @rb.add(d)
+      end
       def echo(*args)
         args.each do |a|
           @rb.add(a)

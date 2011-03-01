@@ -22,11 +22,10 @@ module Statsample
         
         @ods=ds
         @ds=ds.dup_only_valid(ds.fields - @dumped)
-        
+        @ds.name=ds.name
         
         @k=@ds.fields.size        
         @total=@ds.vector_sum
-
         @o_total=@dumped.size > 0 ? @ods.vector_sum : nil
         
         @vector_mean=@ds.vector_mean
@@ -165,7 +164,7 @@ module Statsample
                   t.row(["#{@ods[f].name}(#{f})", "%0.5f" % @ods[f].mean])
                 end
               end
-              s.parse_element(Statsample::Graph::Histogram.new(@o_total)) if @summary_histogram
+              s.parse_element(Statsample::Graph::Histogram.new(@o_total, :name=>"Histogram (complete data) for %s" % @name)) if @summary_histogram
             end
           end
           
@@ -229,7 +228,7 @@ module Statsample
               t.row row
             end # end each
           end # table
-          s.parse_element(Statsample::Graph::Histogram.new(@total)) if @summary_histogram
+          s.parse_element(Statsample::Graph::Histogram.new(@total, :name=>"Histogram (valid data) for %s" % @name)) if @summary_histogram
         end # section
       end # def
     end # class

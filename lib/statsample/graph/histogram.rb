@@ -44,7 +44,7 @@ module Statsample
       # Add a line showing normal distribution
       attr_accessor :line_normal_distribution
       # data could be a vector or a histogram
-      def initialize(data,opts=Hash.new)
+      def initialize(data, opts=Hash.new)
         prov_name=(data.respond_to?(:name)) ? data.name : ""
         opts_default={
           :name=>_("Histograma (%s)") % prov_name,
