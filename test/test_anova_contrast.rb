@@ -17,7 +17,7 @@ class StatsampleAnovaContrastTestCase < MiniTest::Unit::TestCase
       assert_in_delta(-2.623, @c.t, 0.001)
       assert_in_delta(-4.82, @c.confidence_interval[0],0.01)
       assert_in_delta(-0.51, @c.confidence_interval[1],0.01)
-      
+      assert(@c.summary.size>0)
     end
     should "return correct values using c_by_index" do
       @c.c_by_index([0],[1,2,3])

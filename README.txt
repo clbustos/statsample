@@ -12,7 +12,7 @@ Include:
 * Imports and exports datasets from and to Excel, CSV and plain text files.
 * Correlations: Pearson's r, Spearman's rank correlation (rho), point biserial, tau a, tau b and  gamma.  Tetrachoric and Polychoric correlation provides by +statsample-bivariate-extension+ gem.
 * Intra-class correlation
-* Anova: generic and vector-based One-way ANOVA and Two-way ANOVA
+* Anova: generic and vector-based One-way ANOVA and Two-way ANOVA, with contrast for One-way ANOVA.
 * Tests: F, T, Levene, U-Mannwhitney.
 * Regression: Simple, Multiple (OLS), Probit  and Logit
 * Factorial Analysis: Extraction (PCA and Principal Axis), Rotation (Varimax, Equimax, Quartimax) and Parallel Analysis and Velicer's MAP test, for estimation of number of factors.
@@ -29,7 +29,7 @@ Include:
   * Statsample::Vector: An extension of an array, with statistical methods like sum, mean and standard deviation
   * Statsample::Dataset: a group of Statsample::Vector, analog to a excel spreadsheet or a dataframe on R. The base of almost all operations on statsample. 
   * Statsample::Multiset: multiple datasets with same fields and type of vectors
-* Anova module provides generic Statsample::Anova::OneWay and vector based Statsample::Anova::OneWayWithVectors
+* Anova module provides generic Statsample::Anova::OneWay and vector based Statsample::Anova::OneWayWithVectors. Also you can create contrast using Statsample::Anova::Contrast
 * Module Statsample::Bivariate provides covariance and pearson, spearman, point biserial, tau a, tau b, gamma, tetrachoric (see Bivariate::Tetrachoric) and polychoric (see Bivariate::Polychoric) correlations. Include methods to create correlation and covariance matrices
 * Multiple types of regression.
   * Simple Regression :  Statsample::Regression::Simple
@@ -81,16 +81,37 @@ Include:
 
 See multiples examples of use on [http://github.com/clbustos/statsample/tree/master/examples/]
 
+=== Boxplot
+
+    require 'statsample'
+    ss_analysis(Statsample::Graph::Boxplot) do 
+      n=30
+      a=rnorm(n-1,50,10)
+      b=rnorm(n, 30,5)
+      c=rnorm(n,5,1)
+      a.push(2)
+      boxplot(:vectors=>[a,b,c], :width=>300, :height=>300, :groups=>%w{first first second}, :minimum=>0)
+    end    
+    Statsample::Analysis.run # Open svg file on *nix application defined
+
 === Correlation matrix
 
     require 'statsample'
-    a=1000.times.collect {rand}.to_scale
-    b=1000.times.collect {rand}.to_scale
-    c=1000.times.collect {rand}.to_scale
-    d=1000.times.collect {rand}.to_scale
-    ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
-    cm=Statsample::Bivariate.correlation_matrix(ds)
-    puts cm.summary
+    # Note R like generation of random gaussian variable
+    # and correlation matrix
+    
+    ss_analysis("Statsample::Bivariate.correlation_matrix") do
+      samples=1000
+      ds=data_frame(
+        'a'=>rnorm(samples), 
+        'b'=>rnorm(samples),
+        'c'=>rnorm(samples),
+        'd'=>rnorm(samples))
+      cm=cor(ds) 
+      summary(cm)
+    end
+    
+    Statsample::Analysis.run_batch # Echo output to console
 
 
 == REQUIREMENTS:

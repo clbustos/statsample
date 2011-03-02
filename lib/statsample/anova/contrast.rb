@@ -10,7 +10,7 @@ module Statsample
         @vectors=opts[:vectors]
         @c=opts[:c]
         @c1,@c2=opts[:c1], opts[:c2]
-        @t_options=opts[:t_options] || Hash.new
+        @t_options=opts[:t_options] || {:estimate_name=>_("Psi estimate")}
         @name=opts[:name] || _("Contrast")
         psi
         @anova=Statsample::Anova::OneWayWithVectors.new(@vectors)
@@ -34,9 +34,8 @@ module Statsample
         end
         @psi
       end
-      def confidence_interval(int=0.95)
-        t_val=-Distribution::T.p_value((1-int)/ 2.0, df)
-        [psi-t_val*se, psi+t_val*se]
+      def confidence_interval(cl=nil)
+        t_object.confidence_interval(cl)
       end
       # Hypothesis contrast, using custom values
       # Every parameter is a contrast value. You should use
@@ -72,9 +71,6 @@ module Statsample
       def report_building(builder)
          builder.section(:name=>@name) do |s|
            s.text _("Contrast:%s") % c.join(",")
-           s.text _("Psi:%0.4f") % psi
-           s.text _("SE:%0.4f") % se
-           
            s.parse_element(t_object)
          end
       end
