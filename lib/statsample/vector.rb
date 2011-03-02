@@ -556,29 +556,7 @@ module Statsample
       bss.to_dataset
       
     end
-    # For an array or hash of estimators methods, returns
-    # an array with three elements
-    # 1.- A hash with estimators names as keys and lambdas as values
-    # 2.- An array with estimators names
-    # 3.- A Hash with estimators names as keys and empty arrays as values
-    def prepare_bootstrap(estimators)
-      h_est=estimators
-      
-      h_est=[h_est] unless h_est.is_a? Array or h_est.is_a? Hash
-      
-      if h_est.is_a? Array
-        h_est=h_est.inject({}) {|h,est|
-          h[est]=lambda {|v| v.send(est)}
-          h
-        }
-      end
-      
-      bss=h_est.keys.inject({}) {|h,v| h[v]=[];h}
-      
-      [h_est,h_est.keys, bss]
-      
-    end
-    private :prepare_bootstrap
+    
     # == Jacknife
     # Returns a dataset with jacknife delete-+k+ +estimators+ 
     # +estimators+ could be:
@@ -627,6 +605,31 @@ module Statsample
       end
       ps.to_dataset
     end
+    
+    
+    # For an array or hash of estimators methods, returns
+    # an array with three elements
+    # 1.- A hash with estimators names as keys and lambdas as values
+    # 2.- An array with estimators names
+    # 3.- A Hash with estimators names as keys and empty arrays as values
+    def prepare_bootstrap(estimators)
+      h_est=estimators
+      
+      h_est=[h_est] unless h_est.is_a? Array or h_est.is_a? Hash
+      
+      if h_est.is_a? Array
+        h_est=h_est.inject({}) {|h,est|
+          h[est]=lambda {|v| v.send(est)}
+          h
+        }
+      end
+      
+      bss=h_est.keys.inject({}) {|h,v| h[v]=[];h}
+      
+      [h_est,h_est.keys, bss]
+      
+    end
+    private :prepare_bootstrap
     
     # Returns an random sample of size n, with replacement,
     # only with valid data.
@@ -704,7 +707,7 @@ module Statsample
     end
     
     def to_s
-    sprintf("Vector(type:%s, n:%d)[%s]",@type.to_s,@data.size, @data.collect{|d| d.nil? ? "nil":d}.join(","))
+      sprintf("Vector(type:%s, n:%d)[%s]",@type.to_s,@data.size, @data.collect{|d| d.nil? ? "nil":d}.join(","))
     end
     # Ugly name. Really, create a Vector for standard 'matrix' package.
     # <tt>dir</tt> could be :horizontal or :vertical
@@ -930,12 +933,18 @@ module Statsample
     end
 
     # Population average deviation (denominator N)
+    # author: Al Chou
+   
     def average_deviation_population( m = nil )
       check_type :scale
       m ||= mean
       ( @scale_data.inject( 0 ) { |a, x| ( x - m ).abs + a } ).quo( n_valid )
     end
-
+    def median_absolute_deviation
+      med=median
+      recode {|x| (x-med).abs}.median
+    end
+    alias  :mad :median_absolute_deviation
     # Sample Variance (denominator n-1)
     def variance_sample(m=nil)
       check_type :scale

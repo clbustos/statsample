@@ -68,7 +68,7 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       refute(v.flawed?)
       
     end
-
+      
     context "using matrix operations" do
       setup do
         @a=[1,2,3,4,5].to_scale
@@ -166,7 +166,10 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
         assert_counting_tokens(b)
       end
     end
-
+    should "return correct median_absolute_deviation" do
+      a=[1, 1, 2, 2, 4, 6, 9].to_scale
+      assert_equal(1, a.median_absolute_deviation)
+    end
     should "return correct histogram" do
       a=10.times.map {|v| v}.to_scale
       hist=a.histogram(2)
