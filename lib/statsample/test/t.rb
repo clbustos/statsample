@@ -59,45 +59,68 @@ module Statsample
       
       include Statsample::Test
       include Summarizable
-      attr_reader :num, :den, :df
-      # Tails for probability (:both, :left or :right). Default :both
+      attr_reader :standard_error, :estimate, :df
+      # Tails for p-value (:both, :left or :right). Default :both
       attr_accessor :tails
       # Name of F analysis
       attr_accessor :name
+      attr_accessor :confidence_level
       attr_reader :t
+      attr_accessor :estimate_name, :standard_error_name
       # Creates a generic t test. Use OneSample or TwoSamplesIndependent
       # classes for better summaries.
       # Parameters:
-      # * num: numerator
-      # * den: denominator
+      # * estimate: estimate
+      # * standard_error: standard error of estimate
       # * df: degrees of freedom
-      def initialize(num, den, df, opts=Hash.new)
-        @num=num
-        @den=den
+      def initialize(estimate, standard_error, df, opts=Hash.new)
+        @estimate=estimate
+        @standard_error=standard_error
         @df=df
-        @t=num / den.to_f
-        opts_default={:tails=>:both, :name=>_("T Test")}
-        @opts=opts_default.merge(opts)
-        opts_default.keys.each {|k|
-          send("#{k}=", @opts[k])
+        @t = @estimate / @standard_error.to_f
+        opts_default={  :tails=>:both,
+                        :name=>_("T Test"),
+                        :estimate_name=>_("Estimate"),
+                        :standard_error_name=>_("Std.Err.of Estimate"),
+        :confidence_level=>0.95}
+        @opts = opts_default.merge(opts)
+        
+        @opts.keys.each {|k|
+          send("#{k}=", @opts[k]) if respond_to? k
         }
       end
+      
+      alias :se :standard_error
+      
       def to_f
         t
       end
+      
       # probability
       def probability
         p_using_cdf(Distribution::T.cdf(t, df),  tails)
       end
       
+      def confidence_interval(cl=nil)
+          cl||=confidence_level
+          t_crit = t_critical(cl, df)
+          [estimate - se*t_crit, estimate + se*t_crit]
+      end
+      alias :ci :confidence_interval
+      
+      
       def report_building(builder) #:nodoc:
-        if @df.is_a? Integer
-          builder.text "%s : t(%d) = %0.4f , p = %0.4f (%s tails)" % [@name, @df, t, probability, tails]
-        else
-          builder.text "%s : t(%0.2f) = %0.4f , p = %0.4f (%s tails)" % [@name, @df, t, probability, tails]
+        builder.section(:name=>@name) do |section|
+          section.text _("%s: %0.4f | %s: %0.4f") % [@estimate_name, @estimate, @standard_error_name, se]
+          report_building_t(section)
         end
       end
-      
+      def report_building_t(s)
+        df_f=@df.is_a?(Integer) ? "%d" : "%0.4f"
+        s.text _("t(%d) = %0.4f, p=%0.4f (%s tails)") % [df, t,probability, tails]
+        s.text _("CI(%d%%): %0.4f - %0.4f") % [confidence_level*100, ci[0],ci[1]]
+        
+      end
       
       
       # One Sample t-test
@@ -141,22 +164,32 @@ module Statsample
           @name=@opts[:name]
           @u=@opts[:u]
           @tails=@opts[:tails]
+          @confidence_level=@opts[:confidence_level] || 0.95
           @df= @vector.n_valid-1
           @t=nil
         end        
+        def t_object
+          T.new(@vector.mean-u, @vector.se, @vector.n_valid-1, opts)
+        end
         def t
-          T.one_sample(@vector.mean, @u, @vector.sd, @vector.n_valid)
+          t_object.t
         end
-        
         def probability
-          p_using_cdf(Distribution::T.cdf(t, @df), tails)
+          t_object.probability
         end
+        def standard_error
+          t_object.standard_error
+        end
+        alias :se :standard_error
+        def confidence_interval(cl=nil)
+          t_object.confidence_interval(cl)
+        end
+        alias :ci :confidence_interval
         def report_building(b) # :nodoc:
           b.section(:name=>@name) {|s|
-            s.text "Sample mean: #{@vector.mean}"
-            s.text "Population mean:#{u}"
-            s.text "Tails: #{tails}"
-            s.text "t = %0.4f, p=%0.4f, d.f=%d" % [t, probability, df]
+            s.text _("Sample mean: %0.4f | Sample sd: %0.4f | se : %0.4f") % [@vector.mean, @vector.sd, se]
+            s.text _("Population mean: %0.4f") % u if u!=0
+            t_object.report_building_t(s)
           }
         end
       end

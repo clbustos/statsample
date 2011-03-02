@@ -29,6 +29,15 @@ module Statsample
           2*cdf
       end
     end
+    # Get critical t to create confidence interval 
+    def t_critical(confidence_level, df)
+      -Distribution::T.p_value((1-confidence_level) / 2.0, df)
+    end
+    # Get critical z to create confidence interval 
+    def z_critical(confidence_level)
+      -Distribution::Z.p_value((1-confidence_level) / 2.0)
+    end
+    
     extend self
     # Calculate chi square for two Matrix
     class << self

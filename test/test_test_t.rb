@@ -19,6 +19,16 @@ class StatsampleTestTTestCase < MiniTest::Unit::TestCase
       assert_equal(@a.n-1, t.df)
       assert(t.summary.size>0)
     end
+    should "calculate correctly t for one sample" do
+      t1=[6, 4, 6, 7, 4,5,5,12,6,1].to_scale
+      t2=[9, 6, 5,10,10,8,7,10,6,5].to_scale
+      d=t1-t2
+      t=Statsample::Test::T::OneSample.new(d)
+      assert_in_delta(-2.631, t.t, 0.001)
+      assert_in_delta( 0.027, t.probability, 0.001)
+      assert_in_delta( 0.76012, t.se, 0.0001)
+      assert(t.summary.size>0)
+    end
     should "calculate correctly t for two samples" do
       assert_in_delta(1.959, T.two_sample_independent(@x1, @x2, @s1, @s2, @n1, @n2),0.001)
       assert_in_delta(1.959, T.two_sample_independent(@x1, @x2, @s1, @s2, @n1, @n2,true),0.001)

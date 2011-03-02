@@ -1011,6 +1011,13 @@ module Statsample
         check_type :scale
         standard_deviation_sample.quo(mean)
     end
+    # Standard error of the distribution mean
+    # Calculated using sd/sqrt(n)
+    def standard_error
+      standard_deviation_sample.quo(Math.sqrt(valid_data.size))
+    end
+    alias :se :standard_error
+    
     alias_method :sdp, :standard_deviation_population
     alias_method :sds, :standard_deviation_sample
     alias_method :adp, :average_deviation_population
