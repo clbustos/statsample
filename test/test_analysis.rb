@@ -153,7 +153,7 @@ class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
         output=mock()
         output.expects(:puts).with(5.5)
         an=Statsample::Analysis.store(:simple, :output=>output) do
-          ds=data_frame(:x=>c(1..10),:y=>c(1..10))
+          ds=data_frame(:x=>vector(1..10),:y=>vector(1..10))
           attach(ds)
           echo x.mean
         end

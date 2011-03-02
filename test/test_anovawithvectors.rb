@@ -40,7 +40,6 @@ class StatsampleAnovaOneWayWithVectorsTestCase < MiniTest::Unit::TestCase
       
       c2=@anova.contrast(:c=>[1,-0.5,-0.5])
       assert_equal(c1.t,c2.t)
-      puts @anova.summary
       
     end
     should "respond to #summary" do
