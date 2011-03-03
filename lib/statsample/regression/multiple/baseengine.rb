@@ -79,6 +79,11 @@ module Statsample
         def sst
           raise "You should implement this"
         end
+        # R^2 Adjusted.
+        # Estimate Population R^2 usign Ezequiel formula.
+        # Always lower than sample R^2
+        # == Reference:
+        # * Leach, L. & Henson, R. (2007). The Use and Impact of Adjusted R2 Effects in Published Regression Research. Multiple Linear Regression Viewpoints, 33(1), 1-11.
         def r2_adjusted
           r2-((1-r2)*@predictors_n).quo(df_e)
         end

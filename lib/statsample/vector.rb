@@ -777,18 +777,27 @@ module Statsample
       b.section(:name=>name) do |s|
         s.text _("n :%d") % n        
         s.text _("n valid:%d") % n_valid
-        s.text  _("factors:%s") % factors.join(",")
-        s.text   _("mode: %s") % mode
-        s.table(:name=>_("Distribution")) do |t|
-          frequencies.sort.each do |k,v|
-            key=labels.has_key?(k) ? labels[k]:k
-            t.row [key, v , ("%0.2f%%" % (v.quo(n_valid)*100))]
+        if @type==:nominal
+          s.text  _("factors:%s") % factors.join(",") 
+          s.text   _("mode: %s") % mode 
+          
+          s.table(:name=>_("Distribution")) do |t|
+            frequencies.sort.each do |k,v|
+              key=labels.has_key?(k) ? labels[k]:k
+              t.row [key, v , ("%0.2f%%" % (v.quo(n_valid)*100))]
+            end
           end
         end
-        s.text _("median: %s") % median.to_s if(@type==:ordinal)
+        
+        s.text _("median: %s") % median.to_s if(@type==:ordinal or @type==:scale)
         if(@type==:scale)
           s.text _("mean: %0.4f") % mean
-          s.text _("sd: %0.4f") % sd.to_s
+          if sd
+            s.text _("std.dev.: %0.4f") % sd
+            s.text _("std.err.: %0.4f") % se
+            s.text _("skew: %0.4f") % skew
+            s.text _("kurtosis: %0.4f") % kurtosis
+          end
         end
       end
     end

@@ -23,6 +23,20 @@ Include:
 * Creates reports on text, html and rtf, using ReportBuilder gem
 * Graphics: Histogram, Boxplot and Scatterplot
 
+== PRINCIPLES
+
+* Software Design: 
+  * One module/class for each type of analysis
+  * Options can be set as hash on initialize() or as setters methods
+  * Clean API for interactive sessions
+  * summary() returns all necessary informacion for interactive sessions
+  * All statistical data available though methods on objects
+  * All (important) methods should be tested. Better with random data.
+* Statistical Design
+  * Results are tested against text results, SPSS and R outputs.
+  * Go beyond Null Hiphotesis Testing, using confidence intervals and effect sizes when possible
+  * (When possible) All references for methods are documented, providing sensible information on documentation 
+
 == FEATURES:
 
 * Classes for manipulation and storage of data:

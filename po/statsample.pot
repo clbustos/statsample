@@ -6,8 +6,8 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: statsample 1.0.0\n"
-"POT-Creation-Date: 2011-01-28 18:40-0300\n"
+"Project-Id-Version: statsample 1.0.1\n"
+"POT-Creation-Date: 2011-03-03 12:03-0300\n"
 "PO-Revision-Date: 2009-08-04 15:36-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,46 +20,78 @@ msgstr ""
 msgid "F Test"
 msgstr ""
 
-#: lib/statsample/test/t.rb:209
+#: lib/statsample/test/t.rb:82
+msgid "T Test"
+msgstr ""
+
+#: lib/statsample/test/t.rb:83
+msgid "Estimate"
+msgstr ""
+
+#: lib/statsample/test/t.rb:84
+msgid "Std.Err.of Estimate"
+msgstr ""
+
+#: lib/statsample/test/t.rb:114
+msgid "%s: %0.4f | %s: %0.4f"
+msgstr ""
+
+#: lib/statsample/test/t.rb:120
+msgid "t(%d) = %0.4f, p=%0.4f (%s tails)"
+msgstr ""
+
+#: lib/statsample/test/t.rb:121
+msgid "CI(%d%%): %0.4f - %0.4f"
+msgstr ""
+
+#: lib/statsample/test/t.rb:190
+msgid "Sample mean: %0.4f | Sample sd: %0.4f | se : %0.4f"
+msgstr ""
+
+#: lib/statsample/test/t.rb:191
+msgid "Population mean: %0.4f"
+msgstr ""
+
+#: lib/statsample/test/t.rb:292
 msgid "Mean and standard deviation"
 msgstr ""
 
-#: lib/statsample/test/t.rb:209 lib/statsample/regression/simple.rb:109
+#: lib/statsample/test/t.rb:292 lib/statsample/regression/simple.rb:109
 #: lib/statsample/factor/pca.rb:216 lib/statsample/factor/principalaxis.rb:202
 msgid "Variable"
 msgstr ""
 
-#: lib/statsample/test/t.rb:209
+#: lib/statsample/test/t.rb:292
 #: lib/statsample/dominanceanalysis/bootstrap.rb:208
 msgid "mean"
 msgstr ""
 
-#: lib/statsample/test/t.rb:209
+#: lib/statsample/test/t.rb:292
 msgid "sd"
 msgstr ""
 
-#: lib/statsample/test/t.rb:209 lib/statsample/factor/parallelanalysis.rb:103
+#: lib/statsample/test/t.rb:292 lib/statsample/factor/parallelanalysis.rb:103
 #: lib/statsample/factor/parallelanalysis.rb:111
 msgid "n"
 msgstr ""
 
-#: lib/statsample/test/t.rb:213
+#: lib/statsample/test/t.rb:296
 msgid "Levene test for equality of variances"
 msgstr ""
 
-#: lib/statsample/test/t.rb:215
+#: lib/statsample/test/t.rb:298
 msgid "T statistics"
 msgstr ""
 
-#: lib/statsample/test/t.rb:216
+#: lib/statsample/test/t.rb:299
 msgid "Equal variance"
 msgstr ""
 
-#: lib/statsample/test/t.rb:217
+#: lib/statsample/test/t.rb:300
 msgid "Non equal variance"
 msgstr ""
 
-#: lib/statsample/test/t.rb:219
+#: lib/statsample/test/t.rb:302
 msgid "Effect size"
 msgstr ""
 
@@ -268,7 +300,7 @@ msgstr ""
 msgid "Anova Two-Way on %s"
 msgstr ""
 
-#: lib/statsample/anova/twoway.rb:184 lib/statsample/anova/oneway.rb:101
+#: lib/statsample/anova/twoway.rb:184 lib/statsample/anova/oneway.rb:127
 msgid "Test of Homogeneity of variances (Levene)"
 msgstr ""
 
@@ -284,20 +316,36 @@ msgstr ""
 msgid "Unexplained variance"
 msgstr ""
 
-#: lib/statsample/anova/oneway.rb:91
+#: lib/statsample/anova/oneway.rb:97
 msgid "Anova One-Way"
 msgstr ""
 
-#: lib/statsample/anova/oneway.rb:92
+#: lib/statsample/anova/oneway.rb:98
 msgid "Between Groups"
 msgstr ""
 
-#: lib/statsample/anova/oneway.rb:93
+#: lib/statsample/anova/oneway.rb:99
 msgid "Within Groups"
 msgstr ""
 
-#: lib/statsample/anova/oneway.rb:137
+#: lib/statsample/anova/oneway.rb:119
+msgid "Contrast for %s"
+msgstr ""
+
+#: lib/statsample/anova/oneway.rb:163
 msgid "Descriptives"
+msgstr ""
+
+#: lib/statsample/anova/contrast.rb:13
+msgid "Psi estimate"
+msgstr ""
+
+#: lib/statsample/anova/contrast.rb:14
+msgid "Contrast"
+msgstr ""
+
+#: lib/statsample/anova/contrast.rb:73
+msgid "Contrast:%s"
 msgstr ""
 
 #: lib/statsample/graph/scatterplot.rb:72
@@ -529,27 +577,27 @@ msgstr ""
 msgid "Scale %s"
 msgstr ""
 
-#: lib/statsample/reliability/multiscaleanalysis.rb:143
+#: lib/statsample/reliability/multiscaleanalysis.rb:145
 msgid "Reliability analysis of scales"
 msgstr ""
 
-#: lib/statsample/reliability/multiscaleanalysis.rb:149
+#: lib/statsample/reliability/multiscaleanalysis.rb:151
 msgid "Correlation matrix for %s"
 msgstr ""
 
-#: lib/statsample/reliability/multiscaleanalysis.rb:154
+#: lib/statsample/reliability/multiscaleanalysis.rb:156
 msgid "PCA for %s"
 msgstr ""
 
-#: lib/statsample/reliability/multiscaleanalysis.rb:159
+#: lib/statsample/reliability/multiscaleanalysis.rb:161
 msgid "Principal Axis for %s"
 msgstr ""
 
-#: lib/statsample/reliability/multiscaleanalysis.rb:165
+#: lib/statsample/reliability/multiscaleanalysis.rb:167
 msgid "Parallel Analysis for %s"
 msgstr ""
 
-#: lib/statsample/reliability/multiscaleanalysis.rb:170
+#: lib/statsample/reliability/multiscaleanalysis.rb:172
 msgid "MAP for %s"
 msgstr ""
 
@@ -589,96 +637,96 @@ msgstr ""
 msgid "No problematic items"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:45
+#: lib/statsample/reliability/scaleanalysis.rb:44
 msgid "Reliability Analisis"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:158
+#: lib/statsample/reliability/scaleanalysis.rb:157
 msgid "Summary for %s with all items"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:159
+#: lib/statsample/reliability/scaleanalysis.rb:158
 msgid "Items"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:160
-#: lib/statsample/reliability/scaleanalysis.rb:177
+#: lib/statsample/reliability/scaleanalysis.rb:159
+#: lib/statsample/reliability/scaleanalysis.rb:176
 msgid "Sum mean"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:161
+#: lib/statsample/reliability/scaleanalysis.rb:160
 msgid "S.d. mean"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:163
+#: lib/statsample/reliability/scaleanalysis.rb:162
 msgid "Deleted items"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:173
+#: lib/statsample/reliability/scaleanalysis.rb:172
 msgid "Summary for %s"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:174
+#: lib/statsample/reliability/scaleanalysis.rb:173
 msgid "Valid Items"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:176
+#: lib/statsample/reliability/scaleanalysis.rb:175
 msgid "Valid cases"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:178
+#: lib/statsample/reliability/scaleanalysis.rb:177
 msgid "Sum sd"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:180
+#: lib/statsample/reliability/scaleanalysis.rb:179
 msgid "Sum median"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:182
+#: lib/statsample/reliability/scaleanalysis.rb:181
 msgid "Item mean"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:183
+#: lib/statsample/reliability/scaleanalysis.rb:182
 msgid "Item sd"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:185
+#: lib/statsample/reliability/scaleanalysis.rb:184
 msgid "Skewness"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:186
+#: lib/statsample/reliability/scaleanalysis.rb:185
 msgid "Kurtosis"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:188
+#: lib/statsample/reliability/scaleanalysis.rb:187
 msgid "Cronbach's alpha"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:189
+#: lib/statsample/reliability/scaleanalysis.rb:188
 msgid "Standarized Cronbach's alpha"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:190
+#: lib/statsample/reliability/scaleanalysis.rb:189
 msgid "Mean rpb"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:192
+#: lib/statsample/reliability/scaleanalysis.rb:191
 msgid "Variances mean"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:193
+#: lib/statsample/reliability/scaleanalysis.rb:192
 msgid "Covariances mean"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:197
+#: lib/statsample/reliability/scaleanalysis.rb:196
 msgid "Items for obtain alpha(0.8) : %d"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:198
+#: lib/statsample/reliability/scaleanalysis.rb:197
 msgid "Items for obtain alpha(0.9) : %d"
 msgstr ""
 
-#: lib/statsample/reliability/scaleanalysis.rb:206
+#: lib/statsample/reliability/scaleanalysis.rb:205
 msgid "Items report for %s"
 msgstr ""
 
@@ -846,54 +894,54 @@ msgstr ""
 msgid "%s(percentil)"
 msgstr ""
 
-#: lib/statsample/vector.rb:667
+#: lib/statsample/vector.rb:778
 msgid "n :%d"
 msgstr ""
 
-#: lib/statsample/vector.rb:668
+#: lib/statsample/vector.rb:779
 msgid "n valid:%d"
 msgstr ""
 
-#: lib/statsample/vector.rb:669
+#: lib/statsample/vector.rb:780
 msgid "factors:%s"
 msgstr ""
 
-#: lib/statsample/vector.rb:670
+#: lib/statsample/vector.rb:781
 msgid "mode: %s"
 msgstr ""
 
-#: lib/statsample/vector.rb:671
+#: lib/statsample/vector.rb:782
 msgid "Distribution"
 msgstr ""
 
-#: lib/statsample/vector.rb:677
+#: lib/statsample/vector.rb:788
 msgid "median: %s"
 msgstr ""
 
-#: lib/statsample/vector.rb:679
+#: lib/statsample/vector.rb:790
 msgid "mean: %0.4f"
 msgstr ""
 
-#: lib/statsample/vector.rb:680
+#: lib/statsample/vector.rb:791
 msgid "sd: %0.4f"
 msgstr ""
 
-#: lib/statsample/dataset.rb:134
+#: lib/statsample/dataset.rb:161
 msgid "Dataset %d"
 msgstr ""
 
-#: lib/statsample/dataset.rb:427
+#: lib/statsample/dataset.rb:457
 msgid "Sum from %s"
 msgstr ""
 
-#: lib/statsample/dataset.rb:480
+#: lib/statsample/dataset.rb:510
 msgid "Means from %s"
 msgstr ""
 
-#: lib/statsample/dataset.rb:704
+#: lib/statsample/dataset.rb:734
 msgid "%s(filtered)"
 msgstr ""
 
-#: lib/statsample/dataset.rb:926
+#: lib/statsample/dataset.rb:956
 msgid "Cases: %d"
 msgstr ""
