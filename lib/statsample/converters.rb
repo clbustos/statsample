@@ -184,6 +184,7 @@ module Statsample
       #
       def read(filename, opts=Hash.new)
         require 'spreadsheet'
+        raise "options should be Hash" unless opts.is_a? Hash
         opts_default={
           :worksheet_id=>0, 
           :ignore_lines=>0, 
