@@ -16,7 +16,7 @@ module Statsample
         # * <tt>s</tt>: sample/differences standard deviation
         # * <tt>n</tt>: sample size
         def one_sample(x,u,s,n)
-          (x-u).quo(s.quo(Math::sqrt(n)))
+          (x-u)*Math::sqrt(n).quo(s)
         end
         # Test if means of two samples are different.
         # * <tt>x1</tt>: sample 1 mean
