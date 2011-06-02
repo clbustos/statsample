@@ -5,14 +5,14 @@ http://ruby-statsample.rubyforge.org/
 
 == DESCRIPTION:
 
-A suite for basic and advanced statistics on Ruby. Tested on Ruby 1.8.7, 1.9.1, 1.9.2 (April, 2010) and JRuby 1.4 (Ruby 1.8.7 compatible).
+A suite for basic and advanced statistics on Ruby. Tested on Ruby 1.8.7, 1.9.1, 1.9.2 (April, 2010), ruby-head(June, 2011) and JRuby 1.4 (Ruby 1.8.7 compatible).
 
 Include:
 * Descriptive statistics: frequencies, median, mean, standard error, skew, kurtosis (and many others).
 * Imports and exports datasets from and to Excel, CSV and plain text files.
 * Correlations: Pearson's r, Spearman's rank correlation (rho), point biserial, tau a, tau b and  gamma.  Tetrachoric and Polychoric correlation provides by +statsample-bivariate-extension+ gem.
 * Intra-class correlation
-* Anova: generic and vector-based One-way ANOVA and Two-way ANOVA, with contrast for One-way ANOVA.
+* Anova: generic and vector-based One-way ANOVA and Two-way ANOVA, with contrasts for One-way ANOVA.
 * Tests: F, T, Levene, U-Mannwhitney.
 * Regression: Simple, Multiple (OLS), Probit  and Logit
 * Factorial Analysis: Extraction (PCA and Principal Axis), Rotation (Varimax, Equimax, Quartimax) and Parallel Analysis and Velicer's MAP test, for estimation of number of factors.
@@ -75,15 +75,16 @@ Include:
 * Module Statsample::Reliability provides functions to analyze scales with psychometric methods. 
   * Class Statsample::Reliability::ScaleAnalysis provides statistics like mean, standard deviation for a scale, Cronbach's alpha and standarized Cronbach's alpha, and for each item: mean, correlation with total scale, mean if deleted, Cronbach's alpha is deleted.
   * Class Statsample::Reliability::MultiScaleAnalysis provides a DSL to easily analyze reliability of multiple scales and retrieve correlation matrix and factor analysis of them.
-  * Class Statsample::Reliability::ICC provides intra-class correlation, using Shrout & Fleiss(1979) and McGraw & Wong (1996) formulation.
+  * Class Statsample::Reliability::ICC provides intra-class correlation, using Shrout & Fleiss(1979) and McGraw & Wong (1996) formulations.
 * Module Statsample::SRS (Simple Random Sampling) provides a lot of functions to estimate standard error for several type of samples
 * Module Statsample::Test provides several methods and classes to perform inferencial statistics
   * Statsample::Test::BartlettSphericity
   * Statsample::Test::ChiSquare
+  * Statsample::Test::F  
+  * Statsample::Test::KolmogorovSmirnov (only D value)
   * Statsample::Test::Levene
   * Statsample::Test::UMannWhitney
   * Statsample::Test::T
-  * Statsample::Test::F  
 * Module Graph provides several classes to create beautiful graphs using rubyvis
   * Statsample::Graph::Boxplot
   * Statsample::Graph::Histogram
@@ -142,7 +143,7 @@ Optional:
 * Source code on github: http://github.com/clbustos/statsample
 * API: http://ruby-statsample.rubyforge.org/statsample/
 * Bug report and feature request: http://github.com/clbustos/statsample/issues
-
+* E-mailing list: http://groups.google.com/group/statsample
 
 == INSTALL:
 

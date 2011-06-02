@@ -1,3 +1,17 @@
+=== 1.1.0 / 2011-06-02
+
+* New Statsample::Anova::Contrast
+* Jacknife and bootstrap for Vector. Thanks to John Firebaugh for the idea
+* Improved Statsample::Analysis API
+* Updated CSV.read. Third argument is a Hash with options to CSV class  
+* Added restriction on Statsample::Excel.read
+* Updated spanish po 
+* Better summary for Vector
+* Improving summary of t related test (confidence interval and estimate output)
+* Replaced c for vector on Statsample::Analysis examples
+* Added Vector#median_absolute_deviation
+* First implementation of Kolmogorov Smirnov test. Returns correct D value, but without Kolmogorov distribution isn't very useful.
+
 === 1.0.1 / 2011-01-28
 
 * Updated spanish po.

@@ -44,6 +44,7 @@ lib/statsample/analysis.rb
 lib/statsample/analysis/suite.rb
 lib/statsample/analysis/suitereportbuilder.rb
 lib/statsample/anova.rb
+lib/statsample/anova/contrast.rb
 lib/statsample/anova/oneway.rb
 lib/statsample/anova/twoway.rb
 lib/statsample/bivariate.rb
@@ -97,6 +98,7 @@ lib/statsample/test.rb
 lib/statsample/test/bartlettsphericity.rb
 lib/statsample/test/chisquare.rb
 lib/statsample/test/f.rb
+lib/statsample/test/kolmogorovsmirnov.rb
 lib/statsample/test/levene.rb
 lib/statsample/test/t.rb
 lib/statsample/test/umannwhitney.rb
@@ -119,6 +121,7 @@ test/fixtures/tetmat_matrix.txt
 test/fixtures/tetmat_test.txt
 test/helpers_tests.rb
 test/test_analysis.rb
+test/test_anova_contrast.rb
 test/test_anovaoneway.rb
 test/test_anovatwoway.rb
 test/test_anovatwowaywithdataset.rb
@@ -151,6 +154,7 @@ test/test_statistics.rb
 test/test_stest.rb
 test/test_stratified.rb
 test/test_test_f.rb
+test/test_test_kolmogorovsmirnov.rb
 test/test_test_t.rb
 test/test_umannwhitney.rb
 test/test_vector.rb
