@@ -12,16 +12,13 @@ module Statsample
       #
       # USE:
       #     ds=Statsample::CSV.read("test_csv.csv")
-      def read(filename, empty=[''],ignore_lines=0,fs=nil,rs=nil)        
+      def read(filename, empty=[''],ignore_lines=0,csv_opts=Hash.new)        
         first_row=true
         fields=[]
         fields_data={}
         ds=nil
         line_number=0
-        opts={}
-        opts[:col_sep]=fs unless fs.nil?
-        opts[:row_sep]=rs unless rs.nil?
-        csv=CSV_klass.open(filename,'r',opts)
+        csv=CSV_klass.open(filename,'rb', csv_opts)
         csv.each do |row|
           line_number+=1
           if(line_number<=ignore_lines)
