@@ -31,14 +31,29 @@ module Statsample
       fbx=f(b,xi)
       (yi.to_f*Math::log(fbx))+((1.0-yi.to_f)*Math::log(1.0-fbx))
     end
-    
+    def u(x,_p)
+      puts "A"
+      
+    p x*_p
+      a=x*_p.map {|x,i|
+      p x
+      p i
+         
+         Math.exp(v).quo(Math.exp(v)+1)
+      }
+      puts "B"
+      p a
+      exit
+      a
+    end
     # First derivative of log-likehood function
     # x: Matrix (NxM)
     # y: Matrix (Nx1)
     # p: Matrix (Mx1)
     def first_derivative(x,y,p)
       raise "x.rows!=y.rows" if x.row_size!=y.row_size
-      raise "x.columns!=p.rows" if x.column_size!=p.row_size            
+      raise "x.columns!=p.rows" if x.column_size!=p.row_size
+      x.t*(y-u(x,p))            
       n = x.row_size
       k = x.column_size
       fd = Array.new(k)
@@ -50,8 +65,9 @@ module Statsample
         fd[j][0] -= value1*row[j]
         end
       end
-      Matrix.rows(fd, true)
-    
+      out=Matrix.rows(fd, true)
+      p out
+      out
     end
     # Second derivative of log-likehood function
     # x: Matrix (NxM)
