@@ -110,7 +110,7 @@ module Statsample
             t.row [_("r"), f % r]
             t.row [_("r^2"), f % r2]
             t.row [_("a"), f % a]
-            t.row [_("b"), f % a]
+            t.row [_("b"), f % b]
             t.row [_("s.e"), f % standard_error]
           end
         end
