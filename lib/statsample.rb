@@ -161,6 +161,7 @@ module Statsample
   autoload(:Test, 'statsample/test')
   autoload(:Factor, 'statsample/factor')
   autoload(:Graph, 'statsample/graph')
+  autoload(:TimeSeries, 'statsample/tseries')
   
   
   class << self
