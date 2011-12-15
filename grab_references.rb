@@ -2,6 +2,7 @@
 require 'reportbuilder'
 refs=[]
 Dir.glob "**/*.rb" do |f|
+  next if f=~/pkg/
 	reference=false
 	File.open(f).each_line 	do |l|
 		

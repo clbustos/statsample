@@ -22,7 +22,7 @@ class StatsampleFactorMpaTestCase < MiniTest::Unit::TestCase
       map_assertions(@map)
     end
     should_with_gsl "return correct values with gsl" do
-      require 'ruby-prof'
+      #require 'ruby-prof'
 
       @map.use_gsl=true
       map_assertions(@map)    
