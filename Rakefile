@@ -6,8 +6,10 @@ $:.unshift(File.dirname(__FILE__)+'/lib/')
 require 'rubygems'
 require 'statsample'
 require 'hoe'
-Hoe.plugin :git
+require 'rdoc'
 
+Hoe.plugin :git
+Hoe.plugin :doofus
 desc "Ruby Lint"
 task :lint do
   executable=Config::CONFIG['RUBY_INSTALL_NAME']
@@ -22,6 +24,9 @@ task :release do
 system %{git push origin master}
 end
 
+task "clobber_docs" do
+  # Only to omit warnings
+end
 desc "Update pot/po files."
 task "gettext:updatepo" do
   require 'gettext/tools'
@@ -66,6 +71,7 @@ source code first.
   EOF
 	self.need_rdoc=false
 end
+
 if Rake.const_defined?(:RDocTask)
 Rake::RDocTask.new(:docs) do |rd|
   rd.main = h.readme_file
