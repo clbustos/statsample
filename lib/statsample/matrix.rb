@@ -266,16 +266,16 @@ module Statsample
     #   a=Matrix[[1.0, 0.3, 0.2],
     #            [0.3, 1.0, 0.5], 
     #            [0.2, 0.5, 1.0]]
-    #   a.extends CovariateMatrix
-    #   a.labels=%w{a b c}
-    #   a.submatrix(%{c a}, %w{b})
+    #   a.extend CovariateMatrix
+    #   a.fields=%w{a b c}
+    #   a.submatrix(%w{c a}, %w{b})
     #   => Matrix[[0.5],[0.3]]
-    #   a.submatrix(%{c a})
+    #   a.submatrix(%w{c a})
     #   => Matrix[[1.0, 0.2] , [0.2, 1.0]]
     def submatrix(rows,columns=nil)
       raise ArgumentError, "rows shouldn't be empty" if rows.respond_to? :size and rows.size==0
       columns||=rows
-      # Convert all labels on index
+      # Convert all fields on index
       row_index=rows.collect {|v| 
         r=v.is_a?(Numeric) ? v : fields_x.index(v)
         raise "Index #{v} doesn't exists on matrix" if r.nil?
