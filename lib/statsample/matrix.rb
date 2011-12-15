@@ -267,7 +267,6 @@ module Statsample
     #            [0.3, 1.0, 0.5], 
     #            [0.2, 0.5, 1.0]]
     #   a.extend CovariateMatrix
-    #   a.extend NamedMatrix
     #   a.fields=%w{a b c}
     #   a.submatrix(%w{c a}, %w{b})
     #   => Matrix[[0.5],[0.3]]
