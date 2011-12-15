@@ -1,3 +1,10 @@
+=== 1.2.0 / 2011-12-15
+  
+  * Added support for time series (TimeSeries object): MA, EMA, MACD, acf, lag and delta. [Rob Britton]
+  * Changed summary attribute to properly display 'b' value for simple linear regression [hstove]
+  * Merge pull request #6 from hstove/patch-1Changed summary attribute to properly display 'b' value for simple linear regression [Claudio Bustos]
+  * fix example code for CovariateMatrix [James Kebinger]
+
 === 1.1.0 / 2011-06-02
 
 * New Statsample::Anova::Contrast

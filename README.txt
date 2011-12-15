@@ -17,6 +17,7 @@ Include:
 * Regression: Simple, Multiple (OLS), Probit  and Logit
 * Factorial Analysis: Extraction (PCA and Principal Axis), Rotation (Varimax, Equimax, Quartimax) and Parallel Analysis and Velicer's MAP test, for estimation of number of factors.
 * Reliability analysis for simple scale and a DSL to easily analyze multiple scales using factor analysis and correlations, if you want it.
+* Basic time series support
 * Dominance Analysis, with multivariate dependent and bootstrap (Azen & Budescu)
 * Sample calculation related formulas
 * Structural Equation Modeling (SEM), using R libraries +sem+ and +OpenMx+
@@ -89,6 +90,7 @@ Include:
   * Statsample::Graph::Boxplot
   * Statsample::Graph::Histogram
   * Statsample::Graph::Scatterplot
+* Module Statsample::TimeSeries provides basic support for time series. 
 * Gem +statsample-sem+ provides a DSL to R libraries +sem+ and +OpenMx+
 * Close integration with gem <tt>reportbuilder</tt>, to easily create reports on text, html and rtf formats.
 

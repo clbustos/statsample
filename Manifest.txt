@@ -102,6 +102,7 @@ lib/statsample/test/kolmogorovsmirnov.rb
 lib/statsample/test/levene.rb
 lib/statsample/test/t.rb
 lib/statsample/test/umannwhitney.rb
+lib/statsample/timeseries.rb
 lib/statsample/vector.rb
 lib/statsample/vector/gsl.rb
 po/es/statsample.mo
@@ -114,6 +115,7 @@ test/fixtures/correlation_matrix.rb
 test/fixtures/crime.txt
 test/fixtures/hartman_23.matrix
 test/fixtures/repeated_fields.csv
+test/fixtures/stock_data.csv
 test/fixtures/test_binomial.csv
 test/fixtures/test_csv.csv
 test/fixtures/test_xls.xls
@@ -156,6 +158,7 @@ test/test_stratified.rb
 test/test_test_f.rb
 test/test_test_kolmogorovsmirnov.rb
 test/test_test_t.rb
+test/test_tseries.rb
 test/test_umannwhitney.rb
 test/test_vector.rb
 test/test_xls.rb
