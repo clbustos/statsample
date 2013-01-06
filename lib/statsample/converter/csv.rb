@@ -8,6 +8,25 @@ module Statsample
       CSV_klass=::CSV  
     end    
     class << self
+
+      def read19(filename,ignore_lines=0,csv_opts=Hash.new)
+        #default first line is header
+        csv_opts.merge!(:headers=>true, :header_converters => :symbol)
+        csv = CSV_klass::Table.new(CSV_klass::read(filename,'r',csv_opts))
+        csv_headers = if csv_opts[:headers]
+          csv.headers
+        else
+          #as in R, if no header we name the headers as V1,V2,V3,V4,..
+          1.upto(csv.first.length).collect { |i| "V#{i}" }
+        end
+        #we invert row -> column. It means csv[0] is the first column and not row. Similar to R
+        csv.by_col!
+        thash = {}
+        csv_headers.each_with_index do |header,idx|
+          thash[header] = Statsample::Vector.new(csv[idx].drop(ignore_lines))
+        end
+        ds=Statsample::Dataset.new(thash)
+      end
       # Returns a Dataset  based on a csv file
       #
       # USE:
