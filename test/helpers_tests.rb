@@ -14,10 +14,6 @@ require 'statsample'
 module MiniTest
   class Unit
     class TestCase
-      include Shoulda::InstanceMethods
-      extend Shoulda::ClassMethods
-      include Shoulda::Assertions
-      
       def self.should_with_gsl(name,&block)
         should(name) do
           if Statsample.has_gsl?
@@ -25,10 +21,8 @@ module MiniTest
           else
             skip("Requires GSL")
           end
-         
         end
       end
-      
     end
   end
 
