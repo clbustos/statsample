@@ -112,7 +112,7 @@ module Statsample
       
       ########################
       #
-      # :SECTION:  Mean stimation
+      # :SECTION:  Mean estimation
       #
       ########################
 
