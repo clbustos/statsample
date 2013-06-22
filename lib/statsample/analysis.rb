@@ -3,7 +3,7 @@ require 'statsample/analysis/suitereportbuilder'
 
 module Statsample
   # DSL to create analysis without hazzle. 
-  # * Shortcuts methods to avoid use complete namescapes, many based on R  
+  # * Shortcuts methods to avoid use complete namespaces, many based on R  
   # * Attach/detach vectors to workspace, like R
   # == Example
   #  an1=Statsample::Analysis.store(:first) do
