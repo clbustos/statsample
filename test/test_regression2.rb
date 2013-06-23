@@ -12,7 +12,7 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
     @lr=Statsample::Regression::Multiple::RubyEngine.new(@ds,'y')
   end
 
-  def test_correct_values #should "have correct values" do
+  def test_correct_values
     assert_in_delta(0.455,@lr.r2,0.001)
     assert_in_delta(0.427,@lr.r2_adjusted, 0.001)
     assert_in_delta(0.1165,@lr.se_estimate,0.001)
@@ -24,7 +24,7 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
     assert_in_delta(0.064, @lr.constant_se,0.001,"constant se")
   end
   #end
-  def test_error# "return an error if data is linearly dependent" do
+  def test_error
     samples=100
 
     a,b=rand,rand
