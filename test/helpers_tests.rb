@@ -6,6 +6,7 @@ require 'mocha'
 require 'tempfile'
 require 'tmpdir'
 require 'shoulda'
+require 'shoulda-context'
 require 'fixtures/correlation_matrix'
 
 require 'statsample'
@@ -14,10 +15,9 @@ require 'statsample'
 module MiniTest
   class Unit
     class TestCase
-      include Shoulda::InstanceMethods
-      extend Shoulda::ClassMethods
-      include Shoulda::Assertions
-      
+    include Shoulda::Context::Assertions
+    include Shoulda::Context::InstanceMethods
+    extend Shoulda::Context::ClassMethods
       def self.should_with_gsl(name,&block)
         should(name) do
           if Statsample.has_gsl?
