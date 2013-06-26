@@ -62,7 +62,11 @@ module Statsample
         require 'tmpdir'
         fn=Dir.tmpdir+"/image_#{Time.now.to_f}.svg"
         File.open(fn,"w") {|fp| fp.write svg}
-        `xdg-open '#{fn}'`
+	if RUBY_PLATFORM =~/darwin/
+	  %x(open -a safari #{fn})
+	else
+	  %x(xdg-open #{fn})
+	end
       end
       def boxplot(*args)
         show_svg(old_boxplot(*args).to_svg)
