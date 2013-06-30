@@ -2,8 +2,8 @@ module Statsample::TimeSeriesShorthands
   # Creates a new Statsample::TimeSeries object
   # Argument should be equal to TimeSeries.new
   def to_time_series(*args)
-		Statsample::TimeSeries::TimeSeries.new(self, :scale, *args)
-	end
+    Statsample::TimeSeries::TimeSeries.new(self, :scale, *args)
+  end
 
   alias :to_ts :to_time_series
 end
