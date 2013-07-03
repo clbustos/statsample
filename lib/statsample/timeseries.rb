@@ -45,6 +45,96 @@ module Statsample
         end
       end
 
+
+      def yule_walker(k = 1, method='yw')
+        #From the series, estimates AR(p)(autoregressive) parameter
+        #using Yule-Waler equation. See -
+        #http://en.wikipedia.org/wiki/Autoregressive_moving_average_model
+
+        #parameters:
+        #ts = series
+        #k = order, default = 1
+        #method = can be 'yw' or 'mle'. If 'yw' then it is unbiased, denominator
+        #is (n - k)
+
+        #returns:
+        #rho => autoregressive coefficients
+        ts = self #timeseries
+        ts -= ts.mean
+        n = ts.size
+        if method.downcase.eql? 'yw'
+          #unbiased => denominator = (n - k)
+          denom =->(k) { n - k }
+        else
+          #mle
+          #denominator => (n)
+          denom =->(k) { n }
+        end
+        r = Array.new(k + 1) { 0.0 }
+        r[0] = ts.map { |x| x ** 2 }.inject(:+) / denom.call(0)
+
+        for k in (1..(k+1))
+          r[k] = (ts[0...-k] * ts[k...ts.size]).inject(:+) / denom.call(k)
+        end
+
+        R = toeplitz(r[0...-1])
+
+        #TODO: return the solved matrix equation of (R, r[1..r.size])
+        #pending
+      end
+
+
+      def toeplitz(arr)
+        #Generates Toeplitz matrix - http://en.wikipedia.org/wiki/Toeplitz_matrix
+        #=> arr = [0, 1, 2, 3]
+        #=> result:
+        #[[0, 1, 2, 3],
+        # [1, 0, 1, 2],
+        # [2, 1, 0, 1],
+        # [3, 2, 1, 0]]
+        eplitz_matrix = Array.new(arr.size) { Array.new(arr.size) }
+
+        0.upto(arr.size - 1) do |i|
+          j = 0
+          index = i
+          while i >= 0 do
+            eplitz_matrix[index][j] = arr[i]
+            j += 1
+            i -= 1
+          end
+          i = index + 1; k = 1
+          while i < arr.size do
+            eplitz_matrix[index][j] = arr[k]
+            i += 1; j += 1; k += 1
+          end
+        end
+
+        return eplitz_matrix
+      end
+
+
+      def pacf_yw(maxlags, method = 'yw')
+        #partial autocorrelation by yule walker equations.
+        #Inspiration: StatsModels
+        xm = self - self.mean
+        pacf = [1]
+        (1..maxlags).map do |i|
+          pacf << yule_walker(i, method)[0][-1]
+        end
+        return pacf
+      end
+
+
+      def pacf(maxlags = nil, method = 'yw')
+        #parameters:
+        #maxlags => maximum number of lags for pcf
+        #method => for autocovariance in yule_walker:
+          #'yw' for 'yule-walker unbaised', 'mle' for biased maximum likelihood
+
+        maxlags ||= (10 * Math.log10(size)).to_i
+        return pacf_yw(maxlags, method)
+      end
+
       # Lags the series by k periods.
       #
       # The convention is to set the oldest observations (the first ones

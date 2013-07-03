@@ -30,6 +30,7 @@ class StatsampleWaldTest < MiniTest::Unit::TestCase
     lags = 5
     sum_of_squares = sum_of_squares_of_acf_series(lags)
     assert_in_delta chisquare_cdf(sum_of_squares, lags), 1, 0.05
+    assert_equal @wald.acf(lags).size, lags + 1
   end
 
 
@@ -38,6 +39,7 @@ class StatsampleWaldTest < MiniTest::Unit::TestCase
     lags = 10
     sum_of_squares = sum_of_squares_of_acf_series(lags)
     assert_in_delta chisquare_cdf(sum_of_squares, lags), 1, 0.05
+    assert_equal @wald.acf(lags).size, lags + 1
   end
 
 
@@ -46,6 +48,7 @@ class StatsampleWaldTest < MiniTest::Unit::TestCase
     lags = 15
     sum_of_squares = sum_of_squares_of_acf_series(lags)
     assert_in_delta chisquare_cdf(sum_of_squares, lags), 1, 0.05
+    assert_equal @wald.acf(lags).size, lags + 1
   end
 
 
@@ -54,6 +57,7 @@ class StatsampleWaldTest < MiniTest::Unit::TestCase
     lags = 20
     sum_of_squares = sum_of_squares_of_acf_series(lags)
     assert_in_delta chisquare_cdf(sum_of_squares, lags), 1, 0.05
+    assert_equal @wald.acf(lags).size, lags + 1
   end
 
 
@@ -62,5 +66,6 @@ class StatsampleWaldTest < MiniTest::Unit::TestCase
     lags = 25
     sum_of_squares = sum_of_squares_of_acf_series(lags)
     assert_in_delta chisquare_cdf(sum_of_squares, lags), 1, 0.05
+    assert_equal @wald.acf(lags).size, lags + 1
   end
 end
