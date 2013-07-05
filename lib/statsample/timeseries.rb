@@ -74,7 +74,7 @@ module Statsample
         r[0] = ts.map { |x| x ** 2 }.inject(:+).to_f / denom.call(0).to_f
 
         for l in (1..k)
-          r[k] = (ts[0...-l].zip(ts[l...ts.size])).map do |x|
+          r[l] = (ts[0...-l].zip(ts[l...ts.size])).map do |x|
             x.inject(:*)
           end.inject(:+).to_f / denom.call(l).to_f
         end
