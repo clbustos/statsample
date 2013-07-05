@@ -46,7 +46,7 @@ module Statsample
       end
 
 
-      def yule_walker(k = 1, method='yw')
+      def yule_walker(series, k = 1, method='yw')
         #From the series, estimates AR(p)(autoregressive) parameter
         #using Yule-Waler equation. See -
         #http://en.wikipedia.org/wiki/Autoregressive_moving_average_model
@@ -59,8 +59,8 @@ module Statsample
 
         #returns:
         #rho => autoregressive coefficients
-        ts = self #timeseries
-        ts -= ts.mean
+        ts = series #timeseries
+        ts = ts - ts.mean
         n = ts.size
         if method.downcase.eql? 'yw'
           #unbiased => denominator = (n - k)
@@ -71,21 +71,39 @@ module Statsample
           denom =->(k) { n }
         end
         r = Array.new(k + 1) { 0.0 }
-        r[0] = ts.map { |x| x ** 2 }.inject(:+) / denom.call(0)
+        r[0] = ts.map { |x| x ** 2 }.inject(:+).to_f / denom.call(0).to_f
 
-        for k in (1..(k+1))
-          r[k] = (ts[0...-k] * ts[k...ts.size]).inject(:+) / denom.call(k)
+        for l in (1..k)
+          r[k] = (ts[0...-l].zip(ts[l...ts.size])).map do |x|
+            x.inject(:*)
+          end.inject(:+).to_f / denom.call(l).to_f
         end
 
-        R = toeplitz(r[0...-1])
+        r_R = toeplitz(r[0...-1])
 
-        #TODO: return the solved matrix equation of (R, r[1..r.size])
-        #pending
+        mat = Matrix.columns(r_R).inverse()
+        solve_matrix(mat, r[1..r.size])
+      end
+
+      def solve_matrix(matrix, out_vector)
+        solution_vector = Array.new(out_vector.size,0 )
+        matrix = matrix.to_a
+        k = 0
+        matrix.each do |row|
+          row.each_with_index do |element, i|
+            solution_vector[k] += element * 1.0 * out_vector[i]
+          end
+          k += 1
+        end
+        return solution_vector
       end
 
 
       def toeplitz(arr)
-        #Generates Toeplitz matrix - http://en.wikipedia.org/wiki/Toeplitz_matrix
+        #Generates Toeplitz matrix -
+        #http://en.wikipedia.org/wiki/Toeplitz_matrix
+        #Toeplitz matrix are equal when they are stored in row &
+        #column major
         #=> arr = [0, 1, 2, 3]
         #=> result:
         #[[0, 1, 2, 3],
@@ -116,10 +134,9 @@ module Statsample
       def pacf_yw(maxlags, method = 'yw')
         #partial autocorrelation by yule walker equations.
         #Inspiration: StatsModels
-        xm = self - self.mean
-        pacf = [1]
+        pacf = [1.0]
         (1..maxlags).map do |i|
-          pacf << yule_walker(i, method)[0][-1]
+          pacf << yule_walker(self, i, method)[-1]
         end
         return pacf
       end

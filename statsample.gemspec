@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
    {:gem => "statsample-bivariate-extension", :version => "~> 1.1.0"}, {:gem => "rserve-client", :version => "~> 0.3.0"},
    {:gem => "rubyvis", :version => "~> 0.5.2"}, {:gem => "gettext", :version => "~> 2.3.9"},
    {:gem => "mocha", :version => "~> 0.14.0"}, {:gem => "hoe-git", :version => "~> 1.5.0"},
-   {:gem => "minitest", :version => "~> 5.0.5"}, {:gem => "shoulda", :version => "~> 3.5.0"},
+   {:gem => "minitest", :version => "~> 4.2"}, {:gem => "shoulda", :version => "~> 3.5.0"},
   ]
   DEPENDENCIES.each do |dependency|
     s.add_dependency(dependency[:gem], dependency[:version])
