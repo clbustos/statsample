@@ -141,7 +141,13 @@ module Statsample
         return pacf
       end
 
-
+      ## USAGE ##
+      ## series = (1..100).map { rand(100) }.to_ts
+      #  series.pacf(10, 'yw') 
+      #  => yule-walker unbiased partial-autocorrelation
+      #  series.pacf(10, 'mle')
+      #  => yule-walker mle  pacf
+      #
       def pacf(maxlags = nil, method = 'yw')
         #parameters:
         #maxlags => maximum number of lags for pcf
