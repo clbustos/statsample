@@ -30,6 +30,11 @@ class StatsampleTimeSeriesPacfTestCase < MiniTest::Unit::TestCase
       result_5 = [1.0, 0.8947368421052632, -0.10582010582010604, -0.11350188273265083, -0.12357534824820737, -0.13686534216335522]
       assert_equal @pacf_proc.call(10, 'yw'), result_10
       assert_equal @pacf_proc.call(5, 'yw'), result_5
+
+      #Checking for lag = (1..10)
+      1.upto(10) do |i|
+        assert_equal @pacf_proc.call(i, 'yw'), result_10[0..i]
+      end
     end
 
     should "give correct pacf results for mle yule-walker" do
@@ -37,6 +42,11 @@ class StatsampleTimeSeriesPacfTestCase < MiniTest::Unit::TestCase
       result_5 = [1.0, 0.85, -0.07566212829370711, -0.07635069706072706, -0.07698628638512295, -0.07747034005560738]
       assert_equal @pacf_proc.call(10, 'mle'), result_10
       assert_equal @pacf_proc.call(5, 'mle'), result_5
+
+      #Checking for lag = (1..10)
+      1.upto(10) do |i|
+        assert_equal @pacf_proc.call(i, 'mle'), result_10[0..i]
+      end
     end
   end
 end
