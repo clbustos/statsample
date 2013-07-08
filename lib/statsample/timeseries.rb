@@ -29,7 +29,7 @@ module Statsample
       #  ts.acf   # => array with first 21 autocorrelations
       #  ts.acf 3 # => array with first 3 autocorrelations
       #
-      def acf maxlags = nil
+      def acf(maxlags = nil)
         maxlags ||= (10 * Math.log10(size)).to_i
 
         (0..maxlags).map do |i|
@@ -38,15 +38,20 @@ module Statsample
           else
             m = self.mean
 
-            # can't use Pearson coefficient since the mean for the lagged series should
-            # be the same as the regular series
+            # can't use Pearson coefficient since the mean for the lagged series should be the same as the regular series
             ((self - m) * (self.lag(i) - m)).sum / self.variance_sample / (self.size - 1)
           end
         end
       end
 
-
-      def yule_walker(series, k = 1, method='yw')
+      # DOCUMENTATION
+      # WHAT THIS METHOD DO?
+      # * arg 1
+      # * arg 2
+      # * arg 3
+      def yule_walker(series, k = 1, method='yw') # replace 'yw' for :yw
+        # THIS INFORMATION SHOULD BE INCLUDED BEFORE, NOT AFTER THE METHOD
+        # 
         #From the series, estimates AR(p)(autoregressive) parameter
         #using Yule-Waler equation. See -
         #http://en.wikipedia.org/wiki/Autoregressive_moving_average_model
@@ -59,11 +64,12 @@ module Statsample
 
         #returns:
         #rho => autoregressive coefficients
-        ts = series #timeseries
+        ts = series #timeseries -> YOU SHOULD USE ts= series.dup if you want a new copy to update 
         ts = ts - ts.mean
         n = ts.size
         if method.downcase.eql? 'yw'
           #unbiased => denominator = (n - k)
+          # USE lambda  INSTEAD OF ->. Is less confusing.
           denom =->(k) { n - k }
         else
           #mle
@@ -84,7 +90,8 @@ module Statsample
         mat = Matrix.columns(r_R).inverse()
         solve_matrix(mat, r[1..r.size])
       end
-
+      # SHOULD BE INCLUDED IN A SEPARATE MODULE
+      # OR MADE PRIVATE
       def solve_matrix(matrix, out_vector)
         solution_vector = Array.new(out_vector.size,0 )
         matrix = matrix.to_a
@@ -97,8 +104,8 @@ module Statsample
         end
         return solution_vector
       end
-
-
+      # SHOULD BE INCLUDED IN A SEPARATE MODULE
+      # OR MADE PRIVATE    
       def toeplitz(arr)
         #Generates Toeplitz matrix -
         #http://en.wikipedia.org/wiki/Toeplitz_matrix
@@ -130,7 +137,7 @@ module Statsample
         return eplitz_matrix
       end
 
-
+      # 
       def pacf_yw(maxlags, method = 'yw')
         #partial autocorrelation by yule walker equations.
         #Inspiration: StatsModels

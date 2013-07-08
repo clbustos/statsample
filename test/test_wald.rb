@@ -68,11 +68,12 @@ class StatsampleTestWaldTest < MiniTest::Unit::TestCase
     assert_in_delta compute_variance(acf), 1.0/acf.size, 0.1
     assert_equal (generate_acf_summation(20)/20).to_i, compute_chi_df(20)
   end
-
+  # DELETE THIS TEST
   def test_with_different_series
     @wald = 200.times.map { rand }.to_ts
     acf_series = @wald.acf(10)
     lhs = acf_series.each { |x| x ** 2 }.inject(:+)
+    
     rhs = Statsample::Test.chi_square(Matrix[acf_series]).df
     assert_equal (lhs/10).to_i, rhs
   end
