@@ -1,5 +1,4 @@
 require 'statsample'
-require 'debugger'
 include Statsample::TimeSeries
 
 Given /^the following values in a timeseries:$/ do |series|
@@ -10,7 +9,7 @@ Given /^the following values in a timeseries:$/ do |series|
   @timeseries = arr.to_ts
 end
 
-When /^I provide (\d+) lags for pacf$/ do |lags|
+When /^I provide (\d+) lags for p?acf$/ do |lags|
   @lags = lags.to_i
 end
 
@@ -23,9 +22,8 @@ Then /^I should get (\w+) as resultant output$/ do |klass|
   assert_equal @result.class.to_s, klass
 end
 
-Then /^I should get (\w+) values in resultant pacf$/ do |values_count|
+Then /^I should get (\w+) values in resultant p?acf$/ do |values_count|
   assert_equal @result.size, values_count.to_i
-  @timeseries
 end
 
 And /^I should see (\d+\.\d) as first value$/ do |first_value|
