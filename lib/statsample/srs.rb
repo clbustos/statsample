@@ -61,7 +61,7 @@ module Statsample
       # Proportion confidence interval with x value
       # Uses estimated proportion, sample without replacement
       
-      def proportion_confidence_interval(p, sam,pop , x)
+      def proportion_confidence_interval(p, sam, pop, x)
           #f=sam.quo(pop)
           one_range=x * Math::sqrt((qf(sam, pop) * p * (1-p)).quo(sam-1)) + (1.quo(sam * 2.0))
           [p-one_range, p+one_range]
@@ -112,7 +112,7 @@ module Statsample
       
       ########################
       #
-      # :SECTION:  Mean stimation
+      # :SECTION:  Mean estimation
       #
       ########################
 

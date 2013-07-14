@@ -24,8 +24,17 @@ class StatsampleTestTimeSeries < MiniTest::Unit::TestCase
   end
 
   def test_lag
-    assert_in_delta 16.66,    @xiu.lag[@xiu.size - 1], 0.001
-    assert_in_delta 16.36, @xiu.lag(2)[@xiu.size - 1], 0.001
+    #test of default lag
+    lag1 = @xiu.lag
+
+    assert_in_delta 16.66, lag1[lag1.size - 1], 0.001
+    assert_in_delta 16.36, lag1[lag1.size - 2], 0.001
+
+    #test with different lagging unit
+    lag2 = @xiu.lag(2)
+
+    assert_in_delta 16.36, lag2[lag2.size - 1], 0.001
+    assert_in_delta 16.56, lag2[lag2.size - 2], 0.001
   end
 
   def test_delta

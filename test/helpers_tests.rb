@@ -25,10 +25,8 @@ module MiniTest
           else
             skip("Requires GSL")
           end
-         
         end
       end
-      
     end
   end
 

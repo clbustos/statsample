@@ -1,9 +1,10 @@
+require 'statsample/timeseries/pacf'
 module Statsample::TimeSeriesShorthands
   # Creates a new Statsample::TimeSeries object
   # Argument should be equal to TimeSeries.new
   def to_time_series(*args)
-		Statsample::TimeSeries::TimeSeries.new(self, :scale, *args)
-	end
+    Statsample::TimeSeries::TimeSeries.new(self, :scale, *args)
+  end
 
   alias :to_ts :to_time_series
 end
@@ -17,6 +18,7 @@ module Statsample
     # Collection of data indexed by time.
     # The order goes from earliest to latest.
     class TimeSeries < Statsample::Vector
+      include Statsample::TimeSeries::Pacf
       # Calculates the autocorrelation coefficients of the series.
       #
       # The first element is always 1, since that is the correlation
@@ -29,10 +31,10 @@ module Statsample
       #  ts.acf   # => array with first 21 autocorrelations
       #  ts.acf 3 # => array with first 3 autocorrelations
       #
-      def acf maxlags = nil
-        maxlags ||= (10 * Math.log10(size)).to_i
+      def acf max_lags = nil
+        max_lags ||= (10 * Math.log10(size)).to_i
 
-        (0..maxlags).map do |i|
+        (0..max_lags).map do |i|
           if i == 0
             1.0
           else
@@ -43,6 +45,16 @@ module Statsample
             ((self - m) * (self.lag(i) - m)).sum / self.variance_sample / (self.size - 1)
           end
         end
+      end
+
+      def pacf(max_lags = nil, method = 'yw')
+        #parameters:
+        #max_lags => maximum number of lags for pcf
+        #method => for autocovariance in yule_walker:
+          #'yw' for 'yule-walker unbaised', 'mle' for biased maximum likelihood
+
+        max_lags ||= (10 * Math.log10(size)).to_i
+       Pacf::Pacf.pacf_yw(self, max_lags, method)
       end
 
       # Lags the series by k periods.
@@ -86,7 +98,7 @@ module Statsample
       #            # => [0.69, 0.23, 0.44, 0.71, ...]
       #
       #  ts.diff   # => [nil, -0.46, 0.21, 0.27, ...]
-      #  
+      #
       def diff
         self - self.lag
       end
