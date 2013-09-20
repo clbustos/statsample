@@ -24,7 +24,7 @@ require 'extendmatrix'
 require 'distribution'
 require 'dirty-memoize'
 require 'reportbuilder'
-
+require 'bio-statsample-timeseries'
 
 
 class Numeric
@@ -161,7 +161,6 @@ module Statsample
   autoload(:Test, 'statsample/test')
   autoload(:Factor, 'statsample/factor')
   autoload(:Graph, 'statsample/graph')
-  autoload(:TimeSeries, 'statsample/timeseries')
   
   
   class << self

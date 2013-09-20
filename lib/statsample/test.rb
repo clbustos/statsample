@@ -9,6 +9,8 @@ module Statsample
     autoload(:ChiSquare, 'statsample/test/chisquare')
     autoload(:BartlettSphericity, 'statsample/test/bartlettsphericity')
     autoload(:KolmogorovSmirnov, 'statsample/test/kolmogorovsmirnov')
+    autoload(:WilcoxonSignedRank, 'statsample/test/wilcoxonsignedrank')
+    
     
     # Returns probability of getting a value lower or higher
     # than sample, using cdf and number of tails.
@@ -66,7 +68,10 @@ module Statsample
       def t_two_samples_independent(v1,v2, opts=Hash.new)
         Statsample::Test::T::TwoSamplesIndependent.new(v1,v2,opts)
       end
-
+      # Shorthand for Statsample::Test::WilcoxonSignedRank.new
+	  def wilcoxon_signed_rank(v1,v2,opts=Hash.new)
+		Statsample::Test::WilcoxonSignedRank.new(v1,v2,opts)
+	  end
       # Shorthand for Statsample::Test::Levene.new
       def levene(input, opts=Hash.new)
         Statsample::Test::Levene.new(input,opts)

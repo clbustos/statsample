@@ -705,7 +705,7 @@ module Statsample
     
     # Return a correlation matrix for fields included as parameters.
     # By default, uses all fields of dataset
-		def correlation_matrix(fields=nil)
+	def correlation_matrix(fields=nil)
       if fields
         ds=clone(fields)
       else
@@ -715,7 +715,7 @@ module Statsample
     end
    # Return a correlation matrix for fields included as parameters.
     # By default, uses all fields of dataset
-		def covariance_matrix(fields=nil)
+	def covariance_matrix(fields=nil)
       if fields
         ds=clone(fields)
       else
