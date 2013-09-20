@@ -24,7 +24,6 @@ require 'extendmatrix'
 require 'distribution'
 require 'dirty-memoize'
 require 'reportbuilder'
-require 'bio-statsample-timeseries'
 
 
 class Numeric
@@ -134,7 +133,7 @@ module Statsample
   
   create_has_library :gsl
   
-  VERSION = '1.2.0'
+  VERSION = '1.3.0'
   SPLIT_TOKEN = ","
   autoload(:Analysis, 'statsample/analysis')
   autoload(:Database, 'statsample/converters')

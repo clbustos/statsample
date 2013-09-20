@@ -1,3 +1,13 @@
+=== 1.3.0 / 2013-09-19
+
+  * Merge remote-tracking branch 'vpereira/master' into vpereira
+  * New Wilcoxon Signed Rank test
+  * Remove TimeSeries class. Now is available on gem "bio-statsample-timeseries" [GSOC 2013 project :) ]
+  * Update shoulda support
+  * added Bundle depds
+  * improved the csv read method (requires tests)
+  * open svg on mac osx
+
 === 1.2.0 / 2011-12-15
   
   * Added support for time series (TimeSeries object): MA, EMA, MACD, acf, lag and delta. [Rob Britton]
