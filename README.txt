@@ -86,11 +86,12 @@ Include:
   * Statsample::Test::Levene
   * Statsample::Test::UMannWhitney
   * Statsample::Test::T
+  * Statsample::Test::WilcoxonSignedRank
 * Module Graph provides several classes to create beautiful graphs using rubyvis
   * Statsample::Graph::Boxplot
   * Statsample::Graph::Histogram
   * Statsample::Graph::Scatterplot
-* Module Statsample::TimeSeries provides basic support for time series. 
+* Gem +bio-statsample-timeseries- provides module Statsample::TimeSeries with support for time series, including ARIMA estimation using Kalman-Filter. 
 * Gem +statsample-sem+ provides a DSL to R libraries +sem+ and +OpenMx+
 * Close integration with gem <tt>reportbuilder</tt>, to easily create reports on text, html and rtf formats.
 
