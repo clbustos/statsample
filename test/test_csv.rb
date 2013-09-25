@@ -38,7 +38,7 @@ class StatsampleCSVTestCase < MiniTest::Unit::TestCase
     }
   end
 end
-
+=begin
 class StatsampleCSVTestCase2 < MiniTest::Unit::TestCase
   def setup
     @ds=Statsample::CSV.read19(File.dirname(__FILE__)+"/fixtures/test_csv.csv")
@@ -78,3 +78,4 @@ class StatsampleCSVTestCase2 < MiniTest::Unit::TestCase
     }
   end
 end
+=end
