@@ -2,10 +2,10 @@ module Statsample
   module Regression
     # Class for calculation of linear regressions with form
     #   y = a+bx
-    # To create a SimpleRegression object:
-    # * <tt> SimpleRegression.new_from_dataset(ds,x,y)</tt>
-    # * <tt> SimpleRegression.new_from_vectors(vx,vy)</tt>
-    # * <tt> SimpleRegression.new_from_gsl(gsl) </tt>
+    # To create a Statsample::Regression::Simple object:
+    # * <tt> Statsample::Regression::Simple.new_from_dataset(ds,x,y)</tt>
+    # * <tt> Statsample::Regression::Simple.new_from_vectors(vx,vy)</tt>
+    # * <tt> Statsample::Regression::Simple.new_from_gsl(gsl) </tt>
     #
     class Simple
       include Summarizable
