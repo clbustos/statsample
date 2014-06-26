@@ -290,7 +290,7 @@ module Statsample
       sum=@ms.sum_field(field) {|s_name,vector|
         nh=vector.size
         s_size=@strata_sizes[s_name]
-        (s_size**2 * (1-(nh/s_size)) * prop * (1-prop) / (nh -1 ))
+        (s_size**2 * (1-(nh / s_size)) * prop * (1-prop) / (nh - 1 ))
       }
       (1.quo(@population_size)) * Math::sqrt(sum)
     end

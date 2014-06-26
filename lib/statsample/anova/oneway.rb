@@ -13,6 +13,8 @@ module Statsample
       attr_accessor :name_denominator
       attr_accessor :name_numerator
       def initialize(opts=Hash.new)
+        @name=@name_numerator=@name_denominator=nil
+        
         # First see if sum of squares or mean squares are entered
         raise ArgumentError, "You should set d.f." unless (opts.has_key? :df_num and opts.has_key? :df_den)
         @df_num=opts.delete :df_num

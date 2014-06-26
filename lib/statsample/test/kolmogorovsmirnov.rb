@@ -21,8 +21,8 @@ module Statsample
            raise "Second argument should respond to cdf or each"    
          end
          calculate
-       end
-       def calculate
+      end
+      def calculate
          d=0
         @d1.each {|x|
         v1=@d1.cdf(x);
@@ -30,7 +30,7 @@ module Statsample
         d=(v1-v2).to_f.abs if (v1-v2).abs>d
         }
         @d=d
-       end
+      end
       # Make a wrapper EmpiricDistribution to any method which implements
       # each
       # On Statsample::Vector, only uses #valid_data
@@ -55,7 +55,7 @@ module Statsample
           v=@data.index{|v1| v1>=x}
           v.nil? ? 0 : (v+(x==@data[v]? 1 : 0)).quo(@n)
         end
-      end
+      end # End EmpiricDistribution
     end
   end
 end

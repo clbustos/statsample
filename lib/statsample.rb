@@ -165,7 +165,7 @@ module Statsample
   class << self
     # Load a object saved on a file.
     def load(filename)
-      if File.exists? filename
+      if File.exist? filename
         o=false
         File.open(filename,"r") {|fp| o=Marshal.load(fp) }
         o

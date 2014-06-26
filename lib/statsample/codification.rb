@@ -66,7 +66,7 @@ module Statsample
 
       def create_excel(dataset, vectors, filename, sep=Statsample::SPLIT_TOKEN)
         require 'spreadsheet'
-        if File.exists?(filename)
+        if File.exist?(filename)
           raise "Exists a file named #{filename}. Delete ir before overwrite."
         end
         book = Spreadsheet::Workbook.new
@@ -116,7 +116,7 @@ module Statsample
       def recode_vector(v,h,sep=Statsample::SPLIT_TOKEN)
         dict=dictionary(h,sep)
         new_data=v.splitted(sep)
-        recoded=new_data.collect do |c|
+        new_data.collect do |c|
           if c.nil?
             nil
           else

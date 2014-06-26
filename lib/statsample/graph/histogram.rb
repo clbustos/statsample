@@ -105,7 +105,7 @@ module Statsample
       # Returns a Rubyvis panel with scatterplot
       def rubyvis_panel # :nodoc:
         pre_vis
-        that=self
+        #that=self
         
         @minimum_x||=@hist.min
         @maximum_x||=@hist.max

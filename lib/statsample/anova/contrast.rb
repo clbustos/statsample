@@ -12,7 +12,7 @@ module Statsample
         @c1,@c2=opts[:c1], opts[:c2]
         @t_options=opts[:t_options] || {:estimate_name=>_("Psi estimate")}
         @name=opts[:name] || _("Contrast")
-        psi
+        @psi=nil
         @anova=Statsample::Anova::OneWayWithVectors.new(@vectors)
         @msw=@anova.msw
       end
