@@ -1,6 +1,6 @@
 $:.unshift(File.expand_path(File.dirname(__FILE__)+'/../lib/'))
 $:.unshift(File.expand_path(File.dirname(__FILE__)+'/'))
-
+require 'minitest'
 require 'minitest/unit'
 require 'mocha/setup'
 require 'tempfile'
@@ -13,8 +13,7 @@ require 'statsample'
 
 
 module MiniTest
-  class Unit
-    class TestCase
+  class Test
     include Shoulda::Context::Assertions
     include Shoulda::Context::InstanceMethods
     extend Shoulda::Context::ClassMethods
@@ -27,7 +26,7 @@ module MiniTest
           end
          
         end
-      end
+    
       
     end
   end
@@ -74,5 +73,5 @@ module MiniTest
   end
 end
 
-MiniTest::Unit.autorun
+MiniTest.autorun
 

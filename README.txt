@@ -5,7 +5,7 @@ http://ruby-statsample.rubyforge.org/
 
 == DESCRIPTION:
 
-A suite for basic and advanced statistics on Ruby. Tested on Ruby 1.8.7, 1.9.1, 1.9.2 (April, 2010), ruby-head(June, 2011) and JRuby 1.4 (Ruby 1.8.7 compatible).
+A suite for basic and advanced statistics on Ruby. Tested on Ruby 2.1.1p76 (June 2014), 1.8.7, 1.9.1, 1.9.2 (April, 2010), ruby-head(June, 2011) and JRuby 1.4 (Ruby 1.8.7 compatible).
 
 Include:
 * Descriptive statistics: frequencies, median, mean, standard error, skew, kurtosis (and many others).

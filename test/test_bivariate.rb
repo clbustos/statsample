@@ -1,5 +1,5 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleBivariateTestCase < MiniTest::Unit::TestCase
+class StatsampleBivariateTestCase < MiniTest::Test
   should "method sum of squares should be correct" do
     v1=[1,2,3,4,5,6].to_vector(:scale)
     v2=[6,2,4,10,12,8].to_vector(:scale)

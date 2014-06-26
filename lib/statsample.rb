@@ -1,6 +1,6 @@
 # = statsample.rb - 
 # Statsample - Statistic package for Ruby
-# Copyright (C) 2008-2009  Claudio Bustos
+# Copyright (C) 2008-2014  Claudio Bustos
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -133,7 +133,7 @@ module Statsample
   
   create_has_library :gsl
   
-  VERSION = '1.3.0'
+  VERSION = '1.3.1'
   SPLIT_TOKEN = ","
   autoload(:Analysis, 'statsample/analysis')
   autoload(:Database, 'statsample/converters')

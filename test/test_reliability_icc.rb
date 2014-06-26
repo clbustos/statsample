@@ -1,6 +1,8 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
+
 $reliability_icc=nil
-class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
+
+class StatsampleReliabilityIccTestCase < MiniTest::Test
   context Statsample::Reliability::ICC do
     setup do
       a=[9,6,8,7,10,6].to_scale
@@ -117,7 +119,7 @@ class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
       require 'statsample/rserve_extension'
       context "McGraw and Wong" do
         teardown do
-          @r=$reliability_icc[:r].close
+          @r=$reliability_icc[:r].close unless $reliability_icc[:r].nil?
         end
         setup do
           if($reliability_icc.nil?)
@@ -130,7 +132,9 @@ class StatsampleReliabilityIccTestCase < MiniTest::Unit::TestCase
             
             @icc=Statsample::Reliability::ICC.new(@ds)
             @r=Rserve::Connection.new
+            
             @r.assign('ds',@ds)
+          
             @r.void_eval("library(irr);
               iccs=list(
               icc_1=icc(ds,'o','c','s'),
