@@ -9,4 +9,21 @@ doc
 examples/images/*
 examples/*.html
 web/upload_task.rb
-.idea
+
+# From standard gemfile
+*.gem
+.bundle
+.config
+.yardoc
+Gemfile.lock
+InstalledFiles
+_yardoc
+coverage
+doc/
+lib/bundler/man
+pkg
+rdoc
+spec/reports
+test/tmp
+test/version_tmp
+tmp
