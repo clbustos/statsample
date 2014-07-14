@@ -27,14 +27,14 @@ class ::Matrix
   if defined? :eigenpairs
     alias_method :eigenpairs_ruby, :eigenpairs
   end
-  
+
   if Statsample.has_gsl?
     # Optimize eigenpairs of extendmatrix module using gsl
     def eigenpairs
       to_gsl.eigenpairs
     end
   end
-  
+
   def eigenvalues
     eigenpairs.collect {|v| v[0]}
   end
@@ -44,11 +44,11 @@ class ::Matrix
   def eigenvectors_matrix
     Matrix.columns(eigenvectors)
   end
-  
-  
 
-  
-  
+
+
+
+
   def to_gsl
     out=[]
     self.row_size.times{|i|
@@ -76,7 +76,7 @@ module GSL
     def to_gsl
       self
     end
-    
+
     def to_dataset
       f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map {|i| _("VAR_%d") % (i+1) }
       ds=Statsample::Dataset.new(f)
@@ -91,7 +91,7 @@ module GSL
       ds.name=self.name if self.respond_to? :name
       ds
     end
-    
+
     def row_size
       size1
     end
@@ -110,18 +110,18 @@ module GSL
     def eigenvectors
       eigenpairs.collect {|v| v[1]}
     end
-    
+
     # Matrix sum of squares
     def mssq
       sum=0
       to_v.each {|i| sum+=i**2}
       sum
     end
-    
+
     def eigenvectors_matrix
       eigval, eigvec= GSL::Eigen.symmv(self)
       GSL::Eigen::symmv_sort(eigval, eigvec, GSL::Eigen::SORT_VAL_DESC)
-      eigvec 
+      eigvec
     end
     def eigenpairs
       eigval, eigvec= GSL::Eigen.symmv(self)
@@ -130,7 +130,7 @@ module GSL
         [eigval[i],eigvec.get_col(i)]
       }
     end
-    
+
     #def eigenpairs_ruby
     #  self.to_matrix.eigenpairs_ruby
     #end
@@ -158,7 +158,7 @@ end
 module Statsample
   # Module to add names to X and Y fields
   module NamedMatrix
-    include Summarizable  
+    include Summarizable
 
     def fields
     raise "Should be square" if !square?
@@ -178,10 +178,10 @@ module Statsample
     @fields_y=v
     end
     def fields_x
-    @fields_x||=row_size.times.collect {|i| _("X%d") % i} 
+    @fields_x||=row_size.times.collect {|i| _("X%d") % i}
     end
     def fields_y
-    @fields_y||=column_size.times.collect {|i| _("Y%d") % i} 
+    @fields_y||=column_size.times.collect {|i| _("Y%d") % i}
     end
 
     def name
@@ -195,7 +195,7 @@ module Statsample
       @@named_matrix+=1
       _("Matrix %d") % @@named_matrix
     end
-    
+
   end
   # Module to add method for variance/covariance and correlation matrices
   # == Usage
@@ -209,15 +209,19 @@ module Statsample
     # Get type of covariate matrix. Could be :covariance or :correlation
     def _type
       if row_size==column_size
-        if row_size.times.find {|i| self[i,i]!=1.0}
-          :covariance
-        else
-          :correlation
+        @type ||= begin
+          if row_size.times.find { |i| self[i, i] == 1.0 }
+            :correlation
+          elsif row_size.times.find { |i| self[i, i].nil? }
+            :correlation_probability
+          else
+            :covariance
+          end
         end
       else
         @type
       end
-      
+
     end
     def _type=(t)
       @type=t
@@ -233,7 +237,7 @@ module Statsample
             end
           }
         })
-        matrix.extend CovariateMatrix 
+        matrix.extend CovariateMatrix
         matrix.fields_x=fields_x
         matrix.fields_y=fields_y
         matrix._type=:correlation
@@ -242,19 +246,19 @@ module Statsample
         self
       end
     end
-    
-    
+
+
     # Get variance for field k
     # 
     def variance(k)
       submatrix([k])[0,0]
     end
-    
+
     def get_new_name
       @@covariatematrix+=1
       _("Covariate matrix %d") % @@covariatematrix
     end
-    
+
     # Select a submatrix of factors. If you have a correlation matrix
     # with a, b and c, you could obtain a submatrix of correlations of
     # a and b, b and c or a and b
@@ -276,24 +280,24 @@ module Statsample
       raise ArgumentError, "rows shouldn't be empty" if rows.respond_to? :size and rows.size==0
       columns||=rows
       # Convert all fields on index
-      row_index=rows.collect {|v| 
+      row_index=rows.collect {|v|
         r=v.is_a?(Numeric) ? v : fields_x.index(v)
         raise "Index #{v} doesn't exists on matrix" if r.nil?
         r
       }
-      column_index=columns.collect {|v| 
+      column_index=columns.collect {|v|
         r=v.is_a?(Numeric) ? v : fields_y.index(v)
         raise "Index #{v} doesn't exists on matrix" if r.nil?
         r
       }
-      
-      
+
+
       fx=row_index.collect {|v| fields_x[v]}
       fy=column_index.collect {|v| fields_y[v]}
-        
+
       matrix= Matrix.rows(row_index.collect {|i|
         row=column_index.collect {|j| self[i,j]}})
-      matrix.extend CovariateMatrix 
+      matrix.extend CovariateMatrix
       matrix.fields_x=fx
       matrix.fields_y=fy
       matrix._type=_type

@@ -11,6 +11,12 @@ Statsample::Analysis.store("Statsample::Bivariate.correlation_matrix") do
     'd'=>rnorm(samples))
   cm=cor(ds)
   summary(cm)
+
+  cp = corp(ds)
+  summary(cp)
+
+  cov = cov(ds)
+  summary(cov)
 end
 
 if __FILE__==$0

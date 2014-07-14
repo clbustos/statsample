@@ -251,7 +251,11 @@ module Statsample
             (row==col or ds[row].type!=:scale or ds[col].type!=:scale) ? nil : prop_pearson(t_pearson(ds[row],ds[col]), v1a.size, tails)
           end
         end
-        Matrix.rows(rows)
+        m = Matrix.rows(rows)
+        m.extend(Statsample::CovariateMatrix)
+        m.fields=ds.fields
+        m.name = "Correlation Probability"
+        m
       end
       
       # Spearman ranked correlation coefficient (rho) between 2 vectors

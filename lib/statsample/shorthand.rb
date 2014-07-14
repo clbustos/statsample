@@ -40,9 +40,15 @@ module Statsample
     def cor(ds)
       Statsample::Bivariate.correlation_matrix(ds)
     end
+
+    # Create a correlation probability matrix from a dataset
+    def corp(ds)
+      Statsample::Bivariate.correlation_probability_matrix(ds)
+    end
+
     # Create a variance/covariance matrix from a dataset
     def cov(ds)
-      Statsample::Bivariate.covariate_matrix(ds)
+      Statsample::Bivariate.covariance_matrix(ds)
     end
     # Create a Statsample::Vector
     # Analog to R's c
