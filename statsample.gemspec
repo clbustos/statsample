@@ -5,7 +5,6 @@ require 'statsample/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'statsample'
-  spec.version       = '1.3.1'
   spec.version       = Statsample::VERSION
   spec.summary       = "Stats library"
   spec.authors       = ["Claudio Bustos", "Justin Gordon"]
