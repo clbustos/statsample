@@ -219,7 +219,7 @@ module Statsample
     # Vector equality.
     # Two vector will be the same if their data, missing values, type, labels are equals
     def ==(v2)
-      raise TypeError,"Argument should be a Vector" unless v2.instance_of? Statsample::Vector
+      return false unless v2.instance_of? Statsample::Vector
       @data==v2.data and @missing_values==v2.missing_values and @type==v2.type and @labels==v2.labels
     end
     
