@@ -352,6 +352,7 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     v1=[1,2,3].to_vector()
     v2=[1,2,3].to_vector()
     assert_equal(v1,v2)
+    assert_equal(false, v1 == Object.new)
   end
   def test_vector_percentil
     a=[1,2,2,3,4,5,5,5,6,10].to_scale
