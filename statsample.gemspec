@@ -32,5 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rserve-client'
   spec.add_dependency 'rubyvis'
   spec.add_dependency 'spreadsheet'
-  spec.add_dependency 'rb-gsl'
+  # spec.add_dependency 'rb-gsl'
 end

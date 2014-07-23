@@ -189,12 +189,13 @@ module Statsample
       # Correlation matrix.
       # Order of rows and columns depends on Dataset#fields order
       def correlation_matrix(ds)
-        vars,cases=ds.fields.size,ds.cases
-        if !ds.has_missing_data? and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
-          cm=correlation_matrix_optimized(ds)
-        else
+        # Todo uncomment out this code
+        # vars,cases=ds.fields.size,ds.cases
+        # if !ds.has_missing_data? and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
+        #   cm=correlation_matrix_optimized(ds)
+        # else
           cm=correlation_matrix_pairwise(ds)
-        end
+        # end
         cm.extend(Statsample::CovariateMatrix)
         cm.fields=ds.fields
         cm
