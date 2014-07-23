@@ -117,7 +117,7 @@ Statsample::Analysis.run # Open svg file on *nix application defined
 
 ### Correlation matrix
 
-```
+```ruby
 require 'statsample'
 # Note R like generation of random gaussian variable
 # and correlation matrix
