@@ -14,7 +14,4 @@ gem 'minimization'
 gem 'rserve-client'
 gem 'rubyvis'
 gem 'spreadsheet'
-
-if RUBY_PLATFORM.include?('linux')
-  gem 'rb-gsl'
-end
+gem 'rb-gsl'
