@@ -42,6 +42,7 @@ end
 
 h=Hoe.spec('statsample') do 
   self.version=Statsample::VERSION
+  self.urls=["https://github.com/clbustos/statsample"]
   #self.testlib=:minitest
 #  self.rubyforge_name = "ruby-statsample"
   self.developer('Claudio Bustos', 'clbustos@gmail.com')

@@ -1,6 +1,6 @@
 # Statsample
 
-http://ruby-statsample.rubyforge.org/
+Homepage :: http://ruby-statsample.rubyforge.org/
 
 
 ## DESCRIPTION
@@ -147,10 +147,10 @@ Optional:
 
 ## Resources
 
-* Source code on github: http://github.com/clbustos/statsample
-* API: http://ruby-statsample.rubyforge.org/statsample/
-* Bug report and feature request: http://github.com/clbustos/statsample/issues
-* E-mailing list: http://groups.google.com/group/statsample
+* Source code on github :: http://github.com/clbustos/statsample
+* API :: http://ruby-statsample.rubyforge.org/statsample/
+* Bug report and feature request :: http://github.com/clbustos/statsample/issues
+* E-mailing list :: http://groups.google.com/group/statsample
 
 # Installation
 
