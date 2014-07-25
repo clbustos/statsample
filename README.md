@@ -1,9 +1,9 @@
-= Statsample
+# Statsample
 
 http://ruby-statsample.rubyforge.org/
 
 
-== DESCRIPTION:
+## DESCRIPTION
 
 A suite for basic and advanced statistics on Ruby. Tested on Ruby 2.1.1p76 (June 2014), 1.8.7, 1.9.1, 1.9.2 (April, 2010), ruby-head(June, 2011) and JRuby 1.4 (Ruby 1.8.7 compatible).
 
@@ -24,7 +24,7 @@ Include:
 * Creates reports on text, html and rtf, using ReportBuilder gem
 * Graphics: Histogram, Boxplot and Scatterplot
 
-== PRINCIPLES
+## Principles
 
 * Software Design: 
   * One module/class for each type of analysis
@@ -38,7 +38,7 @@ Include:
   * Go beyond Null Hiphotesis Testing, using confidence intervals and effect sizes when possible
   * (When possible) All references for methods are documented, providing sensible information on documentation 
 
-== FEATURES:
+## Features
 
 * Classes for manipulation and storage of data:
   * Statsample::Vector: An extension of an array, with statistical methods like sum, mean and standard deviation
@@ -81,7 +81,7 @@ Include:
 * Module Statsample::Test provides several methods and classes to perform inferencial statistics
   * Statsample::Test::BartlettSphericity
   * Statsample::Test::ChiSquare
-  * Statsample::Test::F  
+  * Statsample::Test::F
   * Statsample::Test::KolmogorovSmirnov (only D value)
   * Statsample::Test::Levene
   * Statsample::Test::UMannWhitney
@@ -95,81 +95,95 @@ Include:
 * Gem +statsample-sem+ provides a DSL to R libraries +sem+ and +OpenMx+
 * Close integration with gem <tt>reportbuilder</tt>, to easily create reports on text, html and rtf formats.
 
-== Examples of use:
+# Examples of use:
 
-See multiples examples of use on [http://github.com/clbustos/statsample/tree/master/examples/]
+See the [examples folder](https://github.com/clbustos/statsample/tree/master/examples/) too.
 
-=== Boxplot
+## Boxplot
 
-    require 'statsample'
-    ss_analysis(Statsample::Graph::Boxplot) do 
-      n=30
-      a=rnorm(n-1,50,10)
-      b=rnorm(n, 30,5)
-      c=rnorm(n,5,1)
-      a.push(2)
-      boxplot(:vectors=>[a,b,c], :width=>300, :height=>300, :groups=>%w{first first second}, :minimum=>0)
-    end    
-    Statsample::Analysis.run # Open svg file on *nix application defined
+```ruby
+require 'statsample'
 
-=== Correlation matrix
+ss_analysis(Statsample::Graph::Boxplot) do 
+  n=30
+  a=rnorm(n-1,50,10)
+  b=rnorm(n, 30,5)
+  c=rnorm(n,5,1)
+  a.push(2)
+  boxplot(:vectors=>[a,b,c], :width=>300, :height=>300, :groups=>%w{first first second}, :minimum=>0)
+end
+Statsample::Analysis.run # Open svg file on *nix application defined
+```
 
-    require 'statsample'
-    # Note R like generation of random gaussian variable
-    # and correlation matrix
-    
-    ss_analysis("Statsample::Bivariate.correlation_matrix") do
-      samples=1000
-      ds=data_frame(
-        'a'=>rnorm(samples), 
-        'b'=>rnorm(samples),
-        'c'=>rnorm(samples),
-        'd'=>rnorm(samples))
-      cm=cor(ds) 
-      summary(cm)
-    end
-    
-    Statsample::Analysis.run_batch # Echo output to console
+### Correlation matrix
 
+```ruby
+require 'statsample'
+# Note R like generation of random gaussian variable
+# and correlation matrix
 
-== REQUIREMENTS:
+ss_analysis("Statsample::Bivariate.correlation_matrix") do
+  samples=1000
+  ds=data_frame(
+    'a'=>rnorm(samples), 
+    'b'=>rnorm(samples),
+    'c'=>rnorm(samples),
+    'd'=>rnorm(samples))
+  cm=cor(ds) 
+  summary(cm)
+end
+
+Statsample::Analysis.run_batch # Echo output to console
+```
+
+## Requirements
 
 Optional: 
 
 * Plotting: gnuplot and rbgnuplot, SVG::Graph
 * Factorial analysis and polychorical correlation(joint estimate and polychoric series): gsl library and rb-gsl (http://rb-gsl.rubyforge.org/). You should install it using <tt>gem install gsl</tt>. 
 
-<b>Note</b>: Use gsl 1.12.109 or later.
+*Note*: Use gsl 1.12.109 or later.
 
-== RESOURCES
+## Resources
 
 * Source code on github: http://github.com/clbustos/statsample
 * API: http://ruby-statsample.rubyforge.org/statsample/
 * Bug report and feature request: http://github.com/clbustos/statsample/issues
 * E-mailing list: http://groups.google.com/group/statsample
 
-== INSTALL:
+# Installation
 
-  $ sudo gem install statsample
+```bash
+$ sudo gem install statsample
+```
 
 On *nix, you should install statsample-optimization to retrieve gems gsl, statistics2 and a C extension to speed some methods. 
 
 There are available precompiled version for Ruby 1.9 on x86, x86_64 and mingw32 archs.
 
-  $ sudo gem install statsample-optimization
+```bash
+$ sudo gem install statsample-optimization
+```
 
 If you use Ruby 1.8, you should compile statsample-optimization, usign parameter <tt>--platform ruby</tt>
 
-  $ sudo gem install statsample-optimization --platform ruby
+```bash
+$ sudo gem install statsample-optimization --platform ruby
+```
 
 If you need to work on Structural Equation Modeling, you could see +statsample-sem+. You need R with +sem+ or +OpenMx+ [http://openmx.psyc.virginia.edu/] libraries installed
 
-  $ sudo gem install statsample-sem
+```bash
+$ sudo gem install statsample-sem
+```
 
 Available setup.rb file
 
-  sudo gem ruby setup.rb
+```bash
+sudo gem ruby setup.rb
+```
 
-== LICENSE:
+## License
 
 GPL-2 (See LICENSE.txt)
