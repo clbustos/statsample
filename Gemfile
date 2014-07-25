@@ -15,4 +15,3 @@ gem 'rserve-client'
 gem 'rubyvis'
 gem 'spreadsheet'
 gem 'rb-gsl'
-
