@@ -2,7 +2,10 @@ language: ruby
 rvm:
 	- "1.9.3"
 	- "2.0.0"
-	- "2.1.0"
-install:
+	- "2.1.1"
+script:
+	- bundle exec rake test
+before_install:
+	- sudo pat-get update -qq
 	- sudo apt-get install libgsl0-dev
 
