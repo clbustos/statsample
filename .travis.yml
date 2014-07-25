@@ -6,6 +6,6 @@ rvm:
 script:
 	- bundle exec rake test
 before_install:
-	- sudo pat-get update -qq
-	- sudo apt-get install libgsl0-dev
+	- sudo apt-get update -qq
+	- sudo apt-get install -y libgsl0-dev
 
