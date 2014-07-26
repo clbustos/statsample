@@ -23,7 +23,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'shoulda', '3.5.0'
   spec.add_development_dependency 'shoulda-matchers', '2.2.0'
 
-  spec.add_dependency 'hoe'
   spec.add_dependency 'reportbuilder'
   spec.add_dependency 'dirty-memoize'
   spec.add_dependency 'distribution'
