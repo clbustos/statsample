@@ -2,6 +2,7 @@
 
 Homepage :: http://ruby-statsample.rubyforge.org/
 
+[![Build Status](https://travis-ci.org/clbustos/statsample.svg?branch=master)](https://travis-ci.org/clbustos/statsample)
 
 ## DESCRIPTION
 
