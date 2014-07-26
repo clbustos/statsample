@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'statsample'
   spec.version       = Statsample::VERSION
   spec.summary       = "Stats library"
-  spec.authors       = ["Claudio Bustos", "Justin Gordon"]
+  spec.authors       = ["Claudio Bustos", "Justin Gordon", "Russell Smith"]
   spec.homepage      = 'https://github.com/clbustos/statsample'
   spec.license       = "MIT"
   spec.files         = `git ls-files -z`.split("\x0")
