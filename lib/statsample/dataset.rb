@@ -300,6 +300,14 @@ module Statsample
       ds_new.update_valid_data
       ds_new
     end
+
+    # Join 2 Datasets by given fields
+    # type is one of :left and :inner, default is :left
+    #
+    # @return {Statsample::Dataset}
+    def join(other_ds,fields_1=nil,fields_2=nil,type=:left)
+
+    end
     # Returns a dataset with standarized data.
     #
     # @return {Statsample::Dataset}
