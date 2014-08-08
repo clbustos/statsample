@@ -305,8 +305,35 @@ module Statsample
     # type is one of :left and :inner, default is :left
     #
     # @return {Statsample::Dataset}
-    def join(other_ds,fields_1=nil,fields_2=nil,type=:left)
+    def join(other_ds,fields_1=[],fields_2=[],type=:left)
+      fields_new = other_ds.fields - fields_2
+      fields = self.fields + fields_new
 
+      other_ds_hash = Hash.new{ Array.new }
+      other_ds.each do |row|
+        key = row.select{|k,v| fields_2.include?(k)}.keys
+        value = row.select{|k,v| fields_new.include?(k)}
+        other_ds_hash[key] << value
+      end
+
+      new_ds = Dataset.new(fields)
+
+      self.each do |row|
+        key = row.select{|k,v| fields_1.include?(k)}.keys
+
+        new_case = row.dup
+
+        if other_ds_hash[key].empty? && type == :left
+          fields_new.each{|field| new_case[field] = nil}
+          new_ds.add_case(new_case)
+        else
+          other_ds_hash[key].each do |new_values|
+            new_ds.add_case new_case.merge(new_values)
+          end
+        end
+
+      end
+      new_ds
     end
     # Returns a dataset with standarized data.
     #
