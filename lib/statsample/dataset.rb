@@ -309,23 +309,29 @@ module Statsample
       fields_new = other_ds.fields - fields_2
       fields = self.fields + fields_new
 
-      other_ds_hash = Hash.new{ Array.new }
+      other_ds_hash = {}
       other_ds.each do |row|
-        key = row.select{|k,v| fields_2.include?(k)}.keys
+        key = row.select{|k,v| fields_2.include?(k)}.values
         value = row.select{|k,v| fields_new.include?(k)}
-        other_ds_hash[key] << value
+        if other_ds_hash[key].nil?
+          other_ds_hash[key] = [value]
+        else
+          other_ds_hash[key] << value
+        end
       end
 
       new_ds = Dataset.new(fields)
 
       self.each do |row|
-        key = row.select{|k,v| fields_1.include?(k)}.keys
+        key = row.select{|k,v| fields_1.include?(k)}.values
 
         new_case = row.dup
 
-        if other_ds_hash[key].empty? && type == :left
-          fields_new.each{|field| new_case[field] = nil}
-          new_ds.add_case(new_case)
+        if other_ds_hash[key].nil?
+          if type == :left
+            fields_new.each{|field| new_case[field] = nil}
+            new_ds.add_case(new_case)
+          end
         else
           other_ds_hash[key].each do |new_values|
             new_ds.add_case new_case.merge(new_values)
