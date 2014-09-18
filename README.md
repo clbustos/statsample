@@ -1,6 +1,6 @@
 # Statsample
 
-Homepage :: http://ruby-statsample.rubyforge.org/
+Homepage :: https://github.com/clbustos/statsample
 
 [![Build Status](https://travis-ci.org/clbustos/statsample.svg?branch=master)](https://travis-ci.org/clbustos/statsample)
 
