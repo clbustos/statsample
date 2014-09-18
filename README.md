@@ -149,7 +149,7 @@ Optional:
 ## Resources
 
 * Source code on github :: http://github.com/clbustos/statsample
-* API :: http://ruby-statsample.rubyforge.org/statsample/
+* Docs :: http://rubydoc.info/gems/statsample/
 * Bug report and feature request :: http://github.com/clbustos/statsample/issues
 * E-mailing list :: http://groups.google.com/group/statsample
 

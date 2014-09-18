@@ -300,6 +300,47 @@ module Statsample
       ds_new.update_valid_data
       ds_new
     end
+
+    # Join 2 Datasets by given fields
+    # type is one of :left and :inner, default is :left
+    #
+    # @return {Statsample::Dataset}
+    def join(other_ds,fields_1=[],fields_2=[],type=:left)
+      fields_new = other_ds.fields - fields_2
+      fields = self.fields + fields_new
+
+      other_ds_hash = {}
+      other_ds.each do |row|
+        key = row.select{|k,v| fields_2.include?(k)}.values
+        value = row.select{|k,v| fields_new.include?(k)}
+        if other_ds_hash[key].nil?
+          other_ds_hash[key] = [value]
+        else
+          other_ds_hash[key] << value
+        end
+      end
+
+      new_ds = Dataset.new(fields)
+
+      self.each do |row|
+        key = row.select{|k,v| fields_1.include?(k)}.values
+
+        new_case = row.dup
+
+        if other_ds_hash[key].nil?
+          if type == :left
+            fields_new.each{|field| new_case[field] = nil}
+            new_ds.add_case(new_case)
+          end
+        else
+          other_ds_hash[key].each do |new_values|
+            new_ds.add_case new_case.merge(new_values)
+          end
+        end
+
+      end
+      new_ds
+    end
     # Returns a dataset with standarized data.
     #
     # @return {Statsample::Dataset}
