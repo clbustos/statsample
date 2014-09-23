@@ -41,7 +41,7 @@ module Statsample
         @variance=@total.variance
         @valid_n = @total.size
         opts_default={
-          :name=>_("Reliability Analisis"),
+          :name=>_("Reliability Analysis"),
           :summary_histogram=>true
         }
         @opts=opts_default.merge(opts)
