@@ -5,10 +5,6 @@ require 'statsample/regression/multiple/matrixengine'
 require 'statsample/regression/multiple/rubyengine'
 require 'statsample/regression/multiple/gslengine'
 
-require 'statsample/regression/binomial'
-require 'statsample/regression/binomial/logit'
-require 'statsample/regression/binomial/probit'
-
 module Statsample
     # = Module for regression procedures.
     # Use the method on this class to generate
@@ -41,28 +37,6 @@ module Statsample
       def self.simple(x,y)
         Statsample::Regression::Simple.new_from_vectors(x,y)
       end
-      # Create a Binomial::Logit object, for logit regression.
-      # * ds:: Dataset
-      # * y::  Name of dependent vector
-      # <b>Usage</b>
-      #   dataset=Statsample::CSV.read("data.csv")
-      #   lr=Statsample::Regression.logit(dataset,'y')
-      #   
-      def self.logit(ds,y_var)
-        Statsample::Regression::Binomial::Logit.new(ds,y_var)                
-      end
-      # Create a Binomial::Probit object, for probit regression
-      # * ds:: Dataset
-      # * y::  Name of dependent vector
-      # <b>Usage</b>
-      #   dataset=Statsample::CSV.read("data.csv")
-      #   lr=Statsample::Regression.probit(dataset,'y')
-      #   
-      
-      def self.probit(ds,y_var)
-        Statsample::Regression::Binomial::Probit.new(ds,y_var)                
-      end
-      
       
       # Creates one of the Statsample::Regression::Multiple object,
       # for OLS multiple regression.
