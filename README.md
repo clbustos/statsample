@@ -27,7 +27,7 @@ Include:
 
 ## Principles
 
-* Software Design: 
+* Software Design:
   * One module/class for each type of analysis
   * Options can be set as hash on initialize() or as setters methods
   * Clean API for interactive sessions
@@ -37,13 +37,13 @@ Include:
 * Statistical Design
   * Results are tested against text results, SPSS and R outputs.
   * Go beyond Null Hiphotesis Testing, using confidence intervals and effect sizes when possible
-  * (When possible) All references for methods are documented, providing sensible information on documentation 
+  * (When possible) All references for methods are documented, providing sensible information on documentation
 
 ## Features
 
 * Classes for manipulation and storage of data:
   * Statsample::Vector: An extension of an array, with statistical methods like sum, mean and standard deviation
-  * Statsample::Dataset: a group of Statsample::Vector, analog to a excel spreadsheet or a dataframe on R. The base of almost all operations on statsample. 
+  * Statsample::Dataset: a group of Statsample::Vector, analog to a excel spreadsheet or a dataframe on R. The base of almost all operations on statsample.
   * Statsample::Multiset: multiple datasets with same fields and type of vectors
 * Anova module provides generic Statsample::Anova::OneWay and vector based Statsample::Anova::OneWayWithVectors. Also you can create contrast using Statsample::Anova::Contrast
 * Module Statsample::Bivariate provides covariance and pearson, spearman, point biserial, tau a, tau b, gamma, tetrachoric (see Bivariate::Tetrachoric) and polychoric (see Bivariate::Polychoric) correlations. Include methods to create correlation and covariance matrices
@@ -53,10 +53,10 @@ Include:
   * Logit Regression:    Statsample::Regression::Binomial::Logit
   * Probit Regression:    Statsample::Regression::Binomial::Probit
 * Factorial Analysis algorithms on Statsample::Factor module.
-  * Classes for Extraction of factors: 
+  * Classes for Extraction of factors:
     * Statsample::Factor::PCA
     * Statsample::Factor::PrincipalAxis
-  * Classes for Rotation of factors: 
+  * Classes for Rotation of factors:
     * Statsample::Factor::Varimax
     * Statsample::Factor::Equimax
     * Statsample::Factor::Quartimax
@@ -65,7 +65,7 @@ Include:
     * Statsample::Factor::MAP performs Velicer's Minimum Average Partial (MAP) test, which retain components as long as the variance in the correlation matrix represents systematic variance.
 * Dominance Analysis. Based on Budescu and Azen papers, dominance analysis is a method to analyze the relative importance of one predictor relative to another on multiple regression
   * Statsample::DominanceAnalysis class can report dominance analysis for a sample, using uni or multivariate dependent variables
-  * Statsample::DominanceAnalysis::Bootstrap can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/]. 
+  * Statsample::DominanceAnalysis::Bootstrap can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/].
 * Module Statsample::Codification, to help to codify open questions
 * Converters to import and export data:
   * Statsample::Database : Can create sql to create tables, read and insert data
@@ -74,7 +74,7 @@ Include:
   * Statsample::Mx    : Write Mx Files
   * Statsample::GGobi : Write Ggobi files
 * Module Statsample::Crosstab provides function to create crosstab for categorical data
-* Module Statsample::Reliability provides functions to analyze scales with psychometric methods. 
+* Module Statsample::Reliability provides functions to analyze scales with psychometric methods.
   * Class Statsample::Reliability::ScaleAnalysis provides statistics like mean, standard deviation for a scale, Cronbach's alpha and standarized Cronbach's alpha, and for each item: mean, correlation with total scale, mean if deleted, Cronbach's alpha is deleted.
   * Class Statsample::Reliability::MultiScaleAnalysis provides a DSL to easily analyze reliability of multiple scales and retrieve correlation matrix and factor analysis of them.
   * Class Statsample::Reliability::ICC provides intra-class correlation, using Shrout & Fleiss(1979) and McGraw & Wong (1996) formulations.
@@ -92,7 +92,7 @@ Include:
   * Statsample::Graph::Boxplot
   * Statsample::Graph::Histogram
   * Statsample::Graph::Scatterplot
-* Gem +bio-statsample-timeseries- provides module Statsample::TimeSeries with support for time series, including ARIMA estimation using Kalman-Filter. 
+* Gem +bio-statsample-timeseries- provides module Statsample::TimeSeries with support for time series, including ARIMA estimation using Kalman-Filter.
 * Gem +statsample-sem+ provides a DSL to R libraries +sem+ and +OpenMx+
 * Close integration with gem <tt>reportbuilder</tt>, to easily create reports on text, html and rtf formats.
 
@@ -105,7 +105,7 @@ See the [examples folder](https://github.com/clbustos/statsample/tree/master/exa
 ```ruby
 require 'statsample'
 
-ss_analysis(Statsample::Graph::Boxplot) do 
+ss_analysis(Statsample::Graph::Boxplot) do
   n=30
   a=rnorm(n-1,50,10)
   b=rnorm(n, 30,5)
@@ -126,11 +126,11 @@ require 'statsample'
 ss_analysis("Statsample::Bivariate.correlation_matrix") do
   samples=1000
   ds=data_frame(
-    'a'=>rnorm(samples), 
+    'a'=>rnorm(samples),
     'b'=>rnorm(samples),
     'c'=>rnorm(samples),
     'd'=>rnorm(samples))
-  cm=cor(ds) 
+  cm=cor(ds)
   summary(cm)
 end
 
@@ -139,10 +139,10 @@ Statsample::Analysis.run_batch # Echo output to console
 
 ## Requirements
 
-Optional: 
+Optional:
 
 * Plotting: gnuplot and rbgnuplot, SVG::Graph
-* Factorial analysis and polychorical correlation(joint estimate and polychoric series): gsl library and rb-gsl (http://rb-gsl.rubyforge.org/). You should install it using <tt>gem install gsl</tt>. 
+* Factorial analysis and polychorical correlation(joint estimate and polychoric series): gsl library and rb-gsl (http://rb-gsl.rubyforge.org/). You should install it using <tt>gem install gsl</tt>.
 
 *Note*: Use gsl 1.12.109 or later.
 
@@ -159,7 +159,7 @@ Optional:
 $ sudo gem install statsample
 ```
 
-On *nix, you should install statsample-optimization to retrieve gems gsl, statistics2 and a C extension to speed some methods. 
+On *nix, you should install statsample-optimization to retrieve gems gsl, statistics2 and a C extension to speed some methods.
 
 There are available precompiled version for Ruby 1.9 on x86, x86_64 and mingw32 archs.
 
