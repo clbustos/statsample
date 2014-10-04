@@ -4,7 +4,7 @@ require 'statsample/graph/histogram'
 module Statsample
   # Several Graph, based on Rubyvis[http://rubyvis.rubyforge.org/]
   # * Statsample::Graph::Boxplot
-  # * Statsample::Graph::Histogram  
+  # * Statsample::Graph::Histogram
   # * Statsample::Graph::Scatterplot
   module Graph
   end
