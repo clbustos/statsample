@@ -37,14 +37,11 @@ desc "Create mo-files"
 task "gettext:makemo" do
   require 'gettext/tools'
   GetText.create_mofiles()
-  # GetText.create_mofiles(true, "po", "locale")  # This is for "Ruby on Rails".
 end
 
 h=Hoe.spec('statsample') do
   self.version=Statsample::VERSION
   self.urls=["https://github.com/clbustos/statsample"]
-  #self.testlib=:minitest
-#  self.rubyforge_name = "ruby-statsample"
   self.readme_file = 'README.md'
   self.urls = ['https://github.com/clbustos/statsample']
   self.developer('Claudio Bustos', 'clbustos@gmail.com')
