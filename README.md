@@ -142,7 +142,7 @@ Statsample::Analysis.run_batch # Echo output to console
 Optional:
 
 * Plotting: gnuplot and rbgnuplot, SVG::Graph
-* Factorial analysis and polychorical correlation(joint estimate and polychoric series): gsl library and rb-gsl (http://rb-gsl.rubyforge.org/). You should install it using <tt>gem install gsl</tt>.
+* Factorial analysis and polychorical correlation(joint estimate and polychoric series): gsl library and rb-gsl (https://github.com/blackwinter/rb-gsl). You should install it using <tt>gem install gsl</tt>.
 
 *Note*: Use gsl 1.12.109 or later.
 
