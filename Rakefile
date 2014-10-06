@@ -44,7 +44,6 @@ h=Hoe.spec('statsample') do
   self.version=Statsample::VERSION
   self.urls=["https://github.com/clbustos/statsample"]
   #self.testlib=:minitest
-#  self.rubyforge_name = "ruby-statsample"
   self.readme_file = 'README.md'
   self.urls = ['https://github.com/clbustos/statsample']
   self.developer('Claudio Bustos', 'clbustos@gmail.com')
@@ -101,6 +100,7 @@ Rake::RDocTask.new(:docs) do |rd|
 end
 
 end
+
 desc 'Publish rdocs with analytics support'
 task :publicar_docs => [:clean, :docs] do
   ruby %{agregar_adsense_a_doc.rb}
