@@ -102,14 +102,13 @@ end
 end
 
 desc 'Publish rdocs with analytics support'
-task :publicar_docs => [:clean, :docs] do
-  ruby %{agregar_adsense_a_doc.rb}
-  path = File.expand_path("~/.rubyforge/user-config.yml")
+task :publicar_docs => [:clean] do
+#  ruby %{agregar_adsense_a_doc.rb}
+  path = File.expand_path("./doc.yaml")
   config = YAML.load(File.read(path))
-  host = "#{config["username"]}@rubyforge.org"
+  host = "#{config["user"]}@#{config["host"]}"
   
-  remote_dir = "/var/www/gforge-projects/#{h.rubyforge_name}/#{h.remote_rdoc_dir
-  }"
+  remote_dir = config["dir"]
   local_dir = h.local_rdoc_dir
   Dir.glob(local_dir+"/**/*") {|file|
     sh %{chmod 755 #{file}}
