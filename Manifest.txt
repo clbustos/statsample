@@ -71,15 +71,8 @@ lib/statsample/graph/histogram.rb
 lib/statsample/graph/scatterplot.rb
 lib/statsample/histogram.rb
 lib/statsample/matrix.rb
-lib/statsample/mle.rb
-lib/statsample/mle/logit.rb
-lib/statsample/mle/normal.rb
-lib/statsample/mle/probit.rb
 lib/statsample/multiset.rb
 lib/statsample/regression.rb
-lib/statsample/regression/binomial.rb
-lib/statsample/regression/binomial/logit.rb
-lib/statsample/regression/binomial/probit.rb
 lib/statsample/regression/multiple.rb
 lib/statsample/regression/multiple/alglibengine.rb
 lib/statsample/regression/multiple/baseengine.rb
@@ -114,11 +107,9 @@ references.txt
 setup.rb
 test/fixtures/bank2.dat
 test/fixtures/correlation_matrix.rb
-test/fixtures/crime.txt
 test/fixtures/hartman_23.matrix
 test/fixtures/repeated_fields.csv
 test/fixtures/stock_data.csv
-test/fixtures/test_binomial.csv
 test/fixtures/test_csv.csv
 test/fixtures/test_xls.xls
 test/fixtures/tetmat_matrix.txt
@@ -143,7 +134,6 @@ test/test_factor_pa.rb
 test/test_ggobi.rb
 test/test_gsl.rb
 test/test_histogram.rb
-test/test_logit.rb
 test/test_matrix.rb
 test/test_mle.rb
 test/test_multiset.rb
