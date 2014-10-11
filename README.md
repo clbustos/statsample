@@ -116,7 +116,7 @@ end
 Statsample::Analysis.run # Open svg file on *nix application defined
 ```
 
-### Correlation matrix
+## Correlation matrix
 
 ```ruby
 require 'statsample'
@@ -137,7 +137,7 @@ end
 Statsample::Analysis.run_batch # Echo output to console
 ```
 
-## Requirements
+# Requirements
 
 Optional: 
 
@@ -146,10 +146,10 @@ Optional:
 
 *Note*: Use gsl 1.12.109 or later.
 
-## Resources
+# Resources
 
 * Source code on github :: http://github.com/clbustos/statsample
-* Docs :: http://rubydoc.info/gems/statsample/
+* Docs :: http://statsample.apsique.cl/
 * Bug report and feature request :: http://github.com/clbustos/statsample/issues
 * E-mailing list :: http://groups.google.com/group/statsample
 
@@ -187,4 +187,6 @@ sudo gem ruby setup.rb
 
 ## License
 
-GPL-2 (See LICENSE.txt)
+BSD-3 (See LICENSE.txt)
+
+Could change between version, without previous warning. If you want a specific license, just choose the version that you need.
