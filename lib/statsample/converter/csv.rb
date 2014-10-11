@@ -25,7 +25,7 @@ module Statsample
         csv_headers.each_with_index do |header,idx|
           thash[header] = Statsample::Vector.new(csv[idx].drop(ignore_lines))
         end
-        ds=Statsample::Dataset.new(thash)
+        Statsample::Dataset.new(thash)
       end
       # Returns a Dataset  based on a csv file
       #
@@ -34,7 +34,7 @@ module Statsample
       def read(filename, empty=[''],ignore_lines=0,csv_opts=Hash.new)        
         first_row=true
         fields=[]
-        fields_data={}
+        #fields_data={}
         ds=nil
         line_number=0
         csv=CSV_klass.open(filename,'rb', csv_opts)

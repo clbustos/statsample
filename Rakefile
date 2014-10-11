@@ -47,9 +47,9 @@ h=Hoe.spec('statsample') do
   self.readme_file = 'README.md'
   self.urls = ['https://github.com/clbustos/statsample']
   self.developer('Claudio Bustos', 'clbustos@gmail.com')
-  self.extra_deps << ["spreadsheet","~>0.6.5"] <<  ["reportbuilder", "~>1.4"] << ["minimization", "~>0.2.0"] << ["fastercsv", ">0"] << ["dirty-memoize", "~>0.0"] << ["extendmatrix","~>0.3.1"] << ["statsample-bivariate-extension", ">0"] << ["rserve-client", "~>0.3"] << ["rubyvis", "~>0.6"] << ["distribution", "~>0.7"]
+  self.extra_deps << ["spreadsheet","~>0.6"] <<  ["reportbuilder", "~>1.4"] << ["minimization", "~>0.2.0"] << ["fastercsv", ">0"] << ["dirty-memoize", "~>0.0"] << ["extendmatrix","~>0.3.1"] << ["statsample-bivariate-extension", ">0"] << ["rserve-client"] << ["rubyvis"] << ["distribution"]
   
-  self.extra_dev_deps << ["hoe","~>0"] << ["shoulda","~>3.1.1"] << ["minitest", "~>2.0"]  << ["gettext", "~>0"] << ["mocha", "~>0"] << ["hoe-git", "~>0"]
+  self.extra_dev_deps << ["hoe","~>0"] << ["shoulda","~>3"] << ["minitest", "~>2"]  << ["gettext", "~>0"] << ["mocha", "~>0"] << ["hoe-git", "~>0"]
   
   self.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"
   self.post_install_message = <<-EOF

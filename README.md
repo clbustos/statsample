@@ -3,7 +3,7 @@
 Homepage :: https://github.com/clbustos/statsample
 
 [![Build Status](https://travis-ci.org/clbustos/statsample.svg?branch=master)](https://travis-ci.org/clbustos/statsample)
-
+[![Gem Version](https://badge.fury.io/rb/statsample.svg)](http://badge.fury.io/rb/statsample)
 ## DESCRIPTION
 
 A suite for basic and advanced statistics on Ruby. Tested on Ruby 2.1.1p76 (June 2014), 1.8.7, 1.9.1, 1.9.2 (April, 2010), ruby-head(June, 2011) and JRuby 1.4 (Ruby 1.8.7 compatible).

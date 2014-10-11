@@ -17,7 +17,6 @@ benchmarks/correlation_matrix_methods/correlation_matrix_with_graphics.ods
 benchmarks/correlation_matrix_methods/results.ds
 benchmarks/factor_map.rb
 benchmarks/helpers_benchmark.rb
-bin/statsample
 data/locale/es/LC_MESSAGES/statsample.mo
 doc_latex/manual/equations.tex
 examples/boxplot.rb
