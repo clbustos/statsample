@@ -92,8 +92,9 @@ Include:
   * Statsample::Graph::Boxplot
   * Statsample::Graph::Histogram
   * Statsample::Graph::Scatterplot
-* Gem +bio-statsample-timeseries- provides module Statsample::TimeSeries with support for time series, including ARIMA estimation using Kalman-Filter. 
-* Gem +statsample-sem+ provides a DSL to R libraries +sem+ and +OpenMx+
+* Gem <tt>bio-statsample-timeseries</tt> provides module Statsample::TimeSeries with support for time series, including ARIMA estimation using Kalman-Filter. 
+* Gem <tt>statsample-sem</tt> provides a DSL to R libraries +sem+ and +OpenMx+
+* Gem <tt>statsample-glm</tt> provides you with GML method, to work with Logistic, Poisson and Gaussian regression ,using ML or IRWLS. 
 * Close integration with gem <tt>reportbuilder</tt>, to easily create reports on text, html and rtf formats.
 
 # Examples of use:
