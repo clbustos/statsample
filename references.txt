@@ -8,11 +8,13 @@ References
 * Dziuban, C., & Shirkey E. (1974). When is a correlation matrix appropriate for factor analysis? Some decision rules. Psychological Bulletin, 81(6), 358-361.
 * Hayton, J., Allen, D. & Scarpello, V.(2004). Factor Retention Decisions in Exploratory Factor Analysis: a Tutorial on Parallel Analysis. <i>Organizational Research Methods, 7</i> (2), 191-205.
 * Härdle, W. & Simar, L. (2003). Applied Multivariate Statistical Analysis. Springer
+* Leach, L. & Henson, R. (2007). The Use and Impact of Adjusted R2 Effects in Published Regression Research. Multiple Linear Regression Viewpoints, 33(1), 1-11.
 * Lin, J. (2007). VARIMAX_K58 [Source code]. [http://www.johnny-lin.com/idl_code/varimax_k58.pro]
 * Liu, O., & Rijmen, F. (2008). A modified procedure for parallel analysis of ordered categorical data. Behavior Research Methods, 40(2), 556-562.
 * McGraw, K. & Wong, S.P. (1996). Forming Inferences About Some Intraclass Correlation Coefficients. Psychological methods, 1(1), 30-46.
 * O'Connor, B. (2000). SPSS and SAS programs for determining the number of components using parallel analysis and Velicer's MAP test. Behavior Research Methods, Instruments, & Computers, 32(3), 396-402.
 * SPSS Manual
+* Sawyer, S. (2005). Resampling Data: Using a Statistical Jacknife.
 * Shrout,P. & Fleiss, J. (1979). Intraclass Correlation: Uses in assessing rater reliability. Psychological Bulletin, 86(2), 420-428
 * Smith, L. (2002). A tutorial on Principal Component Analysis. Available on http://courses.eas.ualberta.ca/eas570/pca_tutorial.pdf 
 * http://en.wikipedia.org/wiki/Welch-Satterthwaite_equation
@@ -20,4 +22,3 @@ References
 * http://stattrek.com/Lesson6/SRS.aspx
 * http://talkstats.com/showthread.php?t=5056
 * http://www.gnu.org/software/gsl/manual/html_node/The-histogram-struct.html
-* http://www.taygeta.com/random/gaussian.html

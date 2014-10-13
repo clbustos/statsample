@@ -48,9 +48,9 @@ h=Hoe.spec('statsample') do
   self.readme_file = 'README.md'
   self.urls = ['https://github.com/clbustos/statsample']
   self.developer('Claudio Bustos', 'clbustos@gmail.com')
-  self.extra_deps << ["spreadsheet","~>0.6.5"] <<  ["reportbuilder", "~>1.4"] << ["minimization", "~>0.2.0"] << ["fastercsv", ">0"] << ["dirty-memoize", "~>0.0"] << ["extendmatrix","~>0.3.1"] << ["statsample-bivariate-extension", ">0"] << ["rserve-client", "~>0.3"] << ["rubyvis", "~>0.6"] << ["distribution", "~>0.7"]
+  self.extra_deps << ["spreadsheet","~>0.6"] <<  ["reportbuilder", "~>1.4"] << ["minimization", "~>0.2.0"] << ["fastercsv", ">0"] << ["dirty-memoize", "~>0.0"] << ["extendmatrix","~>0.3.1"] << ["statsample-bivariate-extension", ">0"] << ["rserve-client"] << ["rubyvis"] << ["distribution"]
   
-  self.extra_dev_deps << ["hoe","~>0"] << ["shoulda","~>3.1.1"] << ["minitest", "~>2.0"]  << ["gettext", "~>0"] << ["mocha", "~>0"] << ["hoe-git", "~>0"]
+  self.extra_dev_deps << ["hoe","~>0"] << ["shoulda","~>3"] << ["minitest", "~>2"]  << ["gettext", "~>0"] << ["mocha", "~>0"] << ["hoe-git", "~>0"]
   
   self.clean_globs << "test/images/*" << "demo/item_analysis/*" << "demo/Regression"
   self.post_install_message = <<-EOF
@@ -103,14 +103,13 @@ end
 end
 
 desc 'Publish rdocs with analytics support'
-task :publicar_docs => [:clean, :docs] do
-  ruby %{agregar_adsense_a_doc.rb}
-  path = File.expand_path("~/.rubyforge/user-config.yml")
+task :publicar_docs => [:clean] do
+#  ruby %{agregar_adsense_a_doc.rb}
+  path = File.expand_path("./doc.yaml")
   config = YAML.load(File.read(path))
-  host = "#{config["username"]}@rubyforge.org"
+  host = "#{config["user"]}@#{config["host"]}"
   
-  remote_dir = "/var/www/gforge-projects/#{h.rubyforge_name}/#{h.remote_rdoc_dir
-  }"
+  remote_dir = config["dir"]
   local_dir = h.local_rdoc_dir
   Dir.glob(local_dir+"/**/*") {|file|
     sh %{chmod 755 #{file}}

@@ -133,7 +133,6 @@ module Statsample
   
   create_has_library :gsl
   
-  VERSION = '1.3.1'
   SPLIT_TOKEN = ","
   autoload(:Analysis, 'statsample/analysis')
   autoload(:Database, 'statsample/converters')
@@ -290,4 +289,4 @@ require 'statsample/dataset'
 require 'statsample/crosstab'
 require 'statsample/matrix'
 require 'statsample/shorthand'
-
+require 'statsample/version'

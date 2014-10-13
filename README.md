@@ -3,7 +3,7 @@
 Homepage :: https://github.com/clbustos/statsample
 
 [![Build Status](https://travis-ci.org/clbustos/statsample.svg?branch=master)](https://travis-ci.org/clbustos/statsample)
-
+[![Gem Version](https://badge.fury.io/rb/statsample.svg)](http://badge.fury.io/rb/statsample)
 ## DESCRIPTION
 
 A suite for basic and advanced statistics on Ruby. Tested on Ruby 2.1.1p76 (June 2014), 1.8.7, 1.9.1, 1.9.2 (April, 2010), ruby-head(June, 2011) and JRuby 1.4 (Ruby 1.8.7 compatible).
@@ -92,8 +92,9 @@ Include:
   * Statsample::Graph::Boxplot
   * Statsample::Graph::Histogram
   * Statsample::Graph::Scatterplot
-* Gem +bio-statsample-timeseries- provides module Statsample::TimeSeries with support for time series, including ARIMA estimation using Kalman-Filter. 
-* Gem +statsample-sem+ provides a DSL to R libraries +sem+ and +OpenMx+
+* Gem <tt>bio-statsample-timeseries</tt> provides module Statsample::TimeSeries with support for time series, including ARIMA estimation using Kalman-Filter. 
+* Gem <tt>statsample-sem</tt> provides a DSL to R libraries +sem+ and +OpenMx+
+* Gem <tt>statsample-glm</tt> provides you with GML method, to work with Logistic, Poisson and Gaussian regression ,using ML or IRWLS. 
 * Close integration with gem <tt>reportbuilder</tt>, to easily create reports on text, html and rtf formats.
 
 # Examples of use:
@@ -116,7 +117,7 @@ end
 Statsample::Analysis.run # Open svg file on *nix application defined
 ```
 
-### Correlation matrix
+## Correlation matrix
 
 ```ruby
 require 'statsample'
@@ -137,7 +138,7 @@ end
 Statsample::Analysis.run_batch # Echo output to console
 ```
 
-## Requirements
+# Requirements
 
 Optional: 
 
@@ -146,10 +147,10 @@ Optional:
 
 *Note*: Use gsl 1.12.109 or later.
 
-## Resources
+# Resources
 
 * Source code on github :: http://github.com/clbustos/statsample
-* Docs :: http://rubydoc.info/gems/statsample/
+* Docs :: http://statsample.apsique.cl/
 * Bug report and feature request :: http://github.com/clbustos/statsample/issues
 * E-mailing list :: http://groups.google.com/group/statsample
 
@@ -187,4 +188,6 @@ sudo gem ruby setup.rb
 
 ## License
 
-GPL-2 (See LICENSE.txt)
+BSD-3 (See LICENSE.txt)
+
+Could change between version, without previous warning. If you want a specific license, just choose the version that you need.

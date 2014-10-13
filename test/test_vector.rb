@@ -349,6 +349,8 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     v1=[1,2,3].to_vector(:nominal)
     v2=[1,2,3].to_vector(:ordinal)
     assert_not_equal(v1,v2)
+    v2=[1,2,3]
+    assert_not_equal(v1,v2)
     v1=[1,2,3].to_vector()
     v2=[1,2,3].to_vector()
     assert_equal(v1,v2)
