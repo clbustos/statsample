@@ -71,6 +71,8 @@ module Statsample
       # giving r and vector size
       # Source : http://faculty.chass.ncsu.edu/garson/PA765/correl.htm
       def t_r(r,size)
+        raise "In computing value for t test for a pearson correlation, invalid size of series: #{size}" if size <= 2
+        raise "In computing value for t test for a pearson correlation, invalid value of r: #{r}" if r >= 1
         r * Math::sqrt(((size)-2).to_f / (1 - r**2))
       end
       # Retrieves the probability value (a la SPSS)
