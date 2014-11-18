@@ -100,6 +100,13 @@ class StatsampleHistogramTestCase < MiniTest::Unit::TestCase
       assert_equal(2,h.sum(1,4))
 
     end
+    should "not raise exception when all values equal" do
+      assert_nothing_raised do
+        a = [5,5,5,5,5,5].to_scale
+        h=Statsample::Graph::Histogram.new(a)
+        h.to_svg
+      end
+    end
     
   end
 end
