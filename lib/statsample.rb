@@ -241,7 +241,7 @@ module Statsample
       min = reverse ? e : s
       max = reverse ? s : e
       span=max-min
-      return [s, e] if (!span or (span.respond_to? :infinite? and span.infinite?))
+      return [s, e] if (span == 0 or (span.respond_to? :infinite? and span.infinite?))
       
       step=10**((Math::log(span).quo(Math::log(10))).round - 1).to_f  
       out=[(min.quo(step)).floor * step, (max.quo(step)).ceil * step]
