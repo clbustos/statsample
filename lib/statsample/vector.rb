@@ -39,6 +39,8 @@ module Statsample
     include Enumerable
     include Writable
     include Summarizable
+    include Statsample::VectorShorthands
+    
     # Level of measurement. Could be :nominal, :ordinal or :scale
     attr_reader :type
     # Original data. 

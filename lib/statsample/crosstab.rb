@@ -8,9 +8,9 @@ module Statsample
     attr_reader :v_rows, :v_cols
     attr_accessor :row_label, :column_label, :name, :percentage_row, :percentage_column, :percentage_total
     def initialize(v1, v2, opts=Hash.new)
-      raise ArgumentError, "Both arguments should be Vectors" unless v1.is_a? Statsample::Vector and v2.is_a? Statsample::Vector
+      #raise ArgumentError, "Both arguments should be Vectors" unless v1.is_a? Statsample::Vector and v2.is_a? Statsample::Vector
       raise ArgumentError, "Vectors should be the same size" unless v1.size==v2.size
-      @v_rows, @v_cols=Statsample.only_valid_clone(v1,v2)
+      @v_rows, @v_cols=Statsample.only_valid_clone(v1.to_vector,v2.to_vector)
       @cases=@v_rows.size
       @row_label=v1.name
       @column_label=v2.name
