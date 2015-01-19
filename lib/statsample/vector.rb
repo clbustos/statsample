@@ -831,32 +831,33 @@ module Statsample
       ######
 
       # Return the value of the percentil q
-=begin
-      def percentil(q)
+      def percentil(q, strategy = :nearest)
         check_type :ordinal
         sorted=@valid_data.sort
-        v= (n_valid * q).quo(100)
-        if(v.to_i!=v)
-          sorted[v.to_i]
+
+        case strategy
+        when :nearest
+          v = (n_valid * q).quo(100)
+          if(v.to_i!=v)
+            sorted[v.to_i]
+          else
+            (sorted[(v-0.5).to_i].to_f + sorted[(v+0.5).to_i]).quo(2)
+          end
+        when :linear
+          index = (q / 100.0) * (n_valid + 1)
+
+          k = index.truncate
+          d = index % 1
+
+          if k == 0
+            sorted[0]
+          elsif k >= sorted.size
+            sorted[-1]
+          else
+            sorted[k - 1] + d * (sorted[k] - sorted[k - 1])
+          end
         else
-          (sorted[(v-0.5).to_i].to_f + sorted[(v+0.5).to_i]).quo(2)
-        end
-      end
-=end
-
-      def percentil(percent)
-        index = (percent / 100.0) * (n_valid + 1)
-        sorted = @valid_data.sort
-
-        k = index.truncate
-        d = index % 1
-
-        if k == 0
-          sorted[0]
-        elsif k >= values.size
-          sorted[-1]
-        else
-          sorted[k - 1] + d * (sorted[k] - sorted[k - 1])
+          raise NotImplementedError.new "Unknown strategy #{strategy.to_s}"
         end
       end
 
