@@ -30,12 +30,12 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       end
       @correct_a=@correct_a.to_scale
       @correct_b=@correct_b.to_scale
-      
+
       @common=lambda  do |av,bv|
         assert_equal(@correct_a, av, "A no es esperado")
         assert_equal(@correct_b, bv, "B no es esperado")
         assert(!av.has_missing_data?, "A tiene datos faltantes")
-        assert(!bv.has_missing_data?, "b tiene datos faltantes")        
+        assert(!bv.has_missing_data?, "b tiene datos faltantes")
       end
     end
     should "return correct only_valid" do
@@ -53,10 +53,10 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       assert_equal(av,av2)
       assert_same(av,av2)
       assert_same(bv,bv2)
-    end 
+    end
   end
   context Statsample::Vector do
-    setup do 
+    setup do
       @c = Statsample::Vector.new([5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99], :nominal)
       @c.name="Test Vector"
       @c.missing_values=[-99]
@@ -66,18 +66,18 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       v=Statsample::Vector.new(gsl)
       assert_equal([1,2,3,4,5], v.to_a)
       refute(v.flawed?)
-      
+
     end
-      
+
     context "using matrix operations" do
       setup do
         @a=[1,2,3,4,5].to_scale
       end
-      should "to_matrix returns a matrix with 1 row" do 
+      should "to_matrix returns a matrix with 1 row" do
         mh=Matrix[[1,2,3,4,5]]
         assert_equal(mh,@a.to_matrix)
       end
-      should "to_matrix(:vertical) returns a matrix with 1 column" do 
+      should "to_matrix(:vertical) returns a matrix with 1 column" do
         mv=Matrix.columns([[1,2,3,4,5]])
         assert_equal(mv,@a.to_matrix(:vertical))
       end
@@ -89,7 +89,7 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       end
     end
     context "when initializing" do
-      setup do 
+      setup do
         @data=(10.times.map{rand(100)})+[nil]
         @original=Statsample::Vector.new(@data, :scale)
       end
@@ -103,9 +103,9 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
         assert_equal(reference, Statsample::Vector[0,4..6,10])
         assert_equal(reference, Statsample::Vector[[0],[4,5,6],[10]])
         assert_equal(reference, Statsample::Vector[[0],[4,[5,[6]]],[10]])
-        
+
         assert_equal(reference, Statsample::Vector[[0],[4,5,6].to_vector,[10]])
-        
+
       end
       should "be the same usign #to_vector" do
         lazy1=@data.to_vector(:scale)
@@ -121,7 +121,7 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
         v1=10.times.map {nil}.to_scale
         v2=Statsample::Vector.new_scale(10)
         assert_equal(v1,v2)
-        
+
       end
       should "could use new_scale with size and value" do
         a=rand
@@ -134,11 +134,11 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
         v2=Statsample::Vector.new_scale(10) {|i| i*2}
         assert_equal(v1,v2)
       end
-      
+
     end
-    
+
     context "#split_by_separator" do
-     
+
       setup do
         @a = Statsample::Vector.new(["a","a,b","c,d","a,d",10,nil],:nominal)
         @b=@a.split_by_separator(",")
@@ -150,14 +150,14 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
         expected=['a','b','c','d',10]
         assert_equal(expected, @b.keys)
       end
-      
+
       should "returns a Hash, which values are Statsample::Vector" do
         @b.each_key {|k| assert_instance_of(Statsample::Vector, @b[k])}
       end
       should "hash values are n times the tokens appears" do
         assert_counting_tokens(@b)
       end
-      should "#split_by_separator_freq returns the number of ocurrences of tokens" do 
+      should "#split_by_separator_freq returns the number of ocurrences of tokens" do
         assert_equal({'a'=>3,'b'=>1,'c'=>1,'d'=>2,10=>1}, @a.split_by_separator_freq())
       end
       should "using a different separator give the same values" do
@@ -177,7 +177,7 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       3.times do |i|
         assert_in_delta(i*4.5, hist.get_range(i)[0], 1e-9)
       end
-      
+
     end
     should "have a name" do
       @c.name=="Test Vector"
@@ -190,17 +190,17 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       next_number=$1.to_i+1
       assert_equal("Vector #{next_number}",b.name)
     end
-    should "save to a file and load the same Vector" do 
+    should "save to a file and load the same Vector" do
       outfile=Tempfile.new("vector.vec")
       @c.save(outfile.path)
       a=Statsample.load(outfile.path)
-      assert_equal(@c,a)  
+      assert_equal(@c,a)
     end
     should "#collect returns an array" do
       val=@c.collect {|v| v}
       assert_equal(val,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99])
     end
-    
+
     should "#recode returns a recoded array" do
       a=@c.recode{|v| @c.is_valid?(v) ? 0 : 1 }
       exp=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1].to_vector
@@ -213,8 +213,8 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       a=[1,2,3,4,5].to_vector(:scale)
       assert_equal(120,a.product)
     end
-    
-    should "missing values" do 
+
+    should "missing values" do
       @c.missing_values=[10]
       assert_equal([-99,-99,1,2,3,4,5,5,5,5,5,6,6,7,8,9], @c.valid_data.sort)
       assert_equal([5,5,5,5,5,6,6,7,8,9,nil,1,2,3,4,nil,-99,-99], @c.data_with_nils)
@@ -224,13 +224,13 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       @c.missing_values=[]
       assert_equal(@c.valid_data.sort,[-99,-99,1,2,3,4,5,5,5,5,5,6,6,7,8,9,10])
       assert_equal(@c.data_with_nils,[5,5,5,5,5,6,6,7,8,9,10,1,2,3,4,nil,-99,-99])
-      
+
     end
-    should "correct has_missing_data? with missing data" do 
+    should "correct has_missing_data? with missing data" do
       a=[1,2,3,nil].to_vector
       assert(a.has_missing_data?)
     end
-    should "correct has_missing_data? without missing data" do   
+    should "correct has_missing_data? without missing data" do
       a=[1,2,3,4,10].to_vector
       assert(!a.has_missing_data?)
     end
@@ -238,12 +238,12 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       a=[1,2,3,4,10].to_vector
       a.missing_values=[10]
       assert(a.has_missing_data?)
-    end 
-    should "label correctly fields" do 
+    end
+    should "label correctly fields" do
       @c.labels={5=>'FIVE'}
       assert_equal(["FIVE","FIVE","FIVE","FIVE","FIVE",6,6,7,8,9,10,1,2,3,4,nil,-99, -99],@c.vector_labeled.to_a)
     end
-    should "verify" do 
+    should "verify" do
       h=@c.verify{|d| !d.nil? and d>0}
       e={15=>nil,16=>-99,17=>-99}
       assert_equal(e,h)
@@ -251,7 +251,7 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     should "have a summary with name on it" do
       assert_match(/#{@c.name}/, @c.summary)
     end
-    
+
     should "GSL::Vector based should push correcty" do
       if Statsample.has_gsl?
         v=GSL::Vector[1,2,3,4,5].to_scale
@@ -263,10 +263,10 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       end
     end
 
-    
+
     should "split correctly" do
       a = Statsample::Vector.new(["a","a,b","c,d","a,d","d",10,nil],:nominal)
-      assert_equal([%w{a},%w{a b},%w{c d},%w{a d},%w{d},[10],nil], a.splitted)      
+      assert_equal([%w{a},%w{a b},%w{c d},%w{a d},%w{d},[10],nil], a.splitted)
     end
     should "multiply correct for scalar" do
       a = [1,2,3].to_scale
@@ -275,20 +275,20 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     should "multiply correct with other vector" do
       a = [1,2,3].to_scale
       b = [2,4,6].to_scale
-      
+
       assert_equal([2,8,18].to_scale, a*b)
     end
     should "sum correct for scalar" do
       a = [1,2,3].to_scale
       assert_equal([11,12,13].to_scale, a+10)
     end
-    
+
     should "raise NoMethodError when method requires ordinal and vector is nominal" do
       @c.type=:nominal
       assert_raise(::NoMethodError) { @c.median }
     end
-    
-    should "raise NoMethodError when method requires scalar and vector is ordinal" do      
+
+    should "raise NoMethodError when method requires scalar and vector is ordinal" do
       @c.type=:ordinal
       assert_raise(::NoMethodError) { @c.mean }
     end
@@ -326,7 +326,7 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
       assert_in_delta(se, ds[:mean].sd, 0.02)
     end
 
-    
+
   end
 
 
@@ -363,8 +363,6 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     a=[1,nil,nil,2,2,3,4,nil,nil,5,5,5,6,10].to_scale
     expected=[10,nil,nil,25,25,40,50,nil,nil,70,70,70,90,100].to_scale
     assert_equal(expected, a.vector_percentil)
-    
-    
   end
   def test_ordinal
     @c.type=:ordinal
@@ -379,6 +377,21 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     assert_equal(6.5, a.percentil(50))
     assert_equal(9.5, a.percentil(75))
     assert_equal(3.0, a.percentil(10))
+  end
+  def test_linear_percentil_strategy
+    values = [102, 104, 105, 107, 108, 109, 110, 112, 115, 116].shuffle.to_scale
+    assert_equal 102, values.percentil(0, :linear)
+    assert_equal 104.75, values.percentil(25, :linear)
+    assert_equal 108.5, values.percentil(50, :linear)
+    assert_equal 112.75, values.percentil(75, :linear)
+    assert_equal 116, values.percentil(100, :linear)
+
+    values = [102, 104, 105, 107, 108, 109, 110, 112, 115, 116, 118].shuffle.to_scale
+    assert_equal 102, values.percentil(0, :linear)
+    assert_equal 105, values.percentil(25, :linear)
+    assert_equal 109, values.percentil(50, :linear)
+    assert_equal 115, values.percentil(75, :linear)
+    assert_equal 118, values.percentil(100, :linear)
   end
   def test_ranked
     v1=[0.8,1.2,1.2,2.3,18].to_vector(:ordinal)
@@ -418,7 +431,7 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     assert_equal(0,vs.mean)
     assert_equal(1,vs.sds)
   end
-  
+
   def test_vector_standarized_with_zero_variance
     v1=100.times.map {|i| 1}.to_scale
     exp=100.times.map {nil}.to_scale
@@ -431,14 +444,14 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     assert_raise(NoMethodError) { v.check_type(:scale)}
     assert_raise(NoMethodError) { v.check_type(:ordinal)}
     assert(v.check_type(:nominal).nil?)
-    
+
     v.type=:ordinal
-    
+
     assert_raise(NoMethodError) { v.check_type(:scale)}
-    
+
     assert(v.check_type(:ordinal).nil?)
     assert(v.check_type(:nominal).nil?)
-    
+
 
     v.type=:scale
     assert(v.check_type(:scale).nil?)
@@ -449,10 +462,8 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
     assert_raise(NoMethodError) { v.check_type(:scale)}
     assert_raise(NoMethodError) { v.check_type(:ordinal)}
     assert_raise(NoMethodError) { v.check_type(:nominal)}
-    
   end
-  
-  
+
   def test_add
     a=Statsample::Vector.new([1,2,3,4,5], :scale)
     b=Statsample::Vector.new([11,12,13,14,15], :scale)
@@ -530,7 +541,7 @@ class StatsampleTestVector < MiniTest::Unit::TestCase
   def test_gsl
     if Statsample.has_gsl?
       a=Statsample::Vector.new([1,2,3,4,"STRING"], :scale)
-      
+
       assert_equal(2,a.mean)
       assert_equal(a.variance_sample_ruby,a.variance_sample)
       assert_equal(a.standard_deviation_sample_ruby,a.sds)
