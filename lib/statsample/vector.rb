@@ -830,13 +830,22 @@ module Statsample
       ### Ordinal Methods
       ######
 
-      # Return the value of the percentil q
-      def percentil(q, strategy = :nearest)
+      # == Percentil
+      # Returns the value of the percentile q
+      #
+      # Accepts an optional second argument specifying the strategy to interpolate
+      # when the requested percentile lies between two data points a and b
+      # Valid strategies are:
+      # * :midpoint (Default): (a + b) / 2
+      # * :linear : a + (b - a) * d where d is the decimal part of the index between a and b.
+      # This is the NIST recommended method (http://en.wikipedia.org/wiki/Percentile#NIST_method)
+      #
+      def percentil(q, strategy = :midpoint)
         check_type :ordinal
         sorted=@valid_data.sort
 
         case strategy
-        when :nearest
+        when :midpoint
           v = (n_valid * q).quo(100)
           if(v.to_i!=v)
             sorted[v.to_i]
