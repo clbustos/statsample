@@ -5,7 +5,6 @@ module Statsample
       # only uses tuples without missing data
       def cronbach_alpha(ods)
         ds=ods.dup_only_valid
-        return nil if ds.vectors.any? {|k,v| v.variance==0}
         n_items=ds.fields.size
         return nil if n_items<=1
         s2_items=ds.vectors.inject(0) {|ac,v|
