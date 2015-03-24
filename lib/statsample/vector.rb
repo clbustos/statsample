@@ -5,8 +5,9 @@ module Statsample::VectorShorthands
   # Creates a new Statsample::Vector object
   # Argument should be equal to Vector.new
   def to_vector(*args)
-		Statsample::Vector.new(self,*args)
-	end
+    Statsample::Vector.new(self,*args)
+  end
+
   # Creates a new Statsample::Vector object of type :scale
   def to_scale(*args)
     Statsample::Vector.new(self, :scale, *args)
@@ -253,21 +254,22 @@ module Statsample
       @data.push(v)
       set_valid_data
     end
+
     # Dicotomize the vector with 0 and 1, based on lowest value
     # If parameter if defined, this value and lower
     # will be 0 and higher, 1
-    def dichotomize(low=nil)
-      fs=factors
-      low||=factors.min
-      @data_with_nils.collect{|x|
+    def dichotomize(low = nil)
+      low ||= factors.min
+
+      @data_with_nils.collect do |x|
         if x.nil?
           nil
-        elsif x>low
+        elsif x > low
           1
         else
           0
         end
-      }.to_scale
+      end.to_scale
     end
     # Iterate on each item.
     # Equivalent to

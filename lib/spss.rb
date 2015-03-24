@@ -1,4 +1,4 @@
-# = spss.rb - 
+# = spss.rb -
 #
 # Provides utilites for working with spss files
 #
@@ -12,40 +12,43 @@ module SPSS # :nodoc: all
       def add(a)
         @elements.push(a)
       end
-      def parse_elements(func=:to_s)
-        @elements.collect{|e| "   "+e.send(func)}.join("\n")
+
+      def parse_elements(func = :to_s)
+        @elements.collect{ |e| "   "+e.send(func) }.join("\n")
       end
+
       def init_with config
-        config.each {|key,value|
-            self.send(key.to_s+"=",value) if methods.include? key.to_s
-        }
+        config.each do |key, value|
+            self.send(key.to_s + "=", value) if methods.include? key.to_s
+        end
       end
-      def initialize(config={})
-        @config=config
-        @elements=[]
+
+      def initialize(config = {})
+        @config = config
+        @elements = []
       end
     end
     class Dictionary < Element
       attr_accessor :locale, :date_time, :row_count
-      def initialize(config={})
+      def initialize(config = {})
         super
         init_with ({
-                :locale=>"en_US", 
+                :locale=>"en_US",
                 :date_time=>Time.new().strftime("%Y-%m-%dT%H:%M:%S"),
                 :row_count=>1
         })
         init_with config
       end
-      
+
       def to_xml
         "<dictionary locale='#{@locale}' creationDateTime='#{@date_time}' rowCount='#{@row_count}' xmlns='http://xml.spss.com/spss/data'>\n"+parse_elements(:to_xml)+"\n</dictionary>"
-        
+
       end
       def to_spss
         parse_elements(:to_spss)
       end
     end
-    
+
     class MissingValue < Element
       attr_accessor :data, :type, :from, :to
       def initialize(data,type=nil)
