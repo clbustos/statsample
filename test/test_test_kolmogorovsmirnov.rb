@@ -1,6 +1,6 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleTestKolmogorovSmirnovTestCase < MiniTest::Unit::TestCase
-  context(Statsample::Test::KolmogorovSmirnov) do 
+class StatsampleTestKolmogorovSmirnovTestCase < Minitest::Test
+  context(Statsample::Test::KolmogorovSmirnov) do
     should "calculate correctly D for two given samples" do
       a=[1.1,2.5,5.6,9]
       b=[1,2.3,5.8,10]
@@ -18,7 +18,7 @@ class StatsampleTestKolmogorovSmirnovTestCase < MiniTest::Unit::TestCase
       ks=Statsample::Test::KolmogorovSmirnov.new(a,Distribution::Normal)
       assert(ks.d<0.15)
     end
-    
+
     context(Statsample::Test::KolmogorovSmirnov::EmpiricDistribution) do
       should "Create a correct empirical distribution for an array" do
         a=[10,9,8,7,6,5,4,3,2,1]

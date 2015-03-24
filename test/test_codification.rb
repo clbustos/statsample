@@ -1,5 +1,5 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleCodificationTestCase < MiniTest::Unit::TestCase
+class StatsampleCodificationTestCase < Minitest::Test
 
   def initialize(*args)
     v1=%w{run walk,run walking running sleep sleeping,dreaming sleep,dream}.to_vector

@@ -1,7 +1,7 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 
-class StatsampleHistogramTestCase < MiniTest::Unit::TestCase
+class StatsampleHistogramTestCase < Minitest::Test
   context Statsample::Histogram do
     should "alloc correctly with integer" do
       h = Statsample::Histogram.alloc(4)
@@ -22,8 +22,8 @@ class StatsampleHistogramTestCase < MiniTest::Unit::TestCase
       h = Statsample::Histogram.alloc(4)
       assert_equal(4,h.bins)
     end
-    should "increment correctly" do 
-      h = Statsample::Histogram.alloc(5, [0, 5])      
+    should "increment correctly" do
+      h = Statsample::Histogram.alloc(5, [0, 5])
       h.increment 2.5
       assert_equal([0.0,0.0,1.0,0.0,0.0], h.bin)
       h.increment [0.5,0.5,3.5,3.5]
@@ -33,7 +33,7 @@ class StatsampleHistogramTestCase < MiniTest::Unit::TestCase
       h.increment 5
       assert_equal([3.0,0.0,1.0,2.0,0.0], h.bin)
     end
-    
+
     should "alloc_uniform correctly with n, min,max" do
       h = Statsample::Histogram.alloc_uniform(5,0,10)
       assert_equal(5,h.bins)
@@ -107,6 +107,6 @@ class StatsampleHistogramTestCase < MiniTest::Unit::TestCase
         h.to_svg
       end
     end
-    
+
   end
 end

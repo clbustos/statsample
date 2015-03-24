@@ -1,8 +1,8 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleTestTTestCase < MiniTest::Unit::TestCase
+class StatsampleTestTTestCase < Minitest::Test
   include Statsample::Test
   include Math
-  context T do 
+  context T do
     setup do
       @a=[30.02, 29.99, 30.11, 29.97, 30.01, 29.99].to_scale
       @b=[29.89, 29.93, 29.72, 29.98, 30.02, 29.98].to_scale
@@ -35,7 +35,7 @@ class StatsampleTestTTestCase < MiniTest::Unit::TestCase
     end
     should "calculate correctly df for equal and unequal variance" do
       assert_equal(10,  T.df_equal_variance(@n1,@n2))
-      assert_in_delta(7.03,  T.df_not_equal_variance(@s1,@s2,@n1,@n2),0.001)    
+      assert_in_delta(7.03,  T.df_not_equal_variance(@s1,@s2,@n1,@n2),0.001)
     end
     should "calculate all values for T object" do
       t=Statsample::Test.t_two_samples_independent(@a,@b)

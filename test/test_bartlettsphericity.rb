@@ -1,6 +1,6 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
-class StatsampleBartlettSphericityTestCase < MiniTest::Test
+class StatsampleBartlettSphericityTestCase < Minitest::Test
   include Statsample::Test
   context Statsample::Test::BartlettSphericity do
     setup do

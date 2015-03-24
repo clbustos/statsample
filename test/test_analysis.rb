@@ -1,6 +1,6 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
-class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
+class StatsampleAnalysisTestCase < Minitest::Test
   context(Statsample::Analysis) do
     setup do
       Statsample::Analysis.clear_analysis
@@ -12,7 +12,7 @@ class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
       assert(Statsample::Analysis.stored_analysis[:first])
       assert(Statsample::Analysis.stored_analysis[:first].is_a? Statsample::Analysis::Suite)
     end
-    
+
     should "ss_analysis should create an Statsample::Analysis" do
       ss_analysis(:first) {a=1}
     end
@@ -22,12 +22,12 @@ class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
       end
       assert_equal(an,Statsample::Analysis.last)
     end
-    
+
     should "add_to_reportbuilder() add sections to reportbuilder object" do
       rb=mock()
       rb.expects(:add).with {|value| value.is_a? ReportBuilder::Section and value.name==:first}
       rb.expects(:add).with {|value| value.is_a? ReportBuilder::Section and value.name==:second}
-      
+
       Statsample::Analysis.store(:first) do
         echo "first","second"
       end
@@ -49,29 +49,29 @@ class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
         summary(a)
       }
       obs=Statsample::Analysis.to_text(:first)
-      
+
       assert_equal(exp.split("\n")[1,exp.size], obs.split("\n")[1,obs.size])
     end
-    
+
     should "run() execute all analysis by default" do
       m1=mock()
       m1.expects(:run).once
       m1.expects(:hide).once
-      
+
       Statsample::Analysis.store(:first) do
         m1.run
       end
       Statsample::Analysis.store(:second) do
         m1.hide
       end
-      
+
       # Should run all test
       Statsample::Analysis.run
     end
-    
+
     should "run() execute blocks specificed on parameters" do
       m1=mock()
-      m1.expects(:run).once   
+      m1.expects(:run).once
       m1.expects(:hide).never
       Statsample::Analysis.store(:first) do
         m1.run
@@ -82,7 +82,7 @@ class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
       # Should run all test
       Statsample::Analysis.run(:first)
     end
-   
+
     context(Statsample::Analysis::Suite) do
       should "echo() uses output#puts with same arguments" do
         an=Statsample::Analysis::Suite.new(:output)
@@ -116,15 +116,15 @@ class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
         an.attach(ds1)
         an.attach(ds2)
         assert_equal(10,an.x.mean)
-        assert_equal(12,an.y.mean)        
-        assert_equal(13,an.z.mean)        
+        assert_equal(12,an.y.mean)
+        assert_equal(13,an.z.mean)
       end
-      
+
       should "detach() without arguments drop latest object" do
         an=Statsample::Analysis::Suite.new(:summary)
         ds1={'x'=>stub(:mean=>100),'y'=>stub(:mean=>120),'z'=>stub(:mean=>13)}
         ds1.expects(:fields).returns(%w{x y z}).at_least_once
-        ds2={'x'=>stub(:mean=>10),'y'=>stub(:mean=>12)}        
+        ds2={'x'=>stub(:mean=>10),'y'=>stub(:mean=>12)}
         ds2.expects(:fields).returns(%w{x y}).at_least_once
         an.attach(ds1)
         an.attach(ds2)
@@ -140,7 +140,7 @@ class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
         ds2.expects(:fields).returns(%w{x y}).at_least_once
         ds3={'y'=>4}
         ds3.expects(:fields).returns(%w{y}).at_least_once
-        
+
         an.attach(ds3)
         an.attach(ds2)
         an.attach(ds1)
@@ -172,6 +172,6 @@ class StatsampleAnalysisTestCase < MiniTest::Unit::TestCase
         an.summary(:first)
       end
     end
-    
+
   end
 end

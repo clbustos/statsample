@@ -1,6 +1,6 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
-class StatsampleTestVector < MiniTest::Unit::TestCase
+class StatsampleTestVector < Minitest::Test
   include Statsample::Shorthand
 
   def setup

@@ -1,16 +1,16 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleExcelTestCase < MiniTest::Unit::TestCase
+class StatsampleExcelTestCase < Minitest::Test
   context "Excel reader" do
-    setup do 
+    setup do
       @ds=Statsample::Excel.read(File.dirname(__FILE__)+"/fixtures/test_xls.xls")
     end
     should "set the number of cases" do
       assert_equal(6,@ds.cases)
     end
-    should "set correct field names" do 
+    should "set correct field names" do
       assert_equal(%w{id name age city a1},@ds.fields)
     end
-    should "set a dataset equal to expected" do 
+    should "set a dataset equal to expected" do
       id=[1,2,3,4,5,6].to_vector(:scale)
       name=["Alex","Claude","Peter","Franz","George","Fernand"].to_vector(:nominal)
       age=[20,23,25,nil,5.5,nil].to_vector(:scale)
@@ -22,12 +22,12 @@ class StatsampleExcelTestCase < MiniTest::Unit::TestCase
       }
       assert_equal(ds_exp,@ds)
     end
-    should "set to nil empty cells" do 
+    should "set to nil empty cells" do
       assert_equal(nil,@ds['age'][5])
     end
   end
   context "Excel writer" do
-    setup do 
+    setup do
       a=100.times.map{rand(100)}.to_scale
       b=(["b"]*100).to_vector
       @ds={'b'=>b, 'a'=>a}.to_dataset(%w{b a})
@@ -46,7 +46,7 @@ class StatsampleExcelTestCase < MiniTest::Unit::TestCase
       @ds2.each_array do |row|
         assert_equal(@ds.case_as_array(i),row)
         i+=1
-      end    
+      end
     end
   end
 end

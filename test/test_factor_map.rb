@@ -2,10 +2,10 @@ require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 #require 'rserve'
 #require 'statsample/rserve_extension'
 
-class StatsampleFactorMpaTestCase < MiniTest::Unit::TestCase
+class StatsampleFactorMpaTestCase < Minitest::Test
   context Statsample::Factor::MAP do
     setup do
-      m=Matrix[ 
+      m=Matrix[
             [ 1, 0.846, 0.805, 0.859, 0.473, 0.398, 0.301, 0.382],
             [ 0.846, 1, 0.881, 0.826, 0.376, 0.326, 0.277, 0.415],
             [ 0.805, 0.881, 1, 0.801, 0.38, 0.319, 0.237, 0.345],
@@ -25,19 +25,19 @@ class StatsampleFactorMpaTestCase < MiniTest::Unit::TestCase
       #require 'ruby-prof'
 
       @map.use_gsl=true
-      map_assertions(@map)    
+      map_assertions(@map)
     end
-    
-    
+
+
   end
-  
+
   def map_assertions(map)
       assert_in_delta(map.minfm, 0.066445,0.00001)
       assert_equal(map.number_of_factors, 2)
       assert_in_delta(map.fm[0], 0.312475,0.00001)
-      assert_in_delta(map.fm[1], 0.245121,0.00001)  
+      assert_in_delta(map.fm[1], 0.245121,0.00001)
     end
-  
-  
+
+
 end
 

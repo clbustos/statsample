@@ -1,5 +1,5 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleAnovaTwoWayTestCase < MiniTest::Unit::TestCase
+class StatsampleAnovaTwoWayTestCase < Minitest::Test
   context(Statsample::Anova::TwoWay) do
     setup do
       @ss_a=192.2
@@ -17,7 +17,7 @@ class StatsampleAnovaTwoWayTestCase < MiniTest::Unit::TestCase
       assert_in_delta(192.2, @anova.ms_a, 0.01)
       assert_in_delta(57.8, @anova.ms_b, 0.01)
       assert_in_delta(168.2, @anova.ms_axb, 0.01)
-      
+
     end
     should "return correct value for f " do
       assert_in_delta(40.68, @anova.f_a, 0.01)

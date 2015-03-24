@@ -1,7 +1,7 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleAnovaOneWayWithVectorsTestCase < MiniTest::Unit::TestCase
+class StatsampleAnovaOneWayWithVectorsTestCase < Minitest::Test
   context(Statsample::Anova::OneWayWithVectors) do
-    
+
     context("when initializing") do
       setup do
         @v1=10.times.map {rand(100)}.to_scale
@@ -37,10 +37,10 @@ class StatsampleAnovaOneWayWithVectorsTestCase < MiniTest::Unit::TestCase
     end
     should "store correctly contrasts" do
       c1=Statsample::Anova::Contrast.new(:vectors=>[@v1,@v2,@v3], :c=>[1,-0.5, -0.5])
-      
+
       c2=@anova.contrast(:c=>[1,-0.5,-0.5])
       assert_equal(c1.t,c2.t)
-      
+
     end
     should "respond to #summary" do
       assert(@anova.respond_to? :summary)

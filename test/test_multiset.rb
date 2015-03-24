@@ -1,7 +1,7 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 
-class StatsampleMultisetTestCase < MiniTest::Unit::TestCase
+class StatsampleMultisetTestCase < Minitest::Test
   def setup
     @x=%w{a a a a b b b b}.to_vector
     @y=[1,2,3,4,5,6,7,8].to_scale
@@ -121,17 +121,17 @@ class StatsampleMultisetTestCase < MiniTest::Unit::TestCase
 
   end
   def test_multiset_union_with_block
-    
+
     r1=rand()
     r2=rand()
     ye=[1*r1,2*r1,3*r1,4*r1,5*r2,6*r2,7*r2,8*r2].to_scale
-    
+
     ze=[10*r1,11*r1,12*r1,13*r1, 14*r2,15*r2,16*r2,17*r2].to_scale
-    
+
     ds2=@ms.union {|k,ds|
-      ds['y'].recode!{|v| 
+      ds['y'].recode!{|v|
       k=='a' ? v*r1 : v*r2}
-      ds['z'].recode!{|v| 
+      ds['z'].recode!{|v|
       k=='a' ? v*r1 : v*r2}
     }
     assert_equal(ye,ds2['y'])
@@ -141,18 +141,18 @@ class StatsampleMultisetTestCase < MiniTest::Unit::TestCase
     r1=rand()
     r2=rand()
     ye=[1*r1,2*r1,3*r1,4*r1,5*r2,6*r2,7*r2,8*r2].to_scale
-    
+
     ze=[10*r1,11*r1,12*r1,13*r1, 14*r2,15*r2,16*r2,17*r2].to_scale
     @ms.each {|k,ds|
-      ds['y'].recode!{|v| 
+      ds['y'].recode!{|v|
       k=='a' ? v*r1 : v*r2}
-      ds['z'].recode!{|v| 
+      ds['z'].recode!{|v|
       k=='a' ? v*r1 : v*r2}
-      
+
     }
     ds2=@ms.union
     assert_equal(ye,ds2['y'])
     assert_equal(ze,ds2['z'])
-    
+
   end
 end

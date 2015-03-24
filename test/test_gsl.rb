@@ -1,5 +1,5 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleGSLTestCase < MiniTest::Unit::TestCase
+class StatsampleGSLTestCase < Minitest::Test
   should_with_gsl "matrix with gsl" do
     a=[1,2,3,4,20].to_vector(:scale)
     b=[3,2,3,4,50].to_vector(:scale)

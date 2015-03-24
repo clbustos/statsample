@@ -1,5 +1,5 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleBivariateTestCase < MiniTest::Test
+class StatsampleBivariateTestCase < Minitest::Test
   should "method sum of squares should be correct" do
     v1=[1,2,3,4,5,6].to_vector(:scale)
     v2=[6,2,4,10,12,8].to_vector(:scale)
@@ -68,14 +68,14 @@ class StatsampleBivariateTestCase < MiniTest::Test
       v5=Statsample::Vector.new_scale(cases) {rand()}
 
       ds={'v1'=>v1,'v2'=>v2,'v3'=>v3,'v4'=>v4,'v5'=>v5}.to_dataset
-      
+
       cor_opt=Statsample::Bivariate.covariance_matrix_optimized(ds)
-      
+
       cor_pw =Statsample::Bivariate.covariance_matrix_pairwise(ds)
       assert_equal_matrix(cor_opt,cor_pw,1e-15)
   end
   should_with_gsl "return same values for optimized and pairwise correlation matrix" do
-    
+
     cases=100
     v1=Statsample::Vector.new_scale(cases) {rand()}
     v2=Statsample::Vector.new_scale(cases) {rand()}
@@ -84,12 +84,12 @@ class StatsampleBivariateTestCase < MiniTest::Test
     v5=Statsample::Vector.new_scale(cases) {rand()}
 
     ds={'v1'=>v1,'v2'=>v2,'v3'=>v3,'v4'=>v4,'v5'=>v5}.to_dataset
-    
+
     cor_opt=Statsample::Bivariate.correlation_matrix_optimized(ds)
-    
+
     cor_pw =Statsample::Bivariate.correlation_matrix_pairwise(ds)
     assert_equal_matrix(cor_opt,cor_pw,1e-15)
-    
+
   end
   should "return correct correlation_matrix without nils values" do
     v1=[6,5,4,7,8,4,3,2].to_vector(:scale)
@@ -112,7 +112,7 @@ class StatsampleBivariateTestCase < MiniTest::Test
     #assert_equal(expected,obt)
   end
 
-  
+
   should "return correct value for prop pearson" do
     assert_in_delta(0.42, Statsample::Bivariate.prop_pearson(Statsample::Bivariate.t_r(0.084,94), 94),0.01)
     assert_in_delta(0.65, Statsample::Bivariate.prop_pearson(Statsample::Bivariate.t_r(0.046,95), 95),0.01)

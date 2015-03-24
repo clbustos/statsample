@@ -1,6 +1,6 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
-class StatsampleUMannWhitneyTestCase < MiniTest::Unit::TestCase
+class StatsampleUMannWhitneyTestCase < Minitest::Test
   include Statsample::Test
   context Statsample::Test::UMannWhitney do
     setup do
@@ -8,8 +8,8 @@ class StatsampleUMannWhitneyTestCase < MiniTest::Unit::TestCase
       @v2=[5,6,11,12,13,16,17,18,19].to_scale
       @u=Statsample::Test::UMannWhitney.new(@v1,@v2)
     end
-    should "have same result using class or Test#u_mannwhitney" do 
-      assert_equal(Statsample::Test.u_mannwhitney(@v1,@v2).u, @u.u) 
+    should "have same result using class or Test#u_mannwhitney" do
+      assert_equal(Statsample::Test.u_mannwhitney(@v1,@v2).u, @u.u)
     end
     should "have correct U values" do
       assert_equal(73,@u.r1)

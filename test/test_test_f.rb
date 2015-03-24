@@ -1,6 +1,6 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleTestFTestCase < MiniTest::Unit::TestCase
-  context(Statsample::Test::F) do 
+class StatsampleTestFTestCase < Minitest::Test
+  context(Statsample::Test::F) do
     setup do
       @ssb=84
       @ssw=68
@@ -14,13 +14,13 @@ class StatsampleTestFTestCase < MiniTest::Unit::TestCase
     should "have df total equal to df_num+df_den" do
       assert_equal(@df_num + @df_den, @f.df_total)
     end
-    should "have probability near 0.002" do 
+    should "have probability near 0.002" do
       assert_in_delta(0.002, @f.probability, 0.0005)
     end
     should "be coerced into float" do
       assert_equal(@f.to_f, @f.f)
     end
-    
+
     context("method summary") do
       setup do
         @summary=@f.summary

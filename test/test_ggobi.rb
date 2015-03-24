@@ -1,6 +1,6 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 require 'ostruct'
-class StatsampleGGobiTestCase < MiniTest::Unit::TestCase
+class StatsampleGGobiTestCase < Minitest::Test
 
   def setup
     v1=([10.2,20.3,10,20,30,40,30,20,30,40]*10).to_vector(:scale)

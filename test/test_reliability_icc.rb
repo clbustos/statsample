@@ -2,7 +2,7 @@ require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 $reliability_icc=nil
 
-class StatsampleReliabilityIccTestCase < MiniTest::Test
+class StatsampleReliabilityIccTestCase < Minitest::Test
   context Statsample::Reliability::ICC do
     setup do
       a=[9,6,8,7,10,6].to_scale
@@ -31,21 +31,21 @@ class StatsampleReliabilityIccTestCase < MiniTest::Test
     should "ms within targets be correct" do
       assert_in_delta(6.26,  @icc.ms_wt, 0.01)
     end
-    should "ms between judges be correct" do 
+    should "ms between judges be correct" do
       assert_in_delta(32.49, @icc.ms_bj, 0.01)
     end
     should "ms residual be correct" do
       assert_in_delta(1.02,  @icc.ms_residual, 0.01)
     end
-    context "with McGraw and Wong denominations," do 
-      
+    context "with McGraw and Wong denominations," do
+
     end
-    context "with Shrout & Fleiss denominations, " do 
+    context "with Shrout & Fleiss denominations, " do
       should "icc(1,1) method be correct" do
         assert_in_delta(0.17, @icc.icc_1_1, 0.01)
       end
       # Verified on SPSS and R
-      should "icc(2,1) method be correct" do    
+      should "icc(2,1) method be correct" do
         assert_in_delta(0.29, @icc.icc_2_1, 0.01)
       end
       should "icc(3,1) method be correct" do
@@ -57,11 +57,11 @@ class StatsampleReliabilityIccTestCase < MiniTest::Test
       # Verified on SPSS and R
       should "icc(2,k) method be correct" do
         assert_in_delta(0.62, @icc.icc_2_k, 0.01)
-      end 
+      end
       should "icc(3,k) method be correct" do
         assert_in_delta(0.91, @icc.icc_3_k, 0.01)
       end
-      
+
       should "icc(1,1) F be correct" do
         assert_in_delta(1.795, @icc.icc_1_f.f)
       end
@@ -73,7 +73,7 @@ class StatsampleReliabilityIccTestCase < MiniTest::Test
         assert_in_delta(-0.884, @icc.icc_1_k_ci[0], 0.001)
         assert_in_delta(0.912, @icc.icc_1_k_ci[1], 0.001)
       end
-      
+
       should "icc(2,1) F be correct" do
         assert_in_delta(11.027, @icc.icc_2_f.f)
       end
@@ -82,8 +82,8 @@ class StatsampleReliabilityIccTestCase < MiniTest::Test
         assert_in_delta(0.019, @icc.icc_2_1_ci[0], 0.001)
         assert_in_delta(0.761, @icc.icc_2_1_ci[1], 0.001)
       end
-      
-      # Verified on SPSS and R      
+
+      # Verified on SPSS and R
       should "icc(2,k) confidence interval should be correct" do
         #skip("Not yet operational")
         #p @icc.icc_2_k_ci
@@ -94,11 +94,11 @@ class StatsampleReliabilityIccTestCase < MiniTest::Test
       #should "Shrout icc(2,k) and McGraw icc(a,k) ci be equal" do
       #  assert_in_delta(@icc.icc_2_k_ci_shrout[0], @icc.icc_2_k_ci_mcgraw[0], 10e-5)
       #end
-      
+
       should "icc(3,1) F be correct" do
         assert_in_delta(11.027, @icc.icc_3_f.f)
       end
-      
+
       should "icc(3,1) confidence interval should be correct" do
         assert_in_delta(0.342, @icc.icc_3_1_ci[0], 0.001)
         assert_in_delta(0.946, @icc.icc_3_1_ci[1], 0.001)
@@ -108,12 +108,12 @@ class StatsampleReliabilityIccTestCase < MiniTest::Test
         assert_in_delta(0.986, @icc.icc_3_k_ci[1], 0.001)
       end
       should "incorrect type raises an error" do
-        assert_raise(::RuntimeError) do 
+        assert_raise(::RuntimeError) do
           @icc.type=:nonexistant_type
         end
       end
     end
-    
+
     begin
       require 'rserve'
       require 'statsample/rserve_extension'
@@ -129,12 +129,12 @@ class StatsampleReliabilityIccTestCase < MiniTest::Test
             c=a.recode{|i|i+rand(4)-2}
             d=a.recode{|i|i+rand(4)-2}
             @ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
-            
+
             @icc=Statsample::Reliability::ICC.new(@ds)
             @r=Rserve::Connection.new
-            
+
             @r.assign('ds',@ds)
-          
+
             @r.void_eval("library(irr);
               iccs=list(
               icc_1=icc(ds,'o','c','s'),
@@ -147,7 +147,7 @@ class StatsampleReliabilityIccTestCase < MiniTest::Test
             @iccs=@r.eval('iccs').to_ruby
             $reliability_icc={ :icc=>@icc, :iccs=>@iccs, :r=>@r
             }
-            
+
           end
           @icc=$reliability_icc[:icc]
           @iccs=$reliability_icc[:iccs]
@@ -186,7 +186,7 @@ class StatsampleReliabilityIccTestCase < MiniTest::Test
               @icc.type=t
               @r_icc=@iccs[t.to_s]
               assert_in_delta(@r_icc['lbound'],@icc.lbound)
-              assert_in_delta(@r_icc['ubound'],@icc.ubound)  
+              assert_in_delta(@r_icc['ubound'],@icc.ubound)
             end
             should "summary generated" do
               assert(@icc.summary.size>0)
@@ -197,6 +197,6 @@ class StatsampleReliabilityIccTestCase < MiniTest::Test
     rescue
       puts "requires rserve"
     end
-    
+
   end
 end

@@ -1,5 +1,5 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleStatisicsTestCase < MiniTest::Unit::TestCase
+class StatsampleStatisicsTestCase < Minitest::Test
 
   def initialize(*args)
     super
@@ -11,7 +11,7 @@ class StatsampleStatisicsTestCase < MiniTest::Unit::TestCase
     assert_equal(1, Statsample::Test.p_using_cdf(0.50, tails=:both))
     assert_equal(0.05, Statsample::Test.p_using_cdf(0.025, tails=:both))
     assert_in_delta(0.05, Statsample::Test.p_using_cdf(0.975, tails=:both),0.0001)
-    
+
   end
   def test_recode_repeated
     a=%w{a b c c d d d e}

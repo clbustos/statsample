@@ -1,5 +1,5 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleAnovaContrastTestCase < MiniTest::Unit::TestCase
+class StatsampleAnovaContrastTestCase < Minitest::Test
   context(Statsample::Anova::Contrast) do
     setup do
       constant=[12,13,11,12,12].to_scale

@@ -1,5 +1,5 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleCrosstabTestCase < MiniTest::Unit::TestCase
+class StatsampleCrosstabTestCase < Minitest::Test
 
   def initialize(*args)
     @v1=%w{black blonde black black red black brown black blonde black red black blonde}.to_vector
@@ -57,7 +57,7 @@ class StatsampleCrosstabTestCase < MiniTest::Unit::TestCase
     v2=%w{0 0 0 0 0 1 1 1 1 1}.to_scale
     ct=Statsample::Crosstab.new(v1,v2)
     assert_equal(Matrix[[0,5],[5,0]],ct.to_matrix)
-    assert_nothing_raised { ct.summary }  
+    assert_nothing_raised { ct.summary }
   end
 
 end

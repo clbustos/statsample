@@ -1,7 +1,7 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
-class StatsampleMatrixTestCase < MiniTest::Unit::TestCase
-  
+class StatsampleMatrixTestCase < Minitest::Test
+
   def test_to_dataset
     m=Matrix[[1,4],[2,5],[3,6]]
     m.extend Statsample::NamedMatrix
@@ -16,8 +16,8 @@ class StatsampleMatrixTestCase < MiniTest::Unit::TestCase
     assert_equal(ds['x1'],obs['x1'])
     assert_equal(ds['x2'],obs['x2'])
     assert_equal(ds['x1'].mean,obs['x1'].mean)
-    
-    
+
+
   end
   def test_covariate
     a=Matrix[[1.0, 0.3, 0.2], [0.3, 1.0, 0.5], [0.2, 0.5, 1.0]]
@@ -46,5 +46,5 @@ class StatsampleMatrixTestCase < MiniTest::Unit::TestCase
         assert_in_delta(corr[i,j], real[i,j],1e-15)
       end
     end
-  end  
+  end
 end

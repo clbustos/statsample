@@ -1,7 +1,7 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 
-class StatsampleReliabilitySkillScaleTestCase < MiniTest::Unit::TestCase
+class StatsampleReliabilitySkillScaleTestCase < Minitest::Test
   context Statsample::Reliability::SkillScaleAnalysis do
     setup do
       options=%w{a b c d e}
@@ -12,7 +12,7 @@ class StatsampleReliabilitySkillScaleTestCase < MiniTest::Unit::TestCase
       @c=cases.times.map {options[rand(5)]}.to_vector
       @d=cases.times.map {options[rand(5)]}.to_vector
       @e=cases.times.map {|i|
-        i==0 ? options[rand(0)] : 
+        i==0 ? options[rand(0)] :
           rand()>0.8 ? nil : options[rand(5)]
       }.to_vector
       @ds={'id'=>@id,'a'=>@a,'b'=>@b,'c'=>@c,'d'=>@d,'e'=>@e}.to_dataset
@@ -49,7 +49,7 @@ class StatsampleReliabilitySkillScaleTestCase < MiniTest::Unit::TestCase
       ssa=Statsample::Reliability::SkillScaleAnalysis.new(ds, key)
       assert(ssa.summary)
     end
-    
+
     should "return valid summary" do
       assert(@ssa.summary.size>0)
     end

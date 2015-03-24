@@ -1,5 +1,5 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
+class StatsampleDatasetTestCase < Minitest::Test
   def setup
     @ds=Statsample::Dataset.new({'id' => Statsample::Vector.new([1,2,3,4,5]), 'name'=>Statsample::Vector.new(%w{Alex Claude Peter Franz George}), 'age'=>Statsample::Vector.new([20,23,25,27,5]),
       'city'=>Statsample::Vector.new(['New York','London','London','Paris','Tome']),
@@ -15,7 +15,7 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     assert_equal([{'c'=>'f'},{'c'=>'g'}], nest['a']['c'])
     assert_equal([{'c'=>'h'}], nest['a']['d'])
     assert_equal([{'c'=>'j'},{'c'=>'k'}], nest['b']['e'])
-   
+
   end
   def test_should_have_summary
     assert(@ds.summary.size>0)
@@ -143,7 +143,7 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     mva=[2,3,0,1,0,1].to_vector(:scale)
     assert_equal(mva,ds.vector_missing_values)
   end
-  
+
   def test_has_missing_values
     a1=[1  ,nil ,3 ,4  , 5,nil].to_vector(:scale)
     a2=[10 ,nil ,20,20 ,20,30].to_vector(:scale)
@@ -155,8 +155,8 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     clean=ds.dup_only_valid
     assert(!clean.has_missing_data?)
   end
-  
-  
+
+
   def test_vector_count_characters
     a1=[1  ,"abcde"  ,3  ,4  , 5,nil].to_vector(:scale)
     a2=[10 ,20.3     ,20 ,20 ,20,30].to_vector(:scale)
@@ -306,7 +306,7 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     assert_equal(ds3.cases,ds_exp.cases)
 
     assert_not_same(ds3.fields,ds_exp.fields)
-     
+
   end
   def test_dup
     v1=[1,2,3,4].to_vector
@@ -375,8 +375,8 @@ class StatsampleDatasetTestCase < MiniTest::Unit::TestCase
     assert_equal(expected.vectors.values,Statsample::only_valid(v1,v2,v3))
     expected_partial=Statsample::Dataset.new({'v1'=>[1,3,4].to_vector(:scale), 'v3'=>[9, 11,12].to_vector(:scale)})
     assert_equal(expected_partial, ds1.dup_only_valid(%w{v1 v3}))
-    
-    
+
+
   end
   def test_filter
     @ds['age'].type=:scale

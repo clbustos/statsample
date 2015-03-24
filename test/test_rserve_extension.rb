@@ -3,7 +3,7 @@ begin
   require 'rserve'
   require 'statsample/rserve_extension'
 
-class StatsampleRserveExtensionTestCase < MiniTest::Unit::TestCase
+class StatsampleRserveExtensionTestCase < Minitest::Test
   context "Statsample Rserve extensions" do
     setup do
       @r=Rserve::Connection.new
@@ -27,7 +27,7 @@ class StatsampleRserveExtensionTestCase < MiniTest::Unit::TestCase
       rexp=ds.to_REXP
       assert(rexp.is_a? Rserve::REXP::GenericVector)
       ret=rexp.to_ruby
-      assert_equal(a.data_with_nils, ret['a']) 
+      assert_equal(a.data_with_nils, ret['a'])
       @r.assign 'df', rexp
       out_df=@r.eval('df').to_ruby
       assert_equal('data.frame', out_df.attributes['class'])

@@ -1,7 +1,7 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 # Reference:
 # * http://www.uwsp.edu/psych/Stat/13/anova-2w.htm#III
-class StatsampleAnovaTwoWayWithVectorsTestCase < MiniTest::Unit::TestCase
+class StatsampleAnovaTwoWayWithVectorsTestCase < Minitest::Test
   context(Statsample::Anova::TwoWayWithVectors) do
     setup do
       @pa=[5,4,3,4,2,18,19,14,12,15,6,7,5,8,4,6,9,5,9,3].to_scale
@@ -25,7 +25,7 @@ class StatsampleAnovaTwoWayWithVectorsTestCase < MiniTest::Unit::TestCase
       assert_in_delta(192.2, @anova.ms_a, 0.01)
       assert_in_delta(57.8, @anova.ms_b, 0.01)
       assert_in_delta(168.2, @anova.ms_axb, 0.01)
-      
+
     end
     should "return correct value for f " do
       assert_in_delta(40.68, @anova.f_a, 0.01)
@@ -39,7 +39,7 @@ class StatsampleAnovaTwoWayWithVectorsTestCase < MiniTest::Unit::TestCase
     end
 
     should "respond to summary" do
-      
+
       @anova.summary_descriptives=true
       @anova.summary_levene=true
       assert(@anova.respond_to? :summary)

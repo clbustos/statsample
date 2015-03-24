@@ -12,22 +12,20 @@ require 'fixtures/correlation_matrix'
 require 'statsample'
 
 
-module MiniTest
+module Minitest
   class Test
     include Shoulda::Context::Assertions
     include Shoulda::Context::InstanceMethods
     extend Shoulda::Context::ClassMethods
-      def self.should_with_gsl(name,&block)
-        should(name) do
-          if Statsample.has_gsl?
-            instance_eval(&block)
-          else
-            skip("Requires GSL")
-          end
-         
+
+    def self.should_with_gsl(name,&block)
+      should(name) do
+        if Statsample.has_gsl?
+          instance_eval(&block)
+        else
+          skip("Requires GSL")
         end
-    
-      
+      end
     end
   end
 

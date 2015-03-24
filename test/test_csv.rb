@@ -1,5 +1,5 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleCSVTestCase < MiniTest::Unit::TestCase
+class StatsampleCSVTestCase < Minitest::Test
   def setup
     @ds=Statsample::CSV.read(File.dirname(__FILE__)+"/fixtures/test_csv.csv")
   end
@@ -39,7 +39,7 @@ class StatsampleCSVTestCase < MiniTest::Unit::TestCase
   end
 end
 =begin
-class StatsampleCSVTestCase2 < MiniTest::Unit::TestCase
+class StatsampleCSVTestCase2 < Minitest::Test
   def setup
     @ds=Statsample::CSV.read19(File.dirname(__FILE__)+"/fixtures/test_csv.csv")
   end

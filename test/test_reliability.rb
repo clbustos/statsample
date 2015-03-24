@@ -1,5 +1,5 @@
 require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
-class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
+class StatsampleReliabilityTestCase < Minitest::Test
   context Statsample::Reliability do
     should "return correct r according to Spearman-Brown prophecy" do
       r=0.6849
@@ -11,7 +11,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         r_d=0.9
         assert_in_delta(62, Statsample::Reliability.n_for_desired_reliability(r, r_d, 15),0.5)
       end
-    context "Cronbach's alpha" do 
+    context "Cronbach's alpha" do
       setup do
         @samples=40
         @n_variables=rand(10)+2
@@ -20,7 +20,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         @n_variables.times do |i|
           @ds[i]=base.collect {|v| v+rand()}.to_scale
         end
-        
+
         @ds.update_valid_data
         @k=@ds.fields.size
         @cm=Statsample::Bivariate.covariance_matrix(@ds)
@@ -41,7 +41,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
       should "method cronbach_alpha_from_n_s2_cov return correct values" do
         sa=Statsample::Reliability::ScaleAnalysis.new(@ds)
         vm, cm = sa.variances_mean, sa.covariances_mean
-        assert_in_delta(sa.alpha, Statsample::Reliability.cronbach_alpha_from_n_s2_cov(@n_variables, vm,cm), 1e-10)        
+        assert_in_delta(sa.alpha, Statsample::Reliability.cronbach_alpha_from_n_s2_cov(@n_variables, vm,cm), 1e-10)
       end
       should "method cronbach_alpha_from_covariance_matrix returns correct value" do
         cov=Statsample::Bivariate.covariance_matrix(@ds)
@@ -52,9 +52,9 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         vm, cm = sa.variances_mean, sa.covariances_mean
         n_obtained=Statsample::Reliability.n_for_desired_alpha(@a, vm,cm)
         #p n_obtained
-        assert_in_delta(Statsample::Reliability.cronbach_alpha_from_n_s2_cov(n_obtained, vm,cm) ,@a,0.001) 
+        assert_in_delta(Statsample::Reliability.cronbach_alpha_from_n_s2_cov(n_obtained, vm,cm) ,@a,0.001)
       end
-      
+
       should "standarized alpha will be equal to sum of matrix covariance less the individual variances on standarized values" do
         total_sum=@cme.total_sum
         ind_var=@dse.fields.inject(0) {|ac,v| ac+@dse[v].variance}
@@ -82,7 +82,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         assert_equal(x2, @icc.vector_total)
         assert_raises(ArgumentError) do
           inc=(@samples+10).times.map{rand(10)}.to_scale
-          @icc=Statsample::Reliability::ItemCharacteristicCurve.new(@ds,inc)          
+          @icc=Statsample::Reliability::ItemCharacteristicCurve.new(@ds,inc)
         end
       end
       should "have 0% for 0 points on maximum value values" do
@@ -108,13 +108,13 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
           total[k]=v.quo(total_g[k])
         }
         assert_equal(expected, @icc.curve_field('a',index))
-        
+
       end
-      
+
     end
-    
+
     context Statsample::Reliability::MultiScaleAnalysis do
-      
+
       setup do
         size=100
         @scales=3
@@ -134,7 +134,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         end
       end
       should "Retrieve correct ScaleAnalysis for whole scale" do
-        sa=Statsample::Reliability::ScaleAnalysis.new(@ds, :name=>"Scale complete") 
+        sa=Statsample::Reliability::ScaleAnalysis.new(@ds, :name=>"Scale complete")
         assert_equal(sa.variances_mean, @msa.scale("complete").variances_mean)
       end
       should "Retrieve correct ScaleAnalysis for each scale" do
@@ -146,7 +146,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
       should "retrieve correct correlation matrix for each scale" do
         vectors={'complete' => @ds.vector_sum}
         @scales.times {|s|
-         vectors["scale_#{s}"]=@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}).vector_sum 
+         vectors["scale_#{s}"]=@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}).vector_sum
         }
         ds2=vectors.to_dataset
         assert_equal(Statsample::Bivariate.correlation_matrix(ds2), @msa.correlation_matrix)
@@ -159,7 +159,7 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         @msa.delete_scale("complete")
         vectors=Hash.new
         @scales.times {|s|
-         vectors["scale_#{s}"]=@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}).vector_sum 
+         vectors["scale_#{s}"]=@ds.dup(@items_per_scale.times.map {|i| "#{s}_#{i}"}).vector_sum
         }
         ds2=vectors.to_dataset
         cor_matrix=Statsample::Bivariate.correlation_matrix(ds2)
@@ -171,17 +171,17 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         @msa.delete_scale("scale_0")
         @msa.delete_scale("scale_1")
         @msa.delete_scale("scale_2")
-        
-        
+
+
         #@msa.summary_correlation_matrix=true
         #@msa.summary_pca=true
-        
-        
+
+
         assert(@msa.summary.size>0)
       end
     end
     context Statsample::Reliability::ScaleAnalysis do
-      setup do 
+      setup do
         @x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_scale
         @x2=[1,1,1,2,2,3,3,3,3,4,4,50].to_scale
         @x3=[2,2,1,1,1,2,2,2,3,4,5,40].to_scale
@@ -189,11 +189,11 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         @ds={'x1'=>@x1,'x2'=>@x2,'x3'=>@x3,'x4'=>@x4}.to_dataset
         @ia=Statsample::Reliability::ScaleAnalysis.new(@ds)
         @cov_matrix=@ia.cov_m
-      end     
-      should "return correct values for item analysis" do 
+      end
+      should "return correct values for item analysis" do
         assert_in_delta(0.980,@ia.alpha,0.001)
         assert_in_delta(0.999,@ia.alpha_standarized,0.001)
-        var_mean=4.times.map{|m| @cov_matrix[m,m]}.to_scale.mean 
+        var_mean=4.times.map{|m| @cov_matrix[m,m]}.to_scale.mean
         assert_in_delta(var_mean, @ia.variances_mean)
         assert_equal(@x1.mean, @ia.item_statistics['x1'][:mean])
         assert_equal(@x4.mean, @ia.item_statistics['x4'][:mean])
@@ -207,11 +207,11 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         assert_in_delta(vector_sum.variance, @ia.stats_if_deleted['x1'][:variance_sample],1e-10)
 
         assert_equal(Statsample::Reliability.cronbach_alpha(ds2), @ia.stats_if_deleted['x1'][:alpha])
-        
+
         covariances=[]
         4.times.each {|i|
           4.times.each {|j|
-            if i!=j 
+            if i!=j
               covariances.push(@cov_matrix[i,j])
             end
           }
@@ -220,10 +220,10 @@ class StatsampleReliabilityTestCase < MiniTest::Unit::TestCase
         assert_in_delta(0.999,@ia.item_total_correlation()['x1'],0.001)
         assert_in_delta(1050.455,@ia.stats_if_deleted()['x1'][:variance_sample],0.001)
       end
-      should "return a summary" do 
+      should "return a summary" do
         assert(@ia.summary.size>0)
       end
-      
+
     end
   end
 end
