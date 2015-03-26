@@ -20,6 +20,11 @@ Rake::TestTask.new do |t|
   t.pattern = "test/test_*.rb"
 end
 
+RDoc::Task.new do |rdoc|
+  rdoc.main = "README.md"
+  rdoc.rdoc_files.include("README.md", "lib", "History.txt", "LICENSE.txt", "references.txt")
+end
+
 desc "Update pot/po files."
 task "gettext:updatepo" do
   require 'gettext/tools'
