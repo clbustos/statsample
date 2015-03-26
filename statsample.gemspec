@@ -75,7 +75,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'rserve-client'
   s.add_runtime_dependency 'rubyvis', '~> 0.5.0'
   s.add_runtime_dependency 'distribution'
-  s.add_runtime_dependency 'rubyvis'
   s.add_runtime_dependency 'rb-gsl'
   s.add_runtime_dependency 'awesome_print'
 
