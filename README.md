@@ -33,6 +33,10 @@ If you need to work on Structural Equation Modeling, you could see +statsample-s
 $ [sudo] gem install statsample-sem
 ```
 
+# Documentation
+
+You can see the latest documentation in [rubydoc.info](http://www.rubydoc.info/github/sciruby/statsample/master).
+
 # Description
 
 A suite for basic and advanced statistics on Ruby. Tested on CRuby 1.9.3, 2.0.0 and 2.1.1. See `.travis.yml` for more information.
