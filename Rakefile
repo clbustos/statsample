@@ -2,6 +2,7 @@ $:.unshift File.expand_path("../lib/", __FILE__)
 
 require 'statsample/version'
 require 'rake'
+require 'rake/testtask'
 require 'rdoc/task'
 require 'bundler/gem_tasks'
 
@@ -13,6 +14,10 @@ rescue Bundler::BundlerError => e
   $stderr.puts e.message
   $stderr.puts "Run `bundle install` to install missing gems"
   exit e.status_code
+end
+
+Rake::TestTask.new do |t|
+  t.pattern = "test/test_*.rb"
 end
 
 desc "Update pot/po files."
