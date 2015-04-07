@@ -1,12 +1,7 @@
+require 'csv'
+
 module Statsample
   class CSV < SpreadsheetBase
-    if RUBY_VERSION<"1.9"
-      require 'fastercsv'
-      CSV_klass=::FasterCSV  
-    else
-      require 'csv'
-      CSV_klass=::CSV  
-    end    
     class << self
 
       def read19(filename,ignore_lines=0,csv_opts=Hash.new)
@@ -31,7 +26,7 @@ module Statsample
       #
       # USE:
       #     ds=Statsample::CSV.read("test_csv.csv")
-      def read(filename, empty=[''],ignore_lines=0,csv_opts=Hash.new)        
+      def read(filename, empty=[''],ignore_lines=0,csv_opts=Hash.new)
         first_row=true
         fields=[]
         #fields_data={}
@@ -63,7 +58,7 @@ module Statsample
       # USE:
       #     Statsample::CSV.write(ds,"test_csv.csv")
       def write(dataset,filename, convert_comma=false,*opts)
-        
+
         writer=CSV_klass.open(filename,'w',*opts)
         writer << dataset.fields
         dataset.each_array do|row|
