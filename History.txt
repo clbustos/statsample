@@ -1,5 +1,6 @@
-=== 1.4.2 / 2015-
-  *
+=== 1.4.2 / 2015-04-07
+  * Statsample::CSV.read accepts numbers in scientific notation.
+  * Test on Ruby 2.2 via Travis CI.
 
 === 1.4.1 / 2015-03-26
   * Removed Hoe gem in order to use `statsample.gemspec`.
