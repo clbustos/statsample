@@ -78,7 +78,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'rb-gsl', '~> 1.16'
   s.add_runtime_dependency 'awesome_print', '~> 1.6'
 
-  s.add_development_dependency 'bundler', '~> 1.9'
+  s.add_development_dependency 'bundler', '~> 1.7'
   s.add_development_dependency 'rake', '~> 10.4'
   s.add_development_dependency 'rdoc', '~> 4.2'
   s.add_development_dependency 'shoulda', '~> 3.5'
