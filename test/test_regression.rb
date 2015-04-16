@@ -2,10 +2,10 @@ require(File.expand_path(File.dirname(__FILE__)+'/helpers_tests.rb'))
 
 class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
   context "Example with missing data" do
-    setup do 
+    setup do
       @x=[0.285714285714286, 0.114285714285714, 0.314285714285714, 0.2, 0.2, 0.228571428571429, 0.2, 0.4, 0.714285714285714, 0.285714285714286, 0.285714285714286, 0.228571428571429, 0.485714285714286, 0.457142857142857, 0.257142857142857, 0.228571428571429, 0.285714285714286, 0.285714285714286, 0.285714285714286, 0.142857142857143, 0.285714285714286, 0.514285714285714, 0.485714285714286, 0.228571428571429, 0.285714285714286, 0.342857142857143, 0.285714285714286, 0.0857142857142857].to_scale
 
-      @y=[nil, 0.233333333333333, nil, 0.266666666666667, 0.366666666666667, nil, 0.333333333333333, 0.3, 0.666666666666667, 0.0333333333333333, 0.333333333333333, nil, nil, 0.533333333333333, 0.433333333333333, 0.4, 0.4, 0.5, 0.4, 0.266666666666667, 0.166666666666667, 0.666666666666667, 0.433333333333333, 0.166666666666667, nil, 0.4, 0.366666666666667, nil].to_scale      
+      @y=[nil, 0.233333333333333, nil, 0.266666666666667, 0.366666666666667, nil, 0.333333333333333, 0.3, 0.666666666666667, 0.0333333333333333, 0.333333333333333, nil, nil, 0.533333333333333, 0.433333333333333, 0.4, 0.4, 0.5, 0.4, 0.266666666666667, 0.166666666666667, 0.666666666666667, 0.433333333333333, 0.166666666666667, nil, 0.4, 0.366666666666667, nil].to_scale
       @ds={'x'=>@x,'y'=>@y}.to_dataset
       @lr=Statsample::Regression::Multiple::RubyEngine.new(@ds,'y')
     end
@@ -21,11 +21,11 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
       assert_in_delta(0.064, @lr.constant_se,0.001,"constant se")
   end
   end
-  should "return an error if data is linearly dependent" do 
+  should "return an error if data is linearly dependent" do
     samples=100
-    
+
     a,b=rand,rand
-    
+
     x1=samples.times.map { rand}.to_scale
     x2=samples.times.map {rand}.to_scale
     x3=samples.times.map {|i| x1[i]*(1+a)+x2[i]*(1+b)}.to_scale
@@ -50,13 +50,13 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
 
   end
   def _test_simple_regression(reg)
-  
+
     assert_in_delta(40.009, reg.a,0.001)
     assert_in_delta(-0.957, reg.b,0.001)
     assert_in_delta(4.248,reg.standard_error,0.002)
     assert(reg.summary)
   end
-  
+
   def test_summaries
     a=10.times.map{rand(100)}.to_scale
     b=10.times.map{rand(100)}.to_scale
@@ -87,7 +87,7 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
     assert_in_delta(0.07, lr.p2yx,0.001)
 
   end
-  
+
   def test_multiple_regression_pairwise_2
     @a=[1,3,2,4,3,5,4,6,5,7,3,nil,3,nil,3].to_vector(:scale)
     @b=[3,3,4,4,5,5,6,6,4,4,2,2,nil,6,2].to_vector(:scale)
@@ -186,7 +186,7 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
     @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
     ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
     cor=Statsample::Bivariate.correlation_matrix(ds)
-    
+
     lr=Statsample::Regression::Multiple::MatrixEngine.new(cor,'y', :y_mean=>@y.mean, :x_mean=>{'a'=>ds['a'].mean, 'b'=>ds['b'].mean, 'c'=>ds['c'].mean}, :cases=>@a.size, :y_sd=>@y.sd , :x_sd=>{'a' => @a.sd, 'b' => @b.sd, 'c' => @c.sd})
     assert_nil(lr.constant_se)
     assert_nil(lr.constant_t)
@@ -228,5 +228,69 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
       end
     end
 
+  end
+  def test_dependent_variable_constant_gsl_engine
+    a=[2.0, 2.0, 6.0, 1.0].to_vector(:scale)
+    b=[1.0, 5.0, 9.0, 2.0].to_vector(:scale)
+    y=[1, 1, 1, 1].to_vector(:scale)
+
+    ds={'a'=>a,'b'=>b,'y'=>y}.to_dataset
+
+    lr=Statsample::Regression::Multiple::GslEngine.new(ds,'y')
+
+    assert(lr.r.nan?, 'r should be NaN')
+    assert(lr.r2.nan?, 'r2 should be NaN')
+    lr.coeffs.each do |(coeff_key, coeff_value)|
+      assert_in_delta(coeff_value, 0, 0.001, "#{coeff_key} should not be 0")
+    end
+    assert_in_delta(lr.constant, 1, 0.001, 'constant should be 1')
+  end
+
+  def test_nan_value_gsl_engine
+    a=[2.0, 2.0, 6.0, 1.0].to_vector(:scale)
+    b=[1.0, 5.0, 9.0, 2.0].to_vector(:scale)
+    y=[1, 1, 1, 1].to_vector(:scale)
+
+    ds={'a'=>a,'b'=>b,'y'=>y}.to_dataset
+
+    lr=Statsample::Regression::Multiple::GslEngine.new(ds,'y')
+
+    assert(lr.r.nan?, 'r should be NaN')
+    assert(lr.r2.nan?, 'r2 should be NaN')
+    lr.coeffs.each do |(coeff_key, coeff_value)|
+      assert_in_delta(coeff_value, 0, 0.001, "#{coeff_key} should not be 0")
+    end
+    assert_in_delta(lr.constant, 1, 0.001, 'constant should be 1')
+  end
+
+  def test_dependent_variable_constant_ruby_engine
+    a=[2.0, 2.0, 6.0, Float::NAN].to_vector(:scale)
+    b=[1.0, 5.0, 9.0, 2.0].to_vector(:scale)
+    y=[1, 1, 1, 1].to_vector(:scale)
+
+    ds={'a'=>a,'b'=>b,'y'=>y}.to_dataset
+
+    lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y')
+
+    assert(lr.r.nan?, 'r should be NaN')
+    assert(lr.r2.nan?, 'r2 should be NaN')
+    assert(lr.constant.nan?, 'constant should be NaN')
+  end
+
+  def test_nan_value_ruby_engine
+    a=[2.0, 2.0, 6.0, Float::NAN].to_vector(:scale)
+    b=[1.0, 5.0, 9.0, 2.0].to_vector(:scale)
+    y=[1, 1, 1, 1].to_vector(:scale)
+
+    ds={'a'=>a,'b'=>b,'y'=>y}.to_dataset
+
+    lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y')
+
+    assert(lr.r.nan?, 'r should be NaN')
+    assert(lr.r2.nan?, 'r2 should be NaN')
+    lr.coeffs.each do |(coeff_key, coeff_value)|
+      assert_in_delta(coeff_value, 0, 0.001, "coefficient '#{coeff_key}' should not be 0")
+    end
+    assert_in_delta(lr.constant, 1, 0.001, 'constant should be 1')
   end
 end
