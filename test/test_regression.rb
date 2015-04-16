@@ -241,7 +241,7 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
     assert(lr.r.nan?, 'r should be NaN')
     assert(lr.r2.nan?, 'r2 should be NaN')
     lr.coeffs.each do |(coeff_key, coeff_value)|
-      assert_in_delta(coeff_value, 0, 0.001, "#{coeff_key} should not be 0")
+      assert_in_delta(coeff_value, 0, 0.001, "#{coeff_key} should be 0")
     end
     assert_in_delta(lr.constant, 1, 0.001, 'constant should be 1')
   end
@@ -258,7 +258,7 @@ class StatsampleRegressionTestCase < MiniTest::Unit::TestCase
     assert(lr.r.nan?, 'r should be NaN')
     assert(lr.r2.nan?, 'r2 should be NaN')
     lr.coeffs.each do |(coeff_key, coeff_value)|
-      assert_in_delta(coeff_value, 0, 0.001, "#{coeff_key} should not be 0")
+      assert_in_delta(coeff_value, 0, 0.001, "#{coeff_key} should be 0")
     end
     assert_in_delta(lr.constant, 1, 0.001, 'constant should be 1')
   end
