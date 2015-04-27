@@ -1,9 +1,21 @@
+=== 1.4.3 / 2015-04-27
+  * Removed rb-gsl dependency.
+
+=== 1.4.2 / 2015-04-07
+  * Statsample::CSV.read accepts numbers in scientific notation.
+  * Test on Ruby 2.2 via Travis CI.
+
+=== 1.4.1 / 2015-03-26
+  * Removed Hoe gem in order to use `statsample.gemspec`.
+  * Improved readability of some files by using rubocop.
+  * Removed a bad check in `cronbach_alpha` (#10).
+
 === 1.4.0 / 2014-10-11
   * Replaced README.txt for README.md
   * Replace File.exists? for File.exist?
   + New Dataset.join to join two dataset based on some fields
   * Deleted MLE based regression (Probit and logistic). Now all GML methods are on statsample-glm
-  
+
 === 1.3.1 / 2014-06-26
 
   * Example referred to a SimpleRegression class which doesn't exist. Updated to working example.
@@ -23,7 +35,7 @@
   * open svg on mac osx
 
 === 1.2.0 / 2011-12-15
-  
+
   * Added support for time series (TimeSeries object): MA, EMA, MACD, acf, lag and delta. [Rob Britton]
   * Changed summary attribute to properly display 'b' value for simple linear regression [hstove]
   * Merge pull request #6 from hstove/patch-1Changed summary attribute to properly display 'b' value for simple linear regression [Claudio Bustos]
@@ -34,9 +46,9 @@
 * New Statsample::Anova::Contrast
 * Jacknife and bootstrap for Vector. Thanks to John Firebaugh for the idea
 * Improved Statsample::Analysis API
-* Updated CSV.read. Third argument is a Hash with options to CSV class  
+* Updated CSV.read. Third argument is a Hash with options to CSV class
 * Added restriction on Statsample::Excel.read
-* Updated spanish po 
+* Updated spanish po
 * Better summary for Vector
 * Improving summary of t related test (confidence interval and estimate output)
 * Replaced c for vector on Statsample::Analysis examples
@@ -51,7 +63,7 @@
 === 1.0.0 / 2011-01-27
 
 * Added Statsample::Analysis, a beautiful DSL to perform fast statistical analysis using statsample. See directory /examples
-* Created benchmarks directory 
+* Created benchmarks directory
 * Removed Distribution module from statsample and moved to a gem. Changes on code to reflect new API
 * Optimized simple regression.  Better library detection
 * New 'should_with_gsl' to test methods with gsl. Refactored Factor::MAP
@@ -62,17 +74,17 @@
 * Modified examples using Statsample::Analysis
 * Simplified eigen calculations
 * Updated some examples. Added correlation matrix speed suite
-* Correlation matrix optimized. Better specs 
-* Optimized correlation matrix. Use gsl matrix algebra or pairwise correlations depending on empiric calculated equations. See benchmarks/correlation_matrix.rb to see implementation of calculation 
+* Correlation matrix optimized. Better specs
+* Optimized correlation matrix. Use gsl matrix algebra or pairwise correlations depending on empiric calculated equations. See benchmarks/correlation_matrix.rb to see implementation of calculation
 * Moved tests fixtures from data to test/fixtures
 * Fixed some errors on tests
-* Bug fix: constant_se on binomial regression have an error 
-* All test should work on ruby 1.9.3 
+* Bug fix: constant_se on binomial regression have an error
+* All test should work on ruby 1.9.3
 * New Vector.[] and Vector.new_scale
-* Detect linearly dependent predictors on OLS. 
+* Detect linearly dependent predictors on OLS.
 
 === 0.18.0 / 2011-01-07
-* New Statsample.load_excel 
+* New Statsample.load_excel
 * New Statsample.load_csv
 * Statsample::Dataset#[] accepts an array of fields and uses clone
 * New Dataset#correlation_matrix  and Statsample::Dataset#covariance_matrix
@@ -83,19 +95,19 @@
 * Improved summary for PCA using covariance matrix
 * New attribute :label_angle for Statsample::Graph::Boxplot
 * Fixed Scatterplots scaling problems
-* New attributes for Scatterplots: groups, minimum_x, minimum_y, maximum_x, 
+* New attributes for Scatterplots: groups, minimum_x, minimum_y, maximum_x,
 * New Statsample::Multiset#union allows to create a new dataset based on a m
 * New Statsample::Multiset#each to traverse through datasets
 * Bug fix: Vector#standarized and Vector#percentile crash on nil data
 * Bug fix: Vector#mean and Vector#sd crash on data without valid values
 * Modified methods names on Statsample::Factor::PCA : feature_vector to feature_matrix, data_transformation to principal_components
 * Added Statsample::Vector.vector_centered
-* Factor::MAP.with_dataset() implemented 
-* Bug fix: Factor::MAP with correlation matrix with non-real eigenvalues crashes * Added documentation for Graph::Histogram 
+* Factor::MAP.with_dataset() implemented
+* Bug fix: Factor::MAP with correlation matrix with non-real eigenvalues crashes * Added documentation for Graph::Histogram
 * Added MPA to Reliability::MultiScaleAnalysis
-* Added custom names for returned vectors and datasets 
-* Updated spanish traslation 
-* Graph::Histogram updated. Custom x and y max and min, optional normal distribution drawing 
+* Added custom names for returned vectors and datasets
+* Updated spanish traslation
+* Graph::Histogram updated. Custom x and y max and min, optional normal distribution drawing
 * Updated Histogram class, with several new methods compatibles with GSL::Histogram
 
 === 0.17.0 / 2010-12-09
@@ -106,18 +118,18 @@
 
 === 0.16.0 / 2010-11-13
 * Works on ruby 1.9.2 and HEAD. Updated Rakefile and manifest
-* Removed all graph based on Svg::Graph. 
+* Removed all graph based on Svg::Graph.
 * First operative version of Graph with Rubyvis
-* Corrected bug on Distribution::Normal.cdf. 
+* Corrected bug on Distribution::Normal.cdf.
 * Added reference on references.txt
 * Ruby-based random gaussian distribution generator when gsl not available
 * Added population average deviation [Al Chou]
 
 === 0.15.1 / 2010-10-20
-* Statsample::Excel and Statsample::PlainText add name to vectors equal to field name 
+* Statsample::Excel and Statsample::PlainText add name to vectors equal to field name
 * Statsample::Dataset.delete_vector accept multiple fields.
-* Statsample::Dataset.dup_only_valid allows duplication of specific fields 
-* ScaleAnalysis doesn't crash on one-item scales 
+* Statsample::Dataset.dup_only_valid allows duplication of specific fields
+* ScaleAnalysis doesn't crash on one-item scales
 * Updated references
 
 === 0.15.0 / 2010-09-07
@@ -126,14 +138,14 @@
 * Added Spearman-Brown prophecy on Reliability module
 * Distribution::F uses Gsl when available
 * Added mean r.p.b. and item sd on Scale Analysis
-* Corrected bug on Vector.ary_method and example of Anova Two Way using vector.  
+* Corrected bug on Vector.ary_method and example of Anova Two Way using vector.
 
 
 === 0.14.1 / 2010-08-18
 
-* Added extra information on $DEBUG=true. 
-* Changed ParallelAnalysis: with_random_data parameters, bootstrap_method options are data and random, resolve bug related to number of factors to preserve, resolved bug related to original eigenvalues, can support failed bootstrap of data for Tetrachoric  correlation. 
-* Optimized eigenpairs on Matrix when GSL is available. 
+* Added extra information on $DEBUG=true.
+* Changed ParallelAnalysis: with_random_data parameters, bootstrap_method options are data and random, resolve bug related to number of factors to preserve, resolved bug related to original eigenvalues, can support failed bootstrap of data for Tetrachoric  correlation.
+* Optimized eigenpairs on Matrix when GSL is available.
 * Added test for parallel analysis using data bootstraping
 * Updated .pot and Manifest.txt
 * Added test for kmo(global and univariate), bartlett and anti-image. Kmo and Bartlett have test based on Dziuban and Shirkey with correct results
@@ -142,16 +154,16 @@
 * Added reference for Statsample::Factor::MAP
 
 === 0.14.0 / 2010-08-16
-* Added Statsample::Factor::MAP, to execute Velicer's (1976) MAP to determine the number of factors to retain on EFA 
+* Added Statsample::Factor::MAP, to execute Velicer's (1976) MAP to determine the number of factors to retain on EFA
 * Bug fix on test suite on Ruby 1.8.7
 * Horn's Parallel Analysis operational and tested for pure random data
-* Fixed bug on Excel writer on Ruby1.9 (frozen string on header raises an error). 
+* Fixed bug on Excel writer on Ruby1.9 (frozen string on header raises an error).
 * Extra information on Factorial Analysis on summaries
-* Fixed bug on Factor::Rotation when used ::Matrix without field method. 
+* Fixed bug on Factor::Rotation when used ::Matrix without field method.
 * Added Vector#vector_percentil method
-* Summaries for PCA, Rotation, MultiScale and ScaleAnalysis created or improved. 
+* Summaries for PCA, Rotation, MultiScale and ScaleAnalysis created or improved.
 * Factor::PCA could have rotation and parallel analysis on summary.
-* Cronbach's alpha from covariance matrix raise an error on size<2 
+* Cronbach's alpha from covariance matrix raise an error on size<2
 * MultiScaleAnalysis could have Parallel Analysis on summary.
 * Added Chi Square test
 * Added new information on README.txt
@@ -168,7 +180,7 @@
 
 * Polychoric and Tetrachoric moved to gem statsample-bivariate-extension
 * All classes left with summary method include Summarizable now. Every method which return localizable string is now parsed with _()
-* Correct implementation of Reliability::MultiScaleAnalysis. 
+* Correct implementation of Reliability::MultiScaleAnalysis.
 * Spanish translation for Mann-Whitney's U
 * Added example for Mann-Whitney's U test
 * Better summary for Mann-Whitney's U Test
@@ -179,10 +191,10 @@
 
 * Modified Rakefile to remove dependencies based on C extensions. These are moved to statsample-optimization
 * T test with unequal variance fixed on i686
-* API Change: Renamed Reliability::ItemAnalysis and moved to independent file 
+* API Change: Renamed Reliability::ItemAnalysis and moved to independent file
 * New Reliability::MultiScaleAnalysis for easy analysis of scales on a same survey, includind reliability, correlation matrix and Factor Analysis
 * Updated README to reflect changes on Reliability module
-* SvgGraph works with reportbuilder. 
+* SvgGraph works with reportbuilder.
 * Added methods on Polychoric based on Olsson(1979): the idea is estimate using second derivatives.
 * Distribution test changed (reduced precision on 32 bits system
 
@@ -196,7 +208,7 @@
 <b>New features:</b>
 * Added Statsample::Anova::TwoWay and Statsample::Anova::TwoWayWithVectors
 * Added Statsample.clone_only valid and Statsample::Dataset.clone_only_valid, for cheap copy on already clean vectors
-<b>Optimizations and bug fix</b> 
+<b>Optimizations and bug fix</b>
 * Removed library statistics2 from package. Used gem statistics2 instead, because have a extension version
 * Added example for Reliability class
 * Bug fix on Statsample::DominanceAnalysis
@@ -204,7 +216,7 @@
 === 0.10.0 / 2010-04-13
 
 <b>API modifications</b>
-* Refactoring of Statsample::Anova module. 
+* Refactoring of Statsample::Anova module.
   * Statsample::Anova::OneWay :implementation of generic ANOVA One-Way, used by Multiple Regression, for example.
   * Statsample::Anova::OneWayWithVectors: implementation of ANOVA One-Way to test differences of means.
 
@@ -228,7 +240,7 @@
 === 0.8.1 / 2010-03-29
 * Fixed Regression summaries
 === 0.8.0 / 2010-03-29
-* New Statsample::Test::T module, with classes and methods to do Student's t tests for one and two samples. 
+* New Statsample::Test::T module, with classes and methods to do Student's t tests for one and two samples.
 * Statsample::PromiseAfter module to set a number of variables without explicitly call the compute or iterate method
 * All tests ported to MiniUnit
 * Directory 'demo' renamed to 'examples'
@@ -266,7 +278,7 @@
 
 
 === 0.6.4 / 2010-02-19
-* Dominance Analysis and Dominance Analysis Bootstrap allows multivariate dependent analysis. 
+* Dominance Analysis and Dominance Analysis Bootstrap allows multivariate dependent analysis.
 * Test suite for Dominance Analysis, using Azen and Budescu papers as references
 * X^2 for polychoric correlation
 
@@ -285,12 +297,12 @@
 * New Statsample::Factor module. Include classes for extracting factors (Statsample::Factor::PCA and  Statsample::Factor::PrincipalAxis) and rotate component matrix  ( Statsample::Factor::Rotation subclasses). For now, only orthogonal rotations
 * New Statsample::Dataset.crosstab_with_asignation, Statsample::Dataset.one_to_many
 * New class Statsample::Permutation to produce permutations of a given array
-* New class Statsample::Histogram, with same interface as GSL one 
+* New class Statsample::Histogram, with same interface as GSL one
 * New class Statsample::Test::UMannWhitney, to perform Mann-Whitney's U test. Gives z based and exact calculation of probability
 * Improved support for ReportBuilder
 * Statsample::Codification module reworked
 * Fixed bugs on Dominance Analysis classes
-* Fixed bugs on Statsample::Vector.kurtosis and Statsample::Vector.skew 
+* Fixed bugs on Statsample::Vector.kurtosis and Statsample::Vector.skew
 
 === 0.5.1 / 2009-10-06
 
@@ -354,15 +366,15 @@
 
 * One Way Anova on Statsample::Anova::OneWay
 * Dominance Analysis!!!! The one and only reason to develop a Multiple Regression on pure ruby.
-* Multiple Regression on Multiple Regression module. Pairwise (pure ruby) or MultipleRegressionPairwise and Listwise (optimized) on MultipleRegressionAlglib and 
+* Multiple Regression on Multiple Regression module. Pairwise (pure ruby) or MultipleRegressionPairwise and Listwise (optimized) on MultipleRegressionAlglib and
 * New Dataset#to_gsl_matrix, #from_to,#[..],#bootstrap,#vector_missing_values, #vector_count_characters, #each_with_index, #collect_with_index
 * New Vector#box_cox_transformation
 * Module Correlation renamed to Bivariate
 * Some fancy methods and classes to create Summaries
 * Some documentation about Algorithm used on doc_latex
 * Deleted 'distributions' extension. Ruby/GSL has all the pdf and cdf you ever need.
-* Tests work without any dependency. Only nags about missing deps. 
-* Test for MultipleRegression, Anova, Excel, Bivariate.correlation_matrix and many others 
+* Tests work without any dependency. Only nags about missing deps.
+* Test for MultipleRegression, Anova, Excel, Bivariate.correlation_matrix and many others
 
 === 0.1.9 / 2009-05-22
 
@@ -372,8 +384,8 @@
 * Module SRS: New methods estimation_n0 and estimation_n
 * Module Reliability: new ItemCharacteristicCurve class
 * New HtmlReport class
-* New experimental SPSS Class. 
-* Converters: Module CSV with new options. Added write() method for GGobi module 
+* New experimental SPSS Class.
+* Converters: Module CSV with new options. Added write() method for GGobi module
 * New Mx exporter (http://www.vcu.edu/mx/)
 * Class SimpleRegression: new methods standard error
 
@@ -404,7 +416,7 @@
 === 0.1.4 / 2008-08-27
 
 * New extension, with cdf functions for
-  chi-square, t, gamma and normal distributions. 
+  chi-square, t, gamma and normal distributions.
   Based on dcdflib (http://www.netlib.org/random/)
   Also, has a function to calculate the tail for a noncentral T distribution
 

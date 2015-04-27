@@ -31,13 +31,13 @@ module Statsample
       # Insert each case of the Dataset on the selected table
       #
       # USE:
-      #        
+      #
       #  ds={'id'=>[1,2,3].to_vector, 'name'=>["a","b","c"].to_vector}.to_dataset
       #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
       #  Statsample::Database.insert(ds,dbh,"test")
       #
       def insert(ds, dbh, table)
-        require 'dbi'            
+        require 'dbi'
         query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"
         sth=dbh.prepare(query)
         ds.each_array{|c| sth.execute(*c) }
@@ -46,11 +46,11 @@ module Statsample
       # Create a sql, basen on a given Dataset
       #
       # USE:
-      #        
+      #
       #  ds={'id'=>[1,2,3,4,5].to_vector,'name'=>%w{Alex Peter Susan Mary John}.to_vector}.to_dataset
       #  Statsample::Database.create_sql(ds,'names')
       #   ==>"CREATE TABLE names (id INTEGER,\n name VARCHAR (255)) CHARACTER SET=UTF8;"
-      # 
+      #
       def create_sql(ds,table,charset="UTF8")
         sql="CREATE TABLE #{table} ("
         fields=ds.fields.collect{|f|
@@ -81,14 +81,14 @@ module Statsample
         fields=row.to_a.collect{|c|
           if c.nil?
             i+=1
-            "var%05d" % i 
+            "var%05d" % i
           else
             c.to_s.downcase
-          end        
+          end
         }
         fields.recode_repeated
       end
-                                         
+
       def process_row(row,empty)
         row.to_a.map do |c|
           if empty.include?(c)
@@ -115,7 +115,7 @@ module Statsample
           end
         end
       end
-    
+
     end
   end
     class PlainText < SpreadsheetBase
@@ -137,7 +137,7 @@ module Statsample
         end
       end
     end
-  class Excel < SpreadsheetBase 
+  class Excel < SpreadsheetBase
     class << self
       # Write a Excel spreadsheet based on a dataset
       # * TODO: Format nicely date values
@@ -177,7 +177,7 @@ module Statsample
         }
       end
       private :process_row, :preprocess_row
-      
+
       # Returns a dataset based on a xls file
       # USE:
       #     ds = Statsample::Excel.read("test.xls")
@@ -186,20 +186,19 @@ module Statsample
         require 'spreadsheet'
         raise "options should be Hash" unless opts.is_a? Hash
         opts_default={
-          :worksheet_id=>0, 
-          :ignore_lines=>0, 
+          :worksheet_id=>0,
+          :ignore_lines=>0,
           :empty=>['']
         }
-        
+
         opts=opts_default.merge opts
-        
+
         worksheet_id=opts[:worksheet_id]
         ignore_lines=opts[:ignore_lines]
         empty=opts[:empty]
-        
+
         first_row=true
         fields=[]
-        fields_data={}
         ds=nil
         line_number=0
         book = Spreadsheet.open filename
@@ -214,7 +213,7 @@ module Statsample
             }
             line_number+=1
             next if(line_number<=ignore_lines)
-            
+
             preprocess_row(row,dates)
             if first_row
               fields=extract_fields(row)
@@ -296,7 +295,7 @@ module Statsample
 				variables_def=dataset.fields.collect{|k|
 					variable_definition(carrier,dataset[k],k)
 				}.join("\n")
-				
+
 				indexes=carrier.categorials.inject({}) {|s,c|
 					s[dataset.fields.index(c)]=c
 					s
@@ -308,7 +307,7 @@ module Statsample
 					}
 					records << "<record>#{values_definition(c, default_opt[:missing])}</record>\n"
 				}
-				
+
 out=<<EOC
 <?xml version="1.0"?>
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">

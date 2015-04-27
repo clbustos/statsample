@@ -1,7 +1,7 @@
 require 'statsample/vector'
 
 class Hash
-  # Creates a Statsample::Dataset based on a Hash 
+  # Creates a Statsample::Dataset based on a Hash
   def to_dataset(*args)
     Statsample::Dataset.new(self, *args)
   end
@@ -29,15 +29,15 @@ module Statsample
       m
     end
   end
-  # Set of cases with values for one or more variables, 
+  # Set of cases with values for one or more variables,
   # analog to a dataframe on R or a standard data file of SPSS.
   # Every vector has <tt>#field</tt> name, which represent it. By default,
-  # the vectors are ordered by it field name, but you can change it 
+  # the vectors are ordered by it field name, but you can change it
   # the fields order manually.
   # The Dataset work as a Hash, with keys are field names
-  # and values are Statsample::Vector  
-  # 
-  # 
+  # and values are Statsample::Vector
+  #
+  #
   # ==Usage
   # Create a empty dataset:
   #   Dataset.new()
@@ -46,7 +46,7 @@ module Statsample
   # Create a dataset with two vectors, called <tt>v1</tt>
   # and <tt>v2</tt>:
   #   Dataset.new({'v1'=>%w{1 2 3}.to_vector, 'v2'=>%w{4 5 6}.to_vector})
-  # Create a dataset with two given vectors (v1 and v2), 
+  # Create a dataset with two given vectors (v1 and v2),
   # with vectors on inverted order:
   #   Dataset.new({'v2'=>v2,'v1'=>v1},['v2','v1'])
   #
@@ -54,8 +54,8 @@ module Statsample
   # field order  as arguments
   #   v1 = [1,2,3].to_scale
   #   v2 = [1,2,3].to_scale
-  #   ds = {'v1'=>v2, 'v2'=>v2}.to_dataset(%w{v2 v1})  
-  
+  #   ds = {'v1'=>v2, 'v2'=>v2}.to_dataset(%w{v2 v1})
+
   class Dataset
     include Writable
     include Summarizable
@@ -99,7 +99,7 @@ module Statsample
         ;a}
       values.each_index{|i|
         h_rows[rows[i]][columns[i]]=values[i]
-      }      
+      }
       ds=Dataset.new(["_id"]+cols_values)
       cols_values.each{|c|
         ds[c].type=values.type
@@ -121,15 +121,15 @@ module Statsample
     end
     # Return a nested hash using fields as keys and
     # an array constructed of hashes with other values.
-    # If block provided, is used to provide the 
-    # values, with parameters +row+ of dataset, 
+    # If block provided, is used to provide the
+    # values, with parameters +row+ of dataset,
     # +current+ last hash on hierarchy and
     # +name+ of the key to include
     def nest(*tree_keys,&block)
       tree_keys=tree_keys[0] if tree_keys[0].is_a? Array
-      out=Hash.new      
+      out=Hash.new
       each do |row|
-        current=out        
+        current=out
         # Create tree
         tree_keys[0,tree_keys.size-1].each do |f|
           root=row[f]
@@ -162,7 +162,7 @@ module Statsample
       @cases=0
       @gsl=nil
       @i=nil
-      
+
       if vectors.instance_of? Array
         @fields=vectors.dup
         @vectors=vectors.inject({}){|a,x| a[x]=Statsample::Vector.new(); a}
@@ -174,10 +174,10 @@ module Statsample
         check_length
       end
     end
-    # 
+    #
     # Creates a copy of the given dataset, deleting all the cases with
     # missing data on one of the vectors.
-    # 
+    #
     # @param array of fields to include. No value include all fields
     #
     def dup_only_valid(*fields_to_include)
@@ -201,12 +201,12 @@ module Statsample
       ds
     end
     #
-    # Returns a duplicate of the Dataset. 
+    # Returns a duplicate of the Dataset.
     # All vectors are copied, so any modification on new
     # dataset doesn't affect original dataset's vectors.
     # If fields given as parameter, only include those vectors.
     #
-    # @param array of fields to include. No value include all fields    
+    # @param array of fields to include. No value include all fields
     # @return {Statsample::Dataset}
     def dup(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
@@ -224,15 +224,15 @@ module Statsample
       ds.name= self.name
       ds
     end
-    
-    
+
+
     # Returns an array with the fields from first argumen to last argument
     def from_to(from,to)
       raise ArgumentError, "Field #{from} should be on dataset" if !@fields.include? from
       raise ArgumentError, "Field #{to} should be on dataset" if !@fields.include? to
       @fields.slice(@fields.index(from)..@fields.index(to))
     end
-    
+
     # Returns (when possible) a cheap copy of dataset.
     # If no vector have missing values, returns original vectors.
     # If missing values presents, uses Dataset.dup_only_valid.
@@ -253,7 +253,7 @@ module Statsample
     # Returns a shallow copy of Dataset.
     # Object id will be distinct, but @vectors will be the same.
     # @param array of fields to include. No value include all fields
-    # @return {Statsample::Dataset}    
+    # @return {Statsample::Dataset}
     def clone(*fields_to_include)
       if fields_to_include.size==1 and fields_to_include[0].is_a? Array
         fields_to_include=fields_to_include[0]
@@ -280,7 +280,7 @@ module Statsample
       Dataset.new(vectors,@fields.dup)
     end
     # Merge vectors from two datasets
-    # In case of name collition, the vectors names are changed to 
+    # In case of name collition, the vectors names are changed to
     # x_1, x_2 ....
     #
     # @return {Statsample::Dataset}
@@ -354,7 +354,7 @@ module Statsample
     # Generate a matrix, based on fields of dataset
     #
     # @return {::Matrix}
-    
+
     def collect_matrix
       rows=@fields.collect{|row|
         @fields.collect{|col|
@@ -363,7 +363,7 @@ module Statsample
       }
       Matrix.rows(rows)
     end
-    
+
     # We have the same datasets if +vectors+ and +fields+ are the same
     #
     # @return {Boolean}
@@ -371,7 +371,7 @@ module Statsample
       @vectors==d2.vectors and @fields==d2.fields
     end
     # Returns vector <tt>c</tt>
-    # 
+    #
     # @return {Statsample::Vector}
     def col(c)
       @vectors[c]
@@ -409,18 +409,18 @@ module Statsample
     # Can only add one case and no error check if performed
     # You SHOULD use #update_valid_data at the end of insertion cycle
     #
-    # 
+    #
     def add_case_array(v)
       v.each_index {|i| d=@vectors[@fields[i]].data; d.push(v[i])}
     end
     # Insert a case, using:
     # * Array: size equal to number of vectors and values in the same order as fields
     # * Hash: keys equal to fields
-    # If uvd is false, #update_valid_data is not executed after 
-    # inserting a case. This is very useful if you want to increase the 
-    # performance on inserting many cases,  because #update_valid_data 
+    # If uvd is false, #update_valid_data is not executed after
+    # inserting a case. This is very useful if you want to increase the
+    # performance on inserting many cases,  because #update_valid_data
     # performs check on vectors and on the dataset
-    
+
     def add_case(v,uvd=true)
       case v
       when Array
@@ -440,7 +440,7 @@ module Statsample
         update_valid_data
       end
     end
-    # Check vectors and fields after inserting data. Use only 
+    # Check vectors and fields after inserting data. Use only
     # after  #add_case_array or #add_case with second parameter to false
     def update_valid_data
       @gsl=nil
@@ -459,7 +459,7 @@ module Statsample
         @vectors.delete(name)
       end
     end
-    
+
     def add_vectors_by_split_recode(name_,join='-',sep=Statsample::SPLIT_TOKEN)
       split=@vectors[name_].split_by_separator(sep)
       i=1
@@ -476,7 +476,7 @@ module Statsample
         add_vector(name+join+k,v)
       }
     end
-    
+
     def vector_by_calculation(type=:scale)
       a=[]
       each do |row|
@@ -485,7 +485,7 @@ module Statsample
       a.to_vector(type)
     end
     # Returns a vector with sumatory of fields
-    # if fields parameter is empty, sum all fields 
+    # if fields parameter is empty, sum all fields
     def vector_sum(fields=nil)
       fields||=@fields
       vector=collect_with_index do |row, i|
@@ -504,7 +504,7 @@ module Statsample
       raise "Fields #{(fields-@fields).join(", ")} doesn't exists on dataset" if (fields-@fields).size>0
       fields
     end
-    
+
     # Returns a vector with the numbers of missing values for a case
     def vector_missing_values(fields=nil)
       fields=check_fields(fields)
@@ -570,7 +570,7 @@ module Statsample
     def each_vector # :yield: |key, vector|
       @fields.each{|k| yield k, @vectors[k]}
     end
-    
+
     if Statsample::STATSAMPLE__.respond_to?(:case_as_hash)
       def case_as_hash(c) # :nodoc:
         Statsample::STATSAMPLE__.case_as_hash(self,c)
@@ -598,7 +598,7 @@ module Statsample
     def _case_as_array(c) # :nodoc:
       @fields.collect {|x| @vectors[x][c]}
     end
-    
+
     # Returns each case as a hash
     def each
       begin
@@ -613,7 +613,7 @@ module Statsample
         raise DatasetException.new(self, e)
       end
     end
-    
+
     # Returns each case as hash and index
     def each_with_index # :yield: |case, i|
       begin
@@ -628,7 +628,7 @@ module Statsample
         raise DatasetException.new(self, e)
       end
     end
-    
+
     # Returns each case as an array, coding missing values as nils
     def each_array_with_nils
       m=fields.size
@@ -702,7 +702,7 @@ module Statsample
       }
       @vectors[vector_name].set_valid_data
     end
-    
+
     def crosstab(v1,v2,opts={})
       Statsample::Crosstab.new(@vectors[v1], @vectors[v2],opts)
     end
@@ -714,7 +714,7 @@ module Statsample
         raise ArgumentError,"Should pass a Statsample::Vector"
       end
     end
-    # Return data as a matrix. Column are ordered by #fields and 
+    # Return data as a matrix. Column are ordered by #fields and
     # rows by orden of insertion
     def to_matrix
       rows=[]
@@ -723,12 +723,12 @@ module Statsample
       }
       Matrix.rows(rows)
     end
-    
+
     if Statsample.has_gsl?
       def clear_gsl
         @gsl=nil
       end
-      
+
       def to_gsl
         if @gsl.nil?
           if cases.nil?
@@ -741,30 +741,31 @@ module Statsample
         end
         @gsl
       end
-      
+
     end
-    
+
     # Return a correlation matrix for fields included as parameters.
     # By default, uses all fields of dataset
-	def correlation_matrix(fields=nil)
-      if fields
-        ds=clone(fields)
-      else
-        ds=self
-      end
-      Statsample::Bivariate.correlation_matrix(ds)
+  def correlation_matrix(fields = nil)
+    if fields
+      ds = clone(fields)
+    else
+      ds = self
     end
-   # Return a correlation matrix for fields included as parameters.
-    # By default, uses all fields of dataset
-	def covariance_matrix(fields=nil)
-      if fields
-        ds=clone(fields)
-      else
-        ds=self
-      end
-      Statsample::Bivariate.covariance_matrix(ds)
+    Statsample::Bivariate.correlation_matrix(ds)
+  end
+
+  # Return a correlation matrix for fields included as parameters.
+  # By default, uses all fields of dataset
+  def covariance_matrix(fields = nil)
+    if fields
+      ds = clone(fields)
+    else
+      ds = self
     end
-    
+    Statsample::Bivariate.covariance_matrix(ds)
+  end
+
     # Create a new dataset with all cases which the block returns true
     def filter
       ds=self.dup_empty
@@ -775,7 +776,7 @@ module Statsample
       ds.name=_("%s(filtered)") % @name
       ds
     end
-    
+
     # creates a new vector with the data of a given field which the block returns true
     def filter_field(field)
       a=[]
@@ -784,11 +785,11 @@ module Statsample
       end
       a.to_vector(@vectors[field].type)
     end
-    
+
     # Creates a Stastample::Multiset, using one or more fields
     # to split the dataset.
-    
-   
+
+
     def to_multiset_by_split(*fields)
 			require 'statsample/multiset'
 			if fields.size==1
@@ -798,7 +799,7 @@ module Statsample
 			end
     end
     # Creates a Statsample::Multiset, using one field
-    
+
     def to_multiset_by_split_one_field(field)
       raise ArgumentError,"Should use a correct field name" if !@fields.include? field
       factors=@vectors[field].factors
@@ -815,7 +816,7 @@ module Statsample
           v1.type=@vectors[k1].type
           v1.name=@vectors[k1].name
           v1.labels=@vectors[k1].labels
-          
+
         }
       }
       ms
@@ -838,7 +839,7 @@ module Statsample
 
       p1=eval "Proc.new {|c| ms[["+fields.collect{|f| "c['#{f}']"}.join(",")+"]].add_case(c,false) }"
       each{|c| p1.call(c)}
-      
+
       ms.datasets.each do |k,ds|
         ds.update_valid_data
         ds.name=fields.size.times.map {|i|
@@ -846,15 +847,15 @@ module Statsample
           sk=k[i]
           @vectors[f].labeling(sk)
         }.join("-")
-        ds.vectors.each{|k1,v1| 
+        ds.vectors.each{|k1,v1|
           v1.type=@vectors[k1].type
           v1.name=@vectors[k1].name
           v1.labels=@vectors[k1].labels
-          
+
         }
       end
       ms
-      
+
     end
     # Returns a vector, based on a string with a calculation based
     # on vector
@@ -923,14 +924,14 @@ module Statsample
     end
     # Creates a new dataset for one to many relations
     # on a dataset, based on pattern of field names.
-    # 
+    #
     # for example, you have a survey for number of children
     # with this structure:
     #   id, name, child_name_1, child_age_1, child_name_2, child_age_2
-    # with 
+    # with
     #   ds.one_to_many(%w{id}, "child_%v_%n"
     # the field of first parameters will be copied verbatim
-    # to new dataset, and fields which responds to second 
+    # to new dataset, and fields which responds to second
     # pattern will be added one case for each different %n.
     # For example
     #   cases=[
@@ -942,13 +943,13 @@ module Statsample
     #   cases.each {|c| ds.add_case_array c }
     #   ds.one_to_many(['id'],'car_%v%n').to_matrix
     #   => Matrix[
-    #      ["red", "1", 10], 
+    #      ["red", "1", 10],
     #      ["blue", "1", 20],
     #      ["green", "2", 15],
     #      ["orange", "2", 30],
     #      ["white", "2", 20]
     #      ]
-    # 
+    #
     def one_to_many(parent_fields, pattern)
       #base_pattern=pattern.gsub(/%v|%n/,"")
       re=Regexp.new pattern.gsub("%v","(.+?)").gsub("%n","(\\d+?)")
@@ -962,7 +963,7 @@ module Statsample
       @fields.each do |f|
         if f=~re
           if !vars.include? $1
-            vars.push($1) 
+            vars.push($1)
             h[$1]=Statsample::Vector.new([], @vectors[f].type)
           end
           max_n=$2.to_i if max_n < $2.to_i
@@ -986,7 +987,7 @@ module Statsample
             row_out["_col_id"]=n
             ds.add_case(row_out,false)
           end
-          
+
         end
       end
       ds.update_valid_data
