@@ -1,6 +1,6 @@
 # Statsample
 
-Homepage :: https://github.com/clbustos/statsample
+Homepage :: https://github.com/sciruby/statsample
 
 [![Build Status](https://travis-ci.org/clbustos/statsample.svg?branch=master)](https://travis-ci.org/clbustos/statsample)
 [![Gem Version](https://badge.fury.io/rb/statsample.svg)](http://badge.fury.io/rb/statsample)
