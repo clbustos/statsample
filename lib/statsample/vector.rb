@@ -26,29 +26,29 @@ if Statsample.has_gsl?
 end
 module Statsample
 
- 
+
   # Collection of values on one dimension. Works as a column on a Spreadsheet.
-  # 
+  #
   # == Usage
   # The fast way to create a vector uses Array.to_vector or Array.to_scale.
   #
   #  v=[1,2,3,4].to_vector(:scale)
   #  v=[1,2,3,4].to_scale
-  # 
+  #
   class Vector
     include Enumerable
     include Writable
     include Summarizable
     include Statsample::VectorShorthands
-    
+
     # Level of measurement. Could be :nominal, :ordinal or :scale
     attr_reader :type
-    # Original data. 
+    # Original data.
     attr_reader :data
     # Valid data. Equal to data, minus values assigned as missing values
     attr_reader :valid_data
     # Array of values considered as missing. Nil is a missing value, by default
-    attr_reader :missing_values 
+    attr_reader :missing_values
     # Array of values considered as "Today", with date type. "NOW", "TODAY", :NOW and :TODAY are 'today' values, by default
     attr_reader :today_values
     # Missing values array
@@ -61,7 +61,7 @@ module Statsample
     attr_accessor :labels
     # Name of vector. Should be used for output by many classes
     attr_accessor :name
-    
+
     # Creates a new Vector object.
     # * <tt>data</tt> Any data which can be converted on Array
     # * <tt>type</tt> Level of meausurement. See Vector#type
@@ -125,7 +125,7 @@ module Statsample
     # Parameters
     # [n]      Size
     # [val]    Value of each value
-    # [&block] If block provided, is used to set the values of vector 
+    # [&block] If block provided, is used to set the values of vector
     def self.new_scale(n,val=nil, &block)
       if block
         vector=n.times.map {|i| block.call(i)}.to_scale
@@ -146,7 +146,7 @@ module Statsample
     def dup_empty
       Vector.new([],@type, :missing_values => @missing_values.dup, :labels => @labels.dup, :name=> @name)
     end
-    
+
     if Statsample::STATSAMPLE__.respond_to?(:check_type)
       # Raises an exception if type of vector is inferior to t type
       def check_type(t)
@@ -157,8 +157,8 @@ module Statsample
         _check_type(t)
       end
     end
-    
-    
+
+
     def _check_type(t) #:nodoc:
       raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal) or (t==:date) or (:date==@type)
     end
@@ -169,12 +169,12 @@ module Statsample
     # Return a vector usign the standarized values for data
     # with sd with denominator n-1. With variance=0 or mean nil,
     # returns a vector of equal size full of nils
-    # 
+    #
     def vector_standarized(use_population=false)
       check_type :scale
       m=mean
       sd=use_population ? sdp : sds
-      return ([nil]*size).to_scale if mean.nil? or sd==0.0 
+      return ([nil]*size).to_scale if mean.nil? or sd==0.0
       vector=vector_standarized_compute(m,sd)
       vector.name=_("%s(standarized)")  % @name
       vector
@@ -191,7 +191,7 @@ module Statsample
       vector.name=_("%s(centered)") % @name
       vector
     end
-    
+
     alias_method :standarized, :vector_standarized
     alias_method  :centered, :vector_centered
     # Return a vector with values replaced with the percentiles
@@ -217,24 +217,24 @@ module Statsample
       end
       }.to_vector(:scale)
     end
-    
+
     # Vector equality.
     # Two vector will be the same if their data, missing values, type, labels are equals
     def ==(v2)
       return false unless v2.instance_of? Statsample::Vector
       @data==v2.data and @missing_values==v2.missing_values and @type==v2.type and @labels==v2.labels
     end
-    
+
     def _dump(i) # :nodoc:
       Marshal.dump({'data'=>@data,'missing_values'=>@missing_values, 'labels'=>@labels, 'type'=>@type,'name'=>@name})
     end
-    
+
     def self._load(data) # :nodoc:
     h=Marshal.load(data)
     Vector.new(h['data'], h['type'], :missing_values=> h['missing_values'], :labels=>h['labels'], :name=>h['name'])
     end
     # Returns a new vector, with data modified by block.
-    # Equivalent to create a Vector after #collect on data 
+    # Equivalent to create a Vector after #collect on data
     def recode(type=nil)
       type||=@type
       @data.collect{|x|
@@ -242,7 +242,7 @@ module Statsample
       }.to_vector(type)
     end
     # Modifies current vector, with data modified by block.
-    # Equivalent to #collect! on @data 
+    # Equivalent to #collect! on @data
     def recode!
     @data.collect!{|x|
       yield x
@@ -275,7 +275,7 @@ module Statsample
     def each
       @data.each{|x| yield(x) }
     end
-    
+
     # Iterate on each item, retrieving index
     def each_index
     (0...@data.size).each {|i|
@@ -320,7 +320,7 @@ module Statsample
       end
     else
       def set_valid_data_intern #:nodoc:
-        _set_valid_data_intern                  
+        _set_valid_data_intern
       end
     end
     def _set_valid_data_intern #:nodoc:
@@ -335,19 +335,19 @@ module Statsample
       end
       @has_missing_data=@missing_data.size>0
     end
-    
+
     # Retrieves true if data has one o more missing values
     def has_missing_data?
       @has_missing_data
     end
-    alias :flawed? :has_missing_data? 
-    
+    alias :flawed? :has_missing_data?
+
     # Retrieves label for value x. Retrieves x if
     # no label defined.
     def labeling(x)
       @labels.has_key?(x) ? @labels[x].to_s : x.to_s
     end
-    alias :label :labeling 
+    alias :label :labeling
     # Returns a Vector with data with labels replaced by the label.
     def vector_labeled
       d=@data.collect{|x|
@@ -364,12 +364,12 @@ module Statsample
       @data.size
     end
     alias_method :n, :size
-    
+
     # Retrieves i element of data
     def [](i)
       @data[i]
     end
-    # Set i element of data. 
+    # Set i element of data.
     # Note: Use set_valid_data if you include missing values
     def []=(i,v)
       @data[i]=v
@@ -389,9 +389,9 @@ module Statsample
       @today_values = vals
       set_valid_data
     end
-    # Set level of measurement. 
+    # Set level of measurement.
     def type=(t)
-      @type=t	
+      @type=t
       set_scale_data if(t==:scale)
       set_date_data if (t==:date)
     end
@@ -402,9 +402,9 @@ module Statsample
         @data.to_a
       end
     end
-    alias_method :to_ary, :to_a 
-    
-    # Vector sum. 
+    alias_method :to_ary, :to_a
+
+    # Vector sum.
     # - If v is a scalar, add this value to all elements
     # - If v is a Array or a Vector, should be of the same size of this vector
     #   every item of this vector will be added to the value of the
@@ -412,17 +412,17 @@ module Statsample
     def +(v)
     _vector_ari("+",v)
     end
-    # Vector rest. 
+    # Vector rest.
     # - If v is a scalar, rest this value to all elements
-    # - If v is a Array or a Vector, should be of the same 
+    # - If v is a Array or a Vector, should be of the same
     #   size of this vector
     #   every item of this vector will be rested to the value of the
     #   item at the same position on the other vector
-    
+
     def -(v)
     _vector_ari("-",v)
     end
-    
+
     def *(v)
       _vector_ari("*",v)
     end
@@ -461,7 +461,7 @@ module Statsample
     else
         raise TypeError,"You should pass a scalar or a array/vector"
     end
-    
+
     end
     # Return an array with the data splitted by a separator.
     #   a=Vector.new(["a,b","c,d","a,b","d"])
@@ -485,11 +485,11 @@ module Statsample
     #
     #  a=Vector.new(["a,b","c,d","a,b"])
     #  a.split_by_separator
-    #  =>  {"a"=>#<Statsample::Type::Nominal:0x7f2dbcc09d88 
-    #        @data=[1, 0, 1]>, 
-    #       "b"=>#<Statsample::Type::Nominal:0x7f2dbcc09c48 
-    #        @data=[1, 1, 0]>, 
-    #      "c"=>#<Statsample::Type::Nominal:0x7f2dbcc09b08 
+    #  =>  {"a"=>#<Statsample::Type::Nominal:0x7f2dbcc09d88
+    #        @data=[1, 0, 1]>,
+    #       "b"=>#<Statsample::Type::Nominal:0x7f2dbcc09c48
+    #        @data=[1, 1, 0]>,
+    #      "c"=>#<Statsample::Type::Nominal:0x7f2dbcc09b08
     #        @data=[0, 1, 1]>}
     #
     def split_by_separator(sep=Statsample::SPLIT_TOKEN)
@@ -506,7 +506,7 @@ module Statsample
         end
       else
         factors.each do |f|
-          out[f].push(r.include?(f) ? 1:0) 
+          out[f].push(r.include?(f) ? 1:0)
         end
       end
     end
@@ -521,11 +521,11 @@ module Statsample
         a
       }
     end
-    
+
     # == Bootstrap
     # Generate +nr+ resamples (with replacement) of size  +s+
     # from vector, computing each estimate from +estimators+
-    # over each resample. 
+    # over each resample.
     # +estimators+ could be
     # a) Hash with variable names as keys and lambdas as  values
     #   a.bootstrap(:log_s2=>lambda {|v| Math.log(v.variance)},1000)
@@ -534,33 +534,33 @@ module Statsample
     # c) A single method to bootstrap
     #   a.jacknife(:mean, 1000)
     # If s is nil, is set to vector size by default.
-    # 
+    #
     # Returns a dataset where each vector is an vector
     # of length +nr+ containing the computed resample estimates.
     def bootstrap(estimators, nr, s=nil)
       s||=n
-      
+
       h_est, es, bss= prepare_bootstrap(estimators)
-      
-     
+
+
       nr.times do |i|
         bs=sample_with_replacement(s)
-        es.each do |estimator|          
+        es.each do |estimator|
           # Add bootstrap
           bss[estimator].push(h_est[estimator].call(bs))
         end
       end
-      
+
       es.each do |est|
         bss[est]=bss[est].to_scale
         bss[est].type=:scale
       end
       bss.to_dataset
-      
+
     end
-    
+
     # == Jacknife
-    # Returns a dataset with jacknife delete-+k+ +estimators+ 
+    # Returns a dataset with jacknife delete-+k+ +estimators+
     # +estimators+ could be:
     # a) Hash with variable names as keys and lambdas as values
     #   a.jacknife(:log_s2=>lambda {|v| Math.log(v.variance)})
@@ -573,23 +573,23 @@ module Statsample
     #
     # Returns a dataset where each vector is an vector
     # of length +cases+/+k+ containing the computed jacknife estimates.
-    # 
+    #
     # == Reference:
     # * Sawyer, S. (2005). Resampling Data: Using a Statistical Jacknife.
     def jacknife(estimators, k=1)
       raise "n should be divisible by k:#{k}" unless n%k==0
-      
+
       nb=(n / k).to_i
-      
-      
+
+
       h_est, es, ps= prepare_bootstrap(estimators)
 
       est_n=es.inject({}) {|h,v|
         h[v]=h_est[v].call(self)
         h
       }
-      
-      
+
+
       nb.times do |i|
         other=@data_with_nils.dup
         other.slice!(i*k,k)
@@ -599,16 +599,16 @@ module Statsample
           ps[estimator].push( nb * est_n[estimator] - (nb-1) * h_est[estimator].call(other))
         end
       end
-      
-      
+
+
       es.each do |est|
         ps[est]=ps[est].to_scale
         ps[est].type=:scale
       end
       ps.to_dataset
     end
-    
-    
+
+
     # For an array or hash of estimators methods, returns
     # an array with three elements
     # 1.- A hash with estimators names as keys and lambdas as values
@@ -616,23 +616,23 @@ module Statsample
     # 3.- A Hash with estimators names as keys and empty arrays as values
     def prepare_bootstrap(estimators)
       h_est=estimators
-      
+
       h_est=[h_est] unless h_est.is_a? Array or h_est.is_a? Hash
-      
+
       if h_est.is_a? Array
         h_est=h_est.inject({}) {|h,est|
           h[est]=lambda {|v| v.send(est)}
           h
         }
       end
-      
+
       bss=h_est.keys.inject({}) {|h,v| h[v]=[];h}
-      
+
       [h_est,h_est.keys, bss]
-      
+
     end
     private :prepare_bootstrap
-    
+
     # Returns an random sample of size n, with replacement,
     # only with valid data.
     #
@@ -646,9 +646,9 @@ module Statsample
     # only with valid data.
     #
     # Every element could only be selected once.
-    # 
+    #
     # A sample of the same size of the vector is the vector itself.
-      
+
     def sample_without_replacement(sample=1)
       raise ArgumentError, "Sample size couldn't be greater than n" if sample>@valid_data.size
       out=[]
@@ -675,9 +675,9 @@ module Statsample
       frequencies[x].nil? ? 0 : frequencies[x]
     end
     end
-    
+
     # Returns the database type for the vector, according to its content
-    
+
     def db_type(dbs='mysql')
     # first, detect any character not number
     if @data.find {|v|  v.to_s=~/\d{2,2}-\d{2,2}-\d{4,4}/} or @data.find {|v|  v.to_s=~/\d{4,4}-\d{2,2}-\d{2,2}/}
@@ -692,7 +692,7 @@ module Statsample
     end
     # Return true if all data is Date, "today" values or nil
     def can_be_date?
-    if @data.find {|v|       
+    if @data.find {|v|
     !v.nil? and !v.is_a? Date and !v.is_a? Time and (v.is_a? String and !@today_values.include? v) and (v.is_a? String and !(v=~/\d{4,4}[-\/]\d{1,2}[-\/]\d{1,2}/))}
       false
     else
@@ -707,7 +707,7 @@ module Statsample
         true
       end
     end
-    
+
     def to_s
       sprintf("Vector(type:%s, n:%d)[%s]",@type.to_s,@data.size, @data.collect{|d| d.nil? ? "nil":d}.join(","))
     end
@@ -736,7 +736,7 @@ module Statsample
     end
     if Statsample::STATSAMPLE__.respond_to?(:frequencies)
       # Returns a hash with the distribution of frecuencies for
-      # the sample                
+      # the sample
       def frequencies
         Statsample::STATSAMPLE__.frequencies(@valid_data)
       end
@@ -745,8 +745,8 @@ module Statsample
         _frequencies
       end
     end
-    
-    
+
+
     def _frequencies #:nodoc:
       @valid_data.inject(Hash.new) {|a,x|
         a[x]||=0
@@ -754,7 +754,7 @@ module Statsample
         a
       }
     end
-    
+
     # Returns the most frequent item.
     def mode
       frequencies.max{|a,b| a[1]<=>b[1]}.first
@@ -777,12 +777,12 @@ module Statsample
     end
     def report_building(b)
       b.section(:name=>name) do |s|
-        s.text _("n :%d") % n        
+        s.text _("n :%d") % n
         s.text _("n valid:%d") % n_valid
         if @type==:nominal
-          s.text  _("factors:%s") % factors.join(",") 
-          s.text   _("mode: %s") % mode 
-          
+          s.text  _("factors:%s") % factors.join(",")
+          s.text   _("mode: %s") % mode
+
           s.table(:name=>_("Distribution")) do |t|
             frequencies.sort.each do |k,v|
               key=labels.has_key?(k) ? labels[k]:k
@@ -790,7 +790,7 @@ module Statsample
             end
           end
         end
-        
+
         s.text _("median: %s") % median.to_s if(@type==:ordinal or @type==:scale)
         if(@type==:scale)
           s.text _("mean: %0.4f") % mean
@@ -803,7 +803,7 @@ module Statsample
         end
       end
     end
-      
+
       # Variance of p, according to poblation size
       def variance_proportion(n_poblation, v=1)
         Statsample::proportion_variance_sample(self.proportion(v), @valid_data.size, n_poblation)
@@ -818,29 +818,58 @@ module Statsample
       def proportion_confidence_interval_z(n_poblation,margin=0.95,v=1)
         Statsample::proportion_confidence_interval_z(proportion(v), @valid_data.size, n_poblation, margin)
       end
-      
+
       self.instance_methods.find_all{|met| met=~/_slow$/}.each do |met|
           met_or=met.gsub("_slow","")
           if !self.method_defined?(met_or)
               alias_method met_or, met
           end
       end
-      
+
       ######
       ### Ordinal Methods
       ######
-    
-      # Return the value of the percentil q
-      def percentil(q)
+
+      # == Percentil
+      # Returns the value of the percentile q
+      #
+      # Accepts an optional second argument specifying the strategy to interpolate
+      # when the requested percentile lies between two data points a and b
+      # Valid strategies are:
+      # * :midpoint (Default): (a + b) / 2
+      # * :linear : a + (b - a) * d where d is the decimal part of the index between a and b.
+      # This is the NIST recommended method (http://en.wikipedia.org/wiki/Percentile#NIST_method)
+      #
+      def percentil(q, strategy = :midpoint)
         check_type :ordinal
         sorted=@valid_data.sort
-        v= (n_valid * q).quo(100)
-        if(v.to_i!=v)
-          sorted[v.to_i]
+
+        case strategy
+        when :midpoint
+          v = (n_valid * q).quo(100)
+          if(v.to_i!=v)
+            sorted[v.to_i]
+          else
+            (sorted[(v-0.5).to_i].to_f + sorted[(v+0.5).to_i]).quo(2)
+          end
+        when :linear
+          index = (q / 100.0) * (n_valid + 1)
+
+          k = index.truncate
+          d = index % 1
+
+          if k == 0
+            sorted[0]
+          elsif k >= sorted.size
+            sorted[-1]
+          else
+            sorted[k - 1] + d * (sorted[k] - sorted[k - 1])
+          end
         else
-          (sorted[(v-0.5).to_i].to_f + sorted[(v+0.5).to_i]).quo(2)
+          raise NotImplementedError.new "Unknown strategy #{strategy.to_s}"
         end
       end
+
       # Returns a ranked vector.
       def ranked(type=:ordinal)
         check_type :ordinal
@@ -858,7 +887,7 @@ module Statsample
         percentil(50)
       end
       # Minimun value
-      def min 
+      def min
         check_type :ordinal
         @valid_data.min
       end
@@ -867,7 +896,7 @@ module Statsample
         check_type :ordinal
         @valid_data.max
       end
-    
+
     def set_date_data
       @date_data_with_nils=@data.collect do|x|
         if x.is_a? Date
@@ -883,7 +912,7 @@ module Statsample
         end
       end
     end
-    
+
     def set_scale_data
       @scale_data=@valid_data.collect do|x|
         if x.is_a? Numeric
@@ -895,18 +924,18 @@ module Statsample
         end
       end
     end
-    
+
     private :set_date_data, :set_scale_data
-    
+
     # The range of the data (max - min)
-    def range; 
+    def range;
       check_type :scale
       @scale_data.max - @scale_data.min
     end
     # The sum of values for the data
     def sum
       check_type :scale
-      @scale_data.inject(0){|a,x|x+a} ; 
+      @scale_data.inject(0){|a,x|x+a} ;
     end
     # The arithmetical mean of data
     def mean
@@ -916,7 +945,7 @@ module Statsample
     # Sum of squares for the data around a value.
     # By default, this value is the  mean
     #   ss= sum{(xi-m)^2}
-    # 
+    #
     def sum_of_squares(m=nil)
       check_type :scale
       m||=mean
@@ -927,7 +956,7 @@ module Statsample
       check_type :scale
       @scale_data.inject(0) {|a,x| x.square+a} - (sum.square.quo(n_valid))
     end
-    
+
     # Population variance (denominator N)
     def variance_population(m=nil)
       check_type :scale
@@ -935,8 +964,8 @@ module Statsample
       squares=@scale_data.inject(0){|a,x| x.square+a}
       squares.quo(n_valid) - m.square
     end
-    
-    
+
+
     # Population Standard deviation (denominator N)
     def standard_deviation_population(m=nil)
       check_type :scale
@@ -945,7 +974,7 @@ module Statsample
 
     # Population average deviation (denominator N)
     # author: Al Chou
-   
+
     def average_deviation_population( m = nil )
       check_type :scale
       m ||= mean
@@ -962,7 +991,7 @@ module Statsample
       m||=mean
       sum_of_squares(m).quo(n_valid - 1)
     end
-    
+
     # Sample Standard deviation (denominator n-1)
     def standard_deviation_sample(m=nil)
         check_type :scale
@@ -982,23 +1011,23 @@ module Statsample
         m||=mean
         fo=@scale_data.inject(0){|a,x| a+((x-m)**4)}
         fo.quo((@scale_data.size)*sd(m)**4)-3
-        
+
     end
     # Product of all values on the sample
-    # 
+    #
     def product
         check_type :scale
         @scale_data.inject(1){|a,x| a*x }
     end
-    
+
     # With a fixnum, creates X bins within the range of data
     # With an Array, each value will be a cut point
     def histogram(bins=10)
       check_type :scale
-      
+
       if bins.is_a? Array
         #h=Statsample::Histogram.new(self, bins)
-        h=Statsample::Histogram.alloc(bins)                        
+        h=Statsample::Histogram.alloc(bins)
       else
         # ugly patch. The upper limit for a bin has the form
         # x < range
@@ -1015,7 +1044,7 @@ module Statsample
       h.increment(@valid_data)
       h
     end
-      
+
     # Coefficient of variation
     # Calculed with the sample standard deviation
     def coefficient_of_variation
@@ -1028,12 +1057,12 @@ module Statsample
       standard_deviation_sample.quo(Math.sqrt(valid_data.size))
     end
     alias :se :standard_error
-    
+
     alias_method :sdp, :standard_deviation_population
     alias_method :sds, :standard_deviation_sample
     alias_method :adp, :average_deviation_population
     alias_method :cov, :coefficient_of_variation
-    alias_method :variance, :variance_sample    
+    alias_method :variance, :variance_sample
     alias_method :sd, :standard_deviation_sample
     alias_method :ss, :sum_of_squares
     include_aliasing Statsample::Vector::GSL_ if Statsample.has_gsl?
