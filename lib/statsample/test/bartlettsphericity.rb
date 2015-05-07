@@ -31,7 +31,7 @@ module Statsample
       # 
       def compute
         @value=-((@ncases-1)-(2*@nvars+5).quo(6))*Math::log(@matrix.determinant)
-        @df=(@nvars*(@nvars-1)).quo(2)
+        @df=(@nvars*(@nvars-1)) / 2
       end
       def probability
         1-Distribution::ChiSquare.cdf(@value,@df)

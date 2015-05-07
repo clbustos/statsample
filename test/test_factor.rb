@@ -34,51 +34,53 @@ class StatsampleFactorTestCase < Minitest::Test
   end
 
   def test_principalcomponents_ruby_gsl
-    ran = Distribution::Normal.rng
+    if Statsample.has_gsl?
+      ran = Distribution::Normal.rng
 
-    #    @r=::Rserve::Connection.new
+      #    @r=::Rserve::Connection.new
 
-    samples = 20
-    [3, 5, 7].each {|k|
-      v = {}
-      v['x0'] = samples.times.map { ran.call }.to_scale.centered
-      (1...k).each {|i|
-        v["x#{i}"] = samples.times.map { |ii| ran.call * 0.5 + v["x#{i - 1}"][ii] * 0.5 }.to_scale.centered
+      samples = 20
+      [3, 5, 7].each {|k|
+        v = {}
+        v['x0'] = samples.times.map { ran.call }.to_scale.centered
+        (1...k).each {|i|
+          v["x#{i}"] = samples.times.map { |ii| ran.call * 0.5 + v["x#{i - 1}"][ii] * 0.5 }.to_scale.centered
+        }
+
+        ds = v.to_dataset
+        cm = ds.covariance_matrix
+        #      @r.assign('ds',ds)
+        #      @r.eval('cm<-cor(ds);sm<-eigen(cm, sym=TRUE);v<-sm$vectors')
+        #      puts "eigenvalues"
+        #      puts @r.eval('v').to_ruby.to_s
+        pca_ruby = Statsample::Factor::PCA.new(cm, m: k, use_gsl: false)
+        pca_gsl = Statsample::Factor::PCA.new(cm, m: k, use_gsl: true)
+        pc_ruby = pca_ruby.principal_components(ds)
+        pc_gsl  = pca_gsl.principal_components(ds)
+        # Test component matrix correlation!
+        cm_ruby = pca_ruby.component_matrix
+        # puts cm_ruby.summary
+        k.times {|i|
+          pc_id = "PC_#{i + 1}"
+          assert_in_delta(pca_ruby.eigenvalues[i], pca_gsl.eigenvalues[i], 1e-10)
+          # Revert gsl component values
+          pc_gsl_data = (pc_gsl[pc_id][0] - pc_ruby[pc_id][0]).abs > 1e-6 ? pc_gsl[pc_id].recode(&:-@) : pc_gsl[pc_id]
+          assert_similar_vector(pc_gsl_data, pc_ruby[pc_id], 1e-6, "PC for #{k} variables")
+          if false
+            k.times {|j| # variable
+              ds_id = "x#{j}"
+              r = Statsample::Bivariate.correlation(ds[ds_id], pc_ruby[pc_id])
+              puts "#{pc_id}-#{ds_id}:#{r}"
+            }
+          end
+        }
       }
-
-      ds = v.to_dataset
-      cm = ds.covariance_matrix
-      #      @r.assign('ds',ds)
-      #      @r.eval('cm<-cor(ds);sm<-eigen(cm, sym=TRUE);v<-sm$vectors')
-      #      puts "eigenvalues"
-      #      puts @r.eval('v').to_ruby.to_s
-      pca_ruby = Statsample::Factor::PCA.new(cm, m: k, use_gsl: false)
-      pca_gsl = Statsample::Factor::PCA.new(cm, m: k, use_gsl: true)
-      pc_ruby = pca_ruby.principal_components(ds)
-      pc_gsl  = pca_gsl.principal_components(ds)
-      # Test component matrix correlation!
-      cm_ruby = pca_ruby.component_matrix
-      # puts cm_ruby.summary
-      k.times {|i|
-        pc_id = "PC_#{i + 1}"
-        assert_in_delta(pca_ruby.eigenvalues[i], pca_gsl.eigenvalues[i], 1e-10)
-        # Revert gsl component values
-        pc_gsl_data = (pc_gsl[pc_id][0] - pc_ruby[pc_id][0]).abs > 1e-6 ? pc_gsl[pc_id].recode(&:-@) : pc_gsl[pc_id]
-        assert_similar_vector(pc_gsl_data, pc_ruby[pc_id], 1e-6, "PC for #{k} variables")
-        if false
-          k.times {|j| # variable
-            ds_id = "x#{j}"
-            r = Statsample::Bivariate.correlation(ds[ds_id], pc_ruby[pc_id])
-            puts "#{pc_id}-#{ds_id}:#{r}"
-          }
-        end
-      }
-    }
+    end
     # @r.close
   end
 
   def test_principalcomponents
-    principalcomponents(true)
+    principalcomponents(true) if Statsample.has_gsl?
     principalcomponents(false)
   end
 

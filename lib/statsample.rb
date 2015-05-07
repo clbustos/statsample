@@ -141,7 +141,7 @@ module Statsample
       class_variable_get(cv)
     end
   end
-
+  
   create_has_library :gsl
 
   SPLIT_TOKEN = ','

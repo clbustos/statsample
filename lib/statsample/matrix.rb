@@ -10,6 +10,7 @@ class ::Matrix
   def to_matrix
     self
   end
+
   def to_dataset
     f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map {|i| _("VAR_%d") % (i+1) }
     ds=Statsample::Dataset.new(f)
@@ -24,6 +25,7 @@ class ::Matrix
     ds.name=self.name if self.respond_to? :name
     ds
   end
+
   if defined? :eigenpairs
     alias_method :eigenpairs_ruby, :eigenpairs
   end
@@ -38,16 +40,14 @@ class ::Matrix
   def eigenvalues
     eigenpairs.collect {|v| v[0]}
   end
+
   def eigenvectors
     eigenpairs.collect {|v| v[1]}
   end
+
   def eigenvectors_matrix
     Matrix.columns(eigenvectors)
   end
-
-
-
-
 
   def to_gsl
     out=[]
@@ -64,9 +64,11 @@ module GSL
       def to_matrix
       ::Matrix.columns([self.size.times.map {|i| self[i]}])
       end
+
       def to_ary
         to_a
       end
+
       def to_gsl
         self
       end
@@ -95,18 +97,23 @@ module GSL
     def row_size
       size1
     end
+
     def column_size
       size2
     end
+
     def determinant
       det
     end
+
     def inverse
       GSL::Linalg::LU.invert(self)
     end
+
     def eigenvalues
       eigenpairs.collect {|v| v[0]}
     end
+
     def eigenvectors
       eigenpairs.collect {|v| v[1]}
     end
@@ -123,6 +130,7 @@ module GSL
       GSL::Eigen::symmv_sort(eigval, eigvec, GSL::Eigen::SORT_VAL_DESC)
       eigvec
     end
+
     def eigenpairs
       eigval, eigvec= GSL::Eigen.symmv(self)
       GSL::Eigen::symmv_sort(eigval, eigvec, GSL::Eigen::SORT_VAL_DESC)
@@ -137,12 +145,14 @@ module GSL
     def square?
       size1==size2
     end
+
     def to_matrix
       rows=self.size1
       cols=self.size2
       out=(0...rows).collect{|i| (0...cols).collect {|j| self[i,j]} }
       ::Matrix.rows(out)
     end
+    
     def total_sum
       sum=0
       size1.times {|i|
