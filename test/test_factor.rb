@@ -141,11 +141,13 @@ class StatsampleFactorTestCase < Minitest::Test
   end
   # Tested with SPSS and R
   def test_pca
+
     a = [2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2.0, 1.0, 1.5, 1.1].to_scale
     b = [2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9].to_scale
     a.recode! { |c| c - a.mean }
     b.recode! { |c| c - b.mean }
     ds = { 'a' => a, 'b' => b }.to_dataset
+
     cov_matrix = Statsample::Bivariate.covariance_matrix(ds)
     if Statsample.has_gsl?
       pca = Statsample::Factor::PCA.new(cov_matrix, use_gsl: true)
@@ -158,6 +160,8 @@ class StatsampleFactorTestCase < Minitest::Test
   end
 
   def pca_set(pca, _type)
+
+
     expected_eigenvalues = [1.284, 0.0490]
     expected_eigenvalues.each_with_index{|ev, i|
       assert_in_delta(ev, pca.eigenvalues[i], 0.001)

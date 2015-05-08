@@ -75,7 +75,8 @@ module Statsample
         
         (ncol-1).times do |m|
           puts "MAP:Eigenvalue #{m+1}" if $DEBUG
-          a=loadings[0..(loadings.row_size-1),0..m]
+          a=use_gsl ? loadings[0..(loadings.row_size-1),0..m] : 
+            loadings.minor(0..(loadings.row_size-1),0..m)
           partcov= gsl_m - (a*a.transpose)
           
           d=klass_m.diagonal(*(partcov.diagonal.collect {|v| Math::sqrt(1/v)}))

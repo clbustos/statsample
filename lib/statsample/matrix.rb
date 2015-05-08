@@ -56,6 +56,10 @@ class ::Matrix
     }
     GSL::Matrix[*out]
   end
+
+  def []=(i, j, x)
+    @rows[i][j] = x
+  end
 end
 
 module GSL
