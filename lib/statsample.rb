@@ -87,6 +87,32 @@ class Array
       self
     end
   end
+
+  def sum
+    inject(:+)
+  end
+
+  def mean
+    self.sum / size
+  end
+
+  # Calcualte sum of squares
+  def sum_of_squares(m=nil)
+    m ||= mean
+    self.inject(0) {|a,x| a + (x-m).square }
+  end
+
+  # Calculate sample variance
+  def variance_sample(m=nil)
+    m ||= mean
+    sum_of_squares(m).quo(size - 1)
+  end
+
+  # Calculate sample standard deviation
+  def sd
+    m ||= mean
+    Math::sqrt(variance_sample(m))
+  end
 end
 
 def create_test(*args, &_proc)

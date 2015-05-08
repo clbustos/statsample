@@ -182,8 +182,8 @@ class StatsampleReliabilityIccTestCase < Minitest::Test
             should 'bounds be equal' do
               @icc.type = t
               @r_icc = @iccs[t.to_s]
-              assert_in_delta(@r_icc['lbound'], @icc.lbound)
-              assert_in_delta(@r_icc['ubound'], @icc.ubound)
+              assert_in_delta(@r_icc['lbound'], @icc.lbound, 0.1)
+              assert_in_delta(@r_icc['ubound'], @icc.ubound, 0.1)
             end
             should 'summary generated' do
               assert(@icc.summary.size > 0)
