@@ -34,7 +34,7 @@ module Statsample
     #   matrix is not appropriate for factor analysis."
     # 
     def self.anti_image_covariance_matrix(matrix)
-      s2=Matrix.diag(*(matrix.inverse.diagonal)).inverse
+      s2=Matrix.diagonal(*(matrix.inverse.diagonal)).inverse
       aicm=(s2)*matrix.inverse*(s2)
       aicm.extend(Statsample::CovariateMatrix)
       aicm.fields=matrix.fields if matrix.respond_to? :fields
@@ -42,13 +42,12 @@ module Statsample
     end
     def self.anti_image_correlation_matrix(matrix)
       matrix=matrix.to_matrix
-      s=Matrix.diag(*(matrix.inverse.diagonal)).sqrt.inverse
+      s=Matrix.diagonal(*(matrix.inverse.diagonal)).sqrt.inverse
       aicm=s*matrix.inverse*s
       
       aicm.extend(Statsample::CovariateMatrix)
       aicm.fields=matrix.fields if matrix.respond_to? :fields
       aicm
-      
     end
       
     # Kaiser-Meyer-Olkin measure of sampling adequacy for correlation matrix.
@@ -101,6 +100,5 @@ module Statsample
       end
       sum_r.quo(sum_r+sum_q)
     end
-    
   end
 end
