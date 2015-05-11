@@ -71,6 +71,12 @@ module Statsample
       # giving r and vector size
       # Source : http://faculty.chass.ncsu.edu/garson/PA765/correl.htm
       def t_r(r,size)
+        raise "In computing value for t test for a pearson correlation, invalid size of series: #{size}" if size <= 2
+        raise "In computing value for t test for a pearson correlation, invalid value of r: #{r}" if r >= 1.1
+        if r >= 1
+          puts "StatSample::Bivariate#t_r: got an R value > 1 (#{r}), so substituting 0.999999"
+          r = 0.999999
+        end
         r * Math::sqrt(((size)-2).to_f / (1 - r**2))
       end
       # Retrieves the probability value (a la SPSS)
@@ -251,7 +257,11 @@ module Statsample
             (row==col or ds[row].type!=:scale or ds[col].type!=:scale) ? nil : prop_pearson(t_pearson(ds[row],ds[col]), v1a.size, tails)
           end
         end
-        Matrix.rows(rows)
+        m = Matrix.rows(rows)
+        m.extend(Statsample::CovariateMatrix)
+        m.fields=ds.fields
+        m.name = "Correlation Probability"
+        m
       end
       
       # Spearman ranked correlation coefficient (rho) between 2 vectors

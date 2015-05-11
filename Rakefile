@@ -7,6 +7,7 @@ require 'rubygems'
 require 'statsample'
 require 'hoe'
 require 'rdoc'
+require "bundler/gem_tasks"
 
 Hoe.plugin :git
 Hoe.plugin :doofus
