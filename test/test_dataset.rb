@@ -58,9 +58,9 @@ class StatsampleDatasetTestCase < Minitest::Test
   end
 
   def test_merge
-    a = [1, 2, 3].to_scale
+    a = [1, 2, 3].to_numeric
     b = [3, 4, 5].to_vector
-    c = [4, 5, 6].to_scale
+    c = [4, 5, 6].to_numeric
     d = [7, 8, 9].to_vector
     e = [10, 20, 30].to_vector
     ds1 = { 'a' => a, 'b' => b }.to_dataset
@@ -117,51 +117,51 @@ class StatsampleDatasetTestCase < Minitest::Test
   end
 
   def test_vector_by_calculation
-    a1 = [1, 2, 3, 4, 5, 6, 7].to_vector(:scale)
-    a2 = [10, 20, 30, 40, 50, 60, 70].to_vector(:scale)
-    a3 = [100, 200, 300, 400, 500, 600, 700].to_vector(:scale)
+    a1 = [1, 2, 3, 4, 5, 6, 7].to_vector(:numeric)
+    a2 = [10, 20, 30, 40, 50, 60, 70].to_vector(:numeric)
+    a3 = [100, 200, 300, 400, 500, 600, 700].to_vector(:numeric)
     ds = { 'a1' => a1, 'a2' => a2, 'a3' => a3 }.to_dataset
     total = ds.vector_by_calculation {|row|
       row['a1'] + row['a2'] + row['a3']
     }
-    expected = [111, 222, 333, 444, 555, 666, 777].to_vector(:scale)
+    expected = [111, 222, 333, 444, 555, 666, 777].to_vector(:numeric)
     assert_equal(expected, total)
   end
 
   def test_vector_sum
-    a1 = [1, 2, 3, 4, 5, nil].to_vector(:scale)
-    a2 = [10, 10, 20, 20, 20, 30].to_vector(:scale)
-    b1 = [nil, 1, 1, 1, 1, 2].to_vector(:scale)
-    b2 = [2, 2, 2, nil, 2, 3].to_vector(:scale)
+    a1 = [1, 2, 3, 4, 5, nil].to_vector(:numeric)
+    a2 = [10, 10, 20, 20, 20, 30].to_vector(:numeric)
+    b1 = [nil, 1, 1, 1, 1, 2].to_vector(:numeric)
+    b2 = [2, 2, 2, nil, 2, 3].to_vector(:numeric)
     ds = { 'a1' => a1, 'a2' => a2, 'b1' => b1, 'b2' => b2 }.to_dataset
     total = ds.vector_sum
     a = ds.vector_sum(%w(a1 a2))
     b = ds.vector_sum(%w(b1 b2))
-    expected_a = [11, 12, 23, 24, 25, nil].to_vector(:scale)
-    expected_b = [nil, 3, 3, nil, 3, 5].to_vector(:scale)
-    expected_total = [nil, 15, 26, nil, 28, nil].to_vector(:scale)
+    expected_a = [11, 12, 23, 24, 25, nil].to_vector(:numeric)
+    expected_b = [nil, 3, 3, nil, 3, 5].to_vector(:numeric)
+    expected_total = [nil, 15, 26, nil, 28, nil].to_vector(:numeric)
     assert_equal(expected_a, a)
     assert_equal(expected_b, b)
     assert_equal(expected_total, total)
   end
 
   def test_vector_missing_values
-    a1 = [1, nil, 3, 4, 5, nil].to_vector(:scale)
-    a2 = [10, nil, 20, 20, 20, 30].to_vector(:scale)
-    b1 = [nil, nil, 1, 1, 1, 2].to_vector(:scale)
-    b2 = [2, 2, 2, nil, 2, 3].to_vector(:scale)
-    c = [nil, 2, 4, 2, 2, 2].to_vector(:scale)
+    a1 = [1, nil, 3, 4, 5, nil].to_vector(:numeric)
+    a2 = [10, nil, 20, 20, 20, 30].to_vector(:numeric)
+    b1 = [nil, nil, 1, 1, 1, 2].to_vector(:numeric)
+    b2 = [2, 2, 2, nil, 2, 3].to_vector(:numeric)
+    c = [nil, 2, 4, 2, 2, 2].to_vector(:numeric)
     ds = { 'a1' => a1, 'a2' => a2, 'b1' => b1, 'b2' => b2, 'c' => c }.to_dataset
-    mva = [2, 3, 0, 1, 0, 1].to_vector(:scale)
+    mva = [2, 3, 0, 1, 0, 1].to_vector(:numeric)
     assert_equal(mva, ds.vector_missing_values)
   end
 
   def test_has_missing_values
-    a1 = [1, nil, 3, 4, 5, nil].to_vector(:scale)
-    a2 = [10, nil, 20, 20, 20, 30].to_vector(:scale)
-    b1 = [nil, nil, 1, 1, 1, 2].to_vector(:scale)
-    b2 = [2, 2, 2, nil, 2, 3].to_vector(:scale)
-    c = [nil, 2, 4, 2, 2, 2].to_vector(:scale)
+    a1 = [1, nil, 3, 4, 5, nil].to_vector(:numeric)
+    a2 = [10, nil, 20, 20, 20, 30].to_vector(:numeric)
+    b1 = [nil, nil, 1, 1, 1, 2].to_vector(:numeric)
+    b2 = [2, 2, 2, nil, 2, 3].to_vector(:numeric)
+    c = [nil, 2, 4, 2, 2, 2].to_vector(:numeric)
     ds = { 'a1' => a1, 'a2' => a2, 'b1' => b1, 'b2' => b2, 'c' => c }.to_dataset
     assert(ds.has_missing_data?)
     clean = ds.dup_only_valid
@@ -169,31 +169,31 @@ class StatsampleDatasetTestCase < Minitest::Test
   end
 
   def test_vector_count_characters
-    a1 = [1, 'abcde', 3, 4, 5, nil].to_vector(:scale)
-    a2 = [10, 20.3, 20, 20, 20, 30].to_vector(:scale)
-    b1 = [nil, '343434', 1, 1, 1, 2].to_vector(:scale)
-    b2 = [2, 2, 2, nil, 2, 3].to_vector(:scale)
-    c = [nil, 2, 'This is a nice example', 2, 2, 2].to_vector(:scale)
+    a1 = [1, 'abcde', 3, 4, 5, nil].to_vector(:numeric)
+    a2 = [10, 20.3, 20, 20, 20, 30].to_vector(:numeric)
+    b1 = [nil, '343434', 1, 1, 1, 2].to_vector(:numeric)
+    b2 = [2, 2, 2, nil, 2, 3].to_vector(:numeric)
+    c = [nil, 2, 'This is a nice example', 2, 2, 2].to_vector(:numeric)
     ds = { 'a1' => a1, 'a2' => a2, 'b1' => b1, 'b2' => b2, 'c' => c }.to_dataset
-    exp = [4, 17, 27, 5, 6, 5].to_vector(:scale)
+    exp = [4, 17, 27, 5, 6, 5].to_vector(:numeric)
     assert_equal(exp, ds.vector_count_characters)
   end
 
   def test_vector_mean
-    a1 = [1, 2, 3, 4, 5, nil].to_vector(:scale)
-    a2 = [10, 10, 20, 20, 20, 30].to_vector(:scale)
-    b1 = [nil, 1, 1, 1, 1, 2].to_vector(:scale)
-    b2 = [2, 2, 2, nil, 2, 3].to_vector(:scale)
-    c = [nil, 2, 4, 2, 2, 2].to_vector(:scale)
+    a1 = [1, 2, 3, 4, 5, nil].to_vector(:numeric)
+    a2 = [10, 10, 20, 20, 20, 30].to_vector(:numeric)
+    b1 = [nil, 1, 1, 1, 1, 2].to_vector(:numeric)
+    b2 = [2, 2, 2, nil, 2, 3].to_vector(:numeric)
+    c = [nil, 2, 4, 2, 2, 2].to_vector(:numeric)
     ds = { 'a1' => a1, 'a2' => a2, 'b1' => b1, 'b2' => b2, 'c' => c }.to_dataset
     total = ds.vector_mean
     a = ds.vector_mean(%w(a1 a2), 1)
     b = ds.vector_mean(%w(b1 b2), 1)
     c = ds.vector_mean(%w(b1 b2 c), 1)
-    expected_a = [5.5, 6, 11.5, 12, 12.5, 30].to_vector(:scale)
-    expected_b = [2, 1.5, 1.5, 1, 1.5, 2.5].to_vector(:scale)
-    expected_c = [nil, 5.0 / 3, 7.0 / 3, 1.5, 5.0 / 3, 7.0 / 3].to_vector(:scale)
-    expected_total = [nil, 3.4, 6, nil, 6.0, nil].to_vector(:scale)
+    expected_a = [5.5, 6, 11.5, 12, 12.5, 30].to_vector(:numeric)
+    expected_b = [2, 1.5, 1.5, 1, 1.5, 2.5].to_vector(:numeric)
+    expected_c = [nil, 5.0 / 3, 7.0 / 3, 1.5, 5.0 / 3, 7.0 / 3].to_vector(:numeric)
+    expected_total = [nil, 3.4, 6, nil, 6.0, nil].to_vector(:numeric)
     assert_equal(expected_a, a)
     assert_equal(expected_b, b)
     assert_equal(expected_c, c)
@@ -210,9 +210,9 @@ class StatsampleDatasetTestCase < Minitest::Test
   end
 
   def test_recode
-    @ds['age'].type = :scale
+    @ds['age'].type = :numeric
     @ds.recode!('age') { |c| c['id'] * 2 }
-    expected = [2, 4, 6, 8, 10].to_vector(:scale)
+    expected = [2, 4, 6, 8, 10].to_vector(:numeric)
     assert_equal(expected, @ds['age'])
   end
 
@@ -231,8 +231,8 @@ class StatsampleDatasetTestCase < Minitest::Test
   end
 
   def test_change_type
-    @ds.col('age').type = :scale
-    assert_equal(:scale, @ds.col('age').type)
+    @ds.col('age').type = :numeric
+    assert_equal(:numeric, @ds.col('age').type)
   end
 
   def test_split_by_separator_recode
@@ -255,13 +255,13 @@ class StatsampleDatasetTestCase < Minitest::Test
   end
 
   def test_percentiles
-    v1 = (1..100).to_a.to_scale
+    v1 = (1..100).to_a.to_numeric
     assert_equal(50.5, v1.median)
     assert_equal(25.5, v1.percentil(25))
-    v2 = (1..99).to_a.to_scale
+    v2 = (1..99).to_a.to_numeric
     assert_equal(50, v2.median)
     assert_equal(25, v2.percentil(25))
-    v3 = (1..50).to_a.to_scale
+    v3 = (1..50).to_a.to_numeric
     assert_equal(25.5, v3.median)
     assert_equal(13, v3.percentil(25))
   end
@@ -336,7 +336,7 @@ class StatsampleDatasetTestCase < Minitest::Test
 
     assert_equal(ds1.fields, ds2.fields)
     assert_not_same(ds1.fields, ds2.fields)
-    ds1['v1'].type = :scale
+    ds1['v1'].type = :numeric
     # dup partial
     ds3 = ds1.dup('v1')
     ds_exp = Statsample::Dataset.new({ 'v1' => v1 }, %w(v1))
@@ -355,7 +355,7 @@ class StatsampleDatasetTestCase < Minitest::Test
     assert_not_equal(ds1['v1'], ds3['v1'])
     assert_equal([], ds3['v1'].data)
     assert_equal([], ds3['v2'].data)
-    assert_equal(:scale, ds3['v1'].type)
+    assert_equal(:numeric, ds3['v1'].type)
     assert_equal(ds1.fields, ds2.fields)
     assert_not_same(ds1.fields, ds2.fields)
   end
@@ -368,9 +368,9 @@ class StatsampleDatasetTestCase < Minitest::Test
   end
 
   def test_each_array_with_nils
-    v1 = [1, -99, 3, 4, 'na'].to_vector(:scale, missing_values: [-99, 'na'])
-    v2 = [5, 6, -99, 8, 20].to_vector(:scale, missing_values: [-99])
-    v3 = [9, 10, 11, 12, 20].to_vector(:scale, missing_values: [-99])
+    v1 = [1, -99, 3, 4, 'na'].to_vector(:numeric, missing_values: [-99, 'na'])
+    v2 = [5, 6, -99, 8, 20].to_vector(:numeric, missing_values: [-99])
+    v3 = [9, 10, 11, 12, 20].to_vector(:numeric, missing_values: [-99])
     ds1 = Statsample::Dataset.new('v1' => v1, 'v2' => v2, 'v3' => v3)
     ds2 = ds1.dup_empty
     ds1.each_array_with_nils {|row|
@@ -382,40 +382,40 @@ class StatsampleDatasetTestCase < Minitest::Test
   end
 
   def test_dup_only_valid
-    v1 = [1, nil, 3, 4].to_vector(:scale)
-    v2 = [5, 6, nil, 8].to_vector(:scale)
-    v3 = [9, 10, 11, 12].to_vector(:scale)
+    v1 = [1, nil, 3, 4].to_vector(:numeric)
+    v2 = [5, 6, nil, 8].to_vector(:numeric)
+    v3 = [9, 10, 11, 12].to_vector(:numeric)
     ds1 = Statsample::Dataset.new('v1' => v1, 'v2' => v2, 'v3' => v3)
     ds2 = ds1.dup_only_valid
-    expected = Statsample::Dataset.new('v1' => [1, 4].to_vector(:scale), 'v2' => [5, 8].to_vector(:scale), 'v3' => [9, 12].to_vector(:scale))
+    expected = Statsample::Dataset.new('v1' => [1, 4].to_vector(:numeric), 'v2' => [5, 8].to_vector(:numeric), 'v3' => [9, 12].to_vector(:numeric))
     assert_equal(expected, ds2)
     assert_equal(expected.vectors.values, Statsample.only_valid(v1, v2, v3))
-    expected_partial = Statsample::Dataset.new('v1' => [1, 3, 4].to_vector(:scale), 'v3' => [9, 11, 12].to_vector(:scale))
+    expected_partial = Statsample::Dataset.new('v1' => [1, 3, 4].to_vector(:numeric), 'v3' => [9, 11, 12].to_vector(:numeric))
     assert_equal(expected_partial, ds1.dup_only_valid(%w(v1 v3)))
   end
 
   def test_filter
-    @ds['age'].type = :scale
+    @ds['age'].type = :numeric
     filtered = @ds.filter { |c| c['id'] == 2 or c['id'] == 4 }
-    expected = Statsample::Dataset.new({ 'id' => Statsample::Vector.new([2, 4]), 'name' => Statsample::Vector.new(%w(Claude Franz)), 'age' => Statsample::Vector.new([23, 27], :scale),
+    expected = Statsample::Dataset.new({ 'id' => Statsample::Vector.new([2, 4]), 'name' => Statsample::Vector.new(%w(Claude Franz)), 'age' => Statsample::Vector.new([23, 27], :numeric),
                                          'city' => Statsample::Vector.new(%w(London Paris)),
                                          'a1' => Statsample::Vector.new(['b,c', nil]) }, %w(id name age city a1))
     assert_equal(expected, filtered)
   end
 
   def test_filter_field
-    @ds['age'].type = :scale
+    @ds['age'].type = :numeric
     filtered = @ds.filter_field('id') { |c| c['id'] == 2 or c['id'] == 4 }
     expected = [2, 4].to_vector
     assert_equal(expected, filtered)
   end
 
   def test_verify
-    name = %w(r1 r2 r3 r4).to_vector(:nominal)
-    v1 = [1, 2, 3, 4].to_vector(:scale)
-    v2 = [4, 3, 2, 1].to_vector(:scale)
-    v3 = [10, 20, 30, 40].to_vector(:scale)
-    v4 = %w(a b a b).to_vector(:nominal)
+    name = %w(r1 r2 r3 r4).to_vector(:object)
+    v1 = [1, 2, 3, 4].to_vector(:numeric)
+    v2 = [4, 3, 2, 1].to_vector(:numeric)
+    v3 = [10, 20, 30, 40].to_vector(:numeric)
+    v4 = %w(a b a b).to_vector(:object)
     ds = { 'v1' => v1, 'v2' => v2, 'v3' => v3, 'v4' => v4, 'id' => name }.to_dataset
     ds.fields = %w(v1 v2 v3 v4 id)
     # Correct
@@ -432,14 +432,14 @@ class StatsampleDatasetTestCase < Minitest::Test
   end
 
   def test_compute_operation
-    v1 = [1, 2, 3, 4].to_vector(:scale)
-    v2 = [4, 3, 2, 1].to_vector(:scale)
-    v3 = [10, 20, 30, 40].to_vector(:scale)
-    vscale = [1.quo(2), 1, 3.quo(2), 2].to_vector(:scale)
-    vsum = [1 + 4 + 10.0, 2 + 3 + 20.0, 3 + 2 + 30.0, 4 + 1 + 40.0].to_vector(:scale)
-    vmult = [1 * 4, 2 * 3, 3 * 2, 4 * 1].to_vector(:scale)
+    v1 = [1, 2, 3, 4].to_vector(:numeric)
+    v2 = [4, 3, 2, 1].to_vector(:numeric)
+    v3 = [10, 20, 30, 40].to_vector(:numeric)
+    vnumeric = [1.quo(2), 1, 3.quo(2), 2].to_vector(:numeric)
+    vsum = [1 + 4 + 10.0, 2 + 3 + 20.0, 3 + 2 + 30.0, 4 + 1 + 40.0].to_vector(:numeric)
+    vmult = [1 * 4, 2 * 3, 3 * 2, 4 * 1].to_vector(:numeric)
     ds = { 'v1' => v1, 'v2' => v2, 'v3' => v3 }.to_dataset
-    assert_equal(vscale, ds.compute('v1/2'))
+    assert_equal(vnumeric, ds.compute('v1/2'))
     assert_equal(vsum, ds.compute('v1+v2+v3'))
     assert_equal(vmult, ds.compute('v1*v2'))
   end
@@ -447,15 +447,15 @@ class StatsampleDatasetTestCase < Minitest::Test
   def test_crosstab_with_asignation
     v1 = %w(a a a b b b c c c).to_vector
     v2 = %w(a b c a b c a b c).to_vector
-    v3 = %w(0 1 0 0 1 1 0 0 1).to_scale
+    v3 = %w(0 1 0 0 1 1 0 0 1).to_numeric
     ds = Statsample::Dataset.crosstab_by_asignation(v1, v2, v3)
-    assert_equal(:nominal, ds['_id'].type)
-    assert_equal(:scale, ds['a'].type)
-    assert_equal(:scale, ds['b'].type)
+    assert_equal(:object, ds['_id'].type)
+    assert_equal(:numeric, ds['a'].type)
+    assert_equal(:numeric, ds['b'].type)
     ev_id = %w(a b c).to_vector
-    ev_a = %w(0 0 0).to_scale
-    ev_b = %w(1 1 0).to_scale
-    ev_c = %w(0 1 1).to_scale
+    ev_a = %w(0 0 0).to_numeric
+    ev_b = %w(1 1 0).to_numeric
+    ev_c = %w(0 1 1).to_numeric
     ds2 = { '_id' => ev_id, 'a' => ev_a, 'b' => ev_b, 'c' => ev_c }.to_dataset
     assert_equal(ds, ds2)
   end
@@ -472,7 +472,7 @@ class StatsampleDatasetTestCase < Minitest::Test
     ids = %w(1 1 2 2 2).to_vector
     colors = %w(red blue green orange white).to_vector
     values = [10, 20, 15, 30, 20].to_vector
-    col_ids = [1, 2, 1, 2, 3].to_scale
+    col_ids = [1, 2, 1, 2, 3].to_numeric
     ds_expected = { 'id' => ids, '_col_id' => col_ids, 'color' => colors, 'value' => values }.to_dataset(%w(id _col_id color value))
     assert_equal(ds_expected, ds.one_to_many(%w(id), 'car_%v%n'))
   end

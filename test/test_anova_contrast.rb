@@ -2,10 +2,10 @@ require(File.expand_path(File.dirname(__FILE__) + '/helpers_tests.rb'))
 class StatsampleAnovaContrastTestCase < Minitest::Test
   context(Statsample::Anova::Contrast) do
     setup do
-      constant = [12, 13, 11, 12, 12].to_scale
-      frequent = [9, 10, 9, 13, 14].to_scale
-      infrequent = [15, 16, 17, 16, 16].to_scale
-      never = [17, 18, 12, 18, 20].to_scale
+      constant = [12, 13, 11, 12, 12].to_numeric
+      frequent = [9, 10, 9, 13, 14].to_numeric
+      infrequent = [15, 16, 17, 16, 16].to_numeric
+      never = [17, 18, 12, 18, 20].to_numeric
       @vectors = [constant, frequent, infrequent, never]
       @c = Statsample::Anova::Contrast.new(vectors: @vectors)
     end

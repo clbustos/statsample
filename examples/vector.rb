@@ -5,7 +5,7 @@ require 'statsample'
 
 Statsample::Analysis.store(Statsample::Vector) do
 
-  a=Statsample::Vector.new_scale(1000) {r=rand(5); r==4 ? nil: r;}
+  a=Statsample::Vector.new_numeric(1000) {r=rand(5); r==4 ? nil: r;}
   summary a
   b=c(1,2,3,4,6..10)
   summary b

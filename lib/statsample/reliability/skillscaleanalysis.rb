@@ -54,7 +54,7 @@ module Statsample
       def corrected_dataset
         if @cds.nil?
           @cds=@ds.dup_empty
-          @key.keys.each {|k| @cds[k].type=:scale; @cds[k].name=@ds[k].name}
+          @key.keys.each {|k| @cds[k].type=:numeric; @cds[k].name=@ds[k].name}
           @ds.each do |row|
             out={}
             row.each do |k,v|

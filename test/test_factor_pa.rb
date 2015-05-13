@@ -15,18 +15,18 @@ class StatsampleFactorTestCase < Minitest::Test
       variables = 10
       iterations = 50
       rng = Distribution::Normal.rng
-      f1 = samples.times.collect { rng.call }.to_scale
-      f2 = samples.times.collect { rng.call }.to_scale
+      f1 = samples.times.collect { rng.call }.to_numeric
+      f2 = samples.times.collect { rng.call }.to_numeric
       vectors = {}
       variables.times do |i|
         if i < 5
           vectors["v#{i}"] = samples.times.collect {|nv|
             f1[nv] * 5 + f2[nv] * 2 + rng.call
-          }.to_scale
+          }.to_numeric
         else
           vectors["v#{i}"] = samples.times.collect {|nv|
             f2[nv] * 5 + f1[nv] * 2 + rng.call
-          }.to_scale
+          }.to_numeric
         end
       end
       ds = vectors.to_dataset

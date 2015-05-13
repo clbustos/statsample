@@ -5,10 +5,10 @@ $reliability_icc = nil
 class StatsampleReliabilityIccTestCase < Minitest::Test
   context Statsample::Reliability::ICC do
     setup do
-      a = [9, 6, 8, 7, 10, 6].to_scale
-      b = [2, 1, 4, 1, 5, 2].to_scale
-      c = [5, 3, 6, 2, 6, 4].to_scale
-      d = [8, 2, 8, 6, 9, 7].to_scale
+      a = [9, 6, 8, 7, 10, 6].to_numeric
+      b = [2, 1, 4, 1, 5, 2].to_numeric
+      c = [5, 3, 6, 2, 6, 4].to_numeric
+      d = [8, 2, 8, 6, 9, 7].to_numeric
       @ds = { 'a' => a, 'b' => b, 'c' => c, 'd' => d }.to_dataset
       @icc = Statsample::Reliability::ICC.new(@ds)
     end
@@ -122,7 +122,7 @@ class StatsampleReliabilityIccTestCase < Minitest::Test
         setup do
           if $reliability_icc.nil?
             size = 100
-            a = size.times.map { rand(10) }.to_scale
+            a = size.times.map { rand(10) }.to_numeric
             b = a.recode { |i| i + rand(4) - 2 }
             c = a.recode { |i| i + rand(4) - 2 }
             d = a.recode { |i| i + rand(4) - 2 }

@@ -8,10 +8,10 @@ module Multiple
 # 
 # Example:
 #
-#   @a=[1,3,2,4,3,5,4,6,5,7].to_vector(:scale)
-#   @b=[3,3,4,4,5,5,6,6,4,4].to_vector(:scale)
-#   @c=[11,22,30,40,50,65,78,79,99,100].to_vector(:scale)
-#   @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:scale)
+#   @a=[1,3,2,4,3,5,4,6,5,7].to_vector(:numeric)
+#   @b=[3,3,4,4,5,5,6,6,4,4].to_vector(:numeric)
+#   @c=[11,22,30,40,50,65,78,79,99,100].to_vector(:numeric)
+#   @y=[3,4,5,6,7,8,9,10,20,30].to_vector(:numeric)
 #   ds={'a'=>@a,'b'=>@b,'c'=>@c,'y'=>@y}.to_dataset
 #   lr=Statsample::Regression::Multiple::RubyEngine.new(ds,'y')
 

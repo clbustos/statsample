@@ -6,10 +6,10 @@ module Statsample
     # PCA and Factor Analysis.
     # 
     # == Usage
-    #  @x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_vector(:scale)
-    #  @x2=[1,1,1,2,2,3,3,3,3,4,4,50].to_vector(:scale)
-    #  @x3=[2,2,1,1,1,2,2,2,3,4,5,40].to_vector(:scale)
-    #  @x4=[1,2,3,4,4,4,4,3,4,4,5,30].to_vector(:scale)
+    #  @x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_vector(:numeric)
+    #  @x2=[1,1,1,2,2,3,3,3,3,4,4,50].to_vector(:numeric)
+    #  @x3=[2,2,1,1,1,2,2,2,3,4,5,40].to_vector(:numeric)
+    #  @x4=[1,2,3,4,4,4,4,3,4,4,5,30].to_vector(:numeric)
     #  ds={'x1'=>@x1,'x2'=>@x2,'x3'=>@x3,'x4'=>@x4}.to_dataset
     #  opts={:name=>"Scales", # Name of analysis
     #        :summary_correlation_matrix=>true, # Add correlation matrix

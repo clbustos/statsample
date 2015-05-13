@@ -8,12 +8,12 @@ module Statsample
     # 
     # == Usage
     # === Svg output
-    #  a=[1,2,3,4].to_scale
-    #  b=[3,4,5,6].to_scale
+    #  a=[1,2,3,4].to_numeric
+    #  b=[3,4,5,6].to_numeric
     #  puts Statsample::Graph::Boxplot.new(:vectors=>[a,b]).to_svg
     # === Using ReportBuilder
-    #  a=[1,2,3,4].to_scale
-    #  b=[3,4,5,6].to_scale
+    #  a=[1,2,3,4].to_numeric
+    #  b=[3,4,5,6].to_numeric
     #  rb=ReportBuilder.new
     #  rb.add(Statsample::Graph::Boxplot.new(:vectors=>[a,b]))
     #  rb.save_html('boxplot.html')

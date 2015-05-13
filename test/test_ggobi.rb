@@ -2,10 +2,10 @@ require(File.expand_path(File.dirname(__FILE__) + '/helpers_tests.rb'))
 require 'ostruct'
 class StatsampleGGobiTestCase < Minitest::Test
   def setup
-    v1 = ([10.2, 20.3, 10, 20, 30, 40, 30, 20, 30, 40] * 10).to_vector(:scale)
-    @v2 = (%w(a b c a a a b b c d) * 10).to_vector(:nominal)
+    v1 = ([10.2, 20.3, 10, 20, 30, 40, 30, 20, 30, 40] * 10).to_vector(:numeric)
+    @v2 = (%w(a b c a a a b b c d) * 10).to_vector(:object)
     @v2.labels = { 'a' => 'letter a', 'd' => 'letter d' }
-    v3 = ([1, 2, 3, 4, 5, 4, 3, 2, 1, 2] * 10).to_vector(:ordinal)
+    v3 = ([1, 2, 3, 4, 5, 4, 3, 2, 1, 2] * 10).to_vector(:numeric)
     @ds = { 'v1' => v1, 'v2' => @v2, 'v3' => v3 }.to_dataset
   end
 

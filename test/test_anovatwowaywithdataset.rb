@@ -4,7 +4,7 @@ require(File.expand_path(File.dirname(__FILE__) + '/helpers_tests.rb'))
 class StatsampleAnovaTwoWayWithVectorsTestCase < Minitest::Test
   context(Statsample::Anova::TwoWayWithVectors) do
     setup do
-      @pa = [5, 4, 3, 4, 2, 18, 19, 14, 12, 15, 6, 7, 5, 8, 4, 6, 9, 5, 9, 3].to_scale
+      @pa = [5, 4, 3, 4, 2, 18, 19, 14, 12, 15, 6, 7, 5, 8, 4, 6, 9, 5, 9, 3].to_numeric
       @pa.name = 'Passive Avoidance'
       @a = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1].to_vector
       @a.labels = { 0 => '0%', 1 => '35%' }

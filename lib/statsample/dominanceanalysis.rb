@@ -7,9 +7,9 @@ module Statsample
   #
   # == Use
   #
-  #  a=1000.times.collect {rand}.to_scale
-  #  b=1000.times.collect {rand}.to_scale
-  #  c=1000.times.collect {rand}.to_scale
+  #  a=1000.times.collect {rand}.to_numeric
+  #  b=1000.times.collect {rand}.to_numeric
+  #  c=1000.times.collect {rand}.to_numeric
   #  ds={'a'=>a,'b'=>b,'c'=>c}.to_dataset
   #  ds['y']=ds.collect{|row| row['a']*5+row['b']*3+row['c']*2+rand()}
   #  da=Statsample::DominanceAnalysis.new(ds,'y')
@@ -279,7 +279,7 @@ module Statsample
     
     def get_averages(averages)
       out={}
-      averages.each{|key,val| out[key]=val.to_vector(:scale).mean }
+      averages.each{|key,val| out[key]=val.to_vector(:numeric).mean }
       out
     end
     # Hash with average for each k size model.

@@ -7,8 +7,8 @@ class StatsampleMatrixTestCase < Minitest::Test
     m.fields_y = %w(x1 x2)
     m.name = 'test'
     samples = 100
-    x1 = [1, 2, 3].to_scale
-    x2 = [4, 5, 6].to_scale
+    x1 = [1, 2, 3].to_numeric
+    x2 = [4, 5, 6].to_numeric
     ds = { 'x1' => x1, 'x2' => x2 }.to_dataset
     ds.name = 'test'
     obs = m.to_dataset
@@ -33,9 +33,9 @@ class StatsampleMatrixTestCase < Minitest::Test
 
     assert_equal(:covariance, a._type)
 
-    a = 50.times.collect { rand }.to_scale
-    b = 50.times.collect { rand }.to_scale
-    c = 50.times.collect { rand }.to_scale
+    a = 50.times.collect { rand }.to_numeric
+    b = 50.times.collect { rand }.to_numeric
+    c = 50.times.collect { rand }.to_numeric
     ds = { 'a' => a, 'b' => b, 'c' => c }.to_dataset
     corr = Statsample::Bivariate.correlation_matrix(ds)
     real = Statsample::Bivariate.covariance_matrix(ds).correlation

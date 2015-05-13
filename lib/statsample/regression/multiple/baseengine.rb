@@ -53,7 +53,7 @@ module Statsample
             else
               process(vect)
             end
-          }.to_vector(:scale)
+          }.to_vector(:numeric)
         end
         # Retrieves a vector with standarized values for y
         def standarized_predicted
@@ -69,7 +69,7 @@ module Statsample
             else
               @ds[@y_var][i] - process(vect)
             end
-          }.to_vector(:scale)
+          }.to_vector(:numeric)
         end
         # R Multiple
         def r
@@ -133,7 +133,7 @@ module Statsample
         def tolerance(var)
           ds=assign_names(@dep_columns)
           ds.each{|k,v|
-          ds[k]=v.to_vector(:scale)
+          ds[k]=v.to_vector(:numeric)
           }
           lr=self.class.new(ds.to_dataset,var)
           1-lr.r2

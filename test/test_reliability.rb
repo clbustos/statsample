@@ -16,9 +16,9 @@ class StatsampleReliabilityTestCase < Minitest::Test
         @samples = 40
         @n_variables = rand(10) + 2
         @ds = Statsample::Dataset.new
-        base = @samples.times.collect { |_a| rand }.to_scale
+        base = @samples.times.collect { |_a| rand }.to_numeric
         @n_variables.times do |i|
-          @ds[i] = base.collect { |v| v + rand }.to_scale
+          @ds[i] = base.collect { |v| v + rand }.to_numeric
         end
 
         @ds.update_valid_data
@@ -67,9 +67,9 @@ class StatsampleReliabilityTestCase < Minitest::Test
         @samples = 100
         @points = rand(10) + 3
         @max_point = (@points - 1) * 3
-        @x1 = @samples.times.map { rand(@points) }.to_scale
-        @x2 = @samples.times.map { rand(@points) }.to_scale
-        @x3 = @samples.times.map { rand(@points) }.to_scale
+        @x1 = @samples.times.map { rand(@points) }.to_numeric
+        @x2 = @samples.times.map { rand(@points) }.to_numeric
+        @x3 = @samples.times.map { rand(@points) }.to_numeric
         @ds = { 'a' => @x1, 'b' => @x2, 'c' => @x3 }.to_dataset
         @icc = Statsample::Reliability::ItemCharacteristicCurve.new(@ds)
       end
@@ -77,11 +77,11 @@ class StatsampleReliabilityTestCase < Minitest::Test
         assert_equal(@ds.vector_sum, @icc.vector_total)
       end
       should 'have a correct different vector_total' do
-        x2 = @samples.times.map { rand(10) }.to_scale
+        x2 = @samples.times.map { rand(10) }.to_numeric
         @icc = Statsample::Reliability::ItemCharacteristicCurve.new(@ds, x2)
         assert_equal(x2, @icc.vector_total)
         assert_raises(ArgumentError) do
-          inc = (@samples + 10).times.map { rand(10) }.to_scale
+          inc = (@samples + 10).times.map { rand(10) }.to_numeric
           @icc = Statsample::Reliability::ItemCharacteristicCurve.new(@ds, inc)
         end
       end
@@ -119,7 +119,7 @@ class StatsampleReliabilityTestCase < Minitest::Test
         h = {}
         @scales.times {|s|
           @items_per_scale.times {|i|
-            h["#{s}_#{i}"] = (size.times.map { (s * 2) + rand }).to_scale
+            h["#{s}_#{i}"] = (size.times.map { (s * 2) + rand }).to_numeric
           }
         }
         @ds = h.to_dataset
@@ -177,10 +177,10 @@ class StatsampleReliabilityTestCase < Minitest::Test
     end
     context Statsample::Reliability::ScaleAnalysis do
       setup do
-        @x1 = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 30].to_scale
-        @x2 = [1, 1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 50].to_scale
-        @x3 = [2, 2, 1, 1, 1, 2, 2, 2, 3, 4, 5, 40].to_scale
-        @x4 = [1, 2, 3, 4, 4, 4, 4, 3, 4, 4, 5, 30].to_scale
+        @x1 = [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 30].to_numeric
+        @x2 = [1, 1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 50].to_numeric
+        @x3 = [2, 2, 1, 1, 1, 2, 2, 2, 3, 4, 5, 40].to_numeric
+        @x4 = [1, 2, 3, 4, 4, 4, 4, 3, 4, 4, 5, 30].to_numeric
         @ds = { 'x1' => @x1, 'x2' => @x2, 'x3' => @x3, 'x4' => @x4 }.to_dataset
         @ia = Statsample::Reliability::ScaleAnalysis.new(@ds)
         @cov_matrix = @ia.cov_m
@@ -188,7 +188,7 @@ class StatsampleReliabilityTestCase < Minitest::Test
       should 'return correct values for item analysis' do
         assert_in_delta(0.980, @ia.alpha, 0.001)
         assert_in_delta(0.999, @ia.alpha_standarized, 0.001)
-        var_mean = 4.times.map { |m| @cov_matrix[m, m] }.to_scale.mean
+        var_mean = 4.times.map { |m| @cov_matrix[m, m] }.to_numeric.mean
         assert_in_delta(var_mean, @ia.variances_mean)
         assert_equal(@x1.mean, @ia.item_statistics['x1'][:mean])
         assert_equal(@x4.mean, @ia.item_statistics['x4'][:mean])
@@ -211,7 +211,7 @@ class StatsampleReliabilityTestCase < Minitest::Test
             end
           }
         }
-        assert_in_delta(covariances.to_scale.mean, @ia.covariances_mean)
+        assert_in_delta(covariances.to_numeric.mean, @ia.covariances_mean)
         assert_in_delta(0.999, @ia.item_total_correlation['x1'], 0.001)
         assert_in_delta(1050.455, @ia.stats_if_deleted['x1'][:variance_sample], 0.001)
       end

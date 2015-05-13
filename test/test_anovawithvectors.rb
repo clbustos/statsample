@@ -3,9 +3,9 @@ class StatsampleAnovaOneWayWithVectorsTestCase < Minitest::Test
   context(Statsample::Anova::OneWayWithVectors) do
     context('when initializing') do
       setup do
-        @v1 = 10.times.map { rand(100) }.to_scale
-        @v2 = 10.times.map { rand(100) }.to_scale
-        @v3 = 10.times.map { rand(100) }.to_scale
+        @v1 = 10.times.map { rand(100) }.to_numeric
+        @v2 = 10.times.map { rand(100) }.to_numeric
+        @v3 = 10.times.map { rand(100) }.to_numeric
       end
       should 'be the same using [] or args*' do
         a1 = Statsample::Anova::OneWayWithVectors.new(@v1, @v2, @v3)
@@ -28,9 +28,9 @@ class StatsampleAnovaOneWayWithVectorsTestCase < Minitest::Test
       end
     end
     setup do
-      @v1 = [3, 3, 2, 3, 6].to_vector(:scale)
-      @v2 = [7, 6, 5, 6, 7].to_vector(:scale)
-      @v3 = [9, 8, 9, 7, 8].to_vector(:scale)
+      @v1 = [3, 3, 2, 3, 6].to_vector(:numeric)
+      @v2 = [7, 6, 5, 6, 7].to_vector(:numeric)
+      @v3 = [9, 8, 9, 7, 8].to_vector(:numeric)
       @name = 'Anova testing'
       @anova = Statsample::Anova::OneWayWithVectors.new(@v1, @v2, @v3, name: @name)
     end

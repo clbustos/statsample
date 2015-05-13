@@ -3,10 +3,10 @@ module Statsample
     # Analysis of a Scale. Analoge of Scale Reliability analysis on SPSS.
     # Returns several statistics for complete scale and each item
     # == Usage
-    #  @x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_vector(:scale)
-    #  @x2=[1,1,1,2,2,3,3,3,3,4,4,50].to_vector(:scale)
-    #  @x3=[2,2,1,1,1,2,2,2,3,4,5,40].to_vector(:scale)
-    #  @x4=[1,2,3,4,4,4,4,3,4,4,5,30].to_vector(:scale)
+    #  @x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_vector(:numeric)
+    #  @x2=[1,1,1,2,2,3,3,3,3,4,4,50].to_vector(:numeric)
+    #  @x3=[2,2,1,1,1,2,2,2,3,4,5,40].to_vector(:numeric)
+    #  @x4=[1,2,3,4,4,4,4,3,4,4,5,30].to_vector(:numeric)
     #  ds={'x1'=>@x1,'x2'=>@x2,'x3'=>@x3,'x4'=>@x4}.to_dataset
     #  ia=Statsample::Reliability::ScaleAnalysis.new(ds)
     #  puts ia.summary
@@ -49,7 +49,7 @@ module Statsample
         
         @cov_m=Statsample::Bivariate.covariance_matrix(@ds)
         # Mean for covariances and variances
-        @variances=@k.times.map {|i| @cov_m[i,i]}.to_scale
+        @variances=@k.times.map {|i| @cov_m[i,i]}.to_numeric
         @variances_mean=@variances.mean
         @covariances_mean=(@variance-@variances.sum).quo(@k**2-@k)
         #begin
@@ -97,7 +97,7 @@ module Statsample
         end
       end
       def mean_rpb
-        item_total_correlation.values.to_scale.mean
+        item_total_correlation.values.to_numeric.mean
       end
       def item_statistics
           @is||=@ds.fields.inject({}) do |a,v|

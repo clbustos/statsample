@@ -4,7 +4,7 @@ class StatsampleTestVector < Minitest::Test
   include Statsample::Shorthand
 
   def setup
-    @c = Statsample::Vector.new([5, 5, 5, 5, 5, 6, 6, 7, 8, 9, 10, 1, 2, 3, 4, nil, -99, -99], :nominal)
+    @c = Statsample::Vector.new([5, 5, 5, 5, 5, 6, 6, 7, 8, 9, 10, 1, 2, 3, 4, nil, -99, -99], :object)
     @c.name = 'Test Vector'
     @c.missing_values = [-99]
   end
@@ -19,8 +19,8 @@ class StatsampleTestVector < Minitest::Test
   context Statsample do
     setup do
       @sample = 100
-      @a = @sample.times.map { |i| (i + rand(10)) % 10 == 0 ? nil : rand(100) }.to_scale
-      @b = @sample.times.map { |i| (i + rand(10)) % 10 == 0 ? nil : rand(100) }.to_scale
+      @a = @sample.times.map { |i| (i + rand(10)) % 10 == 0 ? nil : rand(100) }.to_numeric
+      @b = @sample.times.map { |i| (i + rand(10)) % 10 == 0 ? nil : rand(100) }.to_numeric
       @correct_a = []
       @correct_b = []
       @a.each_with_index do |_v, i|
@@ -29,8 +29,8 @@ class StatsampleTestVector < Minitest::Test
           @correct_b.push(@b[i])
         end
       end
-      @correct_a = @correct_a.to_scale
-      @correct_b = @correct_b.to_scale
+      @correct_a = @correct_a.to_numeric
+      @correct_b = @correct_b.to_numeric
 
       @common = lambda  do |av, bv|
         assert_equal(@correct_a, av, 'A no es esperado')
@@ -58,7 +58,7 @@ class StatsampleTestVector < Minitest::Test
   end
   context Statsample::Vector do
     setup do
-      @c = Statsample::Vector.new([5, 5, 5, 5, 5, 6, 6, 7, 8, 9, 10, 1, 2, 3, 4, nil, -99, -99], :nominal)
+      @c = Statsample::Vector.new([5, 5, 5, 5, 5, 6, 6, 7, 8, 9, 10, 1, 2, 3, 4, nil, -99, -99], :object)
       @c.name = 'Test Vector'
       @c.missing_values = [-99]
     end
@@ -71,7 +71,7 @@ class StatsampleTestVector < Minitest::Test
 
     context 'using matrix operations' do
       setup do
-        @a = [1, 2, 3, 4, 5].to_scale
+        @a = [1, 2, 3, 4, 5].to_numeric
       end
       should 'to_matrix returns a matrix with 1 row' do
         mh = Matrix[[1, 2, 3, 4, 5]]
@@ -83,22 +83,22 @@ class StatsampleTestVector < Minitest::Test
       end
       should 'returns valid submatrixes' do
         # 3*4 + 2*5 = 22
-        a = [3, 2].to_vector(:scale)
-        b = [4, 5].to_vector(:scale)
+        a = [3, 2].to_vector(:numeric)
+        b = [4, 5].to_vector(:numeric)
         assert_equal(22, (a.to_matrix * b.to_matrix(:vertical))[0, 0])
       end
     end
     context 'when initializing' do
       setup do
         @data = (10.times.map { rand(100) }) + [nil]
-        @original = Statsample::Vector.new(@data, :scale)
+        @original = Statsample::Vector.new(@data, :numeric)
       end
       should 'be the sample using []' do
         second = Statsample::Vector[*@data]
         assert_equal(@original, second)
       end
       should '[] returns same results as R-c()' do
-        reference = [0, 4, 5, 6, 10].to_scale
+        reference = [0, 4, 5, 6, 10].to_numeric
         assert_equal(reference, Statsample::Vector[0, 4, 5, 6, 10])
         assert_equal(reference, Statsample::Vector[0, 4..6, 10])
         assert_equal(reference, Statsample::Vector[[0], [4, 5, 6], [10]])
@@ -107,29 +107,29 @@ class StatsampleTestVector < Minitest::Test
         assert_equal(reference, Statsample::Vector[[0], [4, 5, 6].to_vector, [10]])
       end
       should 'be the same usign #to_vector' do
-        lazy1 = @data.to_vector(:scale)
+        lazy1 = @data.to_vector(:numeric)
         assert_equal(@original, lazy1)
       end
-      should 'be the same using #to_scale' do
-        lazy2 = @data.to_scale
+      should 'be the same using #to_numeric' do
+        lazy2 = @data.to_numeric
         assert_equal(@original, lazy2)
-        assert_equal(:scale, lazy2.type)
+        assert_equal(:numeric, lazy2.type)
         assert_equal(@data.find_all { |v| !v.nil? }, lazy2.valid_data)
       end
-      should 'could use new_scale with size only' do
-        v1 = 10.times.map { nil }.to_scale
-        v2 = Statsample::Vector.new_scale(10)
+      should 'could use new_numeric with size only' do
+        v1 = 10.times.map { nil }.to_numeric
+        v2 = Statsample::Vector.new_numeric(10)
         assert_equal(v1, v2)
       end
-      should 'could use new_scale with size and value' do
+      should 'could use new_numeric with size and value' do
         a = rand
-        v1 = 10.times.map { a }.to_scale
-        v2 = Statsample::Vector.new_scale(10, a)
+        v1 = 10.times.map { a }.to_numeric
+        v2 = Statsample::Vector.new_numeric(10, a)
         assert_equal(v1, v2)
       end
-      should 'could use new_scale with func' do
-        v1 = 10.times.map { |i| i * 2 }.to_scale
-        v2 = Statsample::Vector.new_scale(10) { |i| i * 2 }
+      should 'could use new_numeric with func' do
+        v1 = 10.times.map { |i| i * 2 }.to_numeric
+        v2 = Statsample::Vector.new_numeric(10) { |i| i * 2 }
         assert_equal(v1, v2)
       end
     end
@@ -146,17 +146,21 @@ class StatsampleTestVector < Minitest::Test
         assert_equal([1,2,3,4,5], v.valid_data)
       end
 
-      should "show a warning when initializing with :scale, :ordinal or :nominal" do
-        assert_output("WARNING: nominal has been deprecated. Use :object instead.") do
+      should "show a warning when initializing with :nominal, :numeric or :ordinal" do
+        assert_output("WARNING: nominal has been deprecated. Use :object instead.\n") do
           Statsample::Vector.new [1,2,3,4,5,nil,'hello'], :nominal
         end
 
-        assert_output("WARNING: scale has been deprecated. Use :numeric instead.") do
+        assert_output("WARNING: scale has been deprecated. Use :numeric instead.\n") do
           Statsample::Vector.new [1,2,3,4,nil,5], :scale
         end
 
-        assert_output("WARNING: ordinal has been deprecated. Use :numeric instead.") do
+        assert_output("WARNING: ordinal has been deprecated. Use :numeric instead.\n") do
           Statsample::Vector.new [1,2,3,4,5], :ordinal
+        end
+
+        assert_output("WARNING: .new_scale has been deprecated. Use .new_numeric instead.\n") do
+          Statsample::Vector.new_scale 10, 1
         end
       end
 
@@ -170,7 +174,7 @@ class StatsampleTestVector < Minitest::Test
       end
 
       should "test that old shorthands raise warnings" do
-        assert_output("WARNING: to_scale has been deprecated. Use to_numeric instead.") do
+        assert_output("WARNING: to_scale has been deprecated. Use to_numeric instead.\n") do
           [1,2,3,4,nil,5].to_scale
         end
       end
@@ -178,7 +182,7 @@ class StatsampleTestVector < Minitest::Test
 
     context '#split_by_separator' do
       setup do
-        @a = Statsample::Vector.new(['a', 'a,b', 'c,d', 'a,d', 10, nil], :nominal)
+        @a = Statsample::Vector.new(['a', 'a,b', 'c,d', 'a,d', 10, nil], :object)
         @b = @a.split_by_separator(',')
       end
       should 'returns a Hash' do
@@ -199,17 +203,17 @@ class StatsampleTestVector < Minitest::Test
         assert_equal({ 'a' => 3, 'b' => 1, 'c' => 1, 'd' => 2, 10 => 1 }, @a.split_by_separator_freq)
       end
       should 'using a different separator give the same values' do
-        a = Statsample::Vector.new(['a', 'a*b', 'c*d', 'a*d', 10, nil], :nominal)
+        a = Statsample::Vector.new(['a', 'a*b', 'c*d', 'a*d', 10, nil], :object)
         b = a.split_by_separator('*')
         assert_counting_tokens(b)
       end
     end
     should 'return correct median_absolute_deviation' do
-      a = [1, 1, 2, 2, 4, 6, 9].to_scale
+      a = [1, 1, 2, 2, 4, 6, 9].to_numeric
       assert_equal(1, a.median_absolute_deviation)
     end
     should 'return correct histogram' do
-      a = 10.times.map { |v| v }.to_scale
+      a = 10.times.map { |v| v }.to_numeric
       hist = a.histogram(2)
       assert_equal([5, 5], hist.bin)
       3.times do |i|
@@ -220,8 +224,8 @@ class StatsampleTestVector < Minitest::Test
       @c.name == 'Test Vector'
     end
     should 'without explicit name, returns vector with succesive numbers' do
-      a = 10.times.map { rand(100) }.to_scale
-      b = 10.times.map { rand(100) }.to_scale
+      a = 10.times.map { rand(100) }.to_numeric
+      b = 10.times.map { rand(100) }.to_numeric
       assert_match(/Vector \d+/, a.name)
       a.name =~ /Vector (\d+)/
       next_number = Regexp.last_match(1).to_i + 1
@@ -247,7 +251,7 @@ class StatsampleTestVector < Minitest::Test
       assert_equal(exp2, exp)
     end
     should '#product returns the * of all values' do
-      a = [1, 2, 3, 4, 5].to_vector(:scale)
+      a = [1, 2, 3, 4, 5].to_vector(:numeric)
       assert_equal(120, a.product)
     end
 
@@ -290,7 +294,7 @@ class StatsampleTestVector < Minitest::Test
 
     should 'GSL::Vector based should push correcty' do
       if Statsample.has_gsl?
-        v = GSL::Vector[1, 2, 3, 4, 5].to_scale
+        v = GSL::Vector[1, 2, 3, 4, 5].to_numeric
         v.push(nil)
         assert_equal([1, 2, 3, 4, 5, nil], v.to_a)
         assert(v.flawed?)
@@ -300,36 +304,32 @@ class StatsampleTestVector < Minitest::Test
     end
 
     should 'split correctly' do
-      a = Statsample::Vector.new(['a', 'a,b', 'c,d', 'a,d', 'd', 10, nil], :nominal)
+      a = Statsample::Vector.new(['a', 'a,b', 'c,d', 'a,d', 'd', 10, nil], :object)
       assert_equal([%w(a), %w(a b), %w(c d), %w(a d), %w(d), [10], nil], a.splitted)
     end
     should 'multiply correct for scalar' do
-      a = [1, 2, 3].to_scale
-      assert_equal([5, 10, 15].to_scale, a * 5)
+      a = [1, 2, 3].to_numeric
+      assert_equal([5, 10, 15].to_numeric, a * 5)
     end
     should 'multiply correct with other vector' do
-      a = [1, 2, 3].to_scale
-      b = [2, 4, 6].to_scale
+      a = [1, 2, 3].to_numeric
+      b = [2, 4, 6].to_numeric
 
-      assert_equal([2, 8, 18].to_scale, a * b)
+      assert_equal([2, 8, 18].to_numeric, a * b)
     end
     should 'sum correct for scalar' do
-      a = [1, 2, 3].to_scale
-      assert_equal([11, 12, 13].to_scale, a + 10)
+      a = [1, 2, 3].to_numeric
+      assert_equal([11, 12, 13].to_numeric, a + 10)
     end
 
-    should 'raise NoMethodError when method requires ordinal and vector is nominal' do
-      @c.type = :nominal
+    should 'raise NoMethodError when method requires numeric and vector is object' do
+      @c.type = :object
       assert_raise(::NoMethodError) { @c.median }
     end
 
-    should 'raise NoMethodError when method requires scalar and vector is ordinal' do
-      @c.type = :ordinal
-      assert_raise(::NoMethodError) { @c.mean }
-    end
     should 'jacknife correctly with named method' do
       # First example
-      a = [1, 2, 3, 4].to_scale
+      a = [1, 2, 3, 4].to_numeric
       ds = a.jacknife(:mean)
       assert_equal(a.mean, ds[:mean].mean)
       ds = a.jacknife([:mean, :sd])
@@ -338,9 +338,9 @@ class StatsampleTestVector < Minitest::Test
     end
     should 'jacknife correctly with custom method' do
       # Second example
-      a = [17.23, 18.71, 13.93, 18.81, 15.78, 11.29, 14.91, 13.39, 18.21, 11.57, 14.28, 10.94, 18.83, 15.52, 13.45, 15.25].to_scale
+      a = [17.23, 18.71, 13.93, 18.81, 15.78, 11.29, 14.91, 13.39, 18.21, 11.57, 14.28, 10.94, 18.83, 15.52, 13.45, 15.25].to_numeric
       ds = a.jacknife(log_s2: ->(v) {  Math.log(v.variance) })
-      exp = [1.605, 2.972, 1.151, 3.097, 0.998, 3.308, 0.942, 1.393, 2.416, 2.951, 1.043, 3.806, 3.122, 0.958, 1.362, 0.937].to_scale
+      exp = [1.605, 2.972, 1.151, 3.097, 0.998, 3.308, 0.942, 1.393, 2.416, 2.951, 1.043, 3.806, 3.122, 0.958, 1.362, 0.937].to_numeric
 
       assert_similar_vector(exp, ds[:log_s2], 0.001)
       assert_in_delta(2.00389, ds[:log_s2].mean, 0.00001)
@@ -350,7 +350,7 @@ class StatsampleTestVector < Minitest::Test
       a = rnorm(6)
       ds = a.jacknife(:mean, 2)
       mean = a.mean
-      exp = [3 * mean - 2 * (a[2] + a[3] + a[4] + a[5]) / 4, 3 * mean - 2 * (a[0] + a[1] + a[4] + a[5]) / 4, 3 * mean - 2 * (a[0] + a[1] + a[2] + a[3]) / 4].to_scale
+      exp = [3 * mean - 2 * (a[2] + a[3] + a[4] + a[5]) / 4, 3 * mean - 2 * (a[0] + a[1] + a[4] + a[5]) / 4, 3 * mean - 2 * (a[0] + a[1] + a[2] + a[3]) / 4].to_numeric
       assert_similar_vector(exp, ds[:mean], 1e-13)
     end
     should 'bootstrap should return a vector with mean=mu and sd=se' do
@@ -362,7 +362,7 @@ class StatsampleTestVector < Minitest::Test
     end
   end
 
-  def test_nominal
+  def test_object
     assert_equal(@c[1], 5)
     assert_equal({ 1 => 1, 2 => 1, 3 => 1, 4 => 1, 5 => 5, 6 => 2, 7 => 1, 8 => 1, 9 => 1, 10 => 1 }, @c.frequencies)
     assert_equal({ 1 => 1, 2 => 1, 3 => 1, 4 => 1, 5 => 5, 6 => 2, 7 => 1, 8 => 1, 9 => 1, 10 => 1 }, @c._frequencies)
@@ -378,8 +378,8 @@ class StatsampleTestVector < Minitest::Test
     v1 = [1, 2, 3].to_vector
     v2 = [1, 2, 3].to_vector
     assert_equal(v1, v2)
-    v1 = [1, 2, 3].to_vector(:nominal)
-    v2 = [1, 2, 3].to_vector(:ordinal)
+    v1 = [1, 2, 3].to_vector(:object)
+    v2 = [1, 2, 3].to_vector(:numeric)
     assert_not_equal(v1, v2)
     v2 = [1, 2, 3]
     assert_not_equal(v1, v2)
@@ -390,23 +390,23 @@ class StatsampleTestVector < Minitest::Test
   end
 
   def test_vector_percentil
-    a = [1, 2, 2, 3, 4, 5, 5, 5, 6, 10].to_scale
-    expected = [10, 25, 25, 40, 50, 70, 70, 70, 90, 100].to_scale
+    a = [1, 2, 2, 3, 4, 5, 5, 5, 6, 10].to_numeric
+    expected = [10, 25, 25, 40, 50, 70, 70, 70, 90, 100].to_numeric
     assert_equal(expected, a.vector_percentil)
-    a = [1, nil, nil, 2, 2, 3, 4, nil, nil, 5, 5, 5, 6, 10].to_scale
-    expected = [10, nil, nil, 25, 25, 40, 50, nil, nil, 70, 70, 70, 90, 100].to_scale
+    a = [1, nil, nil, 2, 2, 3, 4, nil, nil, 5, 5, 5, 6, 10].to_numeric
+    expected = [10, nil, nil, 25, 25, 40, 50, nil, nil, 70, 70, 70, 90, 100].to_numeric
     assert_equal(expected, a.vector_percentil)
   end
 
-  def test_ordinal
-    @c.type = :ordinal
+  def test_numeric
+    @c.type = :numeric
     assert_equal(5, @c.median)
     assert_equal(4, @c.percentil(25))
     assert_equal(7, @c.percentil(75))
 
-    v = [200_000, 200_000, 210_000, 220_000, 230_000, 250_000, 250_000, 250_000, 270_000, 300_000, 450_000, 130_000, 140_000, 140_000, 140_000, 145_000, 148_000, 165_000, 170_000, 180_000, 180_000, 180_000, 180_000, 180_000, 180_000].to_scale
+    v = [200_000, 200_000, 210_000, 220_000, 230_000, 250_000, 250_000, 250_000, 270_000, 300_000, 450_000, 130_000, 140_000, 140_000, 140_000, 145_000, 148_000, 165_000, 170_000, 180_000, 180_000, 180_000, 180_000, 180_000, 180_000].to_numeric
     assert_equal(180_000, v.median)
-    a = [7.0, 7.0, 7.0, 7.0, 7.0, 8.0, 8.0, 8.0, 9.0, 9.0, 10.0, 10.0, 10.0, 10.0, 10.0, 12.0, 12.0, 13.0, 14.0, 14.0, 2.0, 3.0, 3.0, 3.0, 3.0, 4.0, 4.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 6.0, 6.0, 6.0].to_scale
+    a = [7.0, 7.0, 7.0, 7.0, 7.0, 8.0, 8.0, 8.0, 9.0, 9.0, 10.0, 10.0, 10.0, 10.0, 10.0, 12.0, 12.0, 13.0, 14.0, 14.0, 2.0, 3.0, 3.0, 3.0, 3.0, 4.0, 4.0, 4.0, 4.0, 4.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 6.0, 6.0, 6.0].to_numeric
     assert_equal(4.5, a.percentil(25))
     assert_equal(6.5, a.percentil(50))
     assert_equal(9.5, a.percentil(75))
@@ -414,14 +414,14 @@ class StatsampleTestVector < Minitest::Test
   end
 
   def test_linear_percentil_strategy
-    values = [102, 104, 105, 107, 108, 109, 110, 112, 115, 116].shuffle.to_scale
+    values = [102, 104, 105, 107, 108, 109, 110, 112, 115, 116].shuffle.to_numeric
     assert_equal 102, values.percentil(0, :linear)
     assert_equal 104.75, values.percentil(25, :linear)
     assert_equal 108.5, values.percentil(50, :linear)
     assert_equal 112.75, values.percentil(75, :linear)
     assert_equal 116, values.percentil(100, :linear)
 
-    values = [102, 104, 105, 107, 108, 109, 110, 112, 115, 116, 118].shuffle.to_scale
+    values = [102, 104, 105, 107, 108, 109, 110, 112, 115, 116, 118].shuffle.to_numeric
     assert_equal 102, values.percentil(0, :linear)
     assert_equal 105, values.percentil(25, :linear)
     assert_equal 109, values.percentil(50, :linear)
@@ -430,16 +430,16 @@ class StatsampleTestVector < Minitest::Test
   end
 
   def test_ranked
-    v1 = [0.8, 1.2, 1.2, 2.3, 18].to_vector(:ordinal)
-    expected = [1, 2.5, 2.5, 4, 5].to_vector(:ordinal)
+    v1 = [0.8, 1.2, 1.2, 2.3, 18].to_vector(:numeric)
+    expected = [1, 2.5, 2.5, 4, 5].to_vector(:numeric)
     assert_equal(expected, v1.ranked)
-    v1 = [nil, 0.8, 1.2, 1.2, 2.3, 18, nil].to_vector(:ordinal)
-    expected = [nil, 1, 2.5, 2.5, 4, 5, nil].to_vector(:ordinal)
+    v1 = [nil, 0.8, 1.2, 1.2, 2.3, 18, nil].to_vector(:numeric)
+    expected = [nil, 1, 2.5, 2.5, 4, 5, nil].to_vector(:numeric)
     assert_equal(expected, v1.ranked)
   end
 
-  def test_scale
-    a = Statsample::Vector.new([1, 2, 3, 4, 'STRING'], :scale)
+  def test_numeric
+    a = Statsample::Vector.new([1, 2, 3, 4, 'STRING'], :numeric)
     assert_equal(10, a.sum)
     i = 0
     factors = a.factors.sort
@@ -453,7 +453,7 @@ class StatsampleTestVector < Minitest::Test
   def test_vector_centered
     mean = rand
     samples = 11
-    centered = samples.times.map { |i| i - ((samples / 2).floor).to_i }.to_scale
+    centered = samples.times.map { |i| i - ((samples / 2).floor).to_i }.to_numeric
     not_centered = centered.recode { |v| v + mean }
     obs = not_centered.centered
     centered.each_with_index do |v, i|
@@ -462,9 +462,9 @@ class StatsampleTestVector < Minitest::Test
   end
 
   def test_vector_standarized
-    v1 = [1, 2, 3, 4, nil].to_vector(:scale)
+    v1 = [1, 2, 3, 4, nil].to_vector(:numeric)
     sds = v1.sds
-    expected = [((1 - 2.5).quo(sds)), ((2 - 2.5).quo(sds)), ((3 - 2.5).quo(sds)), ((4 - 2.5).quo(sds)), nil].to_vector(:scale)
+    expected = [((1 - 2.5).quo(sds)), ((2 - 2.5).quo(sds)), ((3 - 2.5).quo(sds)), ((4 - 2.5).quo(sds)), nil].to_vector(:numeric)
     vs = v1.vector_standarized
     assert_equal(expected, vs)
     assert_equal(0, vs.mean)
@@ -472,39 +472,31 @@ class StatsampleTestVector < Minitest::Test
   end
 
   def test_vector_standarized_with_zero_variance
-    v1 = 100.times.map { |_i| 1 }.to_scale
-    exp = 100.times.map { nil }.to_scale
+    v1 = 100.times.map { |_i| 1 }.to_numeric
+    exp = 100.times.map { nil }.to_numeric
     assert_equal(exp, v1.standarized)
   end
 
   def test_check_type
     v = Statsample::Vector.new
-    v.type = :nominal
-    assert_raise(NoMethodError) { v.check_type(:scale) }
-    assert_raise(NoMethodError) { v.check_type(:ordinal) }
-    assert(v.check_type(:nominal).nil?)
+    v.type = :object
+    assert_raise(NoMethodError) { v.check_type(:numeric) }
+    assert(v.check_type(:object).nil?)
 
-    v.type = :ordinal
+    v.type = :numeric
 
-    assert_raise(NoMethodError) { v.check_type(:scale) }
-
-    assert(v.check_type(:ordinal).nil?)
-    assert(v.check_type(:nominal).nil?)
-
-    v.type = :scale
-    assert(v.check_type(:scale).nil?)
-    assert(v.check_type(:ordinal).nil?)
-    assert(v.check_type(:nominal).nil?)
+    assert(v.check_type(:numeric).nil?)
+    assert(v.check_type(:object).nil?)
 
     v.type = :date
-    assert_raise(NoMethodError) { v.check_type(:scale) }
-    assert_raise(NoMethodError) { v.check_type(:ordinal) }
-    assert_raise(NoMethodError) { v.check_type(:nominal) }
+    assert_raise(NoMethodError) { v.check_type(:numeric) }
+    assert_raise(NoMethodError) { v.check_type(:numeric) }
+    assert_raise(NoMethodError) { v.check_type(:object) }
 end
 
   def test_add
-    a = Statsample::Vector.new([1, 2, 3, 4, 5], :scale)
-    b = Statsample::Vector.new([11, 12, 13, 14, 15], :scale)
+    a = Statsample::Vector.new([1, 2, 3, 4, 5], :numeric)
+    b = Statsample::Vector.new([11, 12, 13, 14, 15], :numeric)
     assert_equal([3, 4, 5, 6, 7], (a + 2).to_a)
     assert_equal([12, 14, 16, 18, 20], (a + b).to_a)
     assert_raise ArgumentError do
@@ -513,15 +505,15 @@ end
     assert_raise TypeError do
       a + 'string'
     end
-    a = Statsample::Vector.new([nil, 1, 2, 3, 4, 5], :scale)
-    b = Statsample::Vector.new([11, 12, nil, 13, 14, 15], :scale)
+    a = Statsample::Vector.new([nil, 1, 2, 3, 4, 5], :numeric)
+    b = Statsample::Vector.new([11, 12, nil, 13, 14, 15], :numeric)
     assert_equal([nil, 13, nil, 16, 18, 20], (a + b).to_a)
     assert_equal([nil, 13, nil, 16, 18, 20], (a + b.to_a).to_a)
   end
 
   def test_minus
-    a = Statsample::Vector.new([1, 2, 3, 4, 5], :scale)
-    b = Statsample::Vector.new([11, 12, 13, 14, 15], :scale)
+    a = Statsample::Vector.new([1, 2, 3, 4, 5], :numeric)
+    b = Statsample::Vector.new([11, 12, 13, 14, 15], :numeric)
     assert_equal([-1, 0, 1, 2, 3], (a - 2).to_a)
     assert_equal([10, 10, 10, 10, 10], (b - a).to_a)
     assert_raise ArgumentError do
@@ -530,19 +522,19 @@ end
     assert_raise TypeError do
       a - 'string'
     end
-    a = Statsample::Vector.new([nil, 1, 2, 3, 4, 5], :scale)
-    b = Statsample::Vector.new([11, 12, nil, 13, 14, 15], :scale)
+    a = Statsample::Vector.new([nil, 1, 2, 3, 4, 5], :numeric)
+    b = Statsample::Vector.new([11, 12, nil, 13, 14, 15], :numeric)
     assert_equal([nil, 11, nil, 10, 10, 10], (b - a).to_a)
     assert_equal([nil, 11, nil, 10, 10, 10], (b - a.to_a).to_a)
   end
 
   def test_sum_of_squares
-    a = [1, 2, 3, 4, 5, 6].to_vector(:scale)
+    a = [1, 2, 3, 4, 5, 6].to_vector(:numeric)
     assert_equal(17.5, a.sum_of_squared_deviation)
   end
 
   def test_average_deviation
-    a = [1, 2, 3, 4, 5, 6, 7, 8, 9].to_scale
+    a = [1, 2, 3, 4, 5, 6, 7, 8, 9].to_numeric
     assert_equal(20.quo(9), a.average_deviation_population)
   end
 
@@ -553,7 +545,7 @@ end
     assert_raise ArgumentError do
       @c.sample_without_replacement(20)
     end
-    @c.type = :scale
+    @c.type = :numeric
     srand(1)
     assert_equal(100, @c.sample_with_replacement(100).size)
     assert_equal(@c.valid_data.to_a.sort, @c.sample_without_replacement(15).sort)
@@ -584,7 +576,7 @@ end
 
   def test_gsl
     if Statsample.has_gsl?
-      a = Statsample::Vector.new([1, 2, 3, 4, 'STRING'], :scale)
+      a = Statsample::Vector.new([1, 2, 3, 4, 'STRING'], :numeric)
 
       assert_equal(2, a.mean)
       assert_equal(a.variance_sample_ruby, a.variance_sample)
@@ -592,17 +584,17 @@ end
       assert_equal(a.variance_population_ruby, a.variance_population)
       assert_equal(a.standard_deviation_population_ruby, a.standard_deviation_population)
       assert_nothing_raised do
-        a = [].to_vector(:scale)
+        a = [].to_vector(:numeric)
       end
       a.add(1, false)
       a.add(2, false)
       a.set_valid_data
       assert_equal(3, a.sum)
-      b = [1, 2, nil, 3, 4, 5, nil, 6].to_vector(:scale)
+      b = [1, 2, nil, 3, 4, 5, nil, 6].to_vector(:numeric)
       assert_equal(21, b.sum)
       assert_equal(3.5, b.mean)
       assert_equal(6, b.gsl.size)
-      c = [10, 20, 30, 40, 50, 100, 1000, 2000, 5000].to_scale
+      c = [10, 20, 30, 40, 50, 100, 1000, 2000, 5000].to_numeric
       assert_in_delta(c.skew,     c.skew_ruby, 0.0001)
       assert_in_delta(c.kurtosis, c.kurtosis_ruby, 0.0001)
     end
@@ -617,7 +609,7 @@ end
   end
 
   def test_marshalling
-    v1 = (0..100).to_a.collect { |_n| rand(100) }.to_vector(:scale)
+    v1 = (0..100).to_a.collect { |_n| rand(100) }.to_vector(:numeric)
     v2 = Marshal.load(Marshal.dump(v1))
     assert_equal(v1, v2)
   end
@@ -629,7 +621,7 @@ end
     assert_not_same(v1.data, v2.data)
     assert_equal(v1.type, v2.type)
 
-    v1.type = :ordinal
+    v1.type = :numeric
     assert_not_equal(v1.type, v2.type)
     assert_equal(v1.missing_values, v2.missing_values)
     assert_not_same(v1.missing_values, v2.missing_values)
@@ -641,8 +633,8 @@ end
     assert_not_equal(v1.data, v3.data)
     assert_not_same(v1.data, v3.data)
     assert_equal(v1.type, v3.type)
-    v1.type = :ordinal
-    v3.type = :nominal
+    v1.type = :numeric
+    v3.type = :object
     assert_not_equal(v1.type, v3.type)
     assert_equal(v1.missing_values, v3.missing_values)
     assert_not_same(v1.missing_values, v3.missing_values)
@@ -651,33 +643,33 @@ end
   end
 
   def test_paired_ties
-    a = [0, 0, 0, 1, 1, 2, 3, 3, 4, 4, 4].to_vector(:ordinal)
-    expected = [2, 2, 2, 4.5, 4.5, 6, 7.5, 7.5, 10, 10, 10].to_vector(:ordinal)
+    a = [0, 0, 0, 1, 1, 2, 3, 3, 4, 4, 4].to_vector(:numeric)
+    expected = [2, 2, 2, 4.5, 4.5, 6, 7.5, 7.5, 10, 10, 10].to_vector(:numeric)
     assert_equal(expected, a.ranked)
   end
 
   def test_dichotomize
     a = [0, 0, 0, 1, 2, 3, nil].to_vector
-    exp = [0, 0, 0, 1, 1, 1, nil].to_scale
+    exp = [0, 0, 0, 1, 1, 1, nil].to_numeric
     assert_equal(exp, a.dichotomize)
     a = [1, 1, 1, 2, 2, 2, 3].to_vector
-    exp = [0, 0, 0, 1, 1, 1, 1].to_scale
+    exp = [0, 0, 0, 1, 1, 1, 1].to_numeric
     assert_equal(exp, a.dichotomize)
     a = [0, 0, 0, 1, 2, 3, nil].to_vector
-    exp = [0, 0, 0, 0, 1, 1, nil].to_scale
+    exp = [0, 0, 0, 0, 1, 1, nil].to_numeric
     assert_equal(exp, a.dichotomize(1))
     a = %w(a a a b c d).to_vector
-    exp = [0, 0, 0, 1, 1, 1].to_scale
+    exp = [0, 0, 0, 1, 1, 1].to_numeric
     assert_equal(exp, a.dichotomize)
   end
 
   def test_can_be_methods
     a = [0, 0, 0, 1, 2, 3, nil].to_vector
-    assert(a.can_be_scale?)
+    assert(a.can_be_numeric?)
     a = [0, 's', 0, 1, 2, 3, nil].to_vector
-    assert(!a.can_be_scale?)
+    assert(!a.can_be_numeric?)
     a.missing_values = ['s']
-    assert(a.can_be_scale?)
+    assert(a.can_be_numeric?)
 
     a = [Date.new(2009, 10, 10), Date.today, '2009-10-10', '2009-1-1', nil, 'NOW'].to_vector
     assert(a.can_be_date?)

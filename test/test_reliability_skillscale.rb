@@ -5,7 +5,7 @@ class StatsampleReliabilitySkillScaleTestCase < Minitest::Test
     setup do
       options = %w(a b c d e)
       cases = 20
-      @id = cases.times.map { |v| v }.to_scale
+      @id = cases.times.map { |v| v }.to_numeric
       @a = cases.times.map { options[rand(5)] }.to_vector
       @b = cases.times.map { options[rand(5)] }.to_vector
       @c = cases.times.map { options[rand(5)] }.to_vector
@@ -17,11 +17,11 @@ class StatsampleReliabilitySkillScaleTestCase < Minitest::Test
       @ds = { 'id' => @id, 'a' => @a, 'b' => @b, 'c' => @c, 'd' => @d, 'e' => @e }.to_dataset
       @key = { 'a' => 'a', 'b' => options[rand(5)], 'c' => options[rand(5)], 'd' => options[rand(5)], 'e' => options[rand(5)] }
       @ssa = Statsample::Reliability::SkillScaleAnalysis.new(@ds, @key)
-      @ac = @a.map { |v| v == @key['a'] ? 1 : 0 }.to_scale
-      @bc = @b.map { |v| v == @key['b'] ? 1 : 0 }.to_scale
-      @cc = @c.map { |v| v == @key['c'] ? 1 : 0 }.to_scale
-      @dc = @d.map { |v| v == @key['d'] ? 1 : 0 }.to_scale
-      @ec = @e.map { |v| v.nil? ? nil : (v == @key['e'] ? 1 : 0) }.to_scale
+      @ac = @a.map { |v| v == @key['a'] ? 1 : 0 }.to_numeric
+      @bc = @b.map { |v| v == @key['b'] ? 1 : 0 }.to_numeric
+      @cc = @c.map { |v| v == @key['c'] ? 1 : 0 }.to_numeric
+      @dc = @d.map { |v| v == @key['d'] ? 1 : 0 }.to_numeric
+      @ec = @e.map { |v| v.nil? ? nil : (v == @key['e'] ? 1 : 0) }.to_numeric
     end
     should 'return proper corrected dataset' do
       cds = { 'id' => @id, 'a' => @ac, 'b' => @bc, 'c' => @cc, 'd' => @dc, 'e' => @ec }.to_dataset

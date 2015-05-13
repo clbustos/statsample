@@ -8,11 +8,11 @@ class StatsampleCSVTestCase < Minitest::Test
   def test_read
     header = %w(id name age city a1)
     data = {
-      'id' => [1, 2, 3, 4, 5, 6].to_vector(:scale),
-      'name' => %w(Alex Claude Peter Franz George Fernand).to_vector(:nominal),
-      'age' => [20, 23, 25, 27, 5.5, nil].to_vector(:scale),
-      'city' => ['New York', 'London', 'London', 'Paris', 'Tome', nil].to_vector(:nominal),
-      'a1' => ['a,b', 'b,c', 'a', nil, 'a,b,c', nil].to_vector(:nominal)
+      'id' => [1, 2, 3, 4, 5, 6].to_vector(:numeric),
+      'name' => %w(Alex Claude Peter Franz George Fernand).to_vector(:object),
+      'age' => [20, 23, 25, 27, 5.5, nil].to_vector(:numeric),
+      'city' => ['New York', 'London', 'London', 'Paris', 'Tome', nil].to_vector(:object),
+      'a1' => ['a,b', 'b,c', 'a', nil, 'a,b,c', nil].to_vector(:object)
     }
 
     ds_exp = Statsample::Dataset.new(data, header)
@@ -34,7 +34,7 @@ class StatsampleCSVTestCase < Minitest::Test
   def test_repeated
     ds = Statsample::CSV.read('test/fixtures/repeated_fields.csv')
     assert_equal(%w(id name_1 age_1 city a1 name_2 age_2), ds.fields)
-    age = [3, 4, 5, 6, nil, 8].to_vector(:scale)
+    age = [3, 4, 5, 6, nil, 8].to_vector(:numeric)
     assert_equal(age, ds['age_2'])
   end
 

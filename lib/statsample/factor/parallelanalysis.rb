@@ -124,7 +124,7 @@ module Statsample
         
         @original=Statsample::Bivariate.send(matrix_method, @ds).eigenvalues unless no_data        
         @ds_eigenvalues=Statsample::Dataset.new((1..@n_variables).map{|v| "ev_%05d" % v})
-        @ds_eigenvalues.fields.each {|f| @ds_eigenvalues[f].type=:scale}
+        @ds_eigenvalues.fields.each {|f| @ds_eigenvalues[f].type=:numeric}
         if bootstrap_method==:parameter or bootstrap_method==:random
           rng = Distribution::Normal.rng
         end
@@ -137,7 +137,7 @@ module Statsample
             
             @fields.each do |f|
               if bootstrap_method==:random
-                ds_bootstrap[f]=@n_cases.times.map {|c| rng.call}.to_scale
+                ds_bootstrap[f]=@n_cases.times.map {|c| rng.call}.to_numeric
               elsif bootstrap_method==:data
                 ds_bootstrap[f]=ds[f].sample_with_replacement(@n_cases)
               else

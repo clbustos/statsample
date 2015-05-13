@@ -10,12 +10,12 @@ module Statsample
     # The data is displayed as a collection of points, each having the value of one variable determining the position on the horizontal axis and the value of the other variable determining the position on the vertical axis.[2] This kind of plot is also called a scatter chart, scatter diagram and scatter graph.
     # == Usage
     # === Svg output
-    #  a=[1,2,3,4].to_scale
-    #  b=[3,4,5,6].to_scale
+    #  a=[1,2,3,4].to_numeric
+    #  b=[3,4,5,6].to_numeric
     #  puts Statsample::Graph::Scatterplot.new(a,b).to_svg
     # === Using ReportBuilder
-    #  a=[1,2,3,4].to_scale
-    #  b=[3,4,5,6].to_scale
+    #  a=[1,2,3,4].to_numeric
+    #  b=[3,4,5,6].to_numeric
     #  rb=ReportBuilder.new
     #  rb.add(Statsample::Graph::Scatterplot.new(a,b))
     #  rb.save_html('scatter.html')

@@ -4,8 +4,8 @@ class StatsampleTestTTestCase < Minitest::Test
   include Math
   context T do
     setup do
-      @a = [30.02, 29.99, 30.11, 29.97, 30.01, 29.99].to_scale
-      @b = [29.89, 29.93, 29.72, 29.98, 30.02, 29.98].to_scale
+      @a = [30.02, 29.99, 30.11, 29.97, 30.01, 29.99].to_numeric
+      @b = [29.89, 29.93, 29.72, 29.98, 30.02, 29.98].to_numeric
       @x1 = @a.mean
       @x2 = @b.mean
       @s1 = @a.sd
@@ -20,8 +20,8 @@ class StatsampleTestTTestCase < Minitest::Test
       assert(t.summary.size > 0)
     end
     should 'calculate correctly t for one sample' do
-      t1 = [6, 4, 6, 7, 4, 5, 5, 12, 6, 1].to_scale
-      t2 = [9, 6, 5, 10, 10, 8, 7, 10, 6, 5].to_scale
+      t1 = [6, 4, 6, 7, 4, 5, 5, 12, 6, 1].to_numeric
+      t2 = [9, 6, 5, 10, 10, 8, 7, 10, 6, 5].to_numeric
       d = t1 - t2
       t = Statsample::Test::T::OneSample.new(d)
       assert_in_delta(-2.631, t.t, 0.001)
@@ -48,7 +48,7 @@ class StatsampleTestTTestCase < Minitest::Test
       assert_in_delta(0.09095, t.probability_not_equal_variance, 0.001)
     end
     should 'be the same using shorthand' do
-      v = 100.times.map { rand(100) }.to_scale
+      v = 100.times.map { rand(100) }.to_numeric
       assert_equal(Statsample::Test.t_one_sample(v).t, T::OneSample.new(v).t)
     end
     should 'calculate all values for one sample T test' do

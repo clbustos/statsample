@@ -125,7 +125,7 @@ module Statsample
             nv.push(froms[i]-r*dels[i])
           end
         end
-        nv.to_vector(:scale)
+        nv.to_vector(:numeric)
       end
       # Correlation between v1 and v2, controling the effect of
       # control on both.
@@ -169,7 +169,7 @@ module Statsample
       def covariance_matrix_pairwise(ds)
         cache={}
         matrix=ds.collect_matrix do |row,col|
-          if (ds[row].type!=:scale or ds[col].type!=:scale)
+          if (ds[row].type!=:numeric or ds[col].type!=:numeric)
             nil
           elsif row==col
             ds[row].variance
@@ -215,7 +215,7 @@ module Statsample
         cm=ds.collect_matrix do |row,col|
           if row==col
             1.0
-          elsif (ds[row].type!=:scale or ds[col].type!=:scale)
+          elsif (ds[row].type!=:numeric or ds[col].type!=:numeric)
             nil
           else
             if cache[[col,row]].nil?
@@ -248,7 +248,7 @@ module Statsample
         rows=ds.fields.collect do |row|
           ds.fields.collect do |col|
             v1a,v2a=Statsample.only_valid_clone(ds[row],ds[col])
-            (row==col or ds[row].type!=:scale or ds[col].type!=:scale) ? nil : prop_pearson(t_pearson(ds[row],ds[col]), v1a.size, tails)
+            (row==col or ds[row].type!=:numeric or ds[col].type!=:numeric) ? nil : prop_pearson(t_pearson(ds[row],ds[col]), v1a.size, tails)
           end
         end
         Matrix.rows(rows)
@@ -257,7 +257,7 @@ module Statsample
       # Spearman ranked correlation coefficient (rho) between 2 vectors
       def spearman(v1,v2)
         v1a,v2a=Statsample.only_valid_clone(v1,v2)
-        v1r,v2r=v1a.ranked(:scale),v2a.ranked(:scale)
+        v1r,v2r=v1a.ranked(:numeric),v2a.ranked(:numeric)
         pearson(v1r,v2r)
       end
       # Calculate Point biserial correlation. Equal to Pearson correlation, with
@@ -265,7 +265,7 @@ module Statsample
       def point_biserial(dichotomous,continous)
         ds={'d'=>dichotomous,'c'=>continous}.to_dataset.dup_only_valid
         raise(TypeError, "First vector should be dichotomous") if ds['d'].factors.size!=2
-        raise(TypeError, "Second vector should be continous") if ds['c'].type!=:scale
+        raise(TypeError, "Second vector should be continous") if ds['c'].type!=:numeric
         f0=ds['d'].factors.sort[0]
         m0=ds.filter_field('c') {|c| c['d']==f0}
         m1=ds.filter_field('c') {|c| c['d']!=f0}
@@ -276,7 +276,7 @@ module Statsample
       def tau_a(v1,v2)
         v1a,v2a=Statsample.only_valid_clone(v1,v2)
         n=v1.size
-        v1r,v2r=v1a.ranked(:scale),v2a.ranked(:scale)
+        v1r,v2r=v1a.ranked(:numeric),v2a.ranked(:numeric)
         o1=ordered_pairs(v1r)
         o2=ordered_pairs(v2r)
         delta= o1.size*2-(o2  & o1).size*2
