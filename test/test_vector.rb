@@ -134,6 +134,48 @@ class StatsampleTestVector < Minitest::Test
       end
     end
 
+    context "new types :numeric and :object" do
+      should "set default type of vector to :object" do
+        v = Statsample::Vector.new [1,2,3,4,5]
+        assert_equal(:object, v.type)
+      end
+
+      should "initialize Vector with :numeric type" do
+        v = Statsample::Vector.new [1,2,3,4,5,nil], :numeric
+        assert_equal(:numeric, v.type)
+        assert_equal([1,2,3,4,5], v.valid_data)
+      end
+
+      should "show a warning when initializing with :scale, :ordinal or :nominal" do
+        assert_output("WARNING: nominal has been deprecated. Use :object instead.") do
+          Statsample::Vector.new [1,2,3,4,5,nil,'hello'], :nominal
+        end
+
+        assert_output("WARNING: scale has been deprecated. Use :numeric instead.") do
+          Statsample::Vector.new [1,2,3,4,nil,5], :scale
+        end
+
+        assert_output("WARNING: ordinal has been deprecated. Use :numeric instead.") do
+          Statsample::Vector.new [1,2,3,4,5], :ordinal
+        end
+      end
+
+      should "test that new shorthands work" do
+        numeric = Statsample::Vector.new([1,2,3,4,nil,5], :numeric)
+        assert_equal(numeric, [1,2,3,4,nil,5].to_numeric)
+        assert_equal(numeric, [1,2,3,4,nil,5].to_vector(:numeric))
+
+        obj = Statsample::Vector.new([1,2,3,4,'one','two'], :object)
+        assert_equal(obj, [1,2,3,4,'one','two'].to_vector(:object))
+      end
+
+      should "test that old shorthands raise warnings" do
+        assert_output("WARNING: to_scale has been deprecated. Use to_numeric instead.") do
+          [1,2,3,4,nil,5].to_scale
+        end
+      end
+    end
+
     context '#split_by_separator' do
       setup do
         @a = Statsample::Vector.new(['a', 'a,b', 'c,d', 'a,d', 10, nil], :nominal)
