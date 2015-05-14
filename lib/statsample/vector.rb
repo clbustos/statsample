@@ -11,7 +11,7 @@ module Statsample::VectorShorthands
   # Creates a new Statsample::Vector object of type :scale.
   # Deprecated. Use to_numeric instead.
   def to_scale(*args)
-    puts "WARNING: to_scale has been deprecated. Use to_numeric instead."
+    $stderr.puts "WARNING: to_scale has been deprecated. Use to_numeric instead."
     Statsample::Vector.new(self, :numeric, *args)
   end
 
@@ -79,12 +79,12 @@ module Statsample
     #   * <tt>:name</tt> Name of vector
     def initialize(data=[], type=:object, opts=Hash.new)
       if type == :ordinal or type == :scale
-        puts "WARNING: #{type} has been deprecated. Use :numeric instead."
+        $stderr.puts "WARNING: #{type} has been deprecated. Use :numeric instead."
         type = :numeric
       end
 
       if type == :nominal
-        puts "WARNING: nominal has been deprecated. Use :object instead."
+        $stderr.puts "WARNING: nominal has been deprecated. Use :object instead."
         type = :object
       end
 
@@ -155,7 +155,7 @@ module Statsample
 
     # Deprecated. Use new_numeric instead.
     def self.new_scale(n, val=nil,&block)
-      puts "WARNING: .new_scale has been deprecated. Use .new_numeric instead."
+      $stderr.puts "WARNING: .new_scale has been deprecated. Use .new_numeric instead."
       new_numeric n, val, &block
     end
     # Creates a duplicate of the Vector.

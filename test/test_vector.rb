@@ -147,19 +147,19 @@ class StatsampleTestVector < Minitest::Test
       end
 
       should "show a warning when initializing with :nominal, :numeric or :ordinal" do
-        assert_output("WARNING: nominal has been deprecated. Use :object instead.\n") do
+        assert_output(nil,"WARNING: nominal has been deprecated. Use :object instead.\n") do
           Statsample::Vector.new [1,2,3,4,5,nil,'hello'], :nominal
         end
 
-        assert_output("WARNING: scale has been deprecated. Use :numeric instead.\n") do
+        assert_output(nil,"WARNING: scale has been deprecated. Use :numeric instead.\n") do
           Statsample::Vector.new [1,2,3,4,nil,5], :scale
         end
 
-        assert_output("WARNING: ordinal has been deprecated. Use :numeric instead.\n") do
+        assert_output(nil,"WARNING: ordinal has been deprecated. Use :numeric instead.\n") do
           Statsample::Vector.new [1,2,3,4,5], :ordinal
         end
 
-        assert_output("WARNING: .new_scale has been deprecated. Use .new_numeric instead.\n") do
+        assert_output(nil,"WARNING: .new_scale has been deprecated. Use .new_numeric instead.\n") do
           Statsample::Vector.new_scale 10, 1
         end
       end
@@ -174,7 +174,7 @@ class StatsampleTestVector < Minitest::Test
       end
 
       should "test that old shorthands raise warnings" do
-        assert_output("WARNING: to_scale has been deprecated. Use to_numeric instead.\n") do
+        assert_output(nil,"WARNING: to_scale has been deprecated. Use to_numeric instead.\n") do
           [1,2,3,4,nil,5].to_scale
         end
       end
