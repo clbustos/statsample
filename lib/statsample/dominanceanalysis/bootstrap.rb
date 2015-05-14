@@ -6,10 +6,10 @@ module Statsample
     # == Usage
     # 
     #  require 'statsample'
-    #  a=100.times.collect {rand}.to_scale
-    #  b=100.times.collect {rand}.to_scale
-    #  c=100.times.collect {rand}.to_scale
-    #  d=100.times.collect {rand}.to_scale
+    #  a=100.times.collect {rand}.to_numeric
+    #  b=100.times.collect {rand}.to_numeric
+    #  c=100.times.collect {rand}.to_numeric
+    #  d=100.times.collect {rand}.to_numeric
     #  ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
     #  ds['y']=ds.collect{|row| row['a']*5+row['b']*2+row['c']*2+row['d']*2+10*rand()}
     #  dab=Statsample::DominanceAnalysis::Bootstrap.new(ds2, 'y', :debug=>true)
@@ -182,7 +182,7 @@ module Statsample
           table.row([_("Complete dominance"),"","","","","","",""])
           table.hr
           @pairs.each{|pair|
-            std=@samples_td[pair].to_vector(:scale)
+            std=@samples_td[pair].to_vector(:numeric)
             ttd=da.total_dominance_pairwise(pair[0],pair[1])
             table.row(summary_pairs(pair,std,ttd))
           }
@@ -190,7 +190,7 @@ module Statsample
           table.row([_("Conditional dominance"),"","","","","","",""])
           table.hr
           @pairs.each{|pair|
-            std=@samples_cd[pair].to_vector(:scale)
+            std=@samples_cd[pair].to_vector(:numeric)
             ttd=da.conditional_dominance_pairwise(pair[0],pair[1])
             table.row(summary_pairs(pair,std,ttd))
           
@@ -199,7 +199,7 @@ module Statsample
           table.row([_("General Dominance"),"","","","","","",""])
           table.hr
           @pairs.each{|pair|
-            std=@samples_gd[pair].to_vector(:scale)
+            std=@samples_gd[pair].to_vector(:numeric)
             ttd=da.general_dominance_pairwise(pair[0],pair[1])
             table.row(summary_pairs(pair,std,ttd))
           }
@@ -208,7 +208,7 @@ module Statsample
           table=ReportBuilder::Table.new(:name=>_("General averages"), :header=>[_("var"), _("mean"), _("se"), _("p.5"), _("p.95")])
           
           @fields.each{|f|
-            v=@samples_ga[f].to_vector(:scale)
+            v=@samples_ga[f].to_vector(:numeric)
             row=[@ds[f].name, sprintf("%0.3f",v.mean), sprintf("%0.3f",v.sd), sprintf("%0.3f",v.percentil(5)),sprintf("%0.3f",v.percentil(95))]
             table.row(row)
           

@@ -17,7 +17,7 @@ class StatsampleResampleTestCase < Minitest::Test
       Statsample::Resample.generate(20, 1, 10).count(1)
     }
     assert_equal(400, r.size)
-    v = Statsample::Vector.new(r, :scale)
+    v = Statsample::Vector.new(r, :numeric)
     a = v.count { |x|  x > 3 }
     assert(a >= 30 && a <= 70)
   end

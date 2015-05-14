@@ -120,7 +120,7 @@ module Statsample
         @v2=v2
         @n1=v1.valid_data.size
         @n2=v2.valid_data.size
-        data=(v1.valid_data+v2.valid_data).to_scale
+        data=(v1.valid_data+v2.valid_data).to_numeric
         groups=(([0]*@n1)+([1]*@n2)).to_vector
         ds={'g'=>groups, 'data'=>data}.to_dataset
         @t=nil
@@ -128,7 +128,7 @@ module Statsample
         if(@ties)
           adjust_for_ties(ds['data'])
         end
-        ds['ranked']=ds['data'].ranked(:scale)
+        ds['ranked']=ds['data'].ranked(:numeric)
         
         @n=ds.cases
           

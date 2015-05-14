@@ -228,9 +228,9 @@ module Statsample
     # Returns a duplicate of the input vectors, without missing data
     # for any of the vectors.
     #
-    #  a=[1,2,3,6,7,nil,3,5].to_scale
-    #  b=[nil,nil,5,6,4,5,10,2].to_scale
-    #  c=[2,4,6,7,4,5,6,7].to_scale
+    #  a=[1,2,3,6,7,nil,3,5].to_numeric
+    #  b=[nil,nil,5,6,4,5,10,2].to_numeric
+    #  c=[2,4,6,7,4,5,6,7].to_numeric
     #  a2,b2,c2=Statsample.only_valid(a,b,c)
     #  => [#<Statsample::Scale:0xb748c8c8 @data=[3, 6, 7, 3, 5]>,
     #        #<Statsample::Scale:0xb748c814 @data=[5, 6, 4, 10, 2]>,

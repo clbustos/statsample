@@ -3,9 +3,9 @@ require(File.expand_path(File.dirname(__FILE__) + '/helpers_tests.rb'))
 class StatsampleRegressionTestCase < Minitest::Test
   context 'Example with missing data' do
     setup do
-      @x = [0.285714285714286, 0.114285714285714, 0.314285714285714, 0.2, 0.2, 0.228571428571429, 0.2, 0.4, 0.714285714285714, 0.285714285714286, 0.285714285714286, 0.228571428571429, 0.485714285714286, 0.457142857142857, 0.257142857142857, 0.228571428571429, 0.285714285714286, 0.285714285714286, 0.285714285714286, 0.142857142857143, 0.285714285714286, 0.514285714285714, 0.485714285714286, 0.228571428571429, 0.285714285714286, 0.342857142857143, 0.285714285714286, 0.0857142857142857].to_scale
+      @x = [0.285714285714286, 0.114285714285714, 0.314285714285714, 0.2, 0.2, 0.228571428571429, 0.2, 0.4, 0.714285714285714, 0.285714285714286, 0.285714285714286, 0.228571428571429, 0.485714285714286, 0.457142857142857, 0.257142857142857, 0.228571428571429, 0.285714285714286, 0.285714285714286, 0.285714285714286, 0.142857142857143, 0.285714285714286, 0.514285714285714, 0.485714285714286, 0.228571428571429, 0.285714285714286, 0.342857142857143, 0.285714285714286, 0.0857142857142857].to_numeric
 
-      @y = [nil, 0.233333333333333, nil, 0.266666666666667, 0.366666666666667, nil, 0.333333333333333, 0.3, 0.666666666666667, 0.0333333333333333, 0.333333333333333, nil, nil, 0.533333333333333, 0.433333333333333, 0.4, 0.4, 0.5, 0.4, 0.266666666666667, 0.166666666666667, 0.666666666666667, 0.433333333333333, 0.166666666666667, nil, 0.4, 0.366666666666667, nil].to_scale
+      @y = [nil, 0.233333333333333, nil, 0.266666666666667, 0.366666666666667, nil, 0.333333333333333, 0.3, 0.666666666666667, 0.0333333333333333, 0.333333333333333, nil, nil, 0.533333333333333, 0.433333333333333, 0.4, 0.4, 0.5, 0.4, 0.266666666666667, 0.166666666666667, 0.666666666666667, 0.433333333333333, 0.166666666666667, nil, 0.4, 0.366666666666667, nil].to_numeric
       @ds = { 'x' => @x, 'y' => @y }.to_dataset
       @lr = Statsample::Regression::Multiple::RubyEngine.new(@ds, 'y')
     end
@@ -26,10 +26,10 @@ class StatsampleRegressionTestCase < Minitest::Test
 
     a, b = rand, rand
 
-    x1 = samples.times.map { rand }.to_scale
-    x2 = samples.times.map { rand }.to_scale
-    x3 = samples.times.map { |i| x1[i] * (1 + a) + x2[i] * (1 + b) }.to_scale
-    y = samples.times.map { |i| x1[i] + x2[i] + x3[i] + rand }.to_scale
+    x1 = samples.times.map { rand }.to_numeric
+    x2 = samples.times.map { rand }.to_numeric
+    x3 = samples.times.map { |i| x1[i] * (1 + a) + x2[i] * (1 + b) }.to_numeric
+    y = samples.times.map { |i| x1[i] + x2[i] + x3[i] + rand }.to_numeric
 
     ds = { 'x1' => x1, 'x2' => x2, 'x3' => x3, 'y' => y }.to_dataset
 
@@ -38,8 +38,8 @@ class StatsampleRegressionTestCase < Minitest::Test
     }
   end
   def test_parameters
-    @x = [13, 20, 10, 33, 15].to_vector(:scale)
-    @y = [23, 18, 35, 10, 27].to_vector(:scale)
+    @x = [13, 20, 10, 33, 15].to_vector(:numeric)
+    @y = [23, 18, 35, 10, 27].to_vector(:numeric)
     reg = Statsample::Regression::Simple.new_from_vectors(@x, @y)
     _test_simple_regression(reg)
     ds = { 'x' => @x, 'y' => @y }.to_dataset
@@ -57,9 +57,9 @@ class StatsampleRegressionTestCase < Minitest::Test
   end
 
   def test_summaries
-    a = 10.times.map { rand(100) }.to_scale
-    b = 10.times.map { rand(100) }.to_scale
-    y = 10.times.map { rand(100) }.to_scale
+    a = 10.times.map { rand(100) }.to_numeric
+    b = 10.times.map { rand(100) }.to_numeric
+    y = 10.times.map { rand(100) }.to_numeric
     ds = { 'a' => a, 'b' => b, 'y' => y }.to_dataset
     lr = Statsample::Regression::Multiple::RubyEngine.new(ds, 'y')
     assert(lr.summary.size > 0)
@@ -87,10 +87,10 @@ class StatsampleRegressionTestCase < Minitest::Test
   end
 
   def test_multiple_regression_pairwise_2
-    @a = [1, 3, 2, 4, 3, 5, 4, 6, 5, 7, 3, nil, 3, nil, 3].to_vector(:scale)
-    @b = [3, 3, 4, 4, 5, 5, 6, 6, 4, 4, 2, 2, nil, 6, 2].to_vector(:scale)
-    @c = [11, 22, 30, 40, 50, 65, 78, 79, 99, 100, nil, 3, 7, nil, 7].to_vector(:scale)
-    @y = [3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 30, 40, nil, 50, nil].to_vector(:scale)
+    @a = [1, 3, 2, 4, 3, 5, 4, 6, 5, 7, 3, nil, 3, nil, 3].to_vector(:numeric)
+    @b = [3, 3, 4, 4, 5, 5, 6, 6, 4, 4, 2, 2, nil, 6, 2].to_vector(:numeric)
+    @c = [11, 22, 30, 40, 50, 65, 78, 79, 99, 100, nil, 3, 7, nil, 7].to_vector(:numeric)
+    @y = [3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 30, 40, nil, 50, nil].to_vector(:numeric)
     ds = { 'a' => @a, 'b' => @b, 'c' => @c, 'y' => @y }.to_dataset
     lr = Statsample::Regression::Multiple::RubyEngine.new(ds, 'y')
     assert_in_delta(2407.436, lr.sst, 0.001)
@@ -103,10 +103,10 @@ class StatsampleRegressionTestCase < Minitest::Test
 
   def test_multiple_regression_gsl
     if Statsample.has_gsl?
-      @a = [1, 3, 2, 4, 3, 5, 4, 6, 5, 7].to_vector(:scale)
-      @b = [3, 3, 4, 4, 5, 5, 6, 6, 4, 4].to_vector(:scale)
-      @c = [11, 22, 30, 40, 50, 65, 78, 79, 99, 100].to_vector(:scale)
-      @y = [3, 4, 5, 6, 7, 8, 9, 10, 20, 30].to_vector(:scale)
+      @a = [1, 3, 2, 4, 3, 5, 4, 6, 5, 7].to_vector(:numeric)
+      @b = [3, 3, 4, 4, 5, 5, 6, 6, 4, 4].to_vector(:numeric)
+      @c = [11, 22, 30, 40, 50, 65, 78, 79, 99, 100].to_vector(:numeric)
+      @y = [3, 4, 5, 6, 7, 8, 9, 10, 20, 30].to_vector(:numeric)
       ds = { 'a' => @a, 'b' => @b, 'c' => @c, 'y' => @y }.to_dataset
       lr = Statsample::Regression::Multiple::GslEngine.new(ds, 'y')
       assert(lr.summary.size > 0)
@@ -174,10 +174,10 @@ class StatsampleRegressionTestCase < Minitest::Test
   end
 
   def test_regression_matrix
-    @a = [1, 3, 2, 4, 3, 5, 4, 6, 5, 7].to_vector(:scale)
-    @b = [3, 3, 4, 4, 5, 5, 6, 6, 4, 4].to_vector(:scale)
-    @c = [11, 22, 30, 40, 50, 65, 78, 79, 99, 100].to_vector(:scale)
-    @y = [3, 4, 5, 6, 7, 8, 9, 10, 20, 30].to_vector(:scale)
+    @a = [1, 3, 2, 4, 3, 5, 4, 6, 5, 7].to_vector(:numeric)
+    @b = [3, 3, 4, 4, 5, 5, 6, 6, 4, 4].to_vector(:numeric)
+    @c = [11, 22, 30, 40, 50, 65, 78, 79, 99, 100].to_vector(:numeric)
+    @y = [3, 4, 5, 6, 7, 8, 9, 10, 20, 30].to_vector(:numeric)
     ds = { 'a' => @a, 'b' => @b, 'c' => @c, 'y' => @y }.to_dataset
     cor = Statsample::Bivariate.correlation_matrix(ds)
 
@@ -194,10 +194,10 @@ class StatsampleRegressionTestCase < Minitest::Test
   end
 
   def test_regression_rubyengine
-    @a = [nil, 1, 3, 2, 4, 3, 5, 4, 6, 5, 7].to_vector(:scale)
-    @b = [nil, 3, 3, 4, 4, 5, 5, 6, 6, 4, 4].to_vector(:scale)
-    @c = [nil, 11, 22, 30, 40, 50, 65, 78, 79, 99, 100].to_vector(:scale)
-    @y = [nil, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30].to_vector(:scale)
+    @a = [nil, 1, 3, 2, 4, 3, 5, 4, 6, 5, 7].to_vector(:numeric)
+    @b = [nil, 3, 3, 4, 4, 5, 5, 6, 6, 4, 4].to_vector(:numeric)
+    @c = [nil, 11, 22, 30, 40, 50, 65, 78, 79, 99, 100].to_vector(:numeric)
+    @y = [nil, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30].to_vector(:numeric)
     ds = { 'a' => @a, 'b' => @b, 'c' => @c, 'y' => @y }.to_dataset
     lr = Statsample::Regression::Multiple::RubyEngine.new(ds, 'y')
     assert_equal(11, lr.total_cases)

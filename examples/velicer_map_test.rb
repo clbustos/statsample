@@ -21,7 +21,7 @@ Statsample::Analysis.store(Statsample::Factor::MAP) do
   else
     f1[nv]*2 + f2[nv] *3 +rng.call
   end
-  }.to_scale
+  }.to_numeric
   end
   
   

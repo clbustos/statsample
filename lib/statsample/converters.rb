@@ -18,7 +18,7 @@ module Statsample
         sth.column_info.each {|c|
             vectors[c['name']]=Statsample::Vector.new([])
             vectors[c['name']].name=c['name']
-            vectors[c['name']].type= (c['type_name']=='INTEGER' or c['type_name']=='DOUBLE') ? :scale : :nominal
+            vectors[c['name']].type= (c['type_name']=='INTEGER' or c['type_name']=='DOUBLE') ? :numeric : :object
             fields.push(c['name'])
         }
         ds=Statsample::Dataset.new(vectors,fields)
@@ -106,10 +106,10 @@ module Statsample
           end
         end
       end
-      def convert_to_scale_and_date(ds,fields)
+      def convert_to_numeric_and_date(ds,fields)
         fields.each do |f|
-          if ds[f].can_be_scale?
-            ds[f].type=:scale
+          if ds[f].can_be_numeric?
+            ds[f].type=:numeric
           elsif ds[f].can_be_date?
             ds[f].type=:date
           end
@@ -128,7 +128,7 @@ module Statsample
             next if row==["\x1A"]
             ds.add_case_array(row)
           end
-          convert_to_scale_and_date(ds,fields)
+          convert_to_numeric_and_date(ds,fields)
           ds.update_valid_data
           fields.each {|f|
             ds[f].name=f
@@ -231,7 +231,7 @@ module Statsample
             raise
           end
         end
-        convert_to_scale_and_date(ds, fields)
+        convert_to_numeric_and_date(ds, fields)
         ds.update_valid_data
         fields.each {|f|
           ds[f].name=f
@@ -345,7 +345,7 @@ out
 			# nickname = nickname
 			def variable_definition(carrier,v,name,nickname=nil)
 				nickname = (nickname.nil? ? "" : "nickname=\"#{nickname}\"" )
-				if v.type==:nominal or v.data.find {|d|  d.is_a? String }
+				if v.type==:object or v.data.find {|d|  d.is_a? String }
 					carrier.categorials.push(name)
 					carrier.conversions[name]={}
 					factors=v.factors

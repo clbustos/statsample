@@ -125,7 +125,7 @@ module Statsample
       
       # One Sample t-test
       # == Usage
-      #   a=1000.times.map {rand(100)}.to_scale
+      #   a=1000.times.map {rand(100)}.to_numeric
       #   t_1=Statsample::Test::T::OneSample.new(a, {:u=>50})
       #   t_1.summary
       #
@@ -196,8 +196,8 @@ module Statsample
       # Two Sample t-test.
       #
       # == Usage
-      #   a=1000.times.map {rand(100)}.to_scale
-      #   b=1000.times.map {rand(100)}.to_scale
+      #   a=1000.times.map {rand(100)}.to_numeric
+      #   b=1000.times.map {rand(100)}.to_numeric
       #   t_2=Statsample::Test::T::TwoSamplesIndependent.new(a,b)
       #   t_2.summary
       # === Output

@@ -11,11 +11,11 @@ class StatsampleExcelTestCase < Minitest::Test
       assert_equal(%w(id name age city a1), @ds.fields)
     end
     should 'set a dataset equal to expected' do
-      id = [1, 2, 3, 4, 5, 6].to_vector(:scale)
-      name = %w(Alex Claude Peter Franz George Fernand).to_vector(:nominal)
-      age = [20, 23, 25, nil, 5.5, nil].to_vector(:scale)
-      city = ['New York', 'London', 'London', 'Paris', 'Tome', nil].to_vector(:nominal)
-      a1 = ['a,b', 'b,c', 'a', nil, 'a,b,c', nil].to_vector(:nominal)
+      id = [1, 2, 3, 4, 5, 6].to_vector(:numeric)
+      name = %w(Alex Claude Peter Franz George Fernand).to_vector(:object)
+      age = [20, 23, 25, nil, 5.5, nil].to_vector(:numeric)
+      city = ['New York', 'London', 'London', 'Paris', 'Tome', nil].to_vector(:object)
+      a1 = ['a,b', 'b,c', 'a', nil, 'a,b,c', nil].to_vector(:object)
       ds_exp = Statsample::Dataset.new({ 'id' => id, 'name' => name, 'age' => age, 'city' => city, 'a1' => a1 }, %w(id name age city a1))
       ds_exp.fields.each{|f|
         assert_equal(ds_exp[f], @ds[f])
@@ -28,7 +28,7 @@ class StatsampleExcelTestCase < Minitest::Test
   end
   context 'Excel writer' do
     setup do
-      a = 100.times.map { rand(100) }.to_scale
+      a = 100.times.map { rand(100) }.to_numeric
       b = (['b'] * 100).to_vector
       @ds = { 'b' => b, 'a' => a }.to_dataset(%w(b a))
       tempfile = Tempfile.new('test_write.xls')

@@ -6,8 +6,8 @@ module Factor
   # 
   # == Usage:
   #   require 'statsample'
-  #   a=[2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2.0, 1.0, 1.5, 1.1].to_scale
-  #   b=[2.4,0.7,2.9,2.2,3.0,2.7,1.6,1.1,1.6,0.9].to_scale
+  #   a=[2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2.0, 1.0, 1.5, 1.1].to_numeric
+  #   b=[2.4,0.7,2.9,2.2,3.0,2.7,1.6,1.1,1.6,0.9].to_numeric
   #   ds={'a'=>a,'b'=>b}.to_dataset
   #   cor_matrix=Statsample::Bivariate.correlation_matrix(ds)
   #   pa=Statsample::Factor::PrincipalAxis.new(cor_matrix)

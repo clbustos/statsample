@@ -52,8 +52,8 @@ module Statsample
   #
   # The fast way to create a dataset uses Hash#to_dataset, with
   # field order  as arguments
-  #   v1 = [1,2,3].to_scale
-  #   v2 = [1,2,3].to_scale
+  #   v1 = [1,2,3].to_numeric
+  #   v2 = [1,2,3].to_numeric
   #   ds = {'v1'=>v2, 'v2'=>v2}.to_dataset(%w{v2 v1})
 
   class Dataset
@@ -477,7 +477,7 @@ module Statsample
       }
     end
 
-    def vector_by_calculation(type=:scale)
+    def vector_by_calculation(type=:numeric)
       a=[]
       each do |row|
         a.push(yield(row))
@@ -547,7 +547,7 @@ module Statsample
           a.push(sum.quo(size-invalids))
         end
       end
-      a=a.to_vector(:scale)
+      a=a.to_vector(:numeric)
       a.name=_("Means from %s") % @name
       a
     end
@@ -680,7 +680,7 @@ module Statsample
     end
     # Retrieves a Statsample::Vector, based on the result
     # of calculation performed on each case.
-    def collect(type=:scale)
+    def collect(type=:numeric)
       data=[]
       each {|row|
         data.push yield(row)
@@ -688,7 +688,7 @@ module Statsample
       Statsample::Vector.new(data,type)
     end
     # Same as Statsample::Vector.collect, but giving case index as second parameter on yield.
-    def collect_with_index(type=:scale)
+    def collect_with_index(type=:numeric)
       data=[]
       each_with_index {|row, i|
         data.push(yield(row, i))
@@ -869,7 +869,7 @@ module Statsample
     #   => Vector [4,6]
     def compute(text)
       @fields.each{|f|
-        if @vectors[f].type=:scale
+        if @vectors[f].type=:numeric
           text.gsub!(f,"row['#{f}'].to_f")
         else
           text.gsub!(f,"row['#{f}']")
@@ -958,7 +958,7 @@ module Statsample
       max_n=0
       h=parent_fields.inject({}) {|a,v| a[v]=Statsample::Vector.new([], @vectors[v].type);a }
       # Adding _row_id
-      h['_col_id']=[].to_scale
+      h['_col_id']=[].to_numeric
       ds_vars.push("_col_id")
       @fields.each do |f|
         if f=~re

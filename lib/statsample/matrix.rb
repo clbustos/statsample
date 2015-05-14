@@ -15,7 +15,7 @@ class ::Matrix
     f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map {|i| _("VAR_%d") % (i+1) }
     ds=Statsample::Dataset.new(f)
     f.each do |ff|
-      ds[ff].type=:scale
+      ds[ff].type=:numeric
       ds[ff].name=ff
     end
     row_size.times {|i|
@@ -87,7 +87,7 @@ module GSL
       f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map {|i| _("VAR_%d") % (i+1) }
       ds=Statsample::Dataset.new(f)
       f.each do |ff|
-        ds[ff].type=:scale
+        ds[ff].type=:numeric
         ds[ff].name=ff
       end
       row_size.times {|i|

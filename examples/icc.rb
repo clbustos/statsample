@@ -6,7 +6,7 @@ require 'statsample'
 Statsample::Analysis.store(Statsample::Reliability::ICC) do
 
   size=1000
-  a=Statsample::Vector.new_scale(size) {rand(10)}
+  a=Statsample::Vector.new_numeric(size) {rand(10)}
   b=a.recode{|i|i+rand(4)-2}
   c=a.recode{|i|i+rand(4)-2}
   d=a.recode{|i|i+rand(4)-2}

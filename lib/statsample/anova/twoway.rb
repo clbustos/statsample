@@ -107,9 +107,9 @@ module Statsample
     
     # Two Way Anova with vectors
     # Example:
-    #   v1=[1,1,2,2].to_scale
-    #   v2=[1,2,1,2].to_scale
-    #   v3=[5,3,1,5].to_scale
+    #   v1=[1,1,2,2].to_numeric
+    #   v2=[1,2,1,2].to_numeric
+    #   v3=[5,3,1,5].to_numeric
     #   anova=Statsample::Anova::TwoWayWithVectors.new(:a=>v1,:b=>v2, :dependent=>v3)
     #
     class TwoWayWithVectors < TwoWay

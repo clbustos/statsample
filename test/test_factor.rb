@@ -18,8 +18,8 @@ class StatsampleFactorTestCase < Minitest::Test
     pca = Statsample::Factor::PCA.new(cm, m: 6)
     # puts pca.summary
     # puts pca.feature_matrix
-    exp_eig = [2.985, 0.931, 0.242, 0.194, 0.085, 0.035].to_scale
-    assert_similar_vector(exp_eig, pca.eigenvalues.to_scale, 0.1)
+    exp_eig = [2.985, 0.931, 0.242, 0.194, 0.085, 0.035].to_numeric
+    assert_similar_vector(exp_eig, pca.eigenvalues.to_numeric, 0.1)
     pcs = pca.principal_components(ds)
     k = 6
     comp_matrix = pca.component_matrix
@@ -42,9 +42,9 @@ class StatsampleFactorTestCase < Minitest::Test
       samples = 20
       [3, 5, 7].each {|k|
         v = {}
-        v['x0'] = samples.times.map { ran.call }.to_scale.centered
+        v['x0'] = samples.times.map { ran.call }.to_numeric.centered
         (1...k).each {|i|
-          v["x#{i}"] = samples.times.map { |ii| ran.call * 0.5 + v["x#{i - 1}"][ii] * 0.5 }.to_scale.centered
+          v["x#{i}"] = samples.times.map { |ii| ran.call * 0.5 + v["x#{i - 1}"][ii] * 0.5 }.to_numeric.centered
         }
 
         ds = v.to_dataset
@@ -87,8 +87,8 @@ class StatsampleFactorTestCase < Minitest::Test
   def principalcomponents(gsl)
     ran = Distribution::Normal.rng
     samples = 50
-    x1 = samples.times.map { ran.call }.to_scale
-    x2 = samples.times.map { |i| ran.call * 0.5 + x1[i] * 0.5 }.to_scale
+    x1 = samples.times.map { ran.call }.to_numeric
+    x2 = samples.times.map { |i| ran.call * 0.5 + x1[i] * 0.5 }.to_numeric
     ds = { 'x1' => x1, 'x2' => x2 }.to_dataset
 
     cm = ds.correlation_matrix
@@ -121,9 +121,9 @@ class StatsampleFactorTestCase < Minitest::Test
   end
 
   def test_kmo
-    @v1 = [1, 2, 3, 4, 7, 8, 9, 10, 14, 15, 20, 50, 60, 70].to_scale
-    @v2 = [5, 6, 11, 12, 13, 16, 17, 18, 19, 20, 30, 0, 0, 0].to_scale
-    @v3 = [10, 3, 20, 30, 40, 50, 80, 10, 20, 30, 40, 2, 3, 4].to_scale
+    @v1 = [1, 2, 3, 4, 7, 8, 9, 10, 14, 15, 20, 50, 60, 70].to_numeric
+    @v2 = [5, 6, 11, 12, 13, 16, 17, 18, 19, 20, 30, 0, 0, 0].to_numeric
+    @v3 = [10, 3, 20, 30, 40, 50, 80, 10, 20, 30, 40, 2, 3, 4].to_numeric
     # KMO: 0.490
     ds = { 'v1' => @v1, 'v2' => @v2, 'v3' => @v3 }.to_dataset
     cor = Statsample::Bivariate.correlation_matrix(ds)
@@ -142,8 +142,8 @@ class StatsampleFactorTestCase < Minitest::Test
   # Tested with SPSS and R
   def test_pca
 
-    a = [2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2.0, 1.0, 1.5, 1.1].to_scale
-    b = [2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9].to_scale
+    a = [2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2.0, 1.0, 1.5, 1.1].to_numeric
+    b = [2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9].to_numeric
     a.recode! { |c| c - a.mean }
     b.recode! { |c| c - b.mean }
     ds = { 'a' => a, 'b' => b }.to_dataset

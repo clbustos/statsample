@@ -8,9 +8,15 @@ module Statsample::VectorShorthands
     Statsample::Vector.new(self,*args)
   end
 
-  # Creates a new Statsample::Vector object of type :scale
+  # Creates a new Statsample::Vector object of type :scale.
+  # Deprecated. Use to_numeric instead.
   def to_scale(*args)
-    Statsample::Vector.new(self, :scale, *args)
+    $stderr.puts "WARNING: to_scale has been deprecated. Use to_numeric instead."
+    Statsample::Vector.new(self, :numeric, *args)
+  end
+
+  def to_numeric(*args)
+    Statsample::Vector.new(self, :numeric, *args)
   end
 end
 
@@ -31,10 +37,10 @@ module Statsample
   # Collection of values on one dimension. Works as a column on a Spreadsheet.
   #
   # == Usage
-  # The fast way to create a vector uses Array.to_vector or Array.to_scale.
+  # The fast way to create a vector uses Array.to_vector or Array.to_numeric.
   #
-  #  v=[1,2,3,4].to_vector(:scale)
-  #  v=[1,2,3,4].to_scale
+  #  v=[1,2,3,4].to_vector(:numeric)
+  #  v=[1,2,3,4].to_numeric
   #
   class Vector
     include Enumerable
@@ -42,7 +48,7 @@ module Statsample
     include Summarizable
     include Statsample::VectorShorthands
 
-    # Level of measurement. Could be :nominal, :ordinal or :scale
+    # Level of measurement. Could be :object, :numeric
     attr_reader :type
     # Original data.
     attr_reader :data
@@ -71,7 +77,17 @@ module Statsample
     #   * <tt>:today_values</tt> Array of 'today' values. See Vector#today_values
     #   * <tt>:labels</tt> Labels for data values
     #   * <tt>:name</tt> Name of vector
-    def initialize(data=[], type=:nominal, opts=Hash.new)
+    def initialize(data=[], type=:object, opts=Hash.new)
+      if type == :ordinal or type == :scale
+        $stderr.puts "WARNING: #{type} has been deprecated. Use :numeric instead."
+        type = :numeric
+      end
+
+      if type == :nominal
+        $stderr.puts "WARNING: nominal has been deprecated. Use :object instead."
+        type = :object
+      end
+
       @data=data.is_a?(Array) ? data : data.to_a
       @type=type
       opts_default={
@@ -95,7 +111,7 @@ module Statsample
       @date_data_with_nils=[]
       @missing_data=[]
       @has_missing_data=nil
-      @scale_data=nil
+      @numeric_data=nil
       set_valid_data
       self.type=type
     end
@@ -119,22 +135,28 @@ module Statsample
         end
       end
       vector=new(values)
-      vector.type=:scale if vector.can_be_scale?
+      vector.type=:numeric if vector.can_be_numeric?
       vector
     end
-    # Create a new scale type vector
+    # Create a new numeric type vector
     # Parameters
     # [n]      Size
     # [val]    Value of each value
     # [&block] If block provided, is used to set the values of vector
-    def self.new_scale(n,val=nil, &block)
+    def self.new_numeric(n,val=nil, &block)
       if block
-        vector=n.times.map {|i| block.call(i)}.to_scale
+        vector=n.times.map {|i| block.call(i)}.to_numeric
       else
-        vector=n.times.map { val}.to_scale
+        vector=n.times.map { val}.to_numeric
       end
-      vector.type=:scale
+      vector.type=:numeric
       vector
+    end
+
+    # Deprecated. Use new_numeric instead.
+    def self.new_scale(n, val=nil,&block)
+      $stderr.puts "WARNING: .new_scale has been deprecated. Use .new_numeric instead."
+      new_numeric n, val, &block
     end
     # Creates a duplicate of the Vector.
     # Note: data, missing_values and labels are duplicated, so
@@ -161,33 +183,34 @@ module Statsample
 
 
     def _check_type(t) #:nodoc:
-      raise NoMethodError if (t==:scale and @type!=:scale) or (t==:ordinal and @type==:nominal) or (t==:date) or (:date==@type)
+      raise NoMethodError if (t == :numeric and @type == :object) or 
+                             (t == :date)   or (:date == @type)
     end
 
     def vector_standarized_compute(m,sd) # :nodoc:
-      @data_with_nils.collect{|x| x.nil? ? nil : (x.to_f - m).quo(sd) }.to_vector(:scale)
+      @data_with_nils.collect{|x| x.nil? ? nil : (x.to_f - m).quo(sd) }.to_vector(:numeric)
     end
     # Return a vector usign the standarized values for data
     # with sd with denominator n-1. With variance=0 or mean nil,
     # returns a vector of equal size full of nils
     #
     def vector_standarized(use_population=false)
-      check_type :scale
+      check_type :numeric
       m=mean
       sd=use_population ? sdp : sds
-      return ([nil]*size).to_scale if mean.nil? or sd==0.0
+      return ([nil]*size).to_numeric if mean.nil? or sd==0.0
       vector=vector_standarized_compute(m,sd)
       vector.name=_("%s(standarized)")  % @name
       vector
     end
     def vector_centered_compute(m) #:nodoc:
-      @data_with_nils.collect {|x| x.nil? ? nil : x.to_f-m }.to_scale
+      @data_with_nils.collect {|x| x.nil? ? nil : x.to_f-m }.to_numeric
     end
     # Return a centered vector
     def vector_centered
-      check_type :scale
+      check_type :numeric
       m=mean
-      return ([nil]*size).to_scale if mean.nil?
+      return ([nil]*size).to_numeric if mean.nil?
       vector=vector_centered_compute(m)
       vector.name=_("%s(centered)") % @name
       vector
@@ -198,14 +221,14 @@ module Statsample
     # Return a vector with values replaced with the percentiles
     # of each values
     def vector_percentil
-      check_type :ordinal
+      check_type :numeric
       c=@valid_data.size
       vector=ranked.map {|i| i.nil? ? nil : (i.quo(c)*100).to_f }.to_vector(@type)
       vector.name=_("%s(percentil)")  % @name
       vector
     end
     def box_cox_transformation(lambda) # :nodoc:
-      raise "Should be a scale" unless @type==:scale
+      raise "Should be a numeric" unless @type==:numeric
       @data_with_nils.collect{|x|
       if !x.nil?
         if(lambda==0)
@@ -216,7 +239,7 @@ module Statsample
       else
         nil
       end
-      }.to_vector(:scale)
+      }.to_vector(:numeric)
     end
 
     # Vector equality.
@@ -269,7 +292,7 @@ module Statsample
         else
           0
         end
-      end.to_scale
+      end.to_numeric
     end
     # Iterate on each item.
     # Equivalent to
@@ -313,7 +336,7 @@ module Statsample
       @data_with_nils.clear
       @date_data_with_nils.clear
       set_valid_data_intern
-      set_scale_data if(@type==:scale)
+      set_numeric_data if(@type==:numeric)
       set_date_data if(@type==:date)
     end
     if Statsample::STATSAMPLE__.respond_to?(:set_valid_data_intern)
@@ -394,7 +417,7 @@ module Statsample
     # Set level of measurement.
     def type=(t)
       @type=t
-      set_scale_data if(t==:scale)
+      set_numeric_data if(t==:numeric)
       set_date_data if (t==:date)
     end
     def to_a
@@ -450,7 +473,7 @@ module Statsample
               sum.push(nil)
           end
       }
-      Statsample::Vector.new(sum, :scale)
+      Statsample::Vector.new(sum, :numeric)
     elsif(v.respond_to? method )
       Statsample::Vector.new(
         @data.collect  {|x|
@@ -459,7 +482,7 @@ module Statsample
           else
             nil
           end
-        } , :scale)
+        } , :numeric)
     else
         raise TypeError,"You should pass a scalar or a array/vector"
     end
@@ -487,11 +510,11 @@ module Statsample
     #
     #  a=Vector.new(["a,b","c,d","a,b"])
     #  a.split_by_separator
-    #  =>  {"a"=>#<Statsample::Type::Nominal:0x7f2dbcc09d88
+    #  =>  {"a"=>#<Statsample::Type::object:0x7f2dbcc09d88
     #        @data=[1, 0, 1]>,
-    #       "b"=>#<Statsample::Type::Nominal:0x7f2dbcc09c48
+    #       "b"=>#<Statsample::Type::object:0x7f2dbcc09c48
     #        @data=[1, 1, 0]>,
-    #      "c"=>#<Statsample::Type::Nominal:0x7f2dbcc09b08
+    #      "c"=>#<Statsample::Type::object:0x7f2dbcc09b08
     #        @data=[0, 1, 1]>}
     #
     def split_by_separator(sep=Statsample::SPLIT_TOKEN)
@@ -513,7 +536,7 @@ module Statsample
       end
     end
     out.inject({}){|s,v|
-      s[v[0]]=Vector.new(v[1],:nominal)
+      s[v[0]]=Vector.new(v[1],:object)
       s
     }
     end
@@ -554,8 +577,8 @@ module Statsample
       end
 
       es.each do |est|
-        bss[est]=bss[est].to_scale
-        bss[est].type=:scale
+        bss[est]=bss[est].to_numeric
+        bss[est].type=:numeric
       end
       bss.to_dataset
 
@@ -595,7 +618,7 @@ module Statsample
       nb.times do |i|
         other=@data_with_nils.dup
         other.slice!(i*k,k)
-        other=other.to_scale
+        other=other.to_numeric
         es.each do |estimator|
           # Add pseudovalue
           ps[estimator].push( nb * est_n[estimator] - (nb-1) * h_est[estimator].call(other))
@@ -604,8 +627,8 @@ module Statsample
 
 
       es.each do |est|
-        ps[est]=ps[est].to_scale
-        ps[est].type=:scale
+        ps[est]=ps[est].to_numeric
+        ps[est].type=:numeric
       end
       ps.to_dataset
     end
@@ -702,7 +725,7 @@ module Statsample
     end
     end
     # Return true if all data is Numeric or nil
-    def can_be_scale?
+    def can_be_numeric?
       if @data.find {|v| !v.nil? and !v.is_a? Numeric and !@missing_values.include? v}
         false
       else
@@ -728,8 +751,8 @@ module Statsample
     end
     # Retrieves uniques values for data.
     def factors
-      if @type==:scale
-        @scale_data.uniq.sort
+      if @type==:numeric
+        @numeric_data.uniq.sort
       elsif @type==:date
         @date_data_with_nils.uniq.sort
       else
@@ -781,7 +804,7 @@ module Statsample
       b.section(:name=>name) do |s|
         s.text _("n :%d") % n
         s.text _("n valid:%d") % n_valid
-        if @type==:nominal
+        if @type==:object
           s.text  _("factors:%s") % factors.join(",")
           s.text   _("mode: %s") % mode
 
@@ -793,8 +816,8 @@ module Statsample
           end
         end
 
-        s.text _("median: %s") % median.to_s if(@type==:ordinal or @type==:scale)
-        if(@type==:scale)
+        s.text _("median: %s") % median.to_s if(@type==:numeric or @type==:numeric)
+        if(@type==:numeric)
           s.text _("mean: %0.4f") % mean
           if sd
             s.text _("std.dev.: %0.4f") % sd
@@ -829,7 +852,7 @@ module Statsample
       end
 
       ######
-      ### Ordinal Methods
+      ### numeric Methods
       ######
 
       # == Percentil
@@ -843,7 +866,7 @@ module Statsample
       # This is the NIST recommended method (http://en.wikipedia.org/wiki/Percentile#NIST_method)
       #
       def percentil(q, strategy = :midpoint)
-        check_type :ordinal
+        check_type :numeric
         sorted=@valid_data.sort
 
         case strategy
@@ -873,8 +896,8 @@ module Statsample
       end
 
       # Returns a ranked vector.
-      def ranked(type=:ordinal)
-        check_type :ordinal
+      def ranked(type=:numeric)
+        check_type :numeric
         i=0
         r=frequencies.sort.inject({}){|a,v|
           a[v[0]]=(i+1 + i+v[1]).quo(2)
@@ -885,17 +908,17 @@ module Statsample
       end
       # Return the median (percentil 50)
       def median
-        check_type :ordinal
+        check_type :numeric
         percentil(50)
       end
       # Minimun value
       def min
-        check_type :ordinal
+        check_type :numeric
         @valid_data.min
       end
         # Maximum value
       def max
-        check_type :ordinal
+        check_type :numeric
         @valid_data.max
       end
 
@@ -915,8 +938,8 @@ module Statsample
       end
     end
 
-    def set_scale_data
-      @scale_data=@valid_data.collect do|x|
+    def set_numeric_data
+      @numeric_data=@valid_data.collect do|x|
         if x.is_a? Numeric
           x
         elsif x.is_a? String and x.to_i==x.to_f
@@ -927,21 +950,21 @@ module Statsample
       end
     end
 
-    private :set_date_data, :set_scale_data
+    private :set_date_data, :set_numeric_data
 
     # The range of the data (max - min)
     def range;
-      check_type :scale
-      @scale_data.max - @scale_data.min
+      check_type :numeric
+      @numeric_data.max - @numeric_data.min
     end
     # The sum of values for the data
     def sum
-      check_type :scale
-      @scale_data.inject(0){|a,x|x+a} ;
+      check_type :numeric
+      @numeric_data.inject(0){|a,x|x+a} ;
     end
     # The arithmetical mean of data
     def mean
-      check_type :scale
+      check_type :numeric
       sum.to_f.quo(n_valid)
     end
     # Sum of squares for the data around a value.
@@ -949,28 +972,28 @@ module Statsample
     #   ss= sum{(xi-m)^2}
     #
     def sum_of_squares(m=nil)
-      check_type :scale
+      check_type :numeric
       m||=mean
-      @scale_data.inject(0){|a,x| a+(x-m).square}
+      @numeric_data.inject(0){|a,x| a+(x-m).square}
     end
     # Sum of squared deviation
     def sum_of_squared_deviation
-      check_type :scale
-      @scale_data.inject(0) {|a,x| x.square+a} - (sum.square.quo(n_valid))
+      check_type :numeric
+      @numeric_data.inject(0) {|a,x| x.square+a} - (sum.square.quo(n_valid))
     end
 
     # Population variance (denominator N)
     def variance_population(m=nil)
-      check_type :scale
+      check_type :numeric
       m||=mean
-      squares=@scale_data.inject(0){|a,x| x.square+a}
+      squares=@numeric_data.inject(0){|a,x| x.square+a}
       squares.quo(n_valid) - m.square
     end
 
 
     # Population Standard deviation (denominator N)
     def standard_deviation_population(m=nil)
-      check_type :scale
+      check_type :numeric
       Math::sqrt( variance_population(m) )
     end
 
@@ -978,9 +1001,9 @@ module Statsample
     # author: Al Chou
 
     def average_deviation_population( m = nil )
-      check_type :scale
+      check_type :numeric
       m ||= mean
-      ( @scale_data.inject( 0 ) { |a, x| ( x - m ).abs + a } ).quo( n_valid )
+      ( @numeric_data.inject( 0 ) { |a, x| ( x - m ).abs + a } ).quo( n_valid )
     end
     def median_absolute_deviation
       med=median
@@ -989,43 +1012,43 @@ module Statsample
     alias  :mad :median_absolute_deviation
     # Sample Variance (denominator n-1)
     def variance_sample(m=nil)
-      check_type :scale
+      check_type :numeric
       m||=mean
       sum_of_squares(m).quo(n_valid - 1)
     end
 
     # Sample Standard deviation (denominator n-1)
     def standard_deviation_sample(m=nil)
-        check_type :scale
+        check_type :numeric
         m||=mean
         Math::sqrt(variance_sample(m))
     end
     # Skewness of the sample
     def skew(m=nil)
-        check_type :scale
+        check_type :numeric
         m||=mean
-        th=@scale_data.inject(0){|a,x| a+((x-m)**3)}
-        th.quo((@scale_data.size)*sd(m)**3)
+        th=@numeric_data.inject(0){|a,x| a+((x-m)**3)}
+        th.quo((@numeric_data.size)*sd(m)**3)
     end
     # Kurtosis of the sample
     def kurtosis(m=nil)
-        check_type :scale
+        check_type :numeric
         m||=mean
-        fo=@scale_data.inject(0){|a,x| a+((x-m)**4)}
-        fo.quo((@scale_data.size)*sd(m)**4)-3
+        fo=@numeric_data.inject(0){|a,x| a+((x-m)**4)}
+        fo.quo((@numeric_data.size)*sd(m)**4)-3
 
     end
     # Product of all values on the sample
     #
     def product
-        check_type :scale
-        @scale_data.inject(1){|a,x| a*x }
+        check_type :numeric
+        @numeric_data.inject(1){|a,x| a*x }
     end
 
     # With a fixnum, creates X bins within the range of data
     # With an Array, each value will be a cut point
     def histogram(bins=10)
-      check_type :scale
+      check_type :numeric
 
       if bins.is_a? Array
         #h=Statsample::Histogram.new(self, bins)
@@ -1050,7 +1073,7 @@ module Statsample
     # Coefficient of variation
     # Calculed with the sample standard deviation
     def coefficient_of_variation
-        check_type :scale
+        check_type :numeric
         standard_deviation_sample.quo(mean)
     end
     # Standard error of the distribution mean

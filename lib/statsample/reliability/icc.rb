@@ -7,7 +7,7 @@ module Statsample
     # == Usage
     #   require 'statsample'
     #   size=1000
-    #   a = size.times.map {rand(10)}.to_scale
+    #   a = size.times.map {rand(10)}.to_numeric
     #   b = a.recode{|i|i+rand(4)-2}
     #   c  =a.recode{|i|i+rand(4)-2}
     #   d = a.recode{|i|i+rand(4)-2}

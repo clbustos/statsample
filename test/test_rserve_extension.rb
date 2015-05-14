@@ -12,7 +12,7 @@ begin
         @r.close
       end
       should 'return a valid rexp for numeric vector' do
-        a = 100.times.map { |i| rand > 0.9 ? nil : i + rand }.to_scale
+        a = 100.times.map { |i| rand > 0.9 ? nil : i + rand }.to_numeric
         rexp = a.to_REXP
         assert(rexp.is_a? Rserve::REXP::Double)
         assert_equal(rexp.to_ruby, a.data_with_nils)
@@ -20,9 +20,9 @@ begin
         assert_equal(a.data_with_nils, @r.eval('a').to_ruby)
       end
       should 'return a valid rserve dataframe for statsample datasets' do
-        a = 100.times.map { |i| rand > 0.9 ? nil : i + rand }.to_scale
-        b = 100.times.map { |i| rand > 0.9 ? nil : i + rand }.to_scale
-        c = 100.times.map { |i| rand > 0.9 ? nil : i + rand }.to_scale
+        a = 100.times.map { |i| rand > 0.9 ? nil : i + rand }.to_numeric
+        b = 100.times.map { |i| rand > 0.9 ? nil : i + rand }.to_numeric
+        c = 100.times.map { |i| rand > 0.9 ? nil : i + rand }.to_numeric
         ds = { 'a' => a, 'b' => b, 'c' => c }.to_dataset
         rexp = ds.to_REXP
         assert(rexp.is_a? Rserve::REXP::GenericVector)

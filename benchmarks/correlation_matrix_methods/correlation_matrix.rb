@@ -7,7 +7,7 @@ require 'benchmark'
 def create_dataset(vars,cases) 
   ran=Distribution::Normal.rng
   ds=vars.times.inject({}) {|ac,v|
-    ac["x#{v}"]=Statsample::Vector.new_scale(cases) {ran.call}
+    ac["x#{v}"]=Statsample::Vector.new_numeric(cases) {ran.call}
   ac
   }.to_dataset
 end
@@ -56,7 +56,7 @@ else
 end
 
 
-rs.fields.each {|f| rs[f].type=:scale}
+rs.fields.each {|f| rs[f].type=:numeric}
 
 rs['c_v']=rs.collect {|row| row['cases']*row['vars']}
 

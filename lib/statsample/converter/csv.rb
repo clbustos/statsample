@@ -39,7 +39,7 @@ module Statsample
           end
         end
 
-        convert_to_scale_and_date(ds, fields)
+        convert_to_numeric_and_date(ds, fields)
         ds.update_valid_data
         ds
       end

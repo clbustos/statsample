@@ -67,9 +67,9 @@ module Statsample
     
     # One Way Anova with vectors
     # Example:
-    #   v1=[2,3,4,5,6].to_scale
-    #   v2=[3,3,4,5,6].to_scale
-    #   v3=[5,3,1,5,6].to_scale
+    #   v1=[2,3,4,5,6].to_numeric
+    #   v2=[3,3,4,5,6].to_numeric
+    #   v3=[5,3,1,5,6].to_numeric
     #   anova=Statsample::Anova::OneWayWithVectors.new([v1,v2,v3])
     #   anova.f
     #   => 0.0243902439024391

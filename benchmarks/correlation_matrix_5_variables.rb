@@ -19,7 +19,7 @@ reps 200 #number of repetitions
 
 
 ds=vars.times.inject({}) {|ac,v|
-ac["x#{v}"]=Statsample::Vector.new_scale(cases) {rand()}
+ac["x#{v}"]=Statsample::Vector.new_numeric(cases) {rand()}
 ac
 }.to_dataset
     
