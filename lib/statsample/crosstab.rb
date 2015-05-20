@@ -10,16 +10,18 @@ module Statsample
     def initialize(v1, v2, opts=Hash.new)
       #raise ArgumentError, "Both arguments should be Vectors" unless v1.is_a? Statsample::Vector and v2.is_a? Statsample::Vector
       raise ArgumentError, "Vectors should be the same size" unless v1.size==v2.size
-      @v_rows, @v_cols=Statsample.only_valid_clone(v1.to_vector,v2.to_vector)
-      @cases=@v_rows.size
-      @row_label=v1.name
-      @column_label=v2.name
-      @name=nil
+      @v_rows, @v_cols = Statsample.only_valid_clone(
+        Daru::Vector.new(v1),
+        Daru::Vector.new(v2))
+      @cases          = @v_rows.size
+      @row_label      = v1.name
+      @column_label   = v2.name
+      @name           = nil
       @percentage_row = @percentage_column = @percentage_total=false
-      opts.each{|k,v|
+      opts.each do |k,v|
         self.send("#{k}=",v) if self.respond_to? k
-      }
-      @name||=_("Crosstab %s - %s") % [@row_label, @column_label]
+      end
+      @name ||= _("Crosstab %s - %s") % [@row_label, @column_label]
     end	
     def rows_names
       @v_rows.factors.sort
@@ -35,18 +37,18 @@ module Statsample
     end
     
     def frequencies
-      base=rows_names.inject([]){|s,row| 
-        s+=cols_names.collect{|col| [row,col]}
-      }.inject({}) {|s,par|
+      base = rows_names.inject([]) do |s,row| 
+        s += cols_names.collect { |col| [row,col] }
+      end.inject({}) do |s,par|
         s[par]=0
         s
-      }
+      end
       base.update(Statsample::vector_cols_matrix(@v_rows,@v_cols).to_a.to_vector.frequencies)
     end
     def to_matrix
-      f=frequencies
-      rn=rows_names
-      cn=cols_names
+      f  = frequencies
+      rn = rows_names
+      cn = cols_names
       Matrix.rows(rn.collect{|row|
           cn.collect{|col| f[[row,col]]}
       })

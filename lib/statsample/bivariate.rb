@@ -14,7 +14,7 @@ module Statsample
         v1a,v2a=Statsample.only_valid_clone(v1,v2)
         return nil if v1a.size==0
         if Statsample.has_gsl?
-          GSL::Stats::covariance(v1a.gsl, v2a.gsl)
+          GSL::Stats::covariance(v1a.to_gsl, v2a.to_gsl)
         else
           covariance_slow(v1a,v2a)
         end
@@ -34,7 +34,9 @@ module Statsample
         sum_of_squares(v1a,v2a) / (v1a.size-1)
       end
       def sum_of_squares(v1,v2)
-        v1a,v2a=Statsample.only_valid_clone(v1,v2)        
+        v1a,v2a=Statsample.only_valid_clone(v1,v2)
+        v1a.reset_index!
+        v2a.reset_index!        
         m1=v1a.mean
         m2=v2a.mean
         (v1a.size).times.inject(0) {|ac,i| ac+(v1a[i]-m1)*(v2a[i]-m2)}
@@ -44,13 +46,14 @@ module Statsample
         v1a,v2a=Statsample.only_valid_clone(v1,v2)
         return nil if v1a.size ==0
         if Statsample.has_gsl?
-          GSL::Stats::correlation(v1a.gsl, v2a.gsl)
+          GSL::Stats::correlation(v1a.to_gsl, v2a.to_gsl)
         else
           pearson_slow(v1a,v2a)
         end
       end
       def pearson_slow(v1,v2) # :nodoc:
         v1a,v2a=Statsample.only_valid_clone(v1,v2)
+
         # Calculate sum of squares
         ss=sum_of_squares(v1a,v2a)
         ss.quo(Math::sqrt(v1a.sum_of_squares) * Math::sqrt(v2a.sum_of_squares))
@@ -168,35 +171,39 @@ module Statsample
       
       def covariance_matrix_pairwise(ds)
         cache={}
-        matrix=ds.collect_matrix do |row,col|
-          if (ds[row].type!=:numeric or ds[col].type!=:numeric)
-            nil
-          elsif row==col
-            ds[row].variance
-          else
-            if cache[[col,row]].nil?
-              cov=covariance(ds[row],ds[col])
-              cache[[row,col]]=cov
-              cov
+        vectors = ds.vectors.to_a
+        mat_rows = vectors.collect do |row|
+          vectors.collect do |col|
+            if (ds[row].type!=:numeric or ds[col].type!=:numeric)
+              nil
+            elsif row==col
+              ds[row].variance
             else
-               cache[[col,row]]
+              if cache[[col,row]].nil?
+                cov=covariance(ds[row],ds[col])
+                cache[[row,col]]=cov
+                cov
+              else
+                cache[[col,row]]
+              end
             end
           end
         end
-        matrix
+        
+        Matrix.rows mat_rows
       end
       
       # Correlation matrix.
       # Order of rows and columns depends on Dataset#fields order
       def correlation_matrix(ds)
-        vars,cases=ds.fields.size,ds.cases
+        vars, cases = ds.ncols, ds.nrows
         if !ds.has_missing_data? and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
           cm=correlation_matrix_optimized(ds)
         else
           cm=correlation_matrix_pairwise(ds)
         end
         cm.extend(Statsample::CovariateMatrix)
-        cm.fields=ds.fields
+        cm.fields = ds.vectors.to_a
         cm
       end
 
@@ -212,21 +219,26 @@ module Statsample
       end
       def correlation_matrix_pairwise(ds)
         cache={}
-        cm=ds.collect_matrix do |row,col|
-          if row==col
-            1.0
-          elsif (ds[row].type!=:numeric or ds[col].type!=:numeric)
-            nil
-          else
-            if cache[[col,row]].nil?
-              r=pearson(ds[row],ds[col])
-              cache[[row,col]]=r
-              r
+        vectors = ds.vectors.to_a
+        cm = vectors.collect do |row|
+          vectors.collect do |col|
+            if row==col
+              1.0
+            elsif (ds[row].type!=:numeric or ds[col].type!=:numeric)
+              nil
             else
-              cache[[col,row]]
-            end 
+              if cache[[col,row]].nil?
+                r=pearson(ds[row],ds[col])
+                cache[[row,col]]=r
+                r
+              else
+                cache[[col,row]]
+              end 
+            end
           end
         end
+
+        Matrix.rows cm
       end
       
       # Retrieves the n valid pairwise.
@@ -256,27 +268,27 @@ module Statsample
       
       # Spearman ranked correlation coefficient (rho) between 2 vectors
       def spearman(v1,v2)
-        v1a,v2a=Statsample.only_valid_clone(v1,v2)
-        v1r,v2r=v1a.ranked(:numeric),v2a.ranked(:numeric)
+        v1a,v2a = Statsample.only_valid_clone(v1,v2)
+        v1r,v2r = v1a.ranked, v2a.ranked
         pearson(v1r,v2r)
       end
       # Calculate Point biserial correlation. Equal to Pearson correlation, with
       # one dichotomous value replaced by "0" and the other by "1"
       def point_biserial(dichotomous,continous)
-        ds={'d'=>dichotomous,'c'=>continous}.to_dataset.dup_only_valid
-        raise(TypeError, "First vector should be dichotomous") if ds['d'].factors.size!=2
-        raise(TypeError, "Second vector should be continous") if ds['c'].type!=:numeric
-        f0=ds['d'].factors.sort[0]
-        m0=ds.filter_field('c') {|c| c['d']==f0}
-        m1=ds.filter_field('c') {|c| c['d']!=f0}
-        ((m1.mean-m0.mean).to_f / ds['c'].sdp) * Math::sqrt(m0.size*m1.size.to_f / ds.cases**2)
+        ds = Daru::DataFrame.new({:d=>dichotomous,:c=>continous}).dup_only_valid
+        raise(TypeError, "First vector should be dichotomous") if ds[:d].factors.size != 2
+        raise(TypeError, "Second vector should be continous") if ds[:c].type != :numeric
+        f0=ds[:d].factors.sort.to_a[0]
+        m0=ds.filter_vector(:c) {|c| c[:d] == f0}
+        m1=ds.filter_vector(:c) {|c| c[:d] != f0}
+        ((m1.mean-m0.mean).to_f / ds[:c].sdp) * Math::sqrt(m0.size*m1.size.to_f / ds.nrows**2)
       end
       # Kendall Rank Correlation Coefficient (Tau a)
       # Based on Hervé Adbi article
       def tau_a(v1,v2)
         v1a,v2a=Statsample.only_valid_clone(v1,v2)
         n=v1.size
-        v1r,v2r=v1a.ranked(:numeric),v2a.ranked(:numeric)
+        v1r,v2r=v1a.ranked,v2a.ranked
         o1=ordered_pairs(v1r)
         o2=ordered_pairs(v2r)
         delta= o1.size*2-(o2  & o1).size*2
@@ -348,14 +360,15 @@ module Statsample
         }
         {'P'=>conc,'Q'=>disc,'Y'=>ties_y,'X'=>ties_x}
       end
+
       def ordered_pairs(vector)
-        d=vector.data
-        a=[]
-        (0...(d.size-1)).each{|i|
-          ((i+1)...(d.size)).each {|j|
+        d = vector.to_a
+        a = []
+        (0...(d.size-1)).each do |i|
+          ((i+1)...(d.size)).each do |j|
             a.push([d[i],d[j]])
-          }
-        }
+          end
+        end
         a
       end
 =begin      

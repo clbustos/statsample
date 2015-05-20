@@ -5,7 +5,7 @@ module Statsample::VectorShorthands
   # Creates a new Statsample::Vector object
   # Argument should be equal to Vector.new
   def to_vector(*args)
-    Statsample::Vector.new(self,*args)
+    Daru::Vector.new(self)
   end
 
   # Creates a new Statsample::Vector object of type :scale.
@@ -16,7 +16,7 @@ module Statsample::VectorShorthands
   end
 
   def to_numeric(*args)
-    Statsample::Vector.new(self, :numeric, *args)
+    Daru::Vector.new(self)
   end
 end
 

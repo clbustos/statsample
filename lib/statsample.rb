@@ -22,6 +22,7 @@ require 'extendmatrix'
 require 'distribution'
 require 'dirty-memoize'
 require 'reportbuilder'
+require 'daru'
 
 class Numeric
   def square
@@ -218,7 +219,7 @@ module Statsample
       size = vs[0].size
 
       vs.each do |v|
-        fail ArgumentError, 'Arguments should be Vector' unless v.instance_of? Statsample::Vector
+        fail ArgumentError, 'Arguments should be Vector' unless v.instance_of? Daru::Vector
         fail ArgumentError, 'Vectors size should be the same' if v.size != size
       end
 
@@ -238,16 +239,16 @@ module Statsample
     #
     def only_valid(*vs)
       i = 1
-      h = vs.inject({}) { |acc, v| acc["v#{i}"] = v; i += 1; acc }
-      ds = Statsample::Dataset.new(h).dup_only_valid
-      ds.vectors.values
+      h = vs.inject({}) { |acc, v| acc["v#{i}".to_sym] = v; i += 1; acc }
+      df = Daru::DataFrame.new(h).dup_only_valid
+      df.map { |v| v }
     end
 
     # Cheap version of #only_valid.
     # If any vectors have missing_values, return only valid.
     # If not, return the vectors itself
     def only_valid_clone(*vs)
-      if vs.any?(&:flawed?)
+      if vs.any?(&:has_missing_data?)
         only_valid(*vs)
       else
         vs

@@ -779,7 +779,7 @@ module Statsample
 
     # creates a new vector with the data of a given field which the block returns true
     def filter_field(field)
-      a=[]
+      a = []
       each do |c|
         a.push(c[field]) if yield c
       end
