@@ -23,6 +23,7 @@ require 'distribution'
 require 'dirty-memoize'
 require 'reportbuilder'
 require 'daru'
+require 'statsample/daru'
 
 class Numeric
   def square

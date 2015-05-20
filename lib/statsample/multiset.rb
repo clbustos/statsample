@@ -14,11 +14,12 @@ module Statsample
         @datasets={}
     end
     def self.new_empty_vectors(fields,ds_names) 
-        ms=Multiset.new(fields)
-        ds_names.each{|d|
-            ms.add_dataset(d,Dataset.new(fields))
-        }
-        ms
+      ms = Multiset.new(fields)
+      ds_names.each do |d|
+        ms.add_dataset(d, Daru::DataFrame.new({}, order: fields))
+      end
+
+      ms
     end
     # Generate a new dataset as a union of partial dataset
     # If block given, this is applied to each dataset before union
@@ -29,65 +30,65 @@ module Statsample
       labels={}
       each do |k,ds|
         if block
-          ds=ds.dup
+          ds = ds.dup
           yield k,ds
         end
         @fields.each do |f|
-          union_field[f]||=Array.new
-          union_field[f].concat(ds[f].data)
-          types[f]||=ds[f].type
-          names[f]||=ds[f].name
-          labels[f]||=ds[f].labels
+          union_field[f] ||= Array.new
+          union_field[f].concat(ds[f].to_a)
+          types[f]  ||= ds[f].type
+          names[f]  ||= ds[f].name
+          labels[f] ||= ds[f].index.to_a
         end
       end
       
       @fields.each do |f|
-        union_field[f]=union_field[f].to_vector(types[f])
-        union_field[f].name=names[f]
-        union_field[f].labels=labels[f]
+        union_field[f] = Daru::Vector.new(union_field[f])
+        union_field[f].rename names[f]
       end
-      ds_union=union_field.to_dataset
-      ds_union.fields=@fields
+
+      ds_union = Daru::DataFrame.new(union_field, order: @fields)
       ds_union
     end
+
     def datasets_names
-        @datasets.keys.sort
+      @datasets.keys.sort
     end
+
     def n_datasets
-        @datasets.size
+      @datasets.size
     end
+
     def add_dataset(key,ds)
-      if(ds.fields!=@fields)
-       raise ArgumentError, "Dataset(#{ds.fields.to_s})must have the same fields of the Multiset(#{@fields})"
+      if ds.vectors.to_a != @fields
+        raise ArgumentError, "Dataset(#{ds.vectors.to_a.to_s})must have the same fields of the Multiset(#{@fields})"
       else
-          @datasets[key]=ds
+        @datasets[key] = ds
       end
     end
     def sum_field(field)
       @datasets.inject(0) {|a,da|
-        stratum_name=da[0]
-        vector=da[1][field]
-        val=yield stratum_name,vector
-        a+val
+        stratum_name = da[0]
+        vector       = da[1][field]
+        val          = yield stratum_name,vector
+        a + val
       }
     end
     def collect_vector(field)
-      @datasets.collect {|k,v|
-        yield k, v[field]
-      }
+      @datasets.collect { |k,v| yield k, v[field] }
     end
     
     def each_vector(field)
-      @datasets.each {|k,v|
-        yield k, v[field]
-      }
+      @datasets.each { |k,v| yield k, v[field] }
     end
-    def[](i)
+
+    def [](i)
       @datasets[i]
     end
+
     def each(&block)
       @datasets.each {|k,ds|
-        next if ds.cases==0
+        next if ds.nrows == 0
         block.call(k,ds)
       }
     end
@@ -204,9 +205,9 @@ module Statsample
       @ms=ms
       raise ArgumentError,"You should put a strata size for each dataset" if strata_sizes.keys.sort!=ms.datasets_names
       @strata_sizes=strata_sizes
-      @population_size=@strata_sizes.inject(0) {|a,x| a+x[1]}
+      @population_size=@strata_sizes.inject(0) { |a,x| a+x[1] }
       @strata_number=@ms.n_datasets
-      @sample_size=@ms.datasets.inject(0) {|a,x| a+x[1].cases}
+      @sample_size=@ms.datasets.inject(0) { |a,x| a+x[1].nrows }
     end
     # Number of strata
     def strata_number
