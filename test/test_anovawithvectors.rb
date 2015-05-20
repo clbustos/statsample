@@ -3,9 +3,9 @@ class StatsampleAnovaOneWayWithVectorsTestCase < Minitest::Test
   context(Statsample::Anova::OneWayWithVectors) do
     context('when initializing') do
       setup do
-        @v1 = 10.times.map { rand(100) }.to_numeric
-        @v2 = 10.times.map { rand(100) }.to_numeric
-        @v3 = 10.times.map { rand(100) }.to_numeric
+        @v1 = Daru::Vector.new(10.times.map { rand(100) })
+        @v2 = Daru::Vector.new(10.times.map { rand(100) })
+        @v3 = Daru::Vector.new(10.times.map { rand(100) })
       end
       should 'be the same using [] or args*' do
         a1 = Statsample::Anova::OneWayWithVectors.new(@v1, @v2, @v3)
@@ -28,9 +28,9 @@ class StatsampleAnovaOneWayWithVectorsTestCase < Minitest::Test
       end
     end
     setup do
-      @v1 = [3, 3, 2, 3, 6].to_vector(:numeric)
-      @v2 = [7, 6, 5, 6, 7].to_vector(:numeric)
-      @v3 = [9, 8, 9, 7, 8].to_vector(:numeric)
+      @v1 = Daru::Vector.new([3, 3, 2, 3, 6])
+      @v2 = Daru::Vector.new([7, 6, 5, 6, 7])
+      @v3 = Daru::Vector.new([9, 8, 9, 7, 8])
       @name = 'Anova testing'
       @anova = Statsample::Anova::OneWayWithVectors.new(@v1, @v2, @v3, name: @name)
     end
@@ -66,10 +66,10 @@ class StatsampleAnovaOneWayWithVectorsTestCase < Minitest::Test
       assert_in_delta(@anova.sst, @anova.sswg + @anova.ssbg, 0.00001)
     end
     should 'df total equal to number of n-1' do
-      assert_equal(@v1.n + @v2.n + @v3.n - 1, @anova.df_total)
+      assert_equal(@v1.size + @v2.size + @v3.size - 1, @anova.df_total)
     end
     should 'df wg equal to number of n-k' do
-      assert_equal(@v1.n + @v2.n + @v3.n - 3, @anova.df_wg)
+      assert_equal(@v1.size + @v2.size + @v3.size - 3, @anova.df_wg)
     end
     should 'df bg equal to number of k-1' do
       assert_equal(2, @anova.df_bg)

@@ -90,10 +90,10 @@ module Statsample
       
       def initialize(*args)
         if args[0].is_a? Array
-          @vectors=args.shift
+          @vectors = args.shift
         else
-          @vectors=args.find_all {|v| v.is_a? Statsample::Vector}
-          opts=args.find {|v| v.is_a? Hash}
+          @vectors = args.find_all {|v| v.is_a? Daru::Vector}
+          opts     = args.find {|v| v.is_a? Hash}
         end
         opts||=Hash.new
         opts_default={:name=>_("Anova One-Way"), 

@@ -29,7 +29,7 @@ module Statsample
       attr_accessor :name
       # Input could be an array of vectors or a dataset
       def initialize(input, opts=Hash.new())
-        if input.is_a? Statsample::Dataset
+        if input.is_a? Daru::DataFrame
           @vectors=input.vectors.values
         else
           @vectors=input
@@ -52,28 +52,29 @@ module Statsample
         
         zi=@vectors.collect {|vector|
           mean=vector.mean
-          vector.collect {|v| (v-mean).abs }.to_numeric
+          Daru::Vector.new(vector.collect {|v| (v-mean).abs })
         }
         
-        total_mean=zi.inject([]) {|ac,vector|
-          ac+vector.valid_data
-        }.to_numeric.mean
+        total_mean = Daru::Vector.new(
+          zi.inject([]) do |ac,vector|
+            ac + vector.only_valid(:array)
+          end).mean
       
-        k=@vectors.size
+        k = @vectors.size
+        sum_num = zi.inject(0) do |ac,vector|
+          ac + (vector.size * (vector.mean - total_mean)**2)
+        end
         
-        sum_num=zi.inject(0) {|ac,vector|
-          ac+(vector.size*(vector.mean-total_mean)**2)
-        }
-        
-        sum_den=zi.inject(0) {|ac,vector|
-          z_mean=vector.mean
-          ac+vector.valid_data.inject(0) {|acp,zij|
-            acp+(zij-z_mean)**2
-          }
-        }
-        @w=((n-k)*sum_num).quo((k-1)*sum_den)
-        @d1=k-1
-        @d2=n-k
+        sum_den = zi.inject(0) do |ac,vector|
+          z_mean = vector.mean
+          ac + vector.only_valid(:array).inject(0) do |acp,zij|
+            acp + (zij - z_mean)**2
+          end
+        end
+
+        @w  = ((n - k) * sum_num).quo((k - 1) * sum_den)
+        @d1 = k - 1
+        @d2 = n - k
       end
       private :compute
       # Probability.
