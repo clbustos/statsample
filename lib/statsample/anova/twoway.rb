@@ -121,25 +121,26 @@ module Statsample
       # For now, only equal sample cells allowed
       def initialize(opts=Hash.new)
         raise "You should insert at least :a, :b and :dependent" unless  [:a, :b, :dependent].all? {|v| opts.has_key? v}
-        @a_var='a'
-        @b_var='b'
-        @dep_var='dependent'
-        @a_vector, @b_vector, @dep_vector=Statsample.only_valid_clone opts[:a], opts[:b], opts[:dependent]
+        @a_var   = :a
+        @b_var   = :b
+        @dep_var = :dependent
+        @a_vector, @b_vector, @dep_vector = 
+          Statsample.only_valid_clone opts[:a], opts[:b], opts[:dependent]
         
-        ds={@a_var=>@a_vector, @b_var=>@b_vector, @dep_var=>@dep_vector}.to_dataset
-        @ds=ds.clone_only_valid
-        _p=@a_vector.factors.size
-        _q=@b_vector.factors.size
-        @x_general=@dep_vector.mean
-        @axb_means={}
-        @axb_sd={}
-        @vectors=[]
+        ds  = Daru::DataFrame.new({@a_var=>@a_vector, @b_var=>@b_vector, @dep_var=>@dep_vector})
+        @ds = ds.clone_only_valid
+        _p  = @a_vector.factors.size
+        _q  = @b_vector.factors.size
+        @x_general = @dep_vector.mean
+        @axb_means = {}
+        @axb_sd    = {}
+        @vectors   = []
         n=nil
         @ds.to_multiset_by_split(a_var,b_var).each_vector(dep_var) {|k,v|
-          @axb_means[k]=v.mean
-          @axb_sd[k]=v.sd
+          @axb_means[k] = v.mean
+          @axb_sd[k]    = v.sd
           @vectors << v
-          n||=v.size
+          n ||= v.size
           raise "All cell sizes should be equal" if n!=v.size
         }
 
@@ -151,20 +152,21 @@ module Statsample
         @ds.to_multiset_by_split(b_var).each_vector(dep_var) {|k,v|
           @b_means[k]=v.mean
         }
-        ss_a=n*_q*@ds[a_var].factors.inject(0) {|ac,v|
-          ac+(@a_means[v]-@x_general)**2
+        ss_a = n*_q*@ds[a_var].factors.inject(0) {|ac,v|
+          ac + (@a_means[v]-@x_general)**2
         }
         ss_b=n*_p*@ds[b_var].factors.inject(0) {|ac,v|
           ac+(@b_means[v]-@x_general)**2
         }
-        ss_within=@ds.collect {|row|
+        ss_within = @ds.collect(:row) { |row|
           (row[dep_var]-@axb_means[[row[a_var],row[b_var]]])**2
         }.sum
-        ss_axb=n*@axb_means.inject(0) {|ac,v|
+        ss_axb = n*@axb_means.inject(0) {|ac,v|
           j,k=v[0]
           xjk=v[1]
           ac+(xjk-@a_means[j]-@b_means[k]+@x_general)**2
         }
+
         df_a=_p-1
         df_b=_q-1
         df_within=(_p*_q)*(n-1)
@@ -186,9 +188,9 @@ module Statsample
       def report_building(builder) #:nodoc:#
         builder.section(:name=>@name) do |s|
           if summary_descriptives
-            s.table(:header =>['']+@ds[a_var].factors.map {|a| @ds[a_var].labeling(a)}+[_("%s Mean") % @name_b]) do |t|
+            s.table(:header =>['']+@ds[a_var].factors.map {|a| @ds[a_var].index_of(a)}+[_("%s Mean") % @name_b]) do |t|
               @ds[b_var].factors.each do |b|
-                t.row([@ds[b_var].labeling(b)]+@ds[a_var].factors.map {|a| "%0.3f" % @axb_means[[a,b]] } + ["%0.3f" % @b_means[b]])
+                t.row([@ds[b_var].index_of(b)]+@ds[a_var].factors.map {|a| "%0.3f" % @axb_means[[a,b]] } + ["%0.3f" % @b_means[b]])
               end
               t.row([_("%s Mean") % @name_a]+@ds[a_var].factors.map {|a| "%0.3f" % @a_means[a]}+ ["%0.3f" % @x_general])
             end
