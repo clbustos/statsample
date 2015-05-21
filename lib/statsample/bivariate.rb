@@ -156,15 +156,14 @@ module Statsample
       # Order of rows and columns depends on Dataset#fields order
       
       def covariance_matrix(ds)
-        vars,cases=ds.fields.size,ds.cases
+        vars,cases = ds.vectors.size, ds.nrows
         if !ds.has_missing_data? and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
           cm=covariance_matrix_optimized(ds)
         else
           cm=covariance_matrix_pairwise(ds)
-          
         end
         cm.extend(Statsample::CovariateMatrix)
-        cm.fields=ds.fields
+        cm.fields=ds.vectors.to_a
         cm
       end
       
@@ -243,14 +242,19 @@ module Statsample
       
       # Retrieves the n valid pairwise.
       def n_valid_matrix(ds)
-        ds.collect_matrix do |row,col|
-          if row==col
-            ds[row].valid_data.size
-          else
-            rowa,rowb=Statsample.only_valid_clone(ds[row],ds[col])
-            rowa.size
+        vectors = ds.vectors.to_a
+        m = vectors.collect do |row|
+          vectors.collect do |col|
+            if row==col
+              ds[row].only_valid.size
+            else
+              rowa,rowb = Statsample.only_valid_clone(ds[row],ds[col])
+              rowa.size
+            end
           end
         end
+
+        Matrix.rows m
       end
       
       # Matrix of correlation probabilities.
@@ -384,8 +388,8 @@ module Statsample
       # Report the minimum number of cases valid of a covariate matrix
       # based on a dataset
       def min_n_valid(ds)
-        min=ds.cases
-        m=n_valid_matrix(ds)
+        min = ds.nrows
+        m   = n_valid_matrix(ds)
         for x in 0...m.row_size
           for y in 0...m.column_size
             min=m[x,y] if m[x,y] < min
@@ -393,8 +397,6 @@ module Statsample
         end
         min
       end
-      
-      
     end
   end
 end

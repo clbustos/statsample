@@ -19,33 +19,34 @@ if Statsample.has_gsl?
         class GslEngine < BaseEngine
           def initialize(ds,y_var, opts=Hash.new)
             super
-            @ds=ds.dup_only_valid
-            @ds_valid=@ds
-            @valid_cases=@ds_valid.cases
-            @dy=@ds[@y_var]
-            @ds_indep=ds.dup(ds.fields-[y_var])
+            @ds          = ds.dup_only_valid
+            @ds_valid    = @ds
+            @valid_cases = @ds_valid.nrows
+            @dy          = @ds[@y_var]
+            @ds_indep    = ds.dup(ds.vectors.to_a - [y_var])
             # Create a custom matrix
             columns=[]
             @fields=[]
-            max_deps = GSL::Matrix.alloc(@ds.cases, @ds.fields.size)
-            constant_col=@ds.fields.size-1
-            for i in 0...@ds.cases
+            max_deps = GSL::Matrix.alloc(@ds.nrows, @ds.vectors.size)
+            constant_col=@ds.vectors.size-1
+            for i in 0...@ds.nrows
               max_deps.set(i,constant_col,1)
             end
-            j=0
-            @ds.fields.each{|f|
-              if f!=@y_var
-                @ds[f].each_index{|i1|
+            j = 0
+            @ds.vectors.each do |f|
+              if f != @y_var
+                @ds[f].each_index do |i1|
                   max_deps.set(i1,j,@ds[f][i1])
-                }
+                end
+
                 columns.push(@ds[f].to_a)
                 @fields.push(f)
-                j+=1
+                j += 1
               end
-            }
-            @dep_columns=columns.dup
-            @lr_s=nil
-            c, @cov, @chisq, @status = GSL::MultiFit.linear(max_deps, @dy.gsl)
+            end
+            @dep_columns = columns.dup
+            @lr_s        = nil
+            c, @cov, @chisq, @status = GSL::MultiFit.linear(max_deps, @dy.to_gsl)
             @constant=c[constant_col]
             @coeffs_a=c.to_a.slice(0...constant_col)
             @coeffs=assign_names(@coeffs_a)
@@ -97,7 +98,7 @@ if Statsample.has_gsl?
             @lr_s
           end
           def build_standarized
-            @ds_s=@ds.standarize
+            @ds_s=@ds.standardize
             @lr_s=GslEngine.new(@ds_s,@y_var)
           end
           def process_s(v)
@@ -114,17 +115,15 @@ if Statsample.has_gsl?
 
           # Standard error for coeffs
           def coeffs_se
-            out={}
-            evcm=estimated_variance_covariance_matrix
-            @ds_valid.fields.each_with_index do |f,i|
-
-              mi=i+1
-              next if f==@y_var
-              out[f]=evcm[mi,mi]
+            out  = {}
+            evcm = estimated_variance_covariance_matrix
+            @ds_valid.vectors.to_a.each_with_index do |f,i|
+              mi = i+1
+              next if f == @y_var
+              out[f] = evcm[mi,mi]
             end
             out
           end
-
         end
       end
     end

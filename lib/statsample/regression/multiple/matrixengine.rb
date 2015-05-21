@@ -59,8 +59,6 @@ class MatrixEngine < BaseEngine
     @matrix_y = @matrix_cor.submatrix(@fields, [y_var])
     @matrix_y_cov = @matrix_cov.submatrix(@fields, [y_var])
     
-
-    
     @y_sd=Math::sqrt(@matrix_cov.submatrix([y_var])[0,0])
     
     @x_sd=@n_predictors.times.inject({}) {|ac,i|
@@ -77,14 +75,14 @@ class MatrixEngine < BaseEngine
     @y_mean=0.0
     @name=_("Multiple reggresion of %s on %s") % [@fields.join(","), @y_var]
     
-    opts_default={:digits=>3}
-    opts=opts_default.merge opts
+    opts_default = {:digits=>3}
+    opts         = opts_default.merge opts
     opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
     }
       result_matrix=@matrix_x_cov.inverse * @matrix_y_cov
 
-    if matrix._type==:covariance
+    if matrix._type == :covariance
       @coeffs=result_matrix.column(0).to_a
       @coeffs_stan=coeffs.collect {|k,v|
         coeffs[k]*@x_sd[k].quo(@y_sd)
@@ -116,12 +114,12 @@ class MatrixEngine < BaseEngine
   end
   # Value of constant
   def constant
-    c=coeffs
-    @y_mean - @fields.inject(0){|a,k| a + (c[k] * @x_mean[k])}
+    c = coeffs
+    @y_mean - @fields.inject(0) { |a,k| a + (c[k] * @x_mean[k])}
   end
   # Hash of b or raw coefficients
   def coeffs
-    assign_names(@coeffs)    
+    assign_names(@coeffs)
   end
   # Hash of beta or standarized coefficients
 
@@ -185,7 +183,7 @@ class MatrixEngine < BaseEngine
     sd[:constant]=0
     fields=[:constant]+@matrix_cov.fields-[@y_var]
     # Recreate X'X using the variance-covariance matrix
-    xt_x=Matrix.rows(fields.collect {|i|
+    xt_x=::Matrix.rows(fields.collect {|i|
       fields.collect {|j|
         if i==:constant or j==:constant
           cov=0

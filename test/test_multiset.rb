@@ -127,7 +127,6 @@ class StatsampleMultisetTestCase < Minitest::Test
     }
     xp, yp, zp = {}, {}, {}
     @ms.each {|k, ds|
-      # puts "k #{k} ds #{ds}"
       xp[k] = ds[:x]
       yp[k] = ds[:y]
       zp[k] = ds[:z]

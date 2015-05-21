@@ -26,13 +26,7 @@ module Daru
       #puts "Ingreso a los dataset"
       ms.datasets.each do |k,ds|
         ds.update
-        # puts "idx #{self[field].index_of(k)}"
         ds.rename self[field].index_of(k)
-        # ds.vectors.each do |k1,v1|
-        #   v1.type   = self[k1].type
-        #   v1.name   = self[k1].name
-        #   v1.labels = self[k1].to_hash
-        # end
       end
 
       ms
@@ -69,12 +63,6 @@ module Daru
             self[f].index_of(sk)
           end.join("-")
         )
-
-        # ds.vectors.each do |k1,v1|
-        #   v1.type   = ds[k1].type
-        #   v1.name   = ds[k1].name
-        #   v1.labels = ds[k1].to_hash
-        # end
       end
       ms
     end
