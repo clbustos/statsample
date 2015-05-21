@@ -52,11 +52,13 @@ module Factor
     attr_accessor :rotation_type
     attr_accessor :matrix_type
     def initialize(matrix, opts=Hash.new)
-      @use_gsl=nil
+      @use_gsl = opts[:use_gsl]
+      opts.delete :use_gsl
+
       @name=_("Principal Component Analysis")
       @matrix=matrix
       @n_variables=@matrix.column_size      
-      @variables_names=(@matrix.respond_to? :fields) ? @matrix.fields : @n_variables.times.map {|i| _("VAR_%d") % (i+1)}
+      @variables_names=(@matrix.respond_to? :fields) ? @matrix.fields : @n_variables.times.map {|i| "VAR_#{i+1}".to_sym }
       
       @matrix_type = @matrix.respond_to?(:_type) ? @matrix._type : :correlation
       
@@ -67,13 +69,14 @@ module Factor
       opts.each{|k,v|
         self.send("#{k}=",v) if self.respond_to? k
       }
+
       if @use_gsl.nil?
         @use_gsl=Statsample.has_gsl?
       end
       if @matrix.respond_to? :fields
         @variables_names=@matrix.fields
       else
-        @variables_names=@n_variables.times.map {|i| "V#{i+1}"}
+        @variables_names=@n_variables.times.map {|i| "V#{i+1}".to_sym}
       end
       calculate_eigenpairs
       
@@ -81,7 +84,6 @@ module Factor
         # Set number of factors with eigenvalues > 1
         @m=@eigenpairs.find_all {|ev,ec| ev>=1.0}.size
       end
-      
     end
     def rotation
       @rotation_type.new(component_matrix)
@@ -92,10 +94,10 @@ module Factor
     def create_centered_ds
       h={}
       @original_ds.factors.each {|f|
-        mean=@original_ds[f].mean
-        h[f]=@original_ds[f].recode {|c| c-mean}
+        mean = @original_ds[f].mean
+        h[f] = @original_ds[f].recode {|c| c-mean}
       }
-      @ds=h.to_dataset
+      @ds = Daru::DataFrame.new(h)
     end
     
     # Feature matrix for +m+ factors
@@ -137,8 +139,8 @@ module Factor
       pcs=(fv.transpose*data_matrix.transpose).transpose
       
       pcs.extend Statsample::NamedMatrix
-      pcs.fields_y=m.times.map {|i| "PC_%d" % (i+1)}
-      pcs.to_dataset
+      pcs.fields_y = m.times.map { |i| "PC_#{i+1}".to_sym }
+      pcs.to_dataframe
     end
     def component_matrix(m=nil)
       var="component_matrix_#{matrix_type}"
@@ -159,7 +161,7 @@ module Factor
       cm.extend NamedMatrix
       cm.name=_("Component matrix (from covariance)")
       cm.fields_x = @variables_names
-      cm.fields_y = m.times.map {|i| "PC_%d" % (i+1)}
+      cm.fields_y = m.times.map {|i| "PC_#{i+1}".to_sym }
       
       cm
     end
@@ -180,17 +182,16 @@ module Factor
       cm.extend CovariateMatrix
       cm.name=_("Component matrix")
       cm.fields_x = @variables_names
-      cm.fields_y = m.times.map {|i| "PC_%d" % (i+1)}
+      cm.fields_y = m.times.map { |i| "PC_#{i+1}".to_sym }
       cm
     end
     def communalities(m=nil)
-      
       m||=@m
       h=[]
       @n_variables.times do |i|
         sum=0
         m.times do |j|
-          sum+=(@eigenpairs[j][0].abs*@eigenpairs[j][1][i]**2)
+          sum += (@eigenpairs[j][0].abs*@eigenpairs[j][1][i]**2)
         end
         h.push(sum)
       end
@@ -202,11 +203,11 @@ module Factor
     end
     def eigenvectors
       @eigenpairs.collect {|c| 
-        @use_gsl ? c[1].to_gsl : c[1].to_vector
+        @use_gsl ? c[1].to_gsl : Daru::Vector.new(c[1])
       }
     end
     def calculate_eigenpairs
-      @eigenpairs= @use_gsl ? @matrix.to_gsl.eigenpairs : @matrix.to_matrix.eigenpairs_ruby 
+      @eigenpairs= @use_gsl ? @matrix.to_gsl.eigenpairs : @matrix.to_matrix.eigenpairs_ruby
     end
   
     

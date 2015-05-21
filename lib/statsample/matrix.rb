@@ -11,18 +11,18 @@ class ::Matrix
     self
   end
 
-  def to_dataset
-    f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map {|i| _("VAR_%d") % (i+1) }
-    ds=Statsample::Dataset.new(f)
+  def to_dataframe
+    f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map {|i| "VAR_#{i+1}".to_sym }
+    f = [f] unless f.is_a?(Array)
+    ds= Daru::DataFrame.new({}, order: f)
     f.each do |ff|
-      ds[ff].type=:numeric
-      ds[ff].name=ff
+      ds[ff].rename ff
     end
     row_size.times {|i|
-      ds.add_case_array(self.row(i).to_a)
+      ds.add_row(self.row(i).to_a)
     }
-    ds.update_valid_data
-    ds.name=self.name if self.respond_to? :name
+    ds.update
+    ds.rename(self.name) if self.respond_to? :name
     ds
   end
 
@@ -83,18 +83,18 @@ module GSL
       self
     end
 
-    def to_dataset
-      f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map {|i| _("VAR_%d") % (i+1) }
-      ds=Statsample::Dataset.new(f)
+    def to_dataframe
+      f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map {|i| "VAR_#{i+1}".to_sym }
+      ds=Daru::DataFrame.new({}, order: f)
       f.each do |ff|
-        ds[ff].type=:numeric
-        ds[ff].name=ff
+        ds[ff].rename ff
       end
+
       row_size.times {|i|
-        ds.add_case_array(self.row(i).to_a)
+        ds.add_row(self.row(i).to_a)
       }
-      ds.update_valid_data
-      ds.name=self.name if self.respond_to? :name
+      ds.update
+      ds.rename(self.name) if self.respond_to? :name
       ds
     end
 

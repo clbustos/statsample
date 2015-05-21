@@ -12,6 +12,7 @@ module Statsample
       # Covariance between two vectors
       def covariance(v1,v2)
         v1a,v2a=Statsample.only_valid_clone(v1,v2)
+
         return nil if v1a.size==0
         if Statsample.has_gsl?
           GSL::Stats::covariance(v1a.to_gsl, v2a.to_gsl)
@@ -156,14 +157,14 @@ module Statsample
       # Order of rows and columns depends on Dataset#fields order
       
       def covariance_matrix(ds)
-        vars,cases = ds.vectors.size, ds.nrows
+        vars,cases = ds.ncols, ds.nrows
         if !ds.has_missing_data? and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
           cm=covariance_matrix_optimized(ds)
         else
           cm=covariance_matrix_pairwise(ds)
         end
         cm.extend(Statsample::CovariateMatrix)
-        cm.fields=ds.vectors.to_a
+        cm.fields = ds.vectors.to_a
         cm
       end
       

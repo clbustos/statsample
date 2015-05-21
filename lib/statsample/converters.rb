@@ -121,18 +121,15 @@ module Statsample
     class PlainText < SpreadsheetBase
       class << self
         def read(filename, fields)
-          ds=Statsample::Dataset.new(fields)
-          fp=File.open(filename,"r")
+          ds = Daru::DataFrame.new({}, order: fields)
+          fp = File.open(filename,"r")
           fp.each_line do |line|
-            row=process_row(line.strip.split(/\s+/),[""])
-            next if row==["\x1A"]
-            ds.add_case_array(row)
+            row = process_row(line.strip.split(/\s+/),[""])
+            next if row == ["\x1A"]
+            ds.add_row(row)
           end
-          convert_to_numeric_and_date(ds,fields)
-          ds.update_valid_data
-          fields.each {|f|
-            ds[f].name=f
-          }
+          ds.update
+          fields.each { |f| ds[f].rename f }
           ds
         end
       end

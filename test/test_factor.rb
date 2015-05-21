@@ -7,26 +7,32 @@ class StatsampleFactorTestCase < Minitest::Test
   # Based on Hardle and Simar
   def setup
     @fixtures_dir = File.expand_path(File.dirname(__FILE__) + '/fixtures')
+    Daru.lazy_update = true
+  end
+
+  def teardown
+    Daru.lazy_update = false
   end
   # Based on Hurdle example
   def test_covariance_matrix
-    ds = Statsample::PlainText.read(@fixtures_dir + '/bank2.dat', %w(v1 v2 v3 v4 v5 v6))
-    ds.fields.each {|f|
-      ds[f] = ds[f].centered
+    ds = Statsample::PlainText.read(@fixtures_dir + '/bank2.dat', [:v1,:v2,:v3,:v4,:v5,:v6])
+    ds.vectors.each {|f|
+      ds[f] = ds[f].center
     }
-    cm = ds.covariance_matrix
+    ds.update
+    cm = Statsample::Bivariate.covariance_matrix ds
     pca = Statsample::Factor::PCA.new(cm, m: 6)
     # puts pca.summary
     # puts pca.feature_matrix
-    exp_eig = [2.985, 0.931, 0.242, 0.194, 0.085, 0.035].to_numeric
-    assert_similar_vector(exp_eig, pca.eigenvalues.to_numeric, 0.1)
+    exp_eig = Daru::Vector.new([2.985, 0.931, 0.242, 0.194, 0.085, 0.035])
+    assert_similar_vector(exp_eig, Daru::Vector.new(pca.eigenvalues), 0.1)
     pcs = pca.principal_components(ds)
     k = 6
     comp_matrix = pca.component_matrix
     k.times {|i|
-      pc_id = "PC_#{i + 1}"
+      pc_id = "PC_#{i + 1}".to_sym
       k.times {|j| # variable
-        ds_id = "v#{j + 1}"
+        ds_id = "v#{j + 1}".to_sym
         r = Statsample::Bivariate.correlation(ds[ds_id], pcs[pc_id])
         assert_in_delta(r, comp_matrix[j, i])
       }
@@ -42,13 +48,13 @@ class StatsampleFactorTestCase < Minitest::Test
       samples = 20
       [3, 5, 7].each {|k|
         v = {}
-        v['x0'] = samples.times.map { ran.call }.to_numeric.centered
-        (1...k).each {|i|
-          v["x#{i}"] = samples.times.map { |ii| ran.call * 0.5 + v["x#{i - 1}"][ii] * 0.5 }.to_numeric.centered
+        v[:x0] = Daru::Vector.new(samples.times.map { ran.call }).center
+        (1...k).each { |i|
+          v["x#{i}".to_sym] = Daru::Vector.new(samples.times.map { |ii| ran.call * 0.5 + v["x#{i - 1}".to_sym][ii] * 0.5 }).center
         }
 
-        ds = v.to_dataset
-        cm = ds.covariance_matrix
+        ds = Daru::DataFrame.new(v)
+        cm = Statsample::Bivariate.covariance_matrix ds
         #      @r.assign('ds',ds)
         #      @r.eval('cm<-cor(ds);sm<-eigen(cm, sym=TRUE);v<-sm$vectors')
         #      puts "eigenvalues"
@@ -61,14 +67,14 @@ class StatsampleFactorTestCase < Minitest::Test
         cm_ruby = pca_ruby.component_matrix
         # puts cm_ruby.summary
         k.times {|i|
-          pc_id = "PC_#{i + 1}"
+          pc_id = "PC_#{i + 1}".to_sym
           assert_in_delta(pca_ruby.eigenvalues[i], pca_gsl.eigenvalues[i], 1e-10)
           # Revert gsl component values
           pc_gsl_data = (pc_gsl[pc_id][0] - pc_ruby[pc_id][0]).abs > 1e-6 ? pc_gsl[pc_id].recode(&:-@) : pc_gsl[pc_id]
           assert_similar_vector(pc_gsl_data, pc_ruby[pc_id], 1e-6, "PC for #{k} variables")
           if false
             k.times {|j| # variable
-              ds_id = "x#{j}"
+              ds_id = "x#{j}".to_sym
               r = Statsample::Bivariate.correlation(ds[ds_id], pc_ruby[pc_id])
               puts "#{pc_id}-#{ds_id}:#{r}"
             }
@@ -80,18 +86,22 @@ class StatsampleFactorTestCase < Minitest::Test
   end
 
   def test_principalcomponents
-    principalcomponents(true) if Statsample.has_gsl?
+    if Statsample.has_gsl?
+      principalcomponents(true)
+    else
+      skip "Require GSL"
+    end
     principalcomponents(false)
   end
 
   def principalcomponents(gsl)
     ran = Distribution::Normal.rng
     samples = 50
-    x1 = samples.times.map { ran.call }.to_numeric
-    x2 = samples.times.map { |i| ran.call * 0.5 + x1[i] * 0.5 }.to_numeric
-    ds = { 'x1' => x1, 'x2' => x2 }.to_dataset
+    x1 = Daru::Vector.new(samples.times.map { ran.call })
+    x2 = Daru::Vector.new(samples.times.map { |i| ran.call * 0.5 + x1[i] * 0.5 })
+    ds = Daru::DataFrame.new({ :x1 => x1, :x2 => x2 })
 
-    cm = ds.correlation_matrix
+    cm = Statsample::Bivariate.correlation_matrix ds
     r = cm[0, 1]
     pca = Statsample::Factor::PCA.new(cm, m: 2, use_gsl: gsl)
     assert_in_delta(1 + r, pca.eigenvalues[0], 1e-10)
@@ -103,14 +113,14 @@ class StatsampleFactorTestCase < Minitest::Test
     assert_equal_vector(hs * m_1, pca.eigenvectors[1])
 
     pcs = pca.principal_components(ds)
-    exp_pc_1 = ds.collect_with_index {|row, _i|
-      hs * (row['x1'] + row['x2'])
+    exp_pc_1 = ds.collect_row_with_index {|row, _i|
+      hs * (row[:x1] + row[:x2])
     }
-    exp_pc_2 = ds.collect_with_index {|row, _i|
-      gsl ? hs * (row['x2'] - row['x1']) : hs * (row['x1'] - row['x2'])
+    exp_pc_2 = ds.collect_row_with_index {|row, _i|
+      gsl ? hs * (row[:x2] - row[:x1]) : hs * (row[:x1] - row[:x2])
     }
-    assert_similar_vector(exp_pc_1, pcs['PC_1'])
-    assert_similar_vector(exp_pc_2, pcs['PC_2'])
+    assert_similar_vector(exp_pc_1, pcs[:PC_1])
+    assert_similar_vector(exp_pc_2, pcs[:PC_2])
   end
 
   def test_antiimage
@@ -121,11 +131,11 @@ class StatsampleFactorTestCase < Minitest::Test
   end
 
   def test_kmo
-    @v1 = [1, 2, 3, 4, 7, 8, 9, 10, 14, 15, 20, 50, 60, 70].to_numeric
-    @v2 = [5, 6, 11, 12, 13, 16, 17, 18, 19, 20, 30, 0, 0, 0].to_numeric
-    @v3 = [10, 3, 20, 30, 40, 50, 80, 10, 20, 30, 40, 2, 3, 4].to_numeric
+    @v1 = Daru::Vector.new([1, 2, 3, 4, 7, 8, 9, 10, 14, 15, 20, 50, 60, 70])
+    @v2 = Daru::Vector.new([5, 6, 11, 12, 13, 16, 17, 18, 19, 20, 30, 0, 0, 0])
+    @v3 = Daru::Vector.new([10, 3, 20, 30, 40, 50, 80, 10, 20, 30, 40, 2, 3, 4])
     # KMO: 0.490
-    ds = { 'v1' => @v1, 'v2' => @v2, 'v3' => @v3 }.to_dataset
+    ds = Daru::DataFrame.new({ :v1 => @v1, :v2 => @v2, :v3 => @v3 })
     cor = Statsample::Bivariate.correlation_matrix(ds)
     kmo = Statsample::Factor.kmo(cor)
     assert_in_delta(0.667, kmo, 0.001)
@@ -142,11 +152,11 @@ class StatsampleFactorTestCase < Minitest::Test
   # Tested with SPSS and R
   def test_pca
 
-    a = [2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2.0, 1.0, 1.5, 1.1].to_numeric
-    b = [2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9].to_numeric
-    a.recode! { |c| c - a.mean }
-    b.recode! { |c| c - b.mean }
-    ds = { 'a' => a, 'b' => b }.to_dataset
+    a = Daru::Vector.new([2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2.0, 1.0, 1.5, 1.1], dtype: :gsl)
+    b = Daru::Vector.new([2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9], dtype: :gsl)
+    a = a - a.mean
+    b = b - b.mean
+    ds = Daru::DataFrame.new({ :a => a, :b => b })
 
     cov_matrix = Statsample::Bivariate.covariance_matrix(ds)
     if Statsample.has_gsl?
@@ -160,8 +170,6 @@ class StatsampleFactorTestCase < Minitest::Test
   end
 
   def pca_set(pca, _type)
-
-
     expected_eigenvalues = [1.284, 0.0490]
     expected_eigenvalues.each_with_index{|ev, i|
       assert_in_delta(ev, pca.eigenvalues[i], 0.001)
