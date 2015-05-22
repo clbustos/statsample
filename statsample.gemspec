@@ -85,4 +85,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'minitest', '~> 5.5'
   s.add_development_dependency 'gettext', '~> 3.1'
   s.add_development_dependency 'mocha', '~> 1.1'
+  s.add_development_dependency 'statsample-bivariate-extension'
 end
