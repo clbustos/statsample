@@ -5,11 +5,11 @@ $reliability_icc = nil
 class StatsampleReliabilityIccTestCase < Minitest::Test
   context Statsample::Reliability::ICC do
     setup do
-      a = [9, 6, 8, 7, 10, 6].to_numeric
-      b = [2, 1, 4, 1, 5, 2].to_numeric
-      c = [5, 3, 6, 2, 6, 4].to_numeric
-      d = [8, 2, 8, 6, 9, 7].to_numeric
-      @ds = { 'a' => a, 'b' => b, 'c' => c, 'd' => d }.to_dataset
+      a = Daru::Vector.new([9, 6, 8, 7, 10, 6])
+      b = Daru::Vector.new([2, 1, 4, 1, 5, 2])
+      c = Daru::Vector.new([5, 3, 6, 2, 6, 4])
+      d = Daru::Vector.new([8, 2, 8, 6, 9, 7])
+      @ds = Daru::DataFrame.new({ :a => a, :b => b, :c => c, :d => d })
       @icc = Statsample::Reliability::ICC.new(@ds)
     end
     should 'basic method be correct' do
@@ -122,11 +122,11 @@ class StatsampleReliabilityIccTestCase < Minitest::Test
         setup do
           if $reliability_icc.nil?
             size = 100
-            a = size.times.map { rand(10) }.to_numeric
+            a = Daru::Vector.new(size.times.map { rand(10) })
             b = a.recode { |i| i + rand(4) - 2 }
             c = a.recode { |i| i + rand(4) - 2 }
             d = a.recode { |i| i + rand(4) - 2 }
-            @ds = { 'a' => a, 'b' => b, 'c' => c, 'd' => d }.to_dataset
+            @ds = Daru::DataFrame.new({ :a => a, :b => b, :c => c, :d => d })
 
             @icc = Statsample::Reliability::ICC.new(@ds)
             @r = Rserve::Connection.new

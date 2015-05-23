@@ -97,9 +97,9 @@ module Statsample
       attr_accessor :name
       def initialize(ds, opts=Hash.new)
         @ds=ds.dup_only_valid
-        @vectors=@ds.vectors.values
-        @n=@ds.cases
-        @k=@ds.fields.size
+        @vectors=@ds.map { |e| e }
+        @n=@ds.nrows
+        @k=@ds.ncols
         compute
         @g_rho=0
         @alpha=0.05
