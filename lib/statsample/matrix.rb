@@ -14,7 +14,7 @@ class ::Matrix
   def to_dataframe
     f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map {|i| "VAR_#{i+1}".to_sym }
     f = [f] unless f.is_a?(Array)
-    ds= Daru::DataFrame.new({}, order: f)
+    ds = Daru::DataFrame.new({}, order: f)
     f.each do |ff|
       ds[ff].rename ff
     end

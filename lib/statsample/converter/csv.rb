@@ -14,33 +14,28 @@ module Statsample
       # USE:
       #     ds = Statsample::CSV.read('test_csv.csv')
       def read(filename, empty = [''], ignore_lines = 0, opts = {})
-        first_row = true
-        fields = []
-        ds = nil
+        first_row   = true
+        fields      = []
+        ds          = nil
         line_number = 0
-        options = DEFAULT_OPTIONS.merge(opts)
-
-        csv = ::CSV.open(filename, 'rb', options)
+        options     = DEFAULT_OPTIONS.merge(opts)
+        csv         = ::CSV.open(filename, 'rb', options)
 
         csv.each do |row|
           line_number += 1
-
-          if (line_number <= ignore_lines)
-            next
-          end
+          next if line_number <= ignore_lines
 
           if first_row
             fields = extract_fields(row)
-            ds = Statsample::Dataset.new(fields)
+            ds = Daru::DataFrame.new({}, order: fields)
             first_row = false
           else
             rowa = process_row(row, empty)
-            ds.add_case(rowa, false)
+            ds.add_row(rowa)
           end
         end
 
-        convert_to_numeric_and_date(ds, fields)
-        ds.update_valid_data
+        ds.update
         ds
       end
 
@@ -52,11 +47,14 @@ module Statsample
         options = DEFAULT_OPTIONS.merge(opts)
 
         writer = ::CSV.open(filename, 'w', options)
-        writer << dataset.fields
+        writer << dataset.vectors.to_a
 
-        dataset.each_array do |row|
-          row.collect! { |v| v.to_s.gsub('.', ',') } if convert_comma
-          writer << row
+        dataset.each_row do |row|
+          if convert_comma
+            writer << row.map { |v| v.to_s.gsub('.', ',') }
+          else
+            writer << row.to_a
+          end
         end
 
         writer.close

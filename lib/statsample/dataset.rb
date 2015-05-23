@@ -2,8 +2,8 @@ require 'statsample/vector'
 
 class Hash
   # Creates a Statsample::Dataset based on a Hash
-  def to_dataset(*args)
-    Statsample::Dataset.new(self, *args)
+  def to_dataframe(*args)
+    Daru::DataFrame.new(self, *args)
   end
 end
 
