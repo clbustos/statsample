@@ -338,7 +338,7 @@ out
 			# nickname = nickname
 			def variable_definition(carrier,v,name,nickname=nil)
 				nickname = (nickname.nil? ? "" : "nickname=\"#{nickname}\"" )
-				if v.type==:object or v.data.find {|d|  d.is_a? String }
+				if v.type==:object or v.to_a.find {|d|  d.is_a? String }
 					carrier.categorials.push(name)
 					carrier.conversions[name]={}
 					factors=v.factors
@@ -346,11 +346,11 @@ out
 					out << "<levels count=\"#{factors.size}\">\n"
 					out << (1..factors.size).to_a.collect{|i|
 						carrier.conversions[name][factors[i-1]]=i
-						"<level value=\"#{i}\">#{v.labeling(factors[i-1])}</level>"
+						"<level value=\"#{i}\">#{(v.labels[factors[i-1]] || factors[i-1])}</level>"
 					}.join("\n")
 					out << "</levels>\n</categoricalvariable>\n"
 					out
-				elsif v.data.find {|d| d.is_a? Float}
+				elsif v.to_a.find {|d| d.is_a? Float}
 					"<realvariable name=\"#{name}\" #{nickname} />"
 				else
 					"<integervariable name=\"#{name}\" #{nickname} />"
