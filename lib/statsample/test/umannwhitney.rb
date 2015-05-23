@@ -116,33 +116,33 @@ module Statsample
       # Params: Two Statsample::Vectors
       # 
       def initialize(v1,v2, opts=Hash.new)
-        @v1=v1
-        @v2=v2
-        @n1=v1.valid_data.size
-        @n2=v2.valid_data.size
-        data=(v1.valid_data+v2.valid_data).to_numeric
-        groups=(([0]*@n1)+([1]*@n2)).to_vector
-        ds={'g'=>groups, 'data'=>data}.to_dataset
-        @t=nil
-        @ties=data.data.size!=data.data.uniq.size        
-        if(@ties)
-          adjust_for_ties(ds['data'])
+        @v1      = v1
+        @v2      = v2
+        v1_valid = v1.only_valid.reset_index!
+        v2_valid = v2.only_valid.reset_index!
+        @n1      = v1_valid.size
+        @n2      = v2_valid.size
+        data     = Daru::Vector.new(v1_valid.to_a + v2_valid.to_a)
+        groups   = Daru::Vector.new(([0] * @n1) + ([1] * @n2))
+        ds       = Daru::DataFrame.new({:g => groups, :data => data})
+        @t       = nil
+        @ties    = data.to_a.size != data.to_a.uniq.size        
+        if @ties
+          adjust_for_ties(ds[:data])
         end
-        ds['ranked']=ds['data'].ranked(:numeric)
-        
-        @n=ds.cases
+        ds[:ranked] = ds[:data].ranked      
+        @n = ds.nrows
           
-        @r1=ds.filter{|r| r['g']==0}['ranked'].sum
-        @r2=((ds.cases*(ds.cases+1)).quo(2))-r1
-        @u1=r1-((@n1*(@n1+1)).quo(2))
-        @u2=r2-((@n2*(@n2+1)).quo(2))
-        @u=(u1<u2) ? u1 : u2
-        opts_default={:name=>_("Mann-Whitney's U")}
-        @opts=opts_default.merge(opts)
+        @r1 = ds.filter_rows { |r| r[:g] == 0}[:ranked].sum
+        @r2 = ((ds.nrows * (ds.nrows + 1)).quo(2)) - r1
+        @u1 = r1 - ((@n1 * (@n1 + 1)).quo(2))
+        @u2 = r2 - ((@n2 * (@n2 + 1)).quo(2))
+        @u  = (u1 < u2) ? u1 : u2
+        opts_default = { :name=>_("Mann-Whitney's U") }
+        @opts = opts_default.merge(opts)
         opts_default.keys.each {|k|
           send("#{k}=", @opts[k])
-        }
-          
+        }       
       end
       def report_building(generator) # :nodoc:
         generator.section(:name=>@name) do |s|
@@ -160,8 +160,8 @@ module Statsample
       # Exact probability of finding values of U lower or equal to sample on U distribution. Use with caution with m*n>100000.
       # Uses u_sampling_distribution_as62
       def probability_exact
-        dist=UMannWhitney.u_sampling_distribution_as62(@n1,@n2)
-        sum=0
+        dist = UMannWhitney.u_sampling_distribution_as62(@n1,@n2)
+        sum = 0
         (0..@u.to_i).each {|i|
           sum+=dist[i]
         }
@@ -172,8 +172,8 @@ module Statsample
       # == Reference: 
       # * http://europe.isixsigma.com/library/content/c080806a.asp
       def adjust_for_ties(data)
-        @t=data.frequencies.find_all{|k,v| v>1}.inject(0) {|a,v|
-          a+(v[1]**3-v[1]).quo(12)
+        @t = data.frequencies.find_all { |k,v| v > 1 }.inject(0) { |a,v|
+          a + (v[1]**3 - v[1]).quo(12)
         }        
       end
       

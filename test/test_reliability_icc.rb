@@ -114,7 +114,7 @@ class StatsampleReliabilityIccTestCase < Minitest::Test
 
     begin
       require 'rserve'
-      require 'statsample/rserve_extension'
+      require 'daru/extensions/rserve'
       context 'McGraw and Wong' do
         teardown do
           @r = $reliability_icc[:r].close unless $reliability_icc[:r].nil?

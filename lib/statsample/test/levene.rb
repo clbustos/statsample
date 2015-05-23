@@ -30,9 +30,9 @@ module Statsample
       # Input could be an array of vectors or a dataset
       def initialize(input, opts=Hash.new())
         if input.is_a? Daru::DataFrame
-          @vectors=input.vectors.values
+          @vectors = input.to_hash.values
         else
-          @vectors=input
+          @vectors = input
         end
         @name=_("Levene Test")
         opts.each{|k,v|
@@ -48,17 +48,18 @@ module Statsample
         builder.text "%s : F(%d, %d) = %0.4f , p = %0.4f" % [@name, @d1, @d2, f, probability]
       end
       def compute
-        n=@vectors.inject(0) {|ac,v| ac+v.n_valid}
+        n=@vectors.inject(0) { |ac,v| ac + v.n_valid}
         
-        zi=@vectors.collect {|vector|
+        zi=@vectors.collect do |vector|
           mean=vector.mean
-          Daru::Vector.new(vector.collect {|v| (v-mean).abs })
-        }
+          Daru::Vector.new(vector.collect { |v| (v - mean).abs })
+        end
         
         total_mean = Daru::Vector.new(
           zi.inject([]) do |ac,vector|
             ac + vector.only_valid(:array)
-          end).mean
+          end
+        ).mean
       
         k = @vectors.size
         sum_num = zi.inject(0) do |ac,vector|
@@ -82,7 +83,6 @@ module Statsample
       def probability
         p_using_cdf(Distribution::F.cdf(f, @d1, @d2), :right)
       end
-      
     end
   end
 end
