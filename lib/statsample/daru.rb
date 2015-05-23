@@ -1,6 +1,31 @@
 # Opening the Daru::DataFrame class for adding methods to convert from 
 # data structures to specialized statsample data structues like Multiset.
 module Daru
+  class Vector
+    def histogram(bins=10)
+      type == :numeric or raise TypeError, "Only numeric Vectors can do this operation."
+
+      if bins.is_a? Array
+        h = Statsample::Histogram.alloc(bins)
+      else
+        # ugly patch. The upper limit for a bin has the form
+        # x < range
+        #h=Statsample::Histogram.new(self, bins)
+        valid = only_valid
+        min,max=Statsample::Util.nice(valid.min,valid.max)
+        # fix last data
+        if max == valid.max
+          max += 1e-10
+        end
+        h = Statsample::Histogram.alloc(bins,[min,max])
+        # Fix last bin
+      end
+
+      h.increment(valid)
+      h
+    end
+  end
+
   class DataFrame
     # Functions for converting to Statsample::Multiset
     def to_multiset_by_split(*vecs)

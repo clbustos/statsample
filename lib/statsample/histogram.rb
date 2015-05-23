@@ -95,9 +95,9 @@ module Statsample
         if x.respond_to? :each
           x.each{|y| increment(y,w) }
         elsif x.is_a? Numeric
-          (range.size-1).times do |i|
-            if x>=range[i] and x<range[i+1]
-              @bin[i]+=w
+          (range.size - 1).times do |i|
+            if x >= range[i] and x < range[i+1]
+              @bin[i] += w
               break
             end
           end

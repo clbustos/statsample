@@ -91,6 +91,8 @@ module Statsample
       # If second parameters is empty, returns the ScaleAnalysis
       # <tt>code</tt>.
       def scale(code, ds=nil, opts=nil)
+        require 'awesome_print'
+        # ap @scales
         if ds.nil?
           @scales[code]
         else
@@ -98,6 +100,7 @@ module Statsample
           @scales_keys.push(code)
           @scales[code]=ScaleAnalysis.new(ds, opts)
         end
+        # ap @scales
       end
       # Delete ScaleAnalysis named <tt>code</tt>
       def delete_scale(code)
@@ -123,14 +126,15 @@ module Statsample
         Statsample::Factor::PrincipalAxis.new(correlation_matrix, opts)
       end
       def dataset_from_scales
-        ds=Dataset.new(@scales_keys)
+        ds = Daru::DataFrame.new({}, order: @scales_keys.map(&:to_sym))
         @scales.each_pair do |code,scale|
-          ds[code.to_s]=scale.ds.vector_sum
-          ds[code.to_s].name=scale.name
+          ds[code.to_sym] = scale.ds.vector_sum
         end
-        ds.update_valid_data
+        
+        ds.update
         ds
       end
+
       def parallel_analysis(opts=nil)
         opts||=parallel_analysis_options
         Statsample::Factor::ParallelAnalysis.new(dataset_from_scales, opts)
@@ -140,6 +144,7 @@ module Statsample
       def correlation_matrix
         Statsample::Bivariate.correlation_matrix(dataset_from_scales)
       end
+
       def report_building(b) # :nodoc:
         b.section(:name=>name) do |s|
           s.section(:name=>_("Reliability analysis of scales")) do |s2|

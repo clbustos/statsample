@@ -70,7 +70,7 @@ module Statsample
           @hist=@data
           @mean=@hist.estimated_mean
           @sd=@hist.estimated_standard_deviation
-        elsif @data.is_a? Statsample::Vector
+        elsif @data.is_a? Daru::Vector
           @mean=@data.mean
           @sd=@data.sd
           @bins||=Math::sqrt(@data.size).floor

@@ -16,40 +16,40 @@ module Statsample
       attr_accessor :name
       attr_accessor :summary_histogram
       def initialize(ds, opts=Hash.new)
-        @dumped=ds.fields.find_all {|f|
-          ds[f].variance==0
+        @dumped=ds.vectors.to_a.find_all {|f|
+          ds[f].variance == 0
         }
         
-        @ods=ds
-        @ds=ds.dup_only_valid(ds.fields - @dumped)
-        @ds.name=ds.name
+        @ods = ds
+        @ds  = ds.dup_only_valid(ds.vectors.to_a - @dumped)
+        @ds.rename ds.name
         
-        @k=@ds.fields.size        
-        @total=@ds.vector_sum
+        @k     = @ds.ncols
+        @total = @ds.vector_sum
         @o_total=@dumped.size > 0 ? @ods.vector_sum : nil
         
-        @vector_mean=@ds.vector_mean
-        @item_mean=@vector_mean.mean
-        @item_sd=@vector_mean.sd
+        @vector_mean = @ds.vector_mean
+        @item_mean   = @vector_mean.mean
+        @item_sd     = @vector_mean.sd
         
-        @mean=@total.mean
-        @median=@total.median
-        
-        @skew=@total.skew
-        @kurtosis=@total.kurtosis
-        @sd = @total.sd
-        @variance=@total.variance
-        @valid_n = @total.size
-        opts_default={
-          :name=>_("Reliability Analysis"),
-          :summary_histogram=>true
+        @mean     = @total.mean
+        @median   = @total.median
+        @skew     = @total.skew
+        @kurtosis = @total.kurtosis
+        @sd       = @total.sd
+        @variance = @total.variance
+        @valid_n  = @total.size
+
+        opts_default = {
+          :name => _("Reliability Analysis"),
+          :summary_histogram => true
         }
-        @opts=opts_default.merge(opts)
-        @opts.each{|k,v| self.send("#{k}=",v) if self.respond_to? k }
+        @opts = opts_default.merge(opts)
+        @opts.each{ |k,v| self.send("#{k}=",v) if self.respond_to? k }
         
         @cov_m=Statsample::Bivariate.covariance_matrix(@ds)
         # Mean for covariances and variances
-        @variances=@k.times.map {|i| @cov_m[i,i]}.to_numeric
+        @variances = Daru::Vector.new(@k.times.map { |i| @cov_m[i,i] })
         @variances_mean=@variances.mean
         @covariances_mean=(@variance-@variances.sum).quo(@k**2-@k)
         #begin
@@ -87,12 +87,15 @@ module Statsample
       # Adjusted RPB(Point biserial-correlation) for each item
       #
       def item_total_correlation
-        @itc||=@ds.fields.inject({}) do |a,v|
-          vector=@ds[v].clone
-          ds2=@ds.clone
-          ds2.delete_vector(v)
-          total=ds2.vector_sum
-          a[v]=Statsample::Bivariate.pearson(vector,total)
+        vecs = @ds.vectors.to_a
+        @itc||=vecs.inject({}) do |a,v|
+          # vector=@ds[v].clone
+          # puts "#{vector.inspect}"
+          # ds2=@ds.dup
+          # puts "#{ds2.inspect}"
+          # ds2.delete_vector(v)
+          total=@ds.vector_sum(vecs - [v])
+          a[v]=Statsample::Bivariate.pearson(@ds[v],total)
           a
         end
       end
@@ -100,7 +103,7 @@ module Statsample
         item_total_correlation.values.to_numeric.mean
       end
       def item_statistics
-          @is||=@ds.fields.inject({}) do |a,v|
+          @is||=@ds.vectors.to_a.inject({}) do |a,v|
             a[v]={:mean=>@ds[v].mean, :sds=>Math::sqrt(@cov_m.variance(v))}
             a
           end
@@ -110,20 +113,20 @@ module Statsample
 
       def item_difficulty_analysis
         dif={}
-        @ds.fields.each{|f| dif[f]=@ds[f].mean }
-        dif_sort=dif.sort{|a,b| -(a[1]<=>b[1])}
+        @ds.vectors.each{|f| dif[f]=@ds[f].mean }
+        dif_sort = dif.sort { |a,b| -(a[1]<=>b[1]) }
         scores_sort={}
         scores=@ds.vector_mean
-        scores.each_index{|i| scores_sort[i]=scores[i] }
+        scores.each_index{ |i| scores_sort[i]=scores[i] }
         scores_sort=scores_sort.sort{|a,b| a[1]<=>b[1]}
-        ds_new=Statsample::Dataset.new(['case','score'] + dif_sort.collect{|a,b| a})
+        ds_new = Daru::DataFrame.new({}, order: ([:case,:score] + dif_sort.collect{|a,b| a.to_sym}))
         scores_sort.each do |i,score|
-          row=[i, score]
-          case_row=@ds.case_as_hash(i)
-          dif_sort.each{|variable,dif_value| row.push(case_row[variable]) }
-          ds_new.add_case_array(row)
+          row = [i, score]
+          case_row = @ds.row[i].to_hash
+          dif_sort.each{ |variable,dif_value| row.push(case_row[variable]) }
+          ds_new.add_row(row)
         end
-        ds_new.update_valid_data
+        ds_new.update
         ds_new
       end
       
@@ -132,9 +135,10 @@ module Statsample
       end
       
       def stats_if_deleted_intern # :nodoc:
-        return Hash.new if @ds.fields.size==1
-        @ds.fields.inject({}) do |a,v|
-          cov_2=@cov_m.submatrix(@ds.fields-[v])
+        return Hash.new if @ds.ncols == 1
+        vecs = @ds.vectors.to_a
+        vecs.inject({}) do |a,v|
+          cov_2=@cov_m.submatrix(vecs - [v])
           #ds2=@ds.clone
           #ds2.delete_vector(v)
           #total=ds2.vector_sum
@@ -151,11 +155,10 @@ module Statsample
       def report_building(builder) #:nodoc:
         builder.section(:name=>@name) do |s|
           
-          
           if @dumped.size>0
             s.section(:name=>"Items with variance=0") do |s1|
               s.table(:name=>_("Summary for %s with all items") % @name) do |t|
-                t.row [_("Items"), @ods.fields.size]
+                t.row [_("Items"), @ods.ncols]
                 t.row [_("Sum mean"),     "%0.4f" % @o_total.mean]
                 t.row [_("S.d. mean"),     "%0.4f" % @o_total.sd]
               end
@@ -170,7 +173,7 @@ module Statsample
           
           
           s.table(:name=>_("Summary for %s") % @name) do |t|
-            t.row [_("Valid Items"), @ds.fields.size]
+            t.row [_("Valid Items"), @ds.ncols]
           
           t.row [_("Valid cases"), @valid_n]
           t.row [_("Sum mean"),     "%0.4f" % @mean]
@@ -193,8 +196,8 @@ module Statsample
           end
           
           if (@alpha)
-            s.text _("Items for obtain alpha(0.8) : %d" % Statsample::Reliability::n_for_desired_reliability(@alpha, 0.8, @ds.fields.size))
-            s.text _("Items for obtain alpha(0.9) : %d" % Statsample::Reliability::n_for_desired_reliability(@alpha, 0.9, @ds.fields.size))          
+            s.text _("Items for obtain alpha(0.8) : %d" % Statsample::Reliability::n_for_desired_reliability(@alpha, 0.8, @ds.ncols))
+            s.text _("Items for obtain alpha(0.9) : %d" % Statsample::Reliability::n_for_desired_reliability(@alpha, 0.9, @ds.ncols))
           end
           
           
@@ -203,7 +206,7 @@ module Statsample
           itc=item_total_correlation
           
           s.table(:name=>_("Items report for %s") % @name, :header=>["item","mean","sd", "mean if deleted", "var if deleted", "sd if deleted"," item-total correl.", "alpha if deleted"]) do |t|
-            @ds.fields.each do |f|
+            @ds.vectors.each do |f|
               row=["#{@ds[f].name}(#{f})"]
               if is[f]
                 row+=[sprintf("%0.5f",is[f][:mean]), sprintf("%0.5f", is[f][:sds])]
