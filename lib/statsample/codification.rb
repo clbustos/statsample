@@ -34,15 +34,24 @@ module Statsample
       # will be hashes, with keys = values, for recodification
       def create_hash(dataset, vectors, sep=Statsample::SPLIT_TOKEN)
         raise ArgumentError,"Array should't be empty" if vectors.size==0
-        pro_hash=vectors.inject({}){|h,v_name|
-          raise Exception, "Vector #{v_name} doesn't exists on Dataset" if !dataset.fields.include? v_name
-          v=dataset[v_name]
-          split_data=v.splitted(sep).flatten.collect {|c| c.to_s}.find_all {|c| !c.nil?}
+        pro_hash = vectors.inject({}) do |h,v_name|
+          v_name = v_name.is_a?(Numeric) ? v_name : v_name.to_sym
+          raise Exception, "Vector #{v_name} doesn't exists on Dataset" if 
+            !dataset.vectors.include?(v_name)
+          v = dataset[v_name]
+          split_data = v.splitted(sep)
+                        .flatten
+                        .collect { |c| c.to_s  }
+                        .find_all{ |c| !c.nil? }
 
-          factors=split_data.uniq.compact.sort.inject({}) {|ac,val| ac[val]=val;ac }
-          h[v_name]=factors
+          factors   = split_data.uniq
+                                .compact
+                                .sort
+                                .inject({}) { |ac,val| ac[val] = val; ac }
+          h[v_name] = factors
           h
-        }
+        end
+
         pro_hash
       end
       # Create a yaml to create a dictionary, based on vectors
@@ -69,16 +78,17 @@ module Statsample
         if File.exist?(filename)
           raise "Exists a file named #{filename}. Delete ir before overwrite."
         end
-        book = Spreadsheet::Workbook.new
+        book  = Spreadsheet::Workbook.new
         sheet = book.create_worksheet
-        sheet.row(0).concat(%w{field original recoded})
-        i=1
+        sheet.row(0).concat(%w(field original recoded))
+        i = 1
         create_hash(dataset, vectors, sep).sort.each do |field, inner_hash|
           inner_hash.sort.each do |k,v|
-            sheet.row(i).concat([field.dup,k.dup,v.dup])
-            i+=1
+            sheet.row(i).concat([field.to_s,k.to_s,v.to_s])
+            i += 1
           end
         end
+
         book.write(filename)
       end
       # From a excel generates a dictionary hash
@@ -91,10 +101,11 @@ module Statsample
         sheet= book.worksheet 0
         row_i=0
         sheet.each do |row|
-          row_i+=1
-          next if row_i==1 or row[0].nil? or row[1].nil? or row[2].nil?
-          h[row[0]]={} if h[row[0]].nil?
-          h[row[0]][row[1]]=row[2]
+          row_i += 1
+          next if row_i == 1 or row[0].nil? or row[1].nil? or row[2].nil?
+          key = row[0].to_sym
+          h[key] ||= {}
+          h[key][row[1]] = row[2]
         end
         h
       end
@@ -110,12 +121,12 @@ module Statsample
       end
 
       def dictionary(h, sep=Statsample::SPLIT_TOKEN)
-        h.inject({}) {|a,v| a[v[0]]=v[1].split(sep); a }
+        h.inject({}) { |a,v| a[v[0]]=v[1].split(sep); a }
       end
 
       def recode_vector(v,h,sep=Statsample::SPLIT_TOKEN)
-        dict=dictionary(h,sep)
-        new_data=v.splitted(sep)
+        dict     = dictionary(h,sep)
+        new_data = v.splitted(sep)
         new_data.collect do |c|
           if c.nil?
             nil
@@ -134,20 +145,20 @@ module Statsample
       def _recode_dataset(dataset, h , sep=Statsample::SPLIT_TOKEN, split=false)
         v_names||=h.keys
         v_names.each do |v_name|
-          raise Exception, "Vector #{v_name} doesn't exists on Dataset" if !dataset.fields.include? v_name
-          recoded=recode_vector(dataset[v_name], h[v_name],sep).collect { |c|
+          raise Exception, "Vector #{v_name} doesn't exists on Dataset" if !dataset.vectors.include? v_name
+          recoded = recode_vector(dataset[v_name], h[v_name],sep).collect { |c|
             if c.nil?
               nil
             else
               c.join(sep)
             end
           }.to_vector
-          if(split)
+          if split
             recoded.split_by_separator(sep).each {|k,v|
-              dataset[v_name+"_"+k]=v
+              dataset[(v_name.to_s + "_" + k).to_sym] = v
             }
           else
-            dataset[v_name+"_recoded"]=recoded
+            dataset[(v_name.to_s + "_recoded").to_sym] = recoded
           end
         end
       end

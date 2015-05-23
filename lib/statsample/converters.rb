@@ -182,24 +182,24 @@ module Statsample
       def read(filename, opts=Hash.new)
         require 'spreadsheet'
         raise "options should be Hash" unless opts.is_a? Hash
-        opts_default={
-          :worksheet_id=>0,
-          :ignore_lines=>0,
-          :empty=>['']
+        opts_default = {
+          :worksheet_id => 0,
+          :ignore_lines => 0,
+          :empty        => ['']
         }
 
-        opts=opts_default.merge opts
+        opts         = opts_default.merge opts
 
-        worksheet_id=opts[:worksheet_id]
-        ignore_lines=opts[:ignore_lines]
-        empty=opts[:empty]
+        worksheet_id = opts[:worksheet_id]
+        ignore_lines = opts[:ignore_lines]
+        empty        = opts[:empty]
 
-        first_row=true
-        fields=[]
-        ds=nil
-        line_number=0
-        book = Spreadsheet.open filename
-        sheet= book.worksheet worksheet_id
+        first_row   = true
+        fields      = []
+        ds          = nil
+        line_number = 0
+        book        = Spreadsheet.open filename
+        sheet       = book.worksheet worksheet_id
         sheet.each do |row|
           begin
             dates=[]
@@ -208,32 +208,28 @@ module Statsample
                 dates.push(i)
               end
             }
-            line_number+=1
-            next if(line_number<=ignore_lines)
 
+            line_number+=1
+            next if line_number <= ignore_lines
             preprocess_row(row,dates)
+
             if first_row
-              fields=extract_fields(row)
-              ds=Statsample::Dataset.new(fields)
+              fields = extract_fields(row)
+              ds = Daru::DataFrame.new({},  order: fields)
               first_row=false
             else
-              rowa=process_row(row,empty)
-              (fields.size - rowa.size).times {
-                rowa << nil
-              }
-              ds.add_case(rowa,false)
+              rowa = process_row(row,empty)
+              (fields.size - rowa.size).times { rowa << nil }
+              ds.add_row rowa
             end
           rescue => e
             error="#{e.to_s}\nError on Line # #{line_number}:#{row.join(",")}"
             raise
           end
         end
-        convert_to_numeric_and_date(ds, fields)
-        ds.update_valid_data
-        fields.each {|f|
-          ds[f].name=f
-        }
-        ds.name=filename
+        ds.update
+        fields.map(&:to_sym).each { |f| ds[f].rename f }
+        ds.rename filename 
         ds
       end
     end
