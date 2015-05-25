@@ -4,11 +4,11 @@ class StatsampleBartlettSphericityTestCase < Minitest::Test
   include Statsample::Test
   context Statsample::Test::BartlettSphericity do
     setup do
-      @v1 = [1, 2, 3, 4, 7, 8, 9, 10, 14, 15, 20, 50, 60, 70].to_numeric
-      @v2 = [5, 6, 11, 12, 13, 16, 17, 18, 19, 20, 30, 0, 0, 0].to_numeric
-      @v3 = [10, 3, 20, 30, 40, 50, 80, 10, 20, 30, 40, 2, 3, 4].to_numeric
+      @v1 = Daru::Vector.new([1, 2, 3, 4, 7, 8, 9, 10, 14, 15, 20, 50, 60, 70])
+      @v2 = Daru::Vector.new([5, 6, 11, 12, 13, 16, 17, 18, 19, 20, 30, 0, 0, 0])
+      @v3 = Daru::Vector.new([10, 3, 20, 30, 40, 50, 80, 10, 20, 30, 40, 2, 3, 4])
       # KMO: 0.490
-      ds = { 'v1' => @v1, 'v2' => @v2, 'v3' => @v3 }.to_dataset
+      ds = Daru::DataFrame.new({ :v1 => @v1, :v2 => @v2, :v3 => @v3 })
       cor = Statsample::Bivariate.correlation_matrix(ds)
       @bs = Statsample::Test::BartlettSphericity.new(cor, 14)
     end
