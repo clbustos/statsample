@@ -24,10 +24,10 @@ module Statsample
       @name ||= _("Crosstab %s - %s") % [@row_label, @column_label]
     end	
     def rows_names
-      @v_rows.factors.sort
+      @v_rows.factors.sort.reset_index!
     end
     def cols_names
-      @v_cols.factors.sort
+      @v_cols.factors.sort.reset_index!
     end
     def rows_total
       @v_rows.frequencies
@@ -69,8 +69,8 @@ module Statsample
     end
     # Chi square, based on expected and real matrix
     def chi_square
-        require 'statsample/test'
-        Statsample::Test.chi_square(self.to_matrix, matrix_expected)
+      require 'statsample/test'
+      Statsample::Test.chi_square(self.to_matrix, matrix_expected)
     end
     # Useful to obtain chi square
     def matrix_expected
@@ -100,10 +100,10 @@ module Statsample
         generator.text(_("Rows: %s") % @row_label) unless @row_label.nil?
         generator.text(_("Columns: %s") % @column_label) unless @column_label.nil?
         
-        t=ReportBuilder::Table.new(:name=>@name+" - "+_("Raw"), :header=>[""]+cols_names.collect {|c| @v_cols.labeling(c)}+[_("Total")])
+        t=ReportBuilder::Table.new(:name=>@name+" - "+_("Raw"), :header=>[""]+cols_names.collect {|c| @v_cols.index_of(c)}+[_("Total")])
         rn.each do |row|
           total_row=0
-          t_row=[@v_rows.labeling(row)]
+          t_row=[@v_rows.index_of(row)]
           cn.each do |col|
             data=fq[[row,col]]
             total_row+=fq[[row,col]]
@@ -150,9 +150,9 @@ module Statsample
         when :total   then  _("% Total")
       end
       
-      t=ReportBuilder::Table.new(:name=>@name+" - "+_(type_name), :header=>[""]+cols_names.collect {|c| @v_cols.labeling(c) } + [_("Total")])
+      t=ReportBuilder::Table.new(:name=>@name+" - "+_(type_name), :header=>[""]+cols_names.collect {|c| @v_cols.index_of(c) } + [_("Total")])
         rn.each do |row|
-          t_row=[@v_rows.labeling(row)]
+          t_row=[@v_rows.index_of(row)]
           cn.each do |col|
             total=case type
               when :row     then  rt[row]
