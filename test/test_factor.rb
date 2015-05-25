@@ -151,9 +151,9 @@ class StatsampleFactorTestCase < Minitest::Test
   end
   # Tested with SPSS and R
   def test_pca
-
-    a = Daru::Vector.new([2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2.0, 1.0, 1.5, 1.1], dtype: :gsl)
-    b = Daru::Vector.new([2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9], dtype: :gsl)
+    dtype = Statsample.has_gsl? ? :gsl : :array
+    a = Daru::Vector.new([2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2.0, 1.0, 1.5, 1.1], dtype: dtype)
+    b = Daru::Vector.new([2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9], dtype: dtype)
     a = a - a.mean
     b = b - b.mean
     ds = Daru::DataFrame.new({ :a => a, :b => b })
