@@ -1,5 +1,5 @@
 source "https://www.rubygems.org"
 gemspec
 
-gem 'daru', :path => "/home/sameer/gitrepos/daru/"
-gem 'gsl-nmatrix', :path => "/home/sameer/gitrepos/gsl-nmatrix/"
+gem 'daru', :git => "https://github.com/v0dro/daru.git"
+gem 'gsl-nmatrix', :git => "https://github.com/v0dro/gsl-nmatrix.git"

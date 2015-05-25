@@ -91,8 +91,6 @@ module Statsample
       # If second parameters is empty, returns the ScaleAnalysis
       # <tt>code</tt>.
       def scale(code, ds=nil, opts=nil)
-        require 'awesome_print'
-        # ap @scales
         if ds.nil?
           @scales[code]
         else
@@ -100,7 +98,6 @@ module Statsample
           @scales_keys.push(code)
           @scales[code]=ScaleAnalysis.new(ds, opts)
         end
-        # ap @scales
       end
       # Delete ScaleAnalysis named <tt>code</tt>
       def delete_scale(code)

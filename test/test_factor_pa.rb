@@ -25,14 +25,14 @@ class StatsampleFactorTestCase < Minitest::Test
       vectors = {}
       variables.times do |i|
         if i < 5
-          Daru::Vector.new(          
-            vectors["v#{i}".to_sym] = samples.times.collect { |nv|
+          vectors["v#{i}".to_sym] = Daru::Vector.new(          
+            samples.times.collect { |nv|
               f1[nv] * 5 + f2[nv] * 2 + rng.call
             }
           )
         else
-          Daru::Vector.new(
-            vectors["v#{i}".to_sym] = samples.times.collect { |nv|
+          vectors["v#{i}".to_sym] =  Daru::Vector.new(
+            samples.times.collect { |nv|
               f2[nv] * 5 + f1[nv] * 2 + rng.call
             }
           )

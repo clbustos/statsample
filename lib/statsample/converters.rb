@@ -144,12 +144,12 @@ module Statsample
         sheet = book.create_worksheet
         format = Spreadsheet::Format.new :color => :blue,
                            :weight => :bold
-        sheet.row(0).concat(dataset.fields.map {|i| i.dup}) # Unfreeze strings
+        sheet.row(0).concat(dataset.vectors.to_a.map(&:to_s)) # Unfreeze strings
         sheet.row(0).default_format = format
-        i=1
-        dataset.each_array{|row|
-          sheet.row(i).concat(row)
-          i+=1
+        i = 1
+        dataset.each_row { |row|
+          sheet.row(i).concat(row.to_a)
+          i += 1
         }
         book.write(filename)
       end
@@ -215,7 +215,7 @@ module Statsample
 
             if first_row
               fields = extract_fields(row)
-              ds = Daru::DataFrame.new({},  order: fields)
+              ds = Daru::DataFrame.new({},  order: fields.map(&:to_sym))
               first_row=false
             else
               rowa = process_row(row,empty)

@@ -22,10 +22,12 @@ module Statsample
 
     class ParallelAnalysis
       def self.with_random_data(cases,vars,opts=Hash.new)
-        require 'ostruct'
-        ds=OpenStruct.new
-        ds.vectors=vars.times.map {|i| "v#{i+1}".to_sym}
-        ds.nrows=cases
+        # require 'ostruct'
+        ds= Daru::DataFrame.new({}, 
+          order: vars.times.map {|i| "v#{i+1}".to_sym},
+          index: cases )
+        # ds.vectors=vars.times.map {|i| "v#{i+1}".to_sym}
+        # ds.nrows=cases
         opts=opts.merge({:bootstrap_method=> :random, :no_data=>true})
         new(ds, opts)
       end
