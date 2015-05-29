@@ -37,35 +37,31 @@ module Statsample
   # The Dataset work as a Hash, with keys are field names
   # and values are Statsample::Vector
   #
-  #
-  # ==Usage
-  # Create a empty dataset:
-  #   Dataset.new()
-  # Create a dataset with three empty vectors, called <tt>v1</tt>, <tt>v2</tt> and <tt>v3</tt>:
-  #   Dataset.new(%w{v1 v2 v3})
-  # Create a dataset with two vectors, called <tt>v1</tt>
-  # and <tt>v2</tt>:
-  #   Dataset.new({'v1'=>%w{1 2 3}.to_vector, 'v2'=>%w{4 5 6}.to_vector})
-  # Create a dataset with two given vectors (v1 and v2),
-  # with vectors on inverted order:
-  #   Dataset.new({'v2'=>v2,'v1'=>v1},['v2','v1'])
-  #
-  # The fast way to create a dataset uses Hash#to_dataset, with
-  # field order  as arguments
-  #   v1 = [1,2,3].to_numeric
-  #   v2 = [1,2,3].to_numeric
-  #   ds = {'v1'=>v2, 'v2'=>v2}.to_dataset(%w{v2 v1})
+  # NOTE: This class will soon be replaced by Daru::DataFrame in the 
+  # next release. Please see the daru docs at https://github.com/v0dro/daru 
+  # for more details
+  class Dataset < Daru::DataFrame
+    extend Forwardable
 
-  class Dataset
-    include Writable
-    include Summarizable
-    # Hash of Statsample::Vector
-    attr_reader :vectors
+    def delegate_with_warning from, to
+      def_method
+    end
     # Ordered ids of vectors
-    attr_reader :fields
+    def fields
+      @vectors.to_a
+    end
     # Name of dataset
-    attr_accessor :name
+    def name
+      @name
+    end
+
+    def name= new_name
+      rename new_name
+    end
     # Number of cases
+    def cases
+      nrows
+    end
     attr_reader :cases
     # Location of pointer on enumerations methods (like #each)
     attr_reader :i
