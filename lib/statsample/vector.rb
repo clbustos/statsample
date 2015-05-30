@@ -8,11 +8,11 @@ module Statsample::VectorShorthands
     Daru::Vector.new(self)
   end
 
-  # Creates a new Statsample::Vector object of type :scale.
+  # Creates a new Daru::Vector object of type :scale.
   # Deprecated. Use to_numeric instead.
   def to_scale(*args)
     $stderr.puts "WARNING: to_scale has been deprecated. Use to_numeric instead."
-    Statsample::Vector.new(self, :numeric, *args)
+    Daru::Vector.new(self, *args)
   end
 
   def to_numeric(*args)
@@ -39,35 +39,22 @@ module Statsample
   # == Usage
   # The fast way to create a vector uses Array.to_vector or Array.to_numeric.
   #
-  #  v=[1,2,3,4].to_vector(:numeric)
-  #  v=[1,2,3,4].to_numeric
-  #
-  class Vector
-    include Enumerable
-    include Writable
-    include Summarizable
+  # == Deprecation Warning
+  # 
+  # Statsample::Vector has been deprecated in favour of Daru::Vector. Daru is
+  # a dedicated data analysis and manipulation library that brings awesome
+  # data analysis functionality to ruby. Check out the daru docs at <link>
+  class Vector < Daru::Vector
     include Statsample::VectorShorthands
 
-    # Level of measurement. Could be :object, :numeric
-    attr_reader :type
     # Original data.
     attr_reader :data
     # Valid data. Equal to data, minus values assigned as missing values
     attr_reader :valid_data
-    # Array of values considered as missing. Nil is a missing value, by default
-    attr_reader :missing_values
-    # Array of values considered as "Today", with date type. "NOW", "TODAY", :NOW and :TODAY are 'today' values, by default
-    attr_reader :today_values
     # Missing values array
     attr_reader :missing_data
     # Original data, with all missing values replaced by nils
     attr_reader :data_with_nils
-    # Date date, with all missing values replaced by nils
-    attr_reader :date_data_with_nils
-    # Change label for specific values
-    attr_accessor :labels
-    # Name of vector. Should be used for output by many classes
-    attr_accessor :name
 
     # Creates a new Vector object.
     # * <tt>data</tt> Any data which can be converted on Array
@@ -158,34 +145,6 @@ module Statsample
       $stderr.puts "WARNING: .new_scale has been deprecated. Use .new_numeric instead."
       new_numeric n, val, &block
     end
-    # Creates a duplicate of the Vector.
-    # Note: data, missing_values and labels are duplicated, so
-    # changes on original vector doesn't propages to copies.
-    def dup
-      Vector.new(@data.dup,@type, :missing_values => @missing_values.dup, :labels => @labels.dup, :name=>@name)
-    end
-    # Returns an empty duplicate of the vector. Maintains the type,
-    # missing values and labels.
-    def dup_empty
-      Vector.new([],@type, :missing_values => @missing_values.dup, :labels => @labels.dup, :name=> @name)
-    end
-
-    if Statsample::STATSAMPLE__.respond_to?(:check_type)
-      # Raises an exception if type of vector is inferior to t type
-      def check_type(t)
-        Statsample::STATSAMPLE__.check_type(self,t)
-      end
-    else
-      def check_type(t) #:nodoc:
-        _check_type(t)
-      end
-    end
-
-
-    def _check_type(t) #:nodoc:
-      raise NoMethodError if (t == :numeric and @type == :object) or 
-                             (t == :date)   or (:date == @type)
-    end
 
     def vector_standarized_compute(m,sd) # :nodoc:
       @data_with_nils.collect{|x| x.nil? ? nil : (x.to_f - m).quo(sd) }.to_vector(:numeric)
@@ -218,15 +177,6 @@ module Statsample
 
     alias_method :standarized, :vector_standarized
     alias_method  :centered, :vector_centered
-    # Return a vector with values replaced with the percentiles
-    # of each values
-    def vector_percentil
-      check_type :numeric
-      c=@valid_data.size
-      vector=ranked.map {|i| i.nil? ? nil : (i.quo(c)*100).to_f }.to_vector(@type)
-      vector.name=_("%s(percentil)")  % @name
-      vector
-    end
     def box_cox_transformation(lambda) # :nodoc:
       raise "Should be a numeric" unless @type==:numeric
       @data_with_nils.collect{|x|
@@ -242,467 +192,15 @@ module Statsample
       }.to_vector(:numeric)
     end
 
-    # Vector equality.
-    # Two vector will be the same if their data, missing values, type, labels are equals
-    def ==(v2)
-      return false unless v2.instance_of? Statsample::Vector
-      @data==v2.data and @missing_values==v2.missing_values and @type==v2.type and @labels==v2.labels
-    end
-
-    def _dump(i) # :nodoc:
-      Marshal.dump({'data'=>@data,'missing_values'=>@missing_values, 'labels'=>@labels, 'type'=>@type,'name'=>@name})
-    end
-
-    def self._load(data) # :nodoc:
-    h=Marshal.load(data)
-    Vector.new(h['data'], h['type'], :missing_values=> h['missing_values'], :labels=>h['labels'], :name=>h['name'])
-    end
-    # Returns a new vector, with data modified by block.
-    # Equivalent to create a Vector after #collect on data
-    def recode(type=nil)
-      type||=@type
-      @data.collect{|x|
-        yield x
-      }.to_vector(type)
-    end
-    # Modifies current vector, with data modified by block.
-    # Equivalent to #collect! on @data
-    def recode!
-    @data.collect!{|x|
-      yield x
-    }
-    set_valid_data
-    end
-    def push(v)
-      @data.push(v)
-      set_valid_data
-    end
-
-    # Dicotomize the vector with 0 and 1, based on lowest value
-    # If parameter if defined, this value and lower
-    # will be 0 and higher, 1
-    def dichotomize(low = nil)
-      low ||= factors.min
-
-      @data_with_nils.collect do |x|
-        if x.nil?
-          nil
-        elsif x > low
-          1
-        else
-          0
-        end
-      end.to_numeric
-    end
-    # Iterate on each item.
-    # Equivalent to
-    #   @data.each{|x| yield x}
-    def each
-      @data.each{|x| yield(x) }
-    end
-
-    # Iterate on each item, retrieving index
-    def each_index
-    (0...@data.size).each {|i|
-      yield(i)
-    }
-    end
-    # Add a value at the end of the vector.
-    # If second argument set to false, you should update the Vector usign
-    # Vector.set_valid_data at the end of your insertion cycle
-    #
-    def add(v,update_valid=true)
-      @data.push(v)
-      set_valid_data if update_valid
-    end
-    # Update valid_data, missing_data, data_with_nils and gsl
-    # at the end of an insertion.
-    #
-    # Use after Vector.add(v,false)
-    # Usage:
-    #   v=Statsample::Vector.new
-    #   v.add(2,false)
-    #   v.add(4,false)
-    #   v.data
-    #   => [2,3]
-    #   v.valid_data
-    #   => []
-    #   v.set_valid_data
-    #   v.valid_data
-    #   => [2,3]
-    def set_valid_data
-      @valid_data.clear
-      @missing_data.clear
-      @data_with_nils.clear
-      @date_data_with_nils.clear
-      set_valid_data_intern
-      set_numeric_data if(@type==:numeric)
-      set_date_data if(@type==:date)
-    end
-    if Statsample::STATSAMPLE__.respond_to?(:set_valid_data_intern)
-      def set_valid_data_intern #:nodoc:
-        Statsample::STATSAMPLE__.set_valid_data_intern(self)
-      end
-    else
-      def set_valid_data_intern #:nodoc:
-        _set_valid_data_intern
-      end
-    end
-    def _set_valid_data_intern #:nodoc:
-      @data.each do |n|
-        if is_valid? n
-          @valid_data.push(n)
-          @data_with_nils.push(n)
-        else
-          @data_with_nils.push(nil)
-          @missing_data.push(n)
-        end
-      end
-      @has_missing_data=@missing_data.size>0
-    end
-
-    # Retrieves true if data has one o more missing values
-    def has_missing_data?
-      @has_missing_data
-    end
-    alias :flawed? :has_missing_data?
-
     # Retrieves label for value x. Retrieves x if
     # no label defined.
     def labeling(x)
       @labels.has_key?(x) ? @labels[x].to_s : x.to_s
     end
-    alias :label :labeling
-    # Returns a Vector with data with labels replaced by the label.
-    def vector_labeled
-      d=@data.collect{|x|
-        if @labels.has_key? x
-          @labels[x]
-        else
-          x
-        end
-      }
-      Vector.new(d,@type)
-    end
-    # Size of total data
-    def size
-      @data.size
-    end
     alias_method :n, :size
-
-    # Retrieves i element of data
-    def [](i)
-      @data[i]
-    end
-    # Set i element of data.
-    # Note: Use set_valid_data if you include missing values
-    def []=(i,v)
-      @data[i]=v
-    end
-    # Return true if a value is valid (not nil and not included on missing values)
-    def is_valid?(x)
-      !(x.nil? or @missing_values.include? x)
-    end
-    # Set missing_values.
-    # set_valid_data is called after changes
-    def missing_values=(vals)
-      @missing_values = vals
-      set_valid_data
-    end
-    # Set data considered as "today" on data vectors
-    def today_values=(vals)
-      @today_values = vals
-      set_valid_data
-    end
-    # Set level of measurement.
-    def type=(t)
-      @type=t
-      set_numeric_data if(t==:numeric)
-      set_date_data if (t==:date)
-    end
-    def to_a
-      if @data.is_a? Array
-        @data.dup
-      else
-        @data.to_a
-      end
-    end
     alias_method :to_ary, :to_a
 
-    # Vector sum.
-    # - If v is a scalar, add this value to all elements
-    # - If v is a Array or a Vector, should be of the same size of this vector
-    #   every item of this vector will be added to the value of the
-    #   item at the same position on the other vector
-    def +(v)
-    _vector_ari("+",v)
-    end
-    # Vector rest.
-    # - If v is a scalar, rest this value to all elements
-    # - If v is a Array or a Vector, should be of the same
-    #   size of this vector
-    #   every item of this vector will be rested to the value of the
-    #   item at the same position on the other vector
-
-    def -(v)
-    _vector_ari("-",v)
-    end
-
-    def *(v)
-      _vector_ari("*",v)
-    end
-    # Reports all values that doesn't comply with a condition.
-    # Returns a hash with the index of data and the invalid data.
-    def verify
-    h={}
-    (0...@data.size).to_a.each{|i|
-      if !(yield @data[i])
-        h[i]=@data[i]
-      end
-    }
-    h
-    end
-    def _vector_ari(method,v) # :nodoc:
-    if(v.is_a? Vector or v.is_a? Array)
-      raise ArgumentError, "The array/vector parameter (#{v.size}) should be of the same size of the original vector (#{@data.size})" unless v.size==@data.size
-      sum=[]
-      v.size.times {|i|
-          if((v.is_a? Vector and v.is_valid?(v[i]) and is_valid?(@data[i])) or (v.is_a? Array and !v[i].nil? and !data[i].nil?))
-              sum.push(@data[i].send(method,v[i]))
-          else
-              sum.push(nil)
-          end
-      }
-      Statsample::Vector.new(sum, :numeric)
-    elsif(v.respond_to? method )
-      Statsample::Vector.new(
-        @data.collect  {|x|
-          if(!x.nil?)
-            x.send(method,v)
-          else
-            nil
-          end
-        } , :numeric)
-    else
-        raise TypeError,"You should pass a scalar or a array/vector"
-    end
-
-    end
-    # Return an array with the data splitted by a separator.
-    #   a=Vector.new(["a,b","c,d","a,b","d"])
-    #   a.splitted
-    #     =>
-    #   [["a","b"],["c","d"],["a","b"],["d"]]
-    def splitted(sep=Statsample::SPLIT_TOKEN)
-    @data.collect{|x|
-      if x.nil?
-        nil
-      elsif (x.respond_to? :split)
-        x.split(sep)
-      else
-        [x]
-      end
-    }
-    end
-    # Returns a hash of Vectors, defined by the different values
-    # defined on the fields
-    # Example:
-    #
-    #  a=Vector.new(["a,b","c,d","a,b"])
-    #  a.split_by_separator
-    #  =>  {"a"=>#<Statsample::Type::object:0x7f2dbcc09d88
-    #        @data=[1, 0, 1]>,
-    #       "b"=>#<Statsample::Type::object:0x7f2dbcc09c48
-    #        @data=[1, 1, 0]>,
-    #      "c"=>#<Statsample::Type::object:0x7f2dbcc09b08
-    #        @data=[0, 1, 1]>}
-    #
-    def split_by_separator(sep=Statsample::SPLIT_TOKEN)
-    split_data=splitted(sep)
-    factors=split_data.flatten.uniq.compact
-    out=factors.inject({}) {|a,x|
-      a[x]=[]
-      a
-    }
-    split_data.each do |r|
-      if r.nil?
-        factors.each do |f|
-          out[f].push(nil)
-        end
-      else
-        factors.each do |f|
-          out[f].push(r.include?(f) ? 1:0)
-        end
-      end
-    end
-    out.inject({}){|s,v|
-      s[v[0]]=Vector.new(v[1],:object)
-      s
-    }
-    end
-    def split_by_separator_freq(sep=Statsample::SPLIT_TOKEN)
-      split_by_separator(sep).inject({}) {|a,v|
-        a[v[0]]=v[1].inject {|s,x| s+x.to_i}
-        a
-      }
-    end
-
-    # == Bootstrap
-    # Generate +nr+ resamples (with replacement) of size  +s+
-    # from vector, computing each estimate from +estimators+
-    # over each resample.
-    # +estimators+ could be
-    # a) Hash with variable names as keys and lambdas as  values
-    #   a.bootstrap(:log_s2=>lambda {|v| Math.log(v.variance)},1000)
-    # b) Array with names of method to bootstrap
-    #   a.bootstrap([:mean, :sd],1000)
-    # c) A single method to bootstrap
-    #   a.jacknife(:mean, 1000)
-    # If s is nil, is set to vector size by default.
-    #
-    # Returns a dataset where each vector is an vector
-    # of length +nr+ containing the computed resample estimates.
-    def bootstrap(estimators, nr, s=nil)
-      s||=n
-
-      h_est, es, bss= prepare_bootstrap(estimators)
-
-
-      nr.times do |i|
-        bs=sample_with_replacement(s)
-        es.each do |estimator|
-          # Add bootstrap
-          bss[estimator].push(h_est[estimator].call(bs))
-        end
-      end
-
-      es.each do |est|
-        bss[est]=bss[est].to_numeric
-        bss[est].type=:numeric
-      end
-      bss.to_dataset
-
-    end
-
-    # == Jacknife
-    # Returns a dataset with jacknife delete-+k+ +estimators+
-    # +estimators+ could be:
-    # a) Hash with variable names as keys and lambdas as values
-    #   a.jacknife(:log_s2=>lambda {|v| Math.log(v.variance)})
-    # b) Array with method names to jacknife
-    #   a.jacknife([:mean, :sd])
-    # c) A single method to jacknife
-    #   a.jacknife(:mean)
-    # +k+ represent the block size for block jacknife. By default
-    # is set to 1, for classic delete-one jacknife.
-    #
-    # Returns a dataset where each vector is an vector
-    # of length +cases+/+k+ containing the computed jacknife estimates.
-    #
-    # == Reference:
-    # * Sawyer, S. (2005). Resampling Data: Using a Statistical Jacknife.
-    def jacknife(estimators, k=1)
-      raise "n should be divisible by k:#{k}" unless n%k==0
-
-      nb=(n / k).to_i
-
-
-      h_est, es, ps= prepare_bootstrap(estimators)
-
-      est_n=es.inject({}) {|h,v|
-        h[v]=h_est[v].call(self)
-        h
-      }
-
-
-      nb.times do |i|
-        other=@data_with_nils.dup
-        other.slice!(i*k,k)
-        other=other.to_numeric
-        es.each do |estimator|
-          # Add pseudovalue
-          ps[estimator].push( nb * est_n[estimator] - (nb-1) * h_est[estimator].call(other))
-        end
-      end
-
-
-      es.each do |est|
-        ps[est]=ps[est].to_numeric
-        ps[est].type=:numeric
-      end
-      ps.to_dataset
-    end
-
-
-    # For an array or hash of estimators methods, returns
-    # an array with three elements
-    # 1.- A hash with estimators names as keys and lambdas as values
-    # 2.- An array with estimators names
-    # 3.- A Hash with estimators names as keys and empty arrays as values
-    def prepare_bootstrap(estimators)
-      h_est=estimators
-
-      h_est=[h_est] unless h_est.is_a? Array or h_est.is_a? Hash
-
-      if h_est.is_a? Array
-        h_est=h_est.inject({}) {|h,est|
-          h[est]=lambda {|v| v.send(est)}
-          h
-        }
-      end
-
-      bss=h_est.keys.inject({}) {|h,v| h[v]=[];h}
-
-      [h_est,h_est.keys, bss]
-
-    end
-    private :prepare_bootstrap
-
-    # Returns an random sample of size n, with replacement,
-    # only with valid data.
-    #
-    # In all the trails, every item have the same probability
-    # of been selected.
-    def sample_with_replacement(sample=1)
-      vds=@valid_data.size
-      (0...sample).collect{ @valid_data[rand(vds)] }
-    end
-    # Returns an random sample of size n, without replacement,
-    # only with valid data.
-    #
-    # Every element could only be selected once.
-    #
-    # A sample of the same size of the vector is the vector itself.
-
-    def sample_without_replacement(sample=1)
-      raise ArgumentError, "Sample size couldn't be greater than n" if sample>@valid_data.size
-      out=[]
-      size=@valid_data.size
-      while out.size<sample
-        value=rand(size)
-        out.push(value) if !out.include?value
-      end
-      out.collect{|i| @data[i]}
-    end
-    # Retrieves number of cases which comply condition.
-    # If block given, retrieves number of instances where
-    # block returns true.
-    # If other values given, retrieves the frequency for
-    # this value.
-    def count(x=false)
-    if block_given?
-      r=@data.inject(0) {|s, i|
-        r=yield i
-        s+(r ? 1 : 0)
-      }
-      r.nil? ? 0 : r
-    else
-      frequencies[x].nil? ? 0 : frequencies[x]
-    end
-    end
-
     # Returns the database type for the vector, according to its content
-
     def db_type(dbs='mysql')
     # first, detect any character not number
     if @data.find {|v|  v.to_s=~/\d{2,2}-\d{2,2}-\d{4,4}/} or @data.find {|v|  v.to_s=~/\d{4,4}-\d{2,2}-\d{2,2}/}
@@ -779,15 +277,6 @@ module Statsample
         a
       }
     end
-
-    # Returns the most frequent item.
-    def mode
-      frequencies.max{|a,b| a[1]<=>b[1]}.first
-    end
-    # The numbers of item with valid data.
-    def n_valid
-      @valid_data.size
-    end
     # Returns a hash with the distribution of proportions of
     # the sample.
     def proportions
@@ -854,73 +343,6 @@ module Statsample
       ######
       ### numeric Methods
       ######
-
-      # == Percentil
-      # Returns the value of the percentile q
-      #
-      # Accepts an optional second argument specifying the strategy to interpolate
-      # when the requested percentile lies between two data points a and b
-      # Valid strategies are:
-      # * :midpoint (Default): (a + b) / 2
-      # * :linear : a + (b - a) * d where d is the decimal part of the index between a and b.
-      # This is the NIST recommended method (http://en.wikipedia.org/wiki/Percentile#NIST_method)
-      #
-      def percentil(q, strategy = :midpoint)
-        check_type :numeric
-        sorted=@valid_data.sort
-
-        case strategy
-        when :midpoint
-          v = (n_valid * q).quo(100)
-          if(v.to_i!=v)
-            sorted[v.to_i]
-          else
-            (sorted[(v-0.5).to_i].to_f + sorted[(v+0.5).to_i]).quo(2)
-          end
-        when :linear
-          index = (q / 100.0) * (n_valid + 1)
-
-          k = index.truncate
-          d = index % 1
-
-          if k == 0
-            sorted[0]
-          elsif k >= sorted.size
-            sorted[-1]
-          else
-            sorted[k - 1] + d * (sorted[k] - sorted[k - 1])
-          end
-        else
-          raise NotImplementedError.new "Unknown strategy #{strategy.to_s}"
-        end
-      end
-
-      # Returns a ranked vector.
-      def ranked(type=:numeric)
-        check_type :numeric
-        i=0
-        r=frequencies.sort.inject({}){|a,v|
-          a[v[0]]=(i+1 + i+v[1]).quo(2)
-          i+=v[1]
-          a
-        }
-        @data.collect {|c| r[c] }.to_vector(type)
-      end
-      # Return the median (percentil 50)
-      def median
-        check_type :numeric
-        percentil(50)
-      end
-      # Minimun value
-      def min
-        check_type :numeric
-        @valid_data.min
-      end
-        # Maximum value
-      def max
-        check_type :numeric
-        @valid_data.max
-      end
 
     def set_date_data
       @date_data_with_nils=@data.collect do|x|
