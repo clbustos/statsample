@@ -24,6 +24,24 @@ module Daru
       h.increment(valid)
       h
     end
+
+    # Variance of p, according to poblation size
+    def variance_proportion(n_poblation, v=1)
+      Statsample::proportion_variance_sample(self.proportion(v), @valid_data.size, n_poblation)
+    end
+    
+    # Variance of p, according to poblation size
+    def variance_total(n_poblation, v=1)
+      Statsample::total_variance_sample(self.proportion(v), @valid_data.size, n_poblation)
+    end
+
+    def proportion_confidence_interval_t(n_poblation,margin=0.95,v=1)
+      Statsample::proportion_confidence_interval_t(proportion(v), @valid_data.size, n_poblation, margin)
+    end
+
+    def proportion_confidence_interval_z(n_poblation,margin=0.95,v=1)
+      Statsample::proportion_confidence_interval_z(proportion(v), @valid_data.size, n_poblation, margin)
+    end
   end
 
   class DataFrame
