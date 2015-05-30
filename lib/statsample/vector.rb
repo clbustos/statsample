@@ -1,22 +1,19 @@
-require 'date'
-require 'statsample/vector/gsl'
-
 module Statsample::VectorShorthands
   # Creates a new Statsample::Vector object
   # Argument should be equal to Vector.new
   def to_vector(*args)
-    Daru::Vector.new(self)
+    Statsample::Vector.new(self)
   end
 
   # Creates a new Daru::Vector object of type :scale.
   # Deprecated. Use to_numeric instead.
   def to_scale(*args)
     $stderr.puts "WARNING: to_scale has been deprecated. Use to_numeric instead."
-    Daru::Vector.new(self, *args)
+    Statsample::Vector.new(self, *args)
   end
 
   def to_numeric(*args)
-    Daru::Vector.new(self)
+    Statsample::Vector.new(self)
   end
 end
 
@@ -111,6 +108,7 @@ module Statsample
     def self.[](*args)
       super *args
     end
+
     # Create a new numeric type vector
     # Parameters
     # [n]      Size
@@ -135,9 +133,6 @@ module Statsample
       new_numeric n, val, &block
     end
 
-    alias_method :n, :size
-    alias_method :to_ary, :to_a
-
     # Return true if all data is Date, "today" values or nil
     def can_be_date?
       raise NoMethodError, "This method is no longer supported."
@@ -149,35 +144,6 @@ module Statsample
 
     def to_s
       sprintf("Vector(type:%s, n:%d)[%s]",@type.to_s,@data.size, @data.collect{|d| d.nil? ? "nil":d}.join(","))
-    end
-
-    def report_building(b)
-      b.section(:name=>name) do |s|
-        s.text _("n :%d") % n
-        s.text _("n valid:%d") % n_valid
-        if @type==:object
-          s.text  _("factors:%s") % factors.join(",")
-          s.text   _("mode: %s") % mode
-
-          s.table(:name=>_("Distribution")) do |t|
-            frequencies.sort.each do |k,v|
-              key=labels.has_key?(k) ? labels[k]:k
-              t.row [key, v , ("%0.2f%%" % (v.quo(n_valid)*100))]
-            end
-          end
-        end
-
-        s.text _("median: %s") % median.to_s if(@type==:numeric or @type==:numeric)
-        if(@type==:numeric)
-          s.text _("mean: %0.4f") % mean
-          if sd
-            s.text _("std.dev.: %0.4f") % sd
-            s.text _("std.err.: %0.4f") % se
-            s.text _("skew: %0.4f") % skew
-            s.text _("kurtosis: %0.4f") % kurtosis
-          end
-        end
-      end
     end
   end
 end

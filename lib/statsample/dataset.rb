@@ -37,15 +37,12 @@ module Statsample
   # The Dataset work as a Hash, with keys are field names
   # and values are Statsample::Vector
   #
-  # NOTE: This class will soon be replaced by Daru::DataFrame in the 
+  # == Deprecation Warning
+  # 
+  # This class will soon be replaced by Daru::DataFrame in the 
   # next release. Please see the daru docs at https://github.com/v0dro/daru 
   # for more details
   class Dataset < Daru::DataFrame
-    extend Forwardable
-
-    def delegate_with_warning from, to
-      def_method
-    end
     # Ordered ids of vectors
     def fields
       @vectors.to_a
@@ -62,7 +59,6 @@ module Statsample
     def cases
       nrows
     end
-    attr_reader :cases
     # Location of pointer on enumerations methods (like #each)
     attr_reader :i
 

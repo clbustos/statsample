@@ -77,6 +77,7 @@ class StatsampleTestVector < Minitest::Test
         end
       end
     end
+  end
 
   context "new types :numeric and :object" do
     should "set default type of vector to :object" do

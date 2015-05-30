@@ -44,10 +44,10 @@ module Statsample
     def cov(ds)
       Statsample::Bivariate.covariate_matrix(ds)
     end
-    # Create a Statsample::Vector
+    # Create a Daru::Vector
     # Analog to R's c
     def vector(*args)
-      Statsample::Vector[*args]
+      Daru::Vector[*args]
     end
     # Random generation for the normal distribution
     def rnorm(n,mean=0,sd=1)
@@ -57,8 +57,8 @@ module Statsample
     # Creates a new Statsample::Dataset
     # Each key is transformed into string
     def dataset(vectors=Hash.new)
-      vectors=vectors.inject({}) {|ac,v| ac[v[0].to_s]=v[1];ac}
-      Statsample::Dataset.new(vectors)
+      vectors=vectors.inject({}) { |ac,v| ac[v[0]] = v[1]; ac}
+      Daru::DataFrame.new(vectors)
     end
     alias :data_frame :dataset
     # Returns a Statsample::Graph::Boxplot

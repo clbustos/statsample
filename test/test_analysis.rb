@@ -98,8 +98,8 @@ class StatsampleAnalysisTestCase < Minitest::Test
       end
       should 'attach() allows to call objects on objects which respond to fields' do
         an = Statsample::Analysis::Suite.new(:summary)
-        ds = { 'x' => stub(mean: 10), 'y' => stub(mean: 12) }
-        ds.expects(:fields).returns(%w(x y)).at_least_once
+        ds = { :x => stub(mean: 10), :y => stub(mean: 12) }
+        ds.expects(:vectors).returns([:x, :y]).at_least_once
         an.attach(ds)
         assert_equal(10, an.x.mean)
         assert_equal(12, an.y.mean)
@@ -109,10 +109,10 @@ class StatsampleAnalysisTestCase < Minitest::Test
       end
       should 'attached objects should be called LIFO' do
         an = Statsample::Analysis::Suite.new(:summary)
-        ds1 = { 'x' => stub(mean: 100), 'y' => stub(mean: 120), 'z' => stub(mean: 13) }
-        ds1.expects(:fields).returns(%w(x y z)).at_least_once
-        ds2 = { 'x' => stub(mean: 10), 'y' => stub(mean: 12) }
-        ds2.expects(:fields).returns(%w(x y)).at_least_once
+        ds1 = { :x => stub(mean: 100), :y => stub(mean: 120), :z => stub(mean: 13) }
+        ds1.expects(:vectors).returns([:x, :y, :z]).at_least_once
+        ds2 = { :x => stub(mean: 10), :y => stub(mean: 12) }
+        ds2.expects(:vectors).returns([:x, :y]).at_least_once
         an.attach(ds1)
         an.attach(ds2)
         assert_equal(10, an.x.mean)
@@ -122,10 +122,10 @@ class StatsampleAnalysisTestCase < Minitest::Test
 
       should 'detach() without arguments drop latest object' do
         an = Statsample::Analysis::Suite.new(:summary)
-        ds1 = { 'x' => stub(mean: 100), 'y' => stub(mean: 120), 'z' => stub(mean: 13) }
-        ds1.expects(:fields).returns(%w(x y z)).at_least_once
-        ds2 = { 'x' => stub(mean: 10), 'y' => stub(mean: 12) }
-        ds2.expects(:fields).returns(%w(x y)).at_least_once
+        ds1 = { :x => stub(mean: 100), :y => stub(mean: 120), :z => stub(mean: 13) }
+        ds1.expects(:vectors).returns([:x, :y, :z]).at_least_once
+        ds2 = { :x => stub(mean: 10), :y => stub(mean: 12) }
+        ds2.expects(:vectors).returns([:x, :y]).at_least_once
         an.attach(ds1)
         an.attach(ds2)
         assert_equal(10, an.x.mean)
@@ -134,12 +134,12 @@ class StatsampleAnalysisTestCase < Minitest::Test
       end
       should 'detach() with argument drop select object' do
         an = Statsample::Analysis::Suite.new(:summary)
-        ds1 = { 'x' => 1 }
-        ds1.expects(:fields).returns(%w(x)).at_least_once
-        ds2 = { 'x' => 2, 'y' => 3 }
-        ds2.expects(:fields).returns(%w(x y)).at_least_once
-        ds3 = { 'y' => 4 }
-        ds3.expects(:fields).returns(%w(y)).at_least_once
+        ds1 = { :x => 1 }
+        ds1.expects(:vectors).returns([:x]).at_least_once
+        ds2 = { :x => 2, :y => 3 }
+        ds2.expects(:vectors).returns([:x, :y]).at_least_once
+        ds3 = { :y => 4 }
+        ds3.expects(:vectors).returns([:y]).at_least_once
 
         an.attach(ds3)
         an.attach(ds2)
