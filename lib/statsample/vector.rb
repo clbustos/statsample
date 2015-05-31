@@ -8,7 +8,6 @@ module Statsample::VectorShorthands
   # Creates a new Daru::Vector object of type :scale.
   # Deprecated. Use to_numeric instead.
   def to_scale(*args)
-    $stderr.puts "WARNING: to_scale has been deprecated. Use to_numeric instead."
     Statsample::Vector.new(self, *args)
   end
 
@@ -50,6 +49,7 @@ module Statsample
     # 
     # Use Daru::Vector#only_valid instead of this method.
     def valid_data
+      $stderr.puts "WARNING: valid_data in Statsample::Vector has been deprecated in favor of only_valid in Daru::Vector. Please use that.\n"
       only_valid.to_a
     end
     # Missing values array
@@ -73,7 +73,9 @@ module Statsample
       raise NoMethodError, "Daru::Vector automatically figures the type of data. There is no need to assign it anymore."
     end
 
-    def initialize(data=[], type=:object, opts=Hash.new)
+    def initialize(data=[], type=:object, opts=Hash.new)  
+      $stderr.puts "WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that."      
+
       if type == :ordinal or type == :scale
         $stderr.puts "WARNING: #{type} has been deprecated."
       end
@@ -106,6 +108,7 @@ module Statsample
     # Statsample::Vector is to be replaced by Daru::Vector soon. Use the 
     # equivalent method Daru::Vector.[] for this purpose.
     def self.[](*args)
+      $stderr.puts "WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that."
       super *args
     end
 
@@ -129,7 +132,6 @@ module Statsample
 
     # Deprecated. Use new_numeric instead.
     def self.new_scale(n, val=nil,&block)
-      $stderr.puts "WARNING: .new_scale has been deprecated. Use .new_numeric instead."
       new_numeric n, val, &block
     end
 

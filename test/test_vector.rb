@@ -6,8 +6,8 @@ class StatsampleTestVector < Minitest::Test
   context Statsample do
     setup do
       @sample = 100
-      @a = @sample.times.map { |i| (i + rand(10)) % 10 == 0 ? nil : rand(100) }.to_numeric
-      @b = @sample.times.map { |i| (i + rand(10)) % 10 == 0 ? nil : rand(100) }.to_numeric
+      @a = Daru::Vector.new(@sample.times.map { |i| (i + rand(10)) % 10 == 0 ? nil : rand(100) })
+      @b = Daru::Vector.new(@sample.times.map { |i| (i + rand(10)) % 10 == 0 ? nil : rand(100) })
       @correct_a = []
       @correct_b = []
       @a.each_with_index do |_v, i|
@@ -16,8 +16,8 @@ class StatsampleTestVector < Minitest::Test
           @correct_b.push(@b[i])
         end
       end
-      @correct_a = @correct_a.to_numeric
-      @correct_b = @correct_b.to_numeric
+      @correct_a = Daru::Vector.new(@correct_a)
+      @correct_b = Daru::Vector.new(@correct_b)
 
       @common = lambda  do |av, bv|
         assert_equal(@correct_a, av, 'A no es esperado')
@@ -29,6 +29,8 @@ class StatsampleTestVector < Minitest::Test
 
     should 'return correct only_valid' do
       av, bv = Statsample.only_valid @a, @b
+      av.reset_index!
+      bv.reset_index!
       av2, bv2 = Statsample.only_valid av, bv
       @common.call(av, bv)
       assert_equal(av, av2)
@@ -38,6 +40,8 @@ class StatsampleTestVector < Minitest::Test
 
     should 'return correct only_valid_clone' do
       av, bv = Statsample.only_valid_clone @a, @b
+      av.reset_index!
+      bv.reset_index!
       @common.call(av, bv)
       av2, bv2 = Statsample.only_valid_clone av, bv
       assert_equal(av, av2)
@@ -57,22 +61,25 @@ class StatsampleTestVector < Minitest::Test
   context Statsample::Vector do
     context 'when initializing' do
       should '.new creates a Daru::Vector internally and shows a warning' do
-        assert_output(nil, "WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.") do
+        assert_output(nil, "WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.\n") do
           data = (10.times.map { rand(100) }) + [nil]
           original = Statsample::Vector.new(@data, :numeric)
-          assert_equal(true, original.instance_of?(Daru::Vector))
+          assert_equal(true, original.kind_of?(Daru::Vector))
         end
       end
 
       should '[] returns same results as R-c()' do
-        assert_output(nil, "WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.") do
-          Statsample::Vector[1,2,3,4,5]
+        assert_output(nil, "WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.\n") do
+          assert_equal(true, Statsample::Vector[1,2,3,4,5].kind_of?(Daru::Vector))
         end
       end
 
       should "new_numeric/new_scale creates a Daru::Vector internally and shows a warning" do
-        assert_output(nil, "WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.") do
+        assert_output(nil, "WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.\n") do
           Statsample::Vector.new_scale(4)
+        end
+
+        assert_output(nil, "WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.\n") do
           Statsample::Vector.new_numeric(4)
         end
       end
@@ -80,33 +87,38 @@ class StatsampleTestVector < Minitest::Test
   end
 
   context "new types :numeric and :object" do
-    should "set default type of vector to :object" do
-      v = Statsample::Vector.new [1,2,3,4,5]
+    should "numerical data is automatically detected to be of type :numeric" do
+      v = Statsample::Vector.new [1,2,3,4,5,nil]
+      assert_equal(:numeric, v.type)
+    end
+
+    should "object data automatically detected as :object" do
+      v = Statsample::Vector.new [1,2,3,4,'hello','world']
       assert_equal(:object, v.type)
     end
 
     should "initialize Vector with :numeric type" do
       v = Statsample::Vector.new [1,2,3,4,5,nil], :numeric
       assert_equal(:numeric, v.type)
-      assert_output(nil, "WARNING: valid_data in Statsample::Vector has been deprecated in favor of only_valid in Daru::Vector. Please use that.") do
+      assert_output(nil, "WARNING: valid_data in Statsample::Vector has been deprecated in favor of only_valid in Daru::Vector. Please use that.\n") do
         assert_equal([1,2,3,4,5], v.valid_data)
       end
     end
 
     should "show a warning when initializing with :nominal, :numeric or :ordinal" do
-      assert_output(nil,"WARNING: nominal has been deprecated. Use :object instead.\n") do
+      assert_output(nil,"WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.\nWARNING: nominal has been deprecated.\n") do
         Statsample::Vector.new [1,2,3,4,5,nil,'hello'], :nominal
       end
 
-      assert_output(nil,"WARNING: scale has been deprecated. Use :numeric instead.\n") do
+      assert_output(nil,"WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.\nWARNING: scale has been deprecated.\n") do
         Statsample::Vector.new [1,2,3,4,nil,5], :scale
       end
 
-      assert_output(nil,"WARNING: ordinal has been deprecated. Use :numeric instead.\n") do
+      assert_output(nil,"WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.\nWARNING: ordinal has been deprecated.\n") do
         Statsample::Vector.new [1,2,3,4,5], :ordinal
       end
 
-      assert_output(nil,"WARNING: .new_scale has been deprecated. Use .new_numeric instead.\n") do
+      assert_output(nil,"WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.\n") do
         Statsample::Vector.new_scale 10, 1
       end
     end
@@ -121,7 +133,7 @@ class StatsampleTestVector < Minitest::Test
     end
 
     should "test that old shorthands show deprecation warnings" do
-      assert_output(nil,"WARNING: to_scale has been deprecated. Use to_numeric instead.\n") do
+      assert_output(nil,"WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.\n") do
         [1,2,3,4,nil,5].to_scale
       end
     end
