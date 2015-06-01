@@ -9,9 +9,9 @@ class StatsampleStratifiedTestCase < Minitest::Test
     a = [10, 20, 30, 40, 50]
     b = [110, 120, 130, 140]
     pop = a + b
-    av = a.to_vector(:numeric)
-    bv = b.to_vector(:numeric)
-    popv = pop.to_vector(:numeric)
+    av   = Daru::Vector.new(a)
+    bv   = Daru::Vector.new(b)
+    popv = Daru::Vector.new(pop)
     assert_equal(popv.mean, Statsample::StratifiedSample.mean(av, bv))
   end
 end

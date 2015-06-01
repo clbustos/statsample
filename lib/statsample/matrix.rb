@@ -26,6 +26,8 @@ class ::Matrix
     ds
   end
 
+  alias :to_dataset :to_dataframe
+
   if defined? :eigenpairs
     alias_method :eigenpairs_ruby, :eigenpairs
   end
@@ -84,7 +86,7 @@ module GSL
     end
 
     def to_dataframe
-      f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map {|i| "VAR_#{i+1}".to_sym }
+      f = (self.respond_to? :fields_y) ? fields_y : column_size.times.map { |i| "VAR_#{i+1}".to_sym }
       ds=Daru::DataFrame.new({}, order: f)
       f.each do |ff|
         ds[ff].rename ff
@@ -97,6 +99,8 @@ module GSL
       ds.rename(self.name) if self.respond_to? :name
       ds
     end
+
+    alias :to_dataset :to_dataframe
 
     def row_size
       size1

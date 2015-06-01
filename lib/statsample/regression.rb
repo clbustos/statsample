@@ -25,8 +25,8 @@ module Statsample
       # * x: independent Vector
       # * y: dependent Vector
       # <b>Usage:</b>
-      #   x=100.times.collect {|i| rand(100)}.to_numeric
-      #   y=100.times.collect {|i| 2+x[i]*2+rand()}.to_numeric
+      #   x = Daru::Vector.new(100.times.collect {|i| rand(100)})
+      #   y = Daru::Vector.new(100.times.collect {|i| 2+x[i]*2+rand()})
       #   sr=Statsample::Regression.simple(x,y)
       #   sr.a
       #   => 2.51763295177808

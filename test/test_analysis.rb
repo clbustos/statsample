@@ -39,7 +39,7 @@ class StatsampleAnalysisTestCase < Minitest::Test
     should 'to_text returns the same as a normal ReportBuilder object' do
       rb = ReportBuilder.new(name: :test)
       section = ReportBuilder::Section.new(name: 'first')
-      a = [1, 2, 3].to_numeric
+      a = Daru::Vector.new([1, 2, 3])
       section.add('first')
       section.add(a)
       rb.add(section)

@@ -6,12 +6,12 @@ module Statsample
     # several ratings) on a target and another measurement obtained on that target"
     # == Usage
     #   require 'statsample'
-    #   size=1000
-    #   a = size.times.map {rand(10)}.to_numeric
+    #   size = 1000
+    #   a = Daru::Vector.new(size.times.map {rand(10)})
     #   b = a.recode{|i|i+rand(4)-2}
-    #   c  =a.recode{|i|i+rand(4)-2}
+    #   c = a.recode{|i|i+rand(4)-2}
     #   d = a.recode{|i|i+rand(4)-2}
-    #   ds={'a'=>a,'b'=>b,'c'=>c,'d'=>d}.to_dataset
+    #   ds = Daru::DataFrame.new({:a => a,:b => b,:c => c,:d => d})
     #   # Use :type attribute to set type to summarize
     #   icc=Statsample::Reliability::ICC.new(ds, :type=>:icc_1_k)
     #   puts icc.summary

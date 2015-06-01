@@ -5,6 +5,8 @@ class Hash
   def to_dataframe(*args)
     Daru::DataFrame.new(self, *args)
   end
+
+  alias :to_dataset :to_dataframe
 end
 
 class Array

@@ -113,7 +113,7 @@ module Statsample
       include Summarizable
       #
       # Create a new U Mann-Whitney test
-      # Params: Two Statsample::Vectors
+      # Params: Two Daru::Vectors
       # 
       def initialize(v1,v2, opts=Hash.new)
         @v1      = v1

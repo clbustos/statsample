@@ -8,7 +8,6 @@ module Statsample
     attr_reader :v_rows, :v_cols
     attr_accessor :row_label, :column_label, :name, :percentage_row, :percentage_column, :percentage_total
     def initialize(v1, v2, opts=Hash.new)
-      #raise ArgumentError, "Both arguments should be Vectors" unless v1.is_a? Statsample::Vector and v2.is_a? Statsample::Vector
       raise ArgumentError, "Vectors should be the same size" unless v1.size==v2.size
       @v_rows, @v_cols = Statsample.only_valid_clone(
         Daru::Vector.new(v1),
@@ -43,7 +42,7 @@ module Statsample
         s[par]=0
         s
       end
-      base.update(Statsample::vector_cols_matrix(@v_rows,@v_cols).to_a.to_vector.frequencies)
+      base.update(Daru::Vector.new(Statsample::vector_cols_matrix(@v_rows,@v_cols).to_a).frequencies)
     end
     def to_matrix
       f  = frequencies

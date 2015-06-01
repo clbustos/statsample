@@ -194,13 +194,13 @@ module Statsample
     # Returns a duplicate of the input vectors, without missing data
     # for any of the vectors.
     #
-    #  a=[1,2,3,6,7,nil,3,5].to_numeric
-    #  b=[nil,nil,5,6,4,5,10,2].to_numeric
-    #  c=[2,4,6,7,4,5,6,7].to_numeric
+    #  a = Daru::Vector.new([1,2,3,6,7,nil,3,5])
+    #  b = Daru::Vector.new([nil,nil,5,6,4,5,10,2])
+    #  c = Daru::Vector.new([2,4,6,7,4,5,6,7])
     #  a2,b2,c2=Statsample.only_valid(a,b,c)
-    #  => [#<Statsample::Scale:0xb748c8c8 @data=[3, 6, 7, 3, 5]>,
-    #        #<Statsample::Scale:0xb748c814 @data=[5, 6, 4, 10, 2]>,
-    #        #<Statsample::Scale:0xb748c760 @data=[6, 7, 4, 6, 7]>]
+    #  => [#<Daru::Vector:0xb748c8c8 @data=[3, 6, 7, 3, 5]>,
+    #        #<Daru::Vector:0xb748c814 @data=[5, 6, 4, 10, 2]>,
+    #        #<Daru::Vector:0xb748c760 @data=[6, 7, 4, 6, 7]>]
     #
     def only_valid(*vs)
       i = 1

@@ -1,7 +1,7 @@
 require(File.expand_path(File.dirname(__FILE__) + '/helpers_tests.rb'))
 class StatsampleCodificationTestCase < Minitest::Test
   def initialize(*args)
-    v1 = %w(run walk,run walking running sleep sleeping,dreaming sleep,dream).to_vector
+    v1 = Daru::Vector.new(%w(run walk,run walking running sleep sleeping,dreaming sleep,dream))
     @dict = { 'run' => 'r', 'walk' => 'w', 'walking' => 'w', 'running' => 'r', 'sleep' => 's', 'sleeping' => 's', 'dream' => 'd', 'dreaming' => 'd' }
     @ds = Daru::DataFrame.new({ :v1 => v1 })
     super
@@ -59,7 +59,7 @@ class StatsampleCodificationTestCase < Minitest::Test
 
   def test_recode_dataset_simple
     Statsample::Codification.recode_dataset_simple!(@ds, :v1 => @dict)
-    expected_vector = ['r', 'w,r', 'w', 'r', 's', 's,d', 's,d'].to_vector
+    expected_vector = Daru::Vector.new(['r', 'w,r', 'w', 'r', 's', 's,d', 's,d'])
     assert_not_equal(expected_vector, @ds[:v1])
     assert_equal(expected_vector, @ds[:v1_recoded])
   end

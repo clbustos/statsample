@@ -75,13 +75,13 @@ class StatsampleHistogramTestCase < Minitest::Test
       assert_equal(min, h.min_val)
     end
     should 'return correct estimated mean' do
-      a = [1.5, 1.5, 1.5, 3.5, 3.5, 3.5].to_numeric
+      a = Daru::Vector.new([1.5, 1.5, 1.5, 3.5, 3.5, 3.5])
       h = Statsample::Histogram.alloc(5, [0, 5])
       h.increment(a)
       assert_equal(2.5, h.estimated_mean)
     end
     should 'return correct estimated standard deviation' do
-      a = [0.5, 1.5, 1.5, 1.5, 2.5, 3.5, 3.5, 3.5, 4.5].to_numeric
+      a = Daru::Vector.new([0.5, 1.5, 1.5, 1.5, 2.5, 3.5, 3.5, 3.5, 4.5])
       h = Statsample::Histogram.alloc(5, [0, 5])
       h.increment(a)
       assert_equal(a.sd, h.estimated_standard_deviation)
@@ -100,7 +100,7 @@ class StatsampleHistogramTestCase < Minitest::Test
     end
     should 'not raise exception when all values equal' do
       assert_nothing_raised do
-        a = [5, 5, 5, 5, 5, 5].to_numeric
+        a = Daru::Vector.new([5, 5, 5, 5, 5, 5])
         h = Statsample::Graph::Histogram.new(a)
         h.to_svg
       end

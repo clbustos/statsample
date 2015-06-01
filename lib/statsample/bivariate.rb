@@ -129,7 +129,7 @@ module Statsample
             nv.push(froms[i]-r*dels[i])
           end
         end
-        nv.to_vector(:numeric)
+        Daru::Vector.new(nv)
       end
       # Correlation between v1 and v2, controling the effect of
       # control on both.

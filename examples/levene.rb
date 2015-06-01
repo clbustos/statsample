@@ -5,8 +5,8 @@ require 'statsample'
 
 Statsample::Analysis.store(Statsample::Test::Levene) do
 
-  a=[1,2,3,4,5,6,7,8,100,10].to_numeric
-  b=[30,40,50,60,70,80,90,100,110,120].to_numeric
+  a = Daru::Vector.new([1,2,3,4,5,6,7,8,100,10])
+  b = Daru::Vector.new([30,40,50,60,70,80,90,100,110,120])
   summary(levene([a,b]))
 end
 

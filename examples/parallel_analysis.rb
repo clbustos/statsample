@@ -15,8 +15,8 @@ f3=rnorm(samples)
 vectors={}
 
 variables.times do |i|
-  vectors["v#{i}"]=samples.times.collect {|nv| f1[nv]*i+(f2[nv]*(15-i))+((f3[nv]*(30-i))*1.5)*rng.call}.to_numeric
-  vectors["v#{i}"].name="Vector #{i}"
+  vectors["v#{i}".to_sym] = Daru::Vector.new(samples.times.collect {|nv| f1[nv]*i+(f2[nv]*(15-i))+((f3[nv]*(30-i))*1.5)*rng.call})
+  vectors["v#{i}".to_sym].name="Vector #{i}"
 end
 
   ds=vectors.to_dataset

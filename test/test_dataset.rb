@@ -1,5 +1,5 @@
 require(File.expand_path(File.dirname(__FILE__) + '/helpers_tests.rb'))
-class StatsampleDatasetTestCase
+class StatsampleDatasetTestCase < Minitest::Test
   def setup
     assert_output(nil, "WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.") do
       @ds = Statsample::Dataset.new({ 
@@ -31,9 +31,9 @@ class StatsampleDatasetTestCase
   end
 
   def test_crosstab_with_asignation
-    v1 = %w(a a a b b b c c c).to_vector
-    v2 = %w(a b c a b c a b c).to_vector
-    v3 = %w(0 1 0 0 1 1 0 0 1).to_numeric
+    v1 = Daru::Vector.new(%w(a a a b b b c c c))
+    v2 = Daru::Vector.new(%w(a b c a b c a b c))
+    v3 = Daru::Vector.new(%w(0 1 0 0 1 1 0 0 1))
 
     assert_output(nil, "WARNING: Statsample::Dataset and Statsample::Vector have been deprecated in favor of Daru::DataFrame and Daru::Vector. Please switch to using that.") do
       ds = Statsample::Dataset.crosstab_by_asignation(v1, v2, v3)

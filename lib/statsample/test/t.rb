@@ -125,7 +125,7 @@ module Statsample
       
       # One Sample t-test
       # == Usage
-      #   a=1000.times.map {rand(100)}.to_numeric
+      #   a = Daru::Vector.new(1000.times.map {rand(100)})
       #   t_1=Statsample::Test::T::OneSample.new(a, {:u=>50})
       #   t_1.summary
       #
@@ -196,8 +196,8 @@ module Statsample
       # Two Sample t-test.
       #
       # == Usage
-      #   a=1000.times.map {rand(100)}.to_numeric
-      #   b=1000.times.map {rand(100)}.to_numeric
+      #   a = Daru::Vector.new(1000.times.map {rand(100)})
+      #   b = Daru::Vector.new(1000.times.map {rand(100)})
       #   t_2=Statsample::Test::T::TwoSamplesIndependent.new(a,b)
       #   t_2.summary
       # === Output
@@ -290,7 +290,7 @@ module Statsample
         def report_building(b) # :nodoc:
           b.section(:name=>@name) {|g|
             g.table(:name=>_("Mean and standard deviation"), :header=>[_("Variable"), _("mean"), _("sd"),_("n")]) {|t|
-              t.row([@v1.name,"%0.4f" % @v1.mean,"%0.4f" % @v1.sd,@v1.n_valid])
+              t.row([@v1.name,"%0.4f" % @v1.mean,"%0.4f" % @v1.sd, @v1.n_valid])
               t.row([@v2.name,"%0.4f" % @v2.mean,"%0.4f" % @v2.sd, @v2.n_valid])
             }
             g.parse_element(Statsample::Test.levene([@v1,@v2],:name=>_("Levene test for equality of variances")))

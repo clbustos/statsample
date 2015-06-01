@@ -58,9 +58,9 @@ module Statsample
       # The keys will be vectors name on dataset and the values
       # will be hashes, with keys = values, for recodification
       #
-      #   v1=%w{a,b b,c d}.to_vector
-      #   ds={"v1"=>v1}.to_dataset
-      #   Statsample::Codification.create_yaml(ds,['v1'])
+      #   v1 = Daru::Vector.new(%w{a,b b,c d})
+      #   ds = Daru::DataFrame.new({:v1 => v1})
+      #   Statsample::Codification.create_yaml(ds,[:v1])
       #   => "--- \nv1: \n  a: a\n  b: b\n  c: c\n  d: d\n"
       def create_yaml(dataset, vectors, io=nil, sep=Statsample::SPLIT_TOKEN)
         pro_hash=create_hash(dataset, vectors, sep)
@@ -146,13 +146,15 @@ module Statsample
         v_names||=h.keys
         v_names.each do |v_name|
           raise Exception, "Vector #{v_name} doesn't exists on Dataset" if !dataset.vectors.include? v_name
-          recoded = recode_vector(dataset[v_name], h[v_name],sep).collect { |c|
-            if c.nil?
-              nil
-            else
-              c.join(sep)
+          recoded = Daru::Vector.new(
+            recode_vector(dataset[v_name], h[v_name],sep).collect do |c|
+              if c.nil?
+                nil
+              else
+                c.join(sep)
+              end
             end
-          }.to_vector
+          )
           if split
             recoded.split_by_separator(sep).each {|k,v|
               dataset[(v_name.to_s + "_" + k).to_sym] = v

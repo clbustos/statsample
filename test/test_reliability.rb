@@ -26,7 +26,7 @@ class StatsampleReliabilityTestCase < Minitest::Test
         @ds = Daru::DataFrame.new({}, index: @samples)
         base = Daru::Vector.new(@samples.times.collect { |_a| rand })
         @n_variables.times do |i|
-          @ds[i] = base.collect { |v| v + rand }.to_numeric
+          @ds[i] = Daru::Vector.new(base.collect { |v| v + rand })
         end
 
         @ds.update
@@ -128,7 +128,7 @@ class StatsampleReliabilityTestCase < Minitest::Test
         h = {}
         @scales.times {|s|
           @items_per_scale.times {|i|
-            h["#{s}_#{i}".to_sym] = (size.times.map { (s * 2) + rand }).to_numeric
+            h["#{s}_#{i}".to_sym] = Daru::Vector.new((size.times.map { (s * 2) + rand }))
           }
         }
         @ds = Daru::DataFrame.new(h)
@@ -198,7 +198,7 @@ class StatsampleReliabilityTestCase < Minitest::Test
       should 'return correct values for item analysis' do
         assert_in_delta(0.980, @ia.alpha, 0.001)
         assert_in_delta(0.999, @ia.alpha_standarized, 0.001)
-        var_mean = 4.times.map { |m| @cov_matrix[m, m] }.to_numeric.mean
+        var_mean = Daru::Vector.new(4.times.map { |m| @cov_matrix[m, m] }).mean
         assert_in_delta(var_mean, @ia.variances_mean)
         assert_equal(@x1.mean, @ia.item_statistics[:x1][:mean])
         assert_equal(@x4.mean, @ia.item_statistics[:x4][:mean])
@@ -221,7 +221,7 @@ class StatsampleReliabilityTestCase < Minitest::Test
             end
           }
         }
-        assert_in_delta(covariances.to_numeric.mean, @ia.covariances_mean)
+        assert_in_delta(Daru::Vector.new(covariances).mean, @ia.covariances_mean)
         assert_in_delta(0.999, @ia.item_total_correlation[:x1], 0.001)
         assert_in_delta(1050.455, @ia.stats_if_deleted[:x1][:variance_sample], 0.001)
       end

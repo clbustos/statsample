@@ -52,7 +52,7 @@ module Statsample
     # Random generation for the normal distribution
     def rnorm(n,mean=0,sd=1)
       rng=Distribution::Normal.rng(mean,sd)
-      Statsample::Vector.new_numeric(n) { rng.call}
+      Daru::Vector.new_with_size(n) { rng.call}
     end
     # Creates a new Statsample::Dataset
     # Each key is transformed into string

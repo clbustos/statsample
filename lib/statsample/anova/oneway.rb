@@ -67,9 +67,9 @@ module Statsample
     
     # One Way Anova with vectors
     # Example:
-    #   v1=[2,3,4,5,6].to_numeric
-    #   v2=[3,3,4,5,6].to_numeric
-    #   v3=[5,3,1,5,6].to_numeric
+    #   v1 = Daru::Vector.new([2,3,4,5,6])
+    #   v2 = Daru::Vector.new([3,3,4,5,6])
+    #   v3 = Daru::Vector.new([5,3,1,5,6])
     #   anova=Statsample::Anova::OneWayWithVectors.new([v1,v2,v3])
     #   anova.f
     #   => 0.0243902439024391

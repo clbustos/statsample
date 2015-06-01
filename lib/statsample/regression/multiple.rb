@@ -6,12 +6,12 @@ module Statsample
     #  Use:.
     #
     #  require 'statsample'
-    #  a=1000.times.collect {rand}.to_numeric
-    #  b=1000.times.collect {rand}.to_numeric
-    #  c=1000.times.collect {rand}.to_numeric
-    #  ds={'a'=>a,'b'=>b,'c'=>c}.to_dataset
-    #  ds['y']=ds.collect{|row| row['a']*5+row['b']*3+row['c']*2+rand()}
-    #  lr=Statsample::Regression.multiple(ds,'y')
+    #  a = Daru::Vector.new(1000.times.collect {rand})
+    #  b = Daru::Vector.new(1000.times.collect {rand})
+    #  c = Daru::Vector.new(1000.times.collect {rand})
+    #  ds= Daru::DataFrame.new({:a => a,:b => b,:c => c})
+    #  ds[:y]=ds.collect{|row| row[:a]*5 + row[:b]*3 + row[:c]*2 + rand()}
+    #  lr=Statsample::Regression.multiple(ds, :y)
     #  puts lr.summary
     #  Summary for regression of a,b,c over y
     #  *************************************************************
@@ -53,8 +53,8 @@ module Statsample
         def initialize(matrix,y_var, opts=Hash.new)
           matrix.extend Statsample::CovariateMatrix
           @matrix=matrix
-          @fields=matrix.fields-y_var
-          @y_var=y_var
+          @fields=matrix.fields - y_var
+          @y_var = y_var
           @q=@y_var.size
           @matrix_cor=matrix.correlation
           @matrix_cor_xx = @matrix_cor.submatrix(@fields)
@@ -84,8 +84,6 @@ module Statsample
           vxy.quo(@q)
         end
       end
-      
-      
     end
   end
 end

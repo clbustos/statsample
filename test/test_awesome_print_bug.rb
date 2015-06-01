@@ -5,7 +5,7 @@ class StatsampleAwesomePrintBug < Minitest::Test
       require 'awesome_print'
     end
     should 'should be flawless' do
-      a = [1, 2, 3].to_numeric
+      a = Daru::Vector.new([1, 2, 3])
 
       assert(a != [1, 2, 3])
       assert_nothing_raised do

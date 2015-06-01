@@ -32,7 +32,7 @@ class StatsampleStatisicsTestCase < Minitest::Test
   end
 
   def test_estimation_mean
-    v = ([42] * 23 + [41] * 4 + [36] * 1 + [32] * 1 + [29] * 1 + [27] * 2 + [23] * 1 + [19] * 1 + [16] * 2 + [15] * 2 + [14, 11, 10, 9, 7] + [6] * 3 + [5] * 2 + [4, 3]).to_vector(:numeric)
+    v = Daru::Vector.new([42] * 23 + [41] * 4 + [36] * 1 + [32] * 1 + [29] * 1 + [27] * 2 + [23] * 1 + [19] * 1 + [16] * 2 + [15] * 2 + [14, 11, 10, 9, 7] + [6] * 3 + [5] * 2 + [4, 3])
     assert_equal(50, v.size)
     assert_equal(1471, v.sum)
     # limits=Statsample::SRS.mean_confidence_interval_z(v.mean(), v.sds(), v.size,676,0.80)
@@ -66,8 +66,8 @@ class StatsampleStatisicsTestCase < Minitest::Test
   end
 
   def test_simple_linear_regression
-    a = [1, 2, 3, 4, 5, 6].to_vector(:numeric)
-    b = [6, 2, 4, 10, 12, 8].to_vector(:numeric)
+    a = Daru::Vector.new([1, 2, 3, 4, 5, 6])
+    b = Daru::Vector.new([6, 2, 4, 10, 12, 8])
     reg = Statsample::Regression::Simple.new_from_vectors(a, b)
     assert_in_delta((reg.ssr + reg.sse).to_f, reg.sst, 0.001)
     assert_in_delta(Statsample::Bivariate.pearson(a, b), reg.r, 0.001)

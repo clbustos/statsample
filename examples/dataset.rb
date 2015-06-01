@@ -2,12 +2,12 @@
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 
-Statsample::Analysis.store(Statsample::Dataset) do
+Statsample::Analysis.store(Daru::DataFrame) do
   samples=1000
-  a=Statsample::Vector.new_numeric(samples) {r=rand(5); r==4 ? nil: r}
-  b=Statsample::Vector.new_numeric(samples) {r=rand(5); r==4 ? nil: r}
+  a=Statsample::Vector.new_with_size(samples) {r=rand(5); r==4 ? nil: r}
+  b=Statsample::Vector.new_with_size(samples) {r=rand(5); r==4 ? nil: r}
 
-  ds={'a'=>a,'b'=>b}.to_dataset
+  ds = Daru::DataFrame.new({:a=>a,:b=>b})
   summary(ds)
 end
 

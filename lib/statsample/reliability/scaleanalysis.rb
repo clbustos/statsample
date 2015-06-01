@@ -100,7 +100,7 @@ module Statsample
         end
       end
       def mean_rpb
-        item_total_correlation.values.to_numeric.mean
+        Daru::Vector.new(item_total_correlation.values).mean
       end
       def item_statistics
           @is||=@ds.vectors.to_a.inject({}) do |a,v|

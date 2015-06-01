@@ -12,27 +12,26 @@ module Statsample
       #
       def read(dbh,query)
         require 'dbi'
-        sth=dbh.execute(query)
-        vectors={}
-        fields=[]
-        sth.column_info.each {|c|
-            vectors[c['name']]=Statsample::Vector.new([])
-            vectors[c['name']].name=c['name']
-            vectors[c['name']].type= (c['type_name']=='INTEGER' or c['type_name']=='DOUBLE') ? :numeric : :object
-            fields.push(c['name'])
-        }
-        ds=Statsample::Dataset.new(vectors,fields)
-        sth.fetch do |row|
-            ds.add_case(row.to_a, false )
+        sth     = dbh.execute(query)
+        vectors = {}
+        fields  = []
+        sth.column_info.each do |c|
+          vectors[c[:name]] = Daru::Vector.new([])
+          vectors[c[:name]].rename c[:name]
+          fields.push(c[:name].to_sym)
         end
-        ds.update_valid_data
+        ds=Daru::DataFrame.new(vectors,order: fields)
+        sth.fetch do |row|
+          ds.add_row(row.to_a)
+        end
+        ds.update
         ds
       end
       # Insert each case of the Dataset on the selected table
       #
       # USE:
       #
-      #  ds={'id'=>[1,2,3].to_vector, 'name'=>["a","b","c"].to_vector}.to_dataset
+      #  ds = Daru::DataFrame.new({:id=>Daru::Vector.new([1,2,3]), :name=>Daru::Vector.new(["a","b","c"])})
       #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
       #  Statsample::Database.insert(ds,dbh,"test")
       #
@@ -40,24 +39,27 @@ module Statsample
         require 'dbi'
         query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"
         sth=dbh.prepare(query)
-        ds.each_array{|c| sth.execute(*c) }
+        ds.each_row { |c| sth.execute(*c.to_a) }
         return true
       end
       # Create a sql, basen on a given Dataset
       #
       # USE:
       #
-      #  ds={'id'=>[1,2,3,4,5].to_vector,'name'=>%w{Alex Peter Susan Mary John}.to_vector}.to_dataset
+      #  ds = Daru::DataFrame.new({
+      #   :id   => Daru::Vector.new([1,2,3,4,5]),
+      #   :name => Daru::Vector.new(%w{Alex Peter Susan Mary John})
+      #  })
       #  Statsample::Database.create_sql(ds,'names')
       #   ==>"CREATE TABLE names (id INTEGER,\n name VARCHAR (255)) CHARACTER SET=UTF8;"
       #
       def create_sql(ds,table,charset="UTF8")
-        sql="CREATE TABLE #{table} ("
-        fields=ds.fields.collect{|f|
-            v=ds[f]
-            f+" "+v.db_type
-        }
-        sql+fields.join(",\n ")+") CHARACTER SET=#{charset};"
+        sql    = "CREATE TABLE #{table} ("
+        fields = ds.vectors.to_a.collect do |f|
+          v = ds[f]
+          f.to_s + " " + v.db_type
+        end
+        sql + fields.join(",\n ")+") CHARACTER SET=#{charset};"
       end
     end
   end
@@ -92,7 +94,7 @@ module Statsample
       def process_row(row,empty)
         row.to_a.map do |c|
           if empty.include?(c)
-              nil
+            nil
           else
             if c.is_a? String and c.is_number?
               if c=~/^\d+$/
@@ -106,34 +108,26 @@ module Statsample
           end
         end
       end
-      def convert_to_numeric_and_date(ds,fields)
-        fields.each do |f|
-          if ds[f].can_be_numeric?
-            ds[f].type=:numeric
-          elsif ds[f].can_be_date?
-            ds[f].type=:date
-          end
-        end
-      end
-
     end
   end
-    class PlainText < SpreadsheetBase
-      class << self
-        def read(filename, fields)
-          ds = Daru::DataFrame.new({}, order: fields)
-          fp = File.open(filename,"r")
-          fp.each_line do |line|
-            row = process_row(line.strip.split(/\s+/),[""])
-            next if row == ["\x1A"]
-            ds.add_row(row)
-          end
-          ds.update
-          fields.each { |f| ds[f].rename f }
-          ds
+
+  class PlainText < SpreadsheetBase
+    class << self
+      def read(filename, fields)
+        ds = Daru::DataFrame.new({}, order: fields)
+        fp = File.open(filename,"r")
+        fp.each_line do |line|
+          row = process_row(line.strip.split(/\s+/),[""])
+          next if row == ["\x1A"]
+          ds.add_row(row)
         end
+        ds.update
+        fields.each { |f| ds[f].rename f }
+        ds
       end
     end
+  end
+  
   class Excel < SpreadsheetBase
     class << self
       # Write a Excel spreadsheet based on a dataset

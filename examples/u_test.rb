@@ -4,8 +4,8 @@ require 'statsample'
 
 Statsample::Analysis.store(Statsample::Test::UMannWhitney) do
 
-  a=10.times.map {rand(100)}.to_numeric
-  b=20.times.map {(rand(20))**2+50}.to_numeric
+  a = Daru::Vector.new(10.times.map {rand(100)})
+  b = Daru::Vector.new(20.times.map {(rand(20))**2+50})
 
   u=Statsample::Test::UMannWhitney.new(a,b)
   summary u

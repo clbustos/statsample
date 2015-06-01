@@ -6,10 +6,10 @@ module Statsample
     # 
     # == Usage
     # === Svg output
-    #  a=[1,2,3,4].to_numeric
-    #  puts Statsample::Graph::Histogram.new(a).to_svg
+    # a = Daru::Vector.new([1,2,3,4])
+    # puts Statsample::Graph::Histogram.new(a).to_svg
     # === Using ReportBuilder
-    #  a=[1,2,3,4].to_numeric
+    #  a = Daru::Vector.new([1,2,3,4])
     #  rb=ReportBuilder.new
     #  rb.add(Statsample::Graph::Histogram.new(a))
     #  rb.save_html('histogram.html')
