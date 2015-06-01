@@ -108,9 +108,7 @@ if Statsample.has_gsl?
           def standarized_residuals
             res=residuals
             red_sd=residuals.sds
-            res.collect {|v|
-              v.quo(red_sd)
-            }.to_vector(:numeric)
+            Daru::Vector.new(res.collect {|v| v.quo(red_sd) })
           end
 
           # Standard error for coeffs

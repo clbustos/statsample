@@ -45,6 +45,10 @@ module Daru
   end
 
   class DataFrame
+    def crosstab(v1,v2,opts={})
+      Statsample::Crosstab.new(self[v1], self[v2],opts)
+    end
+
     # Functions for converting to Statsample::Multiset
     def to_multiset_by_split(*vecs)
       require 'statsample/multiset'

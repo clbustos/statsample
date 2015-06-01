@@ -55,16 +55,6 @@ class StatsampleStatisicsTestCase < Minitest::Test
     assert_in_delta(0.46, l[1], 0.01)
   end
 
-  def test_ml
-    if true
-      # real=[1,1,1,1].to_vector(:numeric)
-
-      # pred=[0.0001,0.0001,0.0001,0.0001].to_vector(:numeric)
-      # puts  Statsample::Bivariate.maximum_likehood_dichotomic(pred,real)
-
-    end
-  end
-
   def test_simple_linear_regression
     a = Daru::Vector.new([1, 2, 3, 4, 5, 6])
     b = Daru::Vector.new([6, 2, 4, 10, 12, 8])

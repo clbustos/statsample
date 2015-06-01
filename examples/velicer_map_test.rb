@@ -26,7 +26,7 @@ Statsample::Analysis.store(Statsample::Factor::MAP) do
   end
   
   
-  ds = vectors.to_dataset
+  ds = Daru::DataFrame.new(vectors)
   cor=cor(ds)
   pca=pca(cor)
   

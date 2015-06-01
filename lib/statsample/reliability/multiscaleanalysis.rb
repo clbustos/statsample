@@ -6,17 +6,17 @@ module Statsample
     # PCA and Factor Analysis.
     # 
     # == Usage
-    #  @x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_vector(:numeric)
-    #  @x2=[1,1,1,2,2,3,3,3,3,4,4,50].to_vector(:numeric)
-    #  @x3=[2,2,1,1,1,2,2,2,3,4,5,40].to_vector(:numeric)
-    #  @x4=[1,2,3,4,4,4,4,3,4,4,5,30].to_vector(:numeric)
-    #  ds={'x1'=>@x1,'x2'=>@x2,'x3'=>@x3,'x4'=>@x4}.to_dataset
+    #  @x1 = Daru::Vector.new([1,1,1,1,2,2,2,2,3,3,3,30])
+    #  @x2 = Daru::Vector.new([1,1,1,2,2,3,3,3,3,4,4,50])
+    #  @x3 = Daru::Vector.new([2,2,1,1,1,2,2,2,3,4,5,40])
+    #  @x4 = Daru::Vector.new([1,2,3,4,4,4,4,3,4,4,5,30])
+    #  ds  = Daru::DataFrame.new({:x1 => @x1,:x2 => @x2,:x3 => @x3,:x4 => @x4})
     #  opts={:name=>"Scales", # Name of analysis
     #        :summary_correlation_matrix=>true, # Add correlation matrix
     #        :summary_pca } # Add PCA between scales
     #  msa=Statsample::Reliability::MultiScaleAnalysis.new(opts) do |m|
-    #    m.scale :s1, ds.clone(%w{x1 x2})
-    #    m.scale :s2, ds.clone(%w{x3 x4}), {:name=>"Scale 2"}
+    #    m.scale :s1, ds.clone([:x1, :x2])
+    #    m.scale :s2, ds.clone([:x3, :x4]), {:name=>"Scale 2"}
     #  end
     #  # Retrieve summary
     #  puts msa.summary 

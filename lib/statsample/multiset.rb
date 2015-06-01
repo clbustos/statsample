@@ -5,13 +5,13 @@ module Statsample
   class Multiset
     # Name of fields
     attr_reader :fields
-    # Array with Statsample::Dataset
+    # Array with Daru::DataFrame
     attr_reader :datasets
     # To create a multiset
     # * Multiset.new(%w{f1 f2 f3}) # define only fields
     def initialize(fields)
-        @fields=fields
-        @datasets={}
+      @fields=fields
+      @datasets={}
     end
     def self.new_empty_vectors(fields,ds_names) 
       ms = Multiset.new(fields)

@@ -16,10 +16,10 @@ vectors={}
 
 variables.times do |i|
   vectors["v#{i}".to_sym] = Daru::Vector.new(samples.times.collect {|nv| f1[nv]*i+(f2[nv]*(15-i))+((f3[nv]*(30-i))*1.5)*rng.call})
-  vectors["v#{i}".to_sym].name="Vector #{i}"
+  vectors["v#{i}".to_sym].rename "Vector #{i}"
 end
 
-  ds=vectors.to_dataset
+  ds = Daru::DataFrame.new(vectors)
 
   pa=Statsample::Factor::ParallelAnalysis.new(ds, :iterations=>iterations, :debug=>true)
   pca=pca(cor(ds))

@@ -75,8 +75,7 @@ Include:
 # Features
 
 - Classes for manipulation and storage of data:
-  - Statsample::Vector: An extension of an array, with statistical methods like sum, mean and standard deviation
-  - Statsample::Dataset: a group of Statsample::Vector, analog to a excel spreadsheet or a dataframe on R. The base of almost all operations on statsample.
+  - Uses [daru](https://github.com/v0dro/daru) for storing data and basic statistics.
   - Statsample::Multiset: multiple datasets with same fields and type of vectors
 - Anova module provides generic Statsample::Anova::OneWay and vector based Statsample::Anova::OneWayWithVectors. Also you can create contrast using Statsample::Anova::Contrast
 - Module Statsample::Bivariate provides covariance and pearson, spearman, point biserial, tau a, tau b, gamma, tetrachoric (see Bivariate::Tetrachoric) and polychoric (see Bivariate::Polychoric) correlations. Include methods to create correlation and covariance matrices
@@ -165,10 +164,10 @@ require 'statsample'
 ss_analysis("Statsample::Bivariate.correlation_matrix") do
   samples = 1000
   ds = data_frame(
-    'a' => rnorm(samples),
-    'b' => rnorm(samples),
-    'c' => rnorm(samples),
-    'd' => rnorm(samples))
+    :a => rnorm(samples),
+    :b => rnorm(samples),
+    :c => rnorm(samples),
+    :d => rnorm(samples))
   cm = cor(ds)
   summary(cm)
 end

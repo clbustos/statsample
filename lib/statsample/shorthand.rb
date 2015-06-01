@@ -54,10 +54,14 @@ module Statsample
       rng=Distribution::Normal.rng(mean,sd)
       Daru::Vector.new_with_size(n) { rng.call}
     end
-    # Creates a new Statsample::Dataset
-    # Each key is transformed into string
+    # Creates a new Daru::DataFrame
+    # Each key is transformed into a Symbol wherever possible.
     def dataset(vectors=Hash.new)
-      vectors=vectors.inject({}) { |ac,v| ac[v[0]] = v[1]; ac}
+      vectors = vectors.inject({}) do |ac,v| 
+        n     = v[0].respond_to?(:to_sym) ? v[0].to_sym : v[0] 
+        ac[n] = v[1]
+        ac
+      end
       Daru::DataFrame.new(vectors)
     end
     alias :data_frame :dataset

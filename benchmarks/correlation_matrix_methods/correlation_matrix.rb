@@ -8,7 +8,7 @@ def create_dataset(vars,cases)
   ran = Distribution::Normal.rng
   ds  = Daru::DataFrame.new(
     vars.times.inject({}) do |ac,v|
-      ac["x#{v}".to_sym] = Daru::Vector.new_numeric(cases) {ran.call}
+      ac["x#{v}".to_sym] = Daru::Vector.new_with_size(cases) {ran.call}
       ac
     end
   )
