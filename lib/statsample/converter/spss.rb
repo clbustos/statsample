@@ -9,21 +9,22 @@ module Statsample
       def tetrachoric_correlation_matrix(ds)
         dsv=ds.dup_only_valid
         # Delete all vectors doesn't have variation
-        dsv.fields.each{|f|
+        dsv.vectors.each { |f|
           if dsv[f].factors.size==1
             dsv.delete_vector(f) 
           else
             dsv[f]=dsv[f].dichotomize
           end
         }
+
         tcm=Statsample::Bivariate.tetrachoric_correlation_matrix(dsv)
-        n=dsv.fields.collect {|f|
+        n=dsv.vectors.to_a.collect {|f|
           sprintf("%d",dsv[f].size)
         }
-        meanlist=dsv.fields.collect{|f|
+        meanlist=dsv.vectors.to_a.collect{|f|
           sprintf("%0.3f", dsv[f].mean)
         }
-        stddevlist=dsv.fields.collect{|f|
+        stddevlist=dsv.vectors.to_a.collect{|f|
           sprintf("%0.3f", dsv[f].sd)
         }
         out=<<-HEREDOC

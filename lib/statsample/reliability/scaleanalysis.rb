@@ -66,7 +66,7 @@ module Statsample
         total={}
         @ds.each do |row|
           tot=@total[i]
-          @ds.fields.each do |f|
+          @ds.vectors.each do |f|
             out[f]||= {}
             total[f]||={}
             out[f][tot]||= 0
@@ -88,12 +88,7 @@ module Statsample
       #
       def item_total_correlation
         vecs = @ds.vectors.to_a
-        @itc||=vecs.inject({}) do |a,v|
-          # vector=@ds[v].clone
-          # puts "#{vector.inspect}"
-          # ds2=@ds.dup
-          # puts "#{ds2.inspect}"
-          # ds2.delete_vector(v)
+        @itc ||= vecs.inject({}) do |a,v|
           total=@ds.vector_sum(vecs - [v])
           a[v]=Statsample::Bivariate.pearson(@ds[v],total)
           a
@@ -103,10 +98,10 @@ module Statsample
         Daru::Vector.new(item_total_correlation.values).mean
       end
       def item_statistics
-          @is||=@ds.vectors.to_a.inject({}) do |a,v|
-            a[v]={:mean=>@ds[v].mean, :sds=>Math::sqrt(@cov_m.variance(v))}
-            a
-          end
+        @is||=@ds.vectors.to_a.inject({}) do |a,v|
+          a[v]={:mean=>@ds[v].mean, :sds=>Math::sqrt(@cov_m.variance(v))}
+          a
+        end
       end
       # Returns a dataset with cases ordered by score
       # and variables ordered by difficulty

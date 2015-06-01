@@ -157,4 +157,8 @@ class StatsampleBivariateTestCase < Minitest::Test
     m2 = Matrix[[15, 12, 6, 5], [12, 8, 10, 8], [4, 6, 9, 10]]
     assert_in_delta(0.349, Statsample::Bivariate.gamma(m2), 0.001)
   end
+
+  should 'return correct residuals' do
+    # TODO: test Statsample::Bivariate.residuals
+  end
 end

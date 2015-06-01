@@ -67,9 +67,10 @@ class RubyEngine < MatrixEngine
         field  = empty[0]
         lr     = MultipleRegression.new(@ds_indep,field)
         fields = []
-        @ds_indep.fields.each{|f|
+        @ds_indep.vectors.each { |f|
           fields.push(row[f]) unless f == field
         }
+        
         @ds_indep[field][i]=lr.process(fields)
       end
       i+=1

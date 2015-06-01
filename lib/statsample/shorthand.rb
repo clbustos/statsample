@@ -34,7 +34,7 @@ module Statsample
     
     # Retrieve names (fields) from dataset
     def names(ds)
-      ds.fields
+      ds.vectors.to_a
     end
     # Create a correlation matrix from a dataset
     def cor(ds)

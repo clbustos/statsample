@@ -122,7 +122,9 @@ module Statsample
         r=Statsample::Bivariate.pearson(from,del)
         froms, dels = from.vector_standarized, del.vector_standarized
         nv=[]
-        froms.data_with_nils.each_index do |i|
+        froms.reset_index!
+        dels.reset_index!
+        froms.each_index do |i|
           if froms[i].nil? or dels[i].nil?
             nv.push(nil)
           else
@@ -139,7 +141,6 @@ module Statsample
         rv1con=pearson(v1a,cona)
         rv2con=pearson(v2a,cona)        
         (rv1v2-(rv1con*rv2con)).quo(Math::sqrt(1-rv1con**2) * Math::sqrt(1-rv2con**2))
-        
       end
       
       def covariance_matrix_optimized(ds)
