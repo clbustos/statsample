@@ -3,7 +3,10 @@ $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 
 Statsample::Analysis.store(Statsample::DominanceAnalysis::Bootstrap) do
-  
+  # Remember to call *update* after an assignment/deletion cycle if lazy_update
+  # is *false*.
+  Daru.lazy_update = true
+
   sample=300
   a=rnorm(sample)
   b=rnorm(sample)
@@ -26,6 +29,8 @@ Statsample::Analysis.store(Statsample::DominanceAnalysis::Bootstrap) do
   dab2=dominance_analysis_bootstrap(ds2, :y1, :debug=>true)
   dab2.bootstrap(100,nil)
   summary(dab2)
+
+  Daru.lazy_update = false
 end
 
 if __FILE__==$0

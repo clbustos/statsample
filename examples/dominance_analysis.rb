@@ -1,9 +1,10 @@
 #!/usr/bin/ruby
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 
+# == Description
+#
+# Dominance Analysis with statsample
 require 'statsample'
-
-
 Statsample::Analysis.store(Statsample::DominanceAnalysis) do
   sample=300
   a=rnorm(sample)
@@ -11,9 +12,9 @@ Statsample::Analysis.store(Statsample::DominanceAnalysis) do
   c=rnorm(sample)
   d=rnorm(sample)
   
-  ds = Daru::DataFrame.new({:a => a,:b => b,:cc => c,:d => d})
+  ds = Daru::DataFrame.new({:a => a,:b => b,:cc => c,:d => d}, clone: false)
   attach(ds)
-  ds[:y]=a*5 + b*3 + cc*2 + d + rnorm(300)  
+  ds[:y]=a*5 + b*3 + cc*2 + d + rnorm(300)
   cm=cor(ds)
   summary(cm)
   lr=lr(ds,:y)

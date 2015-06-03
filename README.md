@@ -43,8 +43,10 @@ You can see the latest documentation in [rubydoc.info](http://www.rubydoc.info/g
 
 You can see some iruby notebooks here:
 
-* [Creating Boxplots with daru and statsample](https://github.com/SciRuby/sciruby-notebooks/blob/master/statistics/Boxplot%20with%20daru%20and%20statsample.ipynb)
-* [Correlation Matrix with daru and statsample](https://github.com/SciRuby/sciruby-notebooks/blob/master/statistics/Correlation%20Matrix%20with%20daru%20and%20statsample.ipynb)
+* [Creating Vectors and DataFrames with daru](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/data_analysis/Creation%20of%20Vector%20and%20DataFrame.ipynb)
+* [Creating Boxplots with daru and statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Boxplot%20with%20daru%20and%20statsample.ipynb)
+* [Correlation Matrix with daru and statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Correlation%20Matrix%20with%20daru%20and%20statsample.ipynb)
+* [Dominance Analysis with statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Dominance%20Analysis%20with%20statsample.ipynb)
 
 ## Examples
 
