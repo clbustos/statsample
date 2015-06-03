@@ -47,10 +47,15 @@ You can see some iruby notebooks here:
 * [Creating Boxplots with daru and statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Boxplot%20with%20daru%20and%20statsample.ipynb)
 * [Correlation Matrix with daru and statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Correlation%20Matrix%20with%20daru%20and%20statsample.ipynb)
 * [Dominance Analysis with statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Dominance%20Analysis%20with%20statsample.ipynb)
+* [Creating A Histogram](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Creating%20a%20Histogram.ipynb)
+* [Reliability ICC](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/statistics/Reliability%20ICC%20with%20statsample.ipynb)
+* [Levene Test](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/statistics/Levene%20Test.ipynb)
+* [Multiple Regression](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/statistics/Multiple%20Regression.ipynb)
 
 ## Examples
 
-See the /examples directory for some use cases.
+See the /examples directory for some use cases. The notebooks listed above have mostly
+the same examples, and they look better so you might want to see that first.
 
 # Description
 

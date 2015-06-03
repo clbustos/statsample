@@ -1,6 +1,9 @@
 #!/usr/bin/ruby
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 
+# == Description
+# 
+# This example shows how multiple regression can be performed using statsample and daru.
 require 'statsample'
 
 Statsample::Analysis.store(Statsample::Regression::Multiple) do

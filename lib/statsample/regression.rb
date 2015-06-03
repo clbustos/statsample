@@ -49,7 +49,7 @@ module Statsample
       #     * :pairwise: uses correlation matrix. Use with caution.
       # 
       # <b>Usage:</b>
-      #   lr=Statsample::Regression::multiple(ds,'y')
+      #   lr=Statsample::Regression::multiple(ds,:y)
       def self.multiple(ds,y_var, opts=Hash.new)
         missing_data= (opts[:missing_data].nil? ) ? :listwise : opts.delete(:missing_data)
         if missing_data==:pairwise

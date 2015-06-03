@@ -37,135 +37,144 @@ module Statsample
   # == Reference:
   # * http://www.gnu.org/software/gsl/manual/html_node/The-histogram-struct.html
   
-    class Histogram
-      include Enumerable
-      class << self
-        # Alloc +n_bins+, using +range+ as ranges of bins
-        def alloc(n_bins, range=nil, opts=Hash.new)
-          Histogram.new(n_bins, range, opts)
-          
-        end
-        # Alloc +n_bins+ bins, using +p1+ as minimum and +p2+
-        # as maximum
-        def alloc_uniform(n_bins, p1=nil,p2=nil)
-          if p1.is_a? Array
-            min,max=p1
-          else
-            min,max=p1,p2
-          end
-          range=max - min
-          step=range / n_bins.to_f
-          range=(n_bins+1).times.map {|i| min + (step*i)}
-          Histogram.new(range)
-        end
-      end
-      attr_accessor :name
-      attr_reader :bin
-      attr_reader :range
-      include GetText
-      bindtextdomain("statsample")
-      def initialize(p1, min_max=false, opts=Hash.new)
+  class Histogram
+    include Enumerable
+
+    class << self
+      # Alloc +n_bins+, using +range+ as ranges of bins
+      def alloc(n_bins, range=nil, opts=Hash.new)
+        Histogram.new(n_bins, range, opts)
         
+      end
+      # Alloc +n_bins+ bins, using +p1+ as minimum and +p2+
+      # as maximum
+      def alloc_uniform(n_bins, p1=nil,p2=nil)
         if p1.is_a? Array
-          range=p1
-          @n_bins=p1.size-1
-        elsif p1.is_a? Integer
-          @n_bins=p1
+          min,max=p1
+        else
+          min,max=p1,p2
         end
-        
-        @bin=[0.0]*(@n_bins)
-        if(min_max)
-          min, max=min_max[0], min_max[1]
-          range=Array.new(@n_bins+1)
-          (@n_bins+1).times {|i| range[i]=min+(i*(max-min).quo(@n_bins)) }
-        end
-        range||=[0.0]*(@n_bins+1)
-        set_ranges(range)
-        @name=""
-        opts.each{|k,v|
-        self.send("#{k}=",v) if self.respond_to? k
-        }
+        range=max - min
+        step=range / n_bins.to_f
+        range=(n_bins+1).times.map {|i| min + (step*i)}
+        Histogram.new(range)
       end
-      # Number of bins
-      def bins
-        @n_bins
-      end
-      # 
-      def increment(x, w=1)
-        if x.respond_to? :each
-          x.each{|y| increment(y,w) }
-        elsif x.is_a? Numeric
-          (range.size - 1).times do |i|
-            if x >= range[i] and x < range[i+1]
-              @bin[i] += w
-              break
-            end
-          end
-        end
-      end
-      def set_ranges(range)
-        raise "Range size should be bin+1" if range.size!=@bin.size+1
-        @range=range
-      end
-      def get_range(i)
-        [@range[i],@range[i+1]]
-      end
-      def max
-        @range.last
-      end
-      def min
-        @range.first
-      end
-      def max_val
-        @bin.max
-      end
-      def min_val
-        @bin.min
-      end
-      def each
-        bins.times.each do |i|
-          r=get_range(i)
-          arg={:i=>i, :low=>r[0],:high=>r[1], :middle=>(r[0]+r[1]) / 2.0,  :value=>@bin[i]}
-          yield arg
-        end
-      end
-      def estimated_variance
-        sum,n=0,0
-        mean=estimated_mean
-        each do |v|
-          sum+=v[:value]*(v[:middle]-mean)**2
-          n+=v[:value]
-        end
-        sum / (n-1)
-      end
-      def estimated_standard_deviation
-        Math::sqrt(estimated_variance)
-      end
-      def estimated_mean
-        sum,n=0,0
-        each do |v|
-          sum+= v[:value]* v[:middle]
-          n+=v[:value]
-        end
-        sum / n
-      end
-      alias :mean :estimated_mean
-      alias :sigma :estimated_standard_deviation
+    end
+
+    attr_accessor :name
+    attr_reader :bin
+    attr_reader :range
+
+    include GetText
+    bindtextdomain("statsample")
+
+    def initialize(p1, min_max=false, opts=Hash.new)
       
-      def sum(start=nil,_end=nil)
-        start||=0
-        _end||=@n_bins-1
-        (start.._end).inject(0) {|ac,i| ac+@bin[i]}
+      if p1.is_a? Array
+        range=p1
+        @n_bins=p1.size-1
+      elsif p1.is_a? Integer
+        @n_bins=p1
       end
-      def report_building(generator)
-        hg=Statsample::Graph::Histogram.new(self)
-        generator.parse_element(hg)
+      
+      @bin=[0.0]*(@n_bins)
+      if(min_max)
+        min, max=min_max[0], min_max[1]
+        range=Array.new(@n_bins+1)
+        (@n_bins+1).times {|i| range[i]=min+(i*(max-min).quo(@n_bins)) }
       end
-      def report_building_text(generator)
-        @range.each_with_index do |r,i|
-          next if i==@bin.size
-          generator.text(sprintf("%5.2f : %d", r, @bin[i]))
+      range||=[0.0]*(@n_bins+1)
+      set_ranges(range)
+      @name=""
+      opts.each{|k,v|
+      self.send("#{k}=",v) if self.respond_to? k
+      }
+    end
+
+    # Number of bins
+    def bins
+      @n_bins
+    end
+    
+    def increment(x, w=1)
+      if x.respond_to? :each
+        x.each{|y| increment(y,w) }
+      elsif x.is_a? Numeric
+        (range.size - 1).times do |i|
+          if x >= range[i] and x < range[i+1]
+            @bin[i] += w
+            break
+          end
         end
       end
     end
+
+    def set_ranges(range)
+      raise "Range size should be bin+1" if range.size!=@bin.size+1
+      @range=range
+    end
+
+    def get_range(i)
+      [@range[i],@range[i+1]]
+    end
+
+    def max
+      @range.last
+    end
+    
+    def min
+      @range.first
+    end
+    def max_val
+      @bin.max
+    end
+    def min_val
+      @bin.min
+    end
+    def each
+      bins.times.each do |i|
+        r=get_range(i)
+        arg={:i=>i, :low=>r[0],:high=>r[1], :middle=>(r[0]+r[1]) / 2.0,  :value=>@bin[i]}
+        yield arg
+      end
+    end
+    def estimated_variance
+      sum,n=0,0
+      mean=estimated_mean
+      each do |v|
+        sum+=v[:value]*(v[:middle]-mean)**2
+        n+=v[:value]
+      end
+      sum / (n-1)
+    end
+    def estimated_standard_deviation
+      Math::sqrt(estimated_variance)
+    end
+    def estimated_mean
+      sum,n=0,0
+      each do |v|
+        sum+= v[:value]* v[:middle]
+        n+=v[:value]
+      end
+      sum / n
+    end
+    alias :mean :estimated_mean
+    alias :sigma :estimated_standard_deviation
+    
+    def sum(start=nil,_end=nil)
+      start||=0
+      _end||=@n_bins-1
+      (start.._end).inject(0) {|ac,i| ac+@bin[i]}
+    end
+    def report_building(generator)
+      hg=Statsample::Graph::Histogram.new(self)
+      generator.parse_element(hg)
+    end
+    def report_building_text(generator)
+      @range.each_with_index do |r,i|
+        next if i==@bin.size
+        generator.text(sprintf("%5.2f : %d", r, @bin[i]))
+      end
+    end
+  end
 end
