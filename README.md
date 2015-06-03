@@ -37,6 +37,19 @@ $ [sudo] gem install statsample-sem
 
 You can see the latest documentation in [rubydoc.info](http://www.rubydoc.info/github/sciruby/statsample/master).
 
+# Usage
+
+## Notebooks
+
+You can see some iruby notebooks here:
+
+* [Creating Boxplots with daru and statsample](https://github.com/SciRuby/sciruby-notebooks/blob/master/statistics/Boxplot%20with%20daru%20and%20statsample.ipynb)
+* [Correlation Matrix with daru and statsample](https://github.com/SciRuby/sciruby-notebooks/blob/master/statistics/Correlation%20Matrix%20with%20daru%20and%20statsample.ipynb)
+
+## Examples
+
+See the /examples directory for some use cases.
+
 # Description
 
 A suite for basic and advanced statistics on Ruby. Tested on CRuby 1.9.3, 2.0.0 and 2.1.1. See `.travis.yml` for more information.
@@ -128,52 +141,6 @@ Include:
 - Gem <tt>statsample-sem</tt> provides a DSL to R libraries +sem+ and +OpenMx+
 - Gem <tt>statsample-glm</tt> provides you with GML method, to work with Logistic, Poisson and Gaussian regression ,using ML or IRWLS.
 - Close integration with gem <tt>reportbuilder</tt>, to easily create reports on text, html and rtf formats.
-
-# Usage
-
-See the [examples folder](https://github.com/clbustos/statsample/tree/master/examples/) too.
-
-## Boxplot
-
-```ruby
-require 'statsample'
-
-ss_analysis(Statsample::Graph::Boxplot) do
-  n = 30
-  a = rnorm(n-1, 50, 10)
-  b = rnorm(n, 30, 5)
-  c = rnorm(n, 5, 1)
-  a.push(2)
-  boxplot(vectors: [a, b, c],
-          width: 300,
-          height: 300,
-          groups: %w{first first second},
-          minimum: 0)
-end
-
-Statsample::Analysis.run # Open svg file on *nix application defined
-```
-
-## Correlation matrix
-
-```ruby
-require 'statsample'
-# Note R like generation of random gaussian variable
-# and correlation matrix
-
-ss_analysis("Statsample::Bivariate.correlation_matrix") do
-  samples = 1000
-  ds = data_frame(
-    :a => rnorm(samples),
-    :b => rnorm(samples),
-    :c => rnorm(samples),
-    :d => rnorm(samples))
-  cm = cor(ds)
-  summary(cm)
-end
-
-Statsample::Analysis.run_batch # Echo output to console
-```
 
 # Resources
 
