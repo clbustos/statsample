@@ -195,12 +195,14 @@ module Statsample
         end
         vis
       end
+
       # Returns SVG with scatterplot
       def to_svg
-        rp=rubyvis_panel
+        rp = rubyvis_panel
         rp.render
         rp.to_svg
       end
+
       def report_building(builder) # :nodoc:
         builder.section(:name=>name) do |b|
           b.image(to_svg, :type=>'svg', :width=>width, :height=>height)

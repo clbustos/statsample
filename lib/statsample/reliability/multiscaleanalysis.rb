@@ -107,7 +107,7 @@ module Statsample
       # Retrieves a Principal Component Analysis (Factor::PCA)
       # using all scales, using <tt>opts</tt> a options.
       def pca(opts=nil)
-        opts||=pca_options        
+        opts ||= pca_options        
         Statsample::Factor::PCA.new(correlation_matrix, opts)
       end
       # Retrieve Velicer's MAP

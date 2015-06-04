@@ -1,6 +1,11 @@
 #!/usr/bin/ruby
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
 
+# == Description
+#
+# This example will explain how a parallel analysis can be performed on a PCA.
+# Parallel Analysis helps in determining how many components are to be retained
+# from the PCA.
 require 'statsample'
 samples=150
 variables=30
@@ -8,9 +13,9 @@ iterations=50
 Statsample::Analysis.store(Statsample::Factor::ParallelAnalysis) do 
   
 rng = Distribution::Normal.rng()
-f1=rnorm(samples)
-f2=rnorm(samples)
-f3=rnorm(samples)
+f1  = rnorm(samples)
+f2  = rnorm(samples)
+f3  = rnorm(samples)
 
 vectors={}
 

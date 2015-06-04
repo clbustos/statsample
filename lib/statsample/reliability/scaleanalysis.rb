@@ -8,7 +8,7 @@ module Statsample
     #  @x3 = Daru::Vector.new([2,2,1,1,1,2,2,2,3,4,5,40])
     #  @x4 = Daru::Vector.new([1,2,3,4,4,4,4,3,4,4,5,30])
     #  ds  = Daru::DataFrame.new({:x1 => @x1,:x2 => @x2,:x3 => @x3,:x4 => @x4})
-    #  ia=Statsample::Reliability::ScaleAnalysis.new(ds)
+    #  ia  = Statsample::Reliability::ScaleAnalysis.new(ds)
     #  puts ia.summary
     class ScaleAnalysis
       include Summarizable
