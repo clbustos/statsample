@@ -4,9 +4,9 @@ $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 
 Statsample::Analysis.store(Daru::Vector) do
-  a=Daru::Vector.new_with_size(1000) {r=rand(5); r==4 ? nil: r;}
+  a = Daru::Vector.new_with_size(1000) {r=rand(5); r==4 ? nil: r;}
   summary a
-  b=c(1,2,3,4,6..10)
+  b = Daru::Vector[1,2,3,4,6..10]
   summary b
 end
 

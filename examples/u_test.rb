@@ -1,5 +1,13 @@
 #!/usr/bin/ruby
 $:.unshift(File.dirname(__FILE__)+'/../lib')
+
+# == Description
+#
+# Example illustrating Mann-Whitney U test with statsample.
+#
+# == References
+# 
+# http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test
 require 'statsample'
 
 Statsample::Analysis.store(Statsample::Test::UMannWhitney) do

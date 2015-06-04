@@ -1,10 +1,8 @@
 module Statsample
   module Test
-    
-    
-    
-    
-    # A t-test is any statistical hypothesis test in which the test statistic follows a Student's t distribution, if the null hypothesis is supported
+    # A t-test is any statistical hypothesis test in which the test 
+    # statistic follows a Student's t distribution, if the null 
+    # hypothesis is supported
     class T
       
       class << self

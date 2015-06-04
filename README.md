@@ -43,18 +43,28 @@ You can see the latest documentation in [rubydoc.info](http://www.rubydoc.info/g
 
 You can see some iruby notebooks here:
 
-* [Creating Vectors and DataFrames with daru](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/data_analysis/Creation%20of%20Vector%20and%20DataFrame.ipynb)
-* [Creating Boxplots with daru and statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Visualization/Boxplot%20with%20daru%20and%20statsample.ipynb)
+### Statistics
+
 * [Correlation Matrix with daru and statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Correlation%20Matrix%20with%20daru%20and%20statsample.ipynb)
 * [Dominance Analysis with statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Dominance%20Analysis%20with%20statsample.ipynb)
-* [Creating A Histogram](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Visualization/Creating%20a%20Histogram.ipynb)
 * [Reliability ICC](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/statistics/Reliability%20ICC%20with%20statsample.ipynb)
 * [Levene Test](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/statistics/Levene%20Test.ipynb)
 * [Multiple Regression](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/statistics/Multiple%20Regression.ipynb)
-* [Creating a Scatterplot](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Visualization/Scatterplot%20with%20statsample.ipynb)
 * [Parallel Analysis on PCA](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Parallel%20Analysis%20on%20PCA.ipynb)
 * [Polychoric Analysis](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Polychoric%20Correlation.ipynb)
 * [Reliability Scale and Multiscale Analysis](https://github.com/SciRuby/sciruby-notebooks/blob/master/statistics/Reliability%20Scale%20Analysis.ipynb)
+
+### Visualizations
+
+* [Creating Boxplots with daru and statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Visualization/Boxplot%20with%20daru%20and%20statsample.ipynb)
+* [Creating A Histogram](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Visualization/Creating%20a%20Histogram.ipynb)
+* [Creating a Scatterplot](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Visualization/Scatterplot%20with%20statsample.ipynb)
+
+### Working with DataFrame and Vector
+
+* [Creating Vectors and DataFrames with daru](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/data_analysis/Creation%20of%20Vector%20and%20DataFrame.ipynb)
+* [Detailed Usage of Daru::Vector](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Data%20Analysis/Usage%20of%20Vector.ipynb)
+* Find more notebooks on daru on the [homepage](https://github.com/v0dro/daru).
 
 ## Examples
 
