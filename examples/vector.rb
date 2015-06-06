@@ -1,6 +1,11 @@
 #!/usr/bin/ruby
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
-
+# == Description
+#
+# This example provides a small sneak-peak into creating a Daru::Vector.
+# For details on using Daru::Vector (with example on math, statistics and plotting)
+# see the notebook at this link: 
+# http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Data%20Analysis/Usage%20of%20Vector.ipynb
 require 'statsample'
 
 Statsample::Analysis.store(Daru::Vector) do

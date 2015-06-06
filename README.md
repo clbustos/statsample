@@ -53,6 +53,7 @@ You can see some iruby notebooks here:
 * [Parallel Analysis on PCA](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Parallel%20Analysis%20on%20PCA.ipynb)
 * [Polychoric Analysis](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Polychoric%20Correlation.ipynb)
 * [Reliability Scale and Multiscale Analysis](https://github.com/SciRuby/sciruby-notebooks/blob/master/statistics/Reliability%20Scale%20Analysis.ipynb)
+* [Velicer MAP Test](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Velicer%20MAP%20test.ipynb)
 
 ### Visualizations
 

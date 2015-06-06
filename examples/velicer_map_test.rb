@@ -1,5 +1,8 @@
 #!/usr/bin/ruby
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
+# == Description
+#
+# Velicer MAP test.
 
 require 'statsample'
 
