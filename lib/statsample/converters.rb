@@ -5,61 +5,28 @@ module Statsample
     class << self
       # Read a database query and returns a Dataset
       #
-      # USE:
-      #
-      #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
-      #  Statsample.read(dbh, "SELECT * FROM test")
-      #
+      # == NOTE
+      # 
+      # Deprecated. Use Daru::DataFrame.from_sql instead.
       def read(dbh,query)
-        require 'dbi'
-        sth     = dbh.execute(query)
-        vectors = {}
-        fields  = []
-        sth.column_info.each do |c|
-          vectors[c[:name]] = Daru::Vector.new([])
-          vectors[c[:name]].rename c[:name]
-          fields.push(c[:name].to_sym)
-        end
-        ds=Daru::DataFrame.new(vectors,order: fields)
-        sth.fetch do |row|
-          ds.add_row(row.to_a)
-        end
-        ds.update
-        ds
+        raise NoMethodError, "Deprecated. Use Daru::DataFrame.from_sql instead."
       end
+
       # Insert each case of the Dataset on the selected table
       #
-      # USE:
-      #
-      #  ds = Daru::DataFrame.new({:id=>Daru::Vector.new([1,2,3]), :name=>Daru::Vector.new(["a","b","c"])})
-      #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
-      #  Statsample::Database.insert(ds,dbh,"test")
-      #
+      # == NOTE
+      # 
+      # Deprecated. Use Daru::DataFrame#write_sql instead
       def insert(ds, dbh, table)
-        require 'dbi'
-        query="INSERT INTO #{table} ("+ds.vectors.to_a.join(",")+") VALUES ("+((["?"]*ds.vectors.size).join(","))+")"
-        sth=dbh.prepare(query)
-        ds.each_row { |c| sth.execute(*c.to_a) }
-        return true
+        raise NoMethodError, "Deprecated. Use Daru::DataFrame#write_sql instead."
       end
       # Create a sql, basen on a given Dataset
       #
-      # USE:
-      #
-      #  ds = Daru::DataFrame.new({
-      #   :id   => Daru::Vector.new([1,2,3,4,5]),
-      #   :name => Daru::Vector.new(%w{Alex Peter Susan Mary John})
-      #  })
-      #  Statsample::Database.create_sql(ds,'names')
-      #   ==>"CREATE TABLE names (id INTEGER,\n name VARCHAR (255)) CHARACTER SET=UTF8;"
-      #
+      # == NOTE
+      # 
+      # Deprecated. Use Daru::DataFrame#create_sql instead.
       def create_sql(ds,table,charset="UTF8")
-        sql    = "CREATE TABLE #{table} ("
-        fields = ds.vectors.to_a.collect do |f|
-          v = ds[f]
-          f.to_s + " " + v.db_type
-        end
-        sql + fields.join(",\n ")+") CHARACTER SET=#{charset};"
+        raise NoMethodError, "Deprecated. Use Daru::DataFrame#create_sql instead."
       end
     end
   end
@@ -114,16 +81,7 @@ module Statsample
   class PlainText < SpreadsheetBase
     class << self
       def read(filename, fields)
-        ds = Daru::DataFrame.new({}, order: fields)
-        fp = File.open(filename,"r")
-        fp.each_line do |line|
-          row = process_row(line.strip.split(/\s+/),[""])
-          next if row == ["\x1A"]
-          ds.add_row(row)
-        end
-        ds.update
-        fields.each { |f| ds[f].rename f }
-        ds
+        raise NoMethodError, "Deprecated. Use Daru::DataFrame.from_plaintext instead."
       end
     end
   end
@@ -152,7 +110,7 @@ module Statsample
       end
     end
   end
-  
+
   module Mx
     class << self
       def write(dataset,filename,type=:covariance)

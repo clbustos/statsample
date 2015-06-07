@@ -15,7 +15,7 @@ class StatsampleFactorTestCase < Minitest::Test
   end
   # Based on Hurdle example
   def test_covariance_matrix
-    ds = Statsample::PlainText.read(@fixtures_dir + '/bank2.dat', [:v1,:v2,:v3,:v4,:v5,:v6])
+    ds = Daru::DataFrame.from_plaintext(@fixtures_dir + '/bank2.dat', [:v1,:v2,:v3,:v4,:v5,:v6])
     ds.vectors.each {|f|
       ds[f] = ds[f].center
     }
