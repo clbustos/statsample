@@ -127,107 +127,32 @@ module Statsample
       end
     end
   end
-  
-  class Excel < SpreadsheetBase
+    
+  # This class has been DEPRECATED. Use Daru::DataFrame::from_excel 
+  # Daru::DataFrame#write_excel for XLS file operations.
+  class Excel
     class << self
       # Write a Excel spreadsheet based on a dataset
       # * TODO: Format nicely date values
+      # 
+      # == NOTE
+      # 
+      # Deprecated. Use Daru::DataFrame#write_csv.
       def write(dataset,filename)
-        require 'spreadsheet'
-        book = Spreadsheet::Workbook.new
-        sheet = book.create_worksheet
-        format = Spreadsheet::Format.new :color => :blue,
-                           :weight => :bold
-        sheet.row(0).concat(dataset.vectors.to_a.map(&:to_s)) # Unfreeze strings
-        sheet.row(0).default_format = format
-        i = 1
-        dataset.each_row { |row|
-          sheet.row(i).concat(row.to_a)
-          i += 1
-        }
-        book.write(filename)
+        raise NoMethodError, "Deprecated. Use Daru::DataFrame#write_excel instead."
       end
-      # This should be fixed.
-      # If we have a Formula, should be resolver first
-
-      def preprocess_row(row, dates)
-        i=-1
-        row.collect!{|c|
-          i+=1
-          if c.is_a? Spreadsheet::Formula
-            if(c.value.is_a? Spreadsheet::Excel::Error)
-              nil
-            else
-              c.value
-            end
-          elsif dates.include? i and !c.nil? and c.is_a? Numeric
-              row.date(i)
-          else
-              c
-          end
-        }
-      end
-      private :process_row, :preprocess_row
 
       # Returns a dataset based on a xls file
-      # USE:
-      #     ds = Statsample::Excel.read("test.xls")
-      #
+      # 
+      # == NOTE
+      # 
+      # Deprecated. Use Daru::DataFrame.from_excel instead.
       def read(filename, opts=Hash.new)
-        require 'spreadsheet'
-        raise "options should be Hash" unless opts.is_a? Hash
-        opts_default = {
-          :worksheet_id => 0,
-          :ignore_lines => 0,
-          :empty        => ['']
-        }
-
-        opts         = opts_default.merge opts
-
-        worksheet_id = opts[:worksheet_id]
-        ignore_lines = opts[:ignore_lines]
-        empty        = opts[:empty]
-
-        first_row   = true
-        fields      = []
-        ds          = nil
-        line_number = 0
-        book        = Spreadsheet.open filename
-        sheet       = book.worksheet worksheet_id
-        sheet.each do |row|
-          begin
-            dates=[]
-            row.formats.each_index{|i|
-              if !row.formats[i].nil? and row.formats[i].number_format=="DD/MM/YYYY"
-                dates.push(i)
-              end
-            }
-
-            line_number+=1
-            next if line_number <= ignore_lines
-            preprocess_row(row,dates)
-
-            if first_row
-              fields = extract_fields(row)
-              ds = Daru::DataFrame.new({},  order: fields.map(&:to_sym))
-              first_row=false
-            else
-              rowa = process_row(row,empty)
-              (fields.size - rowa.size).times { rowa << nil }
-              ds.add_row rowa
-            end
-          rescue => e
-            error="#{e.to_s}\nError on Line # #{line_number}:#{row.join(",")}"
-            raise
-          end
-        end
-        ds.update
-        fields.map(&:to_sym).each { |f| ds[f].rename f }
-        ds.rename filename 
-        ds
+        raise NoMethodError, "Deprecated. Use Daru::DataFrame.from_excel instead."
       end
     end
   end
+  
   module Mx
     class << self
       def write(dataset,filename,type=:covariance)

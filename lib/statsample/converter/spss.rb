@@ -4,7 +4,7 @@ module Statsample
       # Export a SPSS Matrix with tetrachoric correlations .
       #
       # Use: 
-      #   ds=Statsample::Excel.read("my_data.xls")
+      #   ds=Daru::DataFrame.from_excel("my_data.xls")
       #   puts Statsample::SPSS.tetrachoric_correlation_matrix(ds)
       def tetrachoric_correlation_matrix(ds)
         dsv=ds.dup_only_valid

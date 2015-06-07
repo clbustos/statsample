@@ -11,25 +11,15 @@ module Statsample
     ###
     # :section: R like methods
     ###
-    def read_with_cache(klass, filename,opts=Hash.new, cache=true)
-      file_ds=filename+".ds"
-      if cache and (File.exists? file_ds and File.mtime(file_ds)>File.mtime(filename))
-        ds=Statsample.load(file_ds)
-      else
-        ds=klass.read(filename)
-        ds.save(file_ds) if cache
-      end
-      ds
-    end
+
     # Import an Excel file. Cache result by default
-    def read_excel(filename, opts=Hash.new, cache=true)
-      read_with_cache(Statsample::Excel, filename, opts, cache)
-
+    def read_excel(filename, opts=Hash.new)
+      Daru::DataFrame.from_excel filename, opts
     end
-    # Import an CSV file. Cache result by default
 
-    def read_csv
-      read_with_cache(Statsample::CSV, filename, opts, cache)
+    # Import an CSV file. Cache result by default
+    def read_csv(filename, opts=Hash.new)
+      Daru::DataFrame.from_csv filename, opts
     end
     
     # Retrieve names (fields) from dataset
@@ -82,13 +72,15 @@ module Statsample
     def levene(*args)
       Statsample::Test::Levene.new(*args)
     end
+
     def principal_axis(*args)
       Statsample::Factor::PrincipalAxis.new(*args)
-      
     end
+
     def polychoric(*args)
       Statsample::Bivariate::Polychoric.new(*args)
     end
+
     def tetrachoric(*args)
       Statsample::Bivariate::Tetrachoric.new(*args)
     end
@@ -99,27 +91,35 @@ module Statsample
     def lr(*args)
       Statsample::Regression.multiple(*args)
     end
+
     def pca(ds,opts=Hash.new)
       Statsample::Factor::PCA.new(ds,opts)
     end
+
     def dominance_analysis(*args)
       Statsample::DominanceAnalysis.new(*args)
     end
+
     def dominance_analysis_bootstrap(*args)
       Statsample::DominanceAnalysis::Bootstrap.new(*args)
     end
+
     def scale_analysis(*args)
       Statsample::Reliability::ScaleAnalysis.new(*args)
     end
+
     def skill_scale_analysis(*args)
       Statsample::Reliability::SkillScaleAnalysis.new(*args)
     end
+
     def multiscale_analysis(*args,&block)
       Statsample::Reliability::MultiScaleAnalysis.new(*args,&block)
     end
+
     def test_u(*args)
       Statsample::Test::UMannWhitney.new(*args)
     end
+    
     module_function :test_u, :rnorm
   end
 end

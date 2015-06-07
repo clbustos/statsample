@@ -21,7 +21,7 @@ class StatsampleCodificationTestCase < Minitest::Test
     Statsample::Codification.create_excel(@ds, ['v1'], filename)
     field = Daru::Vector.new(['v1'] * 8, name: :field)
     keys = Daru::Vector.new(%w(dream dreaming run running sleep sleeping walk walking))
-    ds = Statsample::Excel.read(filename)
+    ds = Daru::DataFrame.from_excel(filename)
     assert_equal(field, ds[:field])
     assert_equal(keys, ds[:original])
     assert_equal(keys, ds[:recoded])
