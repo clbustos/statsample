@@ -1,6 +1,10 @@
 require 'statsample/converter/spss'
 module Statsample
-    # Create and dumps Datasets on a database
+  # Create and dumps Datasets on a database
+  # 
+  # == NOTE
+  # 
+  # Deprecated. Use Daru::DataFrame.from_sql and Daru::DataFrame#write_sql
   module Database
     class << self
       # Read a database query and returns a Dataset
@@ -38,40 +42,6 @@ module Statsample
           dataset.each_row do |row|
             row2 = row.map { |v| v.nil? ? "NA" : v.to_s.gsub(/\s+/,"_") }
             fp.puts row2.join("\t")
-          end
-        end
-      end
-    end
-  end
-  class SpreadsheetBase
-    class << self
-      def extract_fields(row)
-        i=0;
-        fields=row.to_a.collect{|c|
-          if c.nil?
-            i+=1
-            "var%05d" % i
-          else
-            c.to_s.downcase
-          end
-        }
-        fields.recode_repeated
-      end
-
-      def process_row(row,empty)
-        row.to_a.map do |c|
-          if empty.include?(c)
-            nil
-          else
-            if c.is_a? String and c.is_number?
-              if c=~/^\d+$/
-                c.to_i
-              else
-                c.gsub(",",".").to_f
-              end
-            else
-              c
-            end
           end
         end
       end
@@ -233,7 +203,6 @@ out
 					"<integervariable name=\"#{name}\" #{nickname} />"
 				end
 			end
-
 		end
 	end
 end
