@@ -7,7 +7,7 @@ module Statsample
       
       def generate (size,low,upper)
         range=upper-low+1
-        Vector.new((0...size).collect {|x| rand(range)+low },:numeric)
+        Daru::Vector.new((0...size).collect {|x| rand(range)+low })
       end
               
     end

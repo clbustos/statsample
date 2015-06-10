@@ -48,7 +48,7 @@ module Statsample
     end
   end
 
-  class PlainText < SpreadsheetBase
+  class PlainText
     class << self
       def read(filename, fields)
         raise NoMethodError, "Deprecated. Use Daru::DataFrame.from_plaintext instead."
