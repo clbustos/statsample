@@ -9,21 +9,16 @@ rvm:
   - '2.0'
   - '2.1'
   - '2.2'
-  - ruby-head
 
 matrix:
-  allow_failures:
-    - rvm: ruby-head
-
   fast_finish:
     true
 
 script: "bundle exec rake test"
 
 install:
-  - gem install bundler -v '~> 1.6'
-  - gem install nmatrix-0.1.0.gem
-  - gem install gsl-nmatrix-1.17.gem
+  - gem install bundler
+  - ./.build.sh
   - bundle install
 
 before_install:
