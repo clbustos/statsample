@@ -3,7 +3,7 @@ $:.unshift File.expand_path("../lib/", __FILE__)
 require 'statsample/version'
 require 'date'
 
-DESCRIPTION = <<MSG
+Statsample::DESCRIPTION = <<MSG
 A suite for basic and advanced statistics on Ruby. Tested on CRuby 1.9.3, 2.0.0
 and 2.1.1. See `.travis.yml` for more information.
 
@@ -11,7 +11,6 @@ Include:
 
 - Descriptive statistics: frequencies, median, mean,
 standard error, skew, kurtosis (and many others).
-- Imports and exports datasets from and to Excel, CSV and plain text files.
 - Correlations: Pearson's r, Spearman's rank correlation (rho), point biserial,
 tau a, tau b and  gamma. Tetrachoric and Polychoric correlation provides by
 statsample-bivariate-extension gem.
@@ -32,16 +31,10 @@ scales using factor analysis and correlations, if you want it.
 - Graphics: Histogram, Boxplot and Scatterplot.
 MSG
 
-POSTINSTALL = <<MSG
+Statsample::POSTINSTALL = <<MSG
 ***************************************************
 
 Thanks for installing statsample.
-
-On *nix, you could install statsample-optimization
-to retrieve gems gsl, statistics2 and a C extension
-to speed some methods.
-
-$ [sudo] gem install statsample-optimization
 
 *****************************************************
 MSG
@@ -56,8 +49,8 @@ Gem::Specification.new do |s|
   s.email = ["clbustos@gmail.com", "carlos@onox.com.br"]
 
   s.summary = "A suite for basic and advanced statistics on Ruby"
-  s.description = DESCRIPTION
-  s.post_install_message = POSTINSTALL
+  s.description = Statsample::DESCRIPTION
+  s.post_install_message = Statsample::POSTINSTALL
 
   s.rdoc_options = ["--main", "README.md"]
   s.extra_rdoc_files = ["History.txt", "LICENSE.txt", "README.md", "references.txt"]
@@ -67,6 +60,7 @@ Gem::Specification.new do |s|
   s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
 
+  s.add_runtime_dependency 'daru', '~> 0.1'
   s.add_runtime_dependency 'spreadsheet', '~> 1.0.3'
   s.add_runtime_dependency 'reportbuilder', '~> 1.4'
   s.add_runtime_dependency 'minimization', '~> 0.2'
@@ -85,5 +79,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'minitest', '~> 5.7'
   s.add_development_dependency 'gettext', '~> 3.1'
   s.add_development_dependency 'mocha', '~> 1.1'
-  s.add_development_dependency 'statsample-bivariate-extension'
+  s.add_development_dependency 'statsample-bivariate-extension', '~> 1.2'
+  s.add_development_dependency 'nmatrix', '~> 0.1.0'
+  s.add_development_dependency 'gsl-nmatrix', '~> 1.17.0'
 end

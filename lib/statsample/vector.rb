@@ -39,7 +39,8 @@ module Statsample
   # 
   # Statsample::Vector has been deprecated in favour of Daru::Vector. Daru is
   # a dedicated data analysis and manipulation library that brings awesome
-  # data analysis functionality to ruby. Check out the daru docs at <link>
+  # data analysis functionality to ruby. Check out the daru docs at
+  # https://github.com/v0dro/daru#notebooks
   class Vector < Daru::Vector
     include Statsample::VectorShorthands
 
@@ -60,7 +61,7 @@ module Statsample
     def missing_data
       only_missing.to_a
     end
-    # Original data, with all missing values replaced by nils
+    # Original data.
     # 
     # == Deprecation Warning
     # 

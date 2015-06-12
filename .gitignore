@@ -12,3 +12,4 @@ examples/images/*
 examples/*.html
 web/upload_task.rb
 .idea
+*.gem

@@ -22,15 +22,13 @@ module Statsample
 
     class ParallelAnalysis
       def self.with_random_data(cases,vars,opts=Hash.new)
-        # require 'ostruct'
         ds= Daru::DataFrame.new({}, 
           order: vars.times.map {|i| "v#{i+1}".to_sym},
           index: cases )
-        # ds.vectors=vars.times.map {|i| "v#{i+1}".to_sym}
-        # ds.nrows=cases
         opts=opts.merge({:bootstrap_method=> :random, :no_data=>true})
         new(ds, opts)
       end
+
       include DirtyMemoize
       include Summarizable
       # Number of random sets to produce. 50 by default
@@ -124,7 +122,7 @@ module Statsample
       def compute
         @original=Statsample::Bivariate.send(matrix_method, @ds).eigenvalues unless no_data
         @ds_eigenvalues=Daru::DataFrame.new({}, order: (1..@n_variables).map{|v| ("ev_%05d" % v).to_sym})
-        # @ds_eigenvalues.vectors.each {|f| @ds_eigenvalues[f].type = :numeric}
+        
         if bootstrap_method==:parameter or bootstrap_method==:random
           rng = Distribution::Normal.rng
         end

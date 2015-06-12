@@ -32,6 +32,9 @@ If you need to work on Structural Equation Modeling, you could see +statsample-s
 ```bash
 $ [sudo] gem install statsample-sem
 ```
+# Testing
+
+See CONTRIBUTING for information on testing and contributing to statsample.
 
 # Documentation
 
@@ -45,15 +48,15 @@ You can see some iruby notebooks here:
 
 ### Statistics
 
-* [Correlation Matrix with daru and statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Correlation%20Matrix%20with%20daru%20and%20statsample.ipynb)
-* [Dominance Analysis with statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Dominance%20Analysis%20with%20statsample.ipynb)
-* [Reliability ICC](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/statistics/Reliability%20ICC%20with%20statsample.ipynb)
-* [Levene Test](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/statistics/Levene%20Test.ipynb)
-* [Multiple Regression](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/statistics/Multiple%20Regression.ipynb)
-* [Parallel Analysis on PCA](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Parallel%20Analysis%20on%20PCA.ipynb)
-* [Polychoric Analysis](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Polychoric%20Correlation.ipynb)
-* [Reliability Scale and Multiscale Analysis](https://github.com/SciRuby/sciruby-notebooks/blob/master/statistics/Reliability%20Scale%20Analysis.ipynb)
-* [Velicer MAP Test](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/statistics/Velicer%20MAP%20test.ipynb)
+* [Correlation Matrix with daru and statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Statistics/Correlation%20Matrix%20with%20daru%20and%20statsample.ipynb)
+* [Dominance Analysis with statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Statistics/Dominance%20Analysis%20with%20statsample.ipynb)
+* [Reliability ICC](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/Statistics/Reliability%20ICC%20with%20statsample.ipynb)
+* [Levene Test](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/Statistics/Levene%20Test.ipynb)
+* [Multiple Regression](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/Statistics/Multiple%20Regression.ipynb)
+* [Parallel Analysis on PCA](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Statistics/Parallel%20Analysis%20on%20PCA.ipynb)
+* [Polychoric Analysis](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Statistics/Polychoric%20Correlation.ipynb)
+* [Reliability Scale and Multiscale Analysis](https://github.com/SciRuby/sciruby-notebooks/blob/master/Statistics/Reliability%20Scale%20Analysis.ipynb)
+* [Velicer MAP Test](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Statistics/Velicer%20MAP%20test.ipynb)
 
 ### Visualizations
 
@@ -63,9 +66,10 @@ You can see some iruby notebooks here:
 
 ### Working with DataFrame and Vector
 
-* [Creating Vectors and DataFrames with daru](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/data_analysis/Creation%20of%20Vector%20and%20DataFrame.ipynb)
+* [Creating Vectors and DataFrames with daru](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Data%20Analysis/Creation%20of%20Vector%20and%20DataFrame.ipynb)
 * [Detailed Usage of Daru::Vector](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Data%20Analysis/Usage%20of%20Vector.ipynb)
-* Find more notebooks on daru on the [homepage](https://github.com/v0dro/daru).
+* [Detailed Usage of Daru::DataFrame](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Data%20Analysis/Usage%20of%20DataFrame.ipynb)
+* [Visualizing Data with Daru::DataFrame](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Visualization/Visualizing%20data%20with%20daru%20DataFrame.ipynb)
 
 ## Examples
 
@@ -78,7 +82,6 @@ A suite for basic and advanced statistics on Ruby. Tested on CRuby 1.9.3, 2.0.0 
 
 Include:
 - Descriptive statistics: frequencies, median, mean, standard error, skew, kurtosis (and many others).
-- Imports and exports datasets from and to Excel, CSV and plain text files.
 - Correlations: Pearson's r, Spearman's rank correlation (rho), point biserial, tau a, tau b and  gamma.  Tetrachoric and Polychoric correlation provides by +statsample-bivariate-extension+ gem.
 - Intra-class correlation
 - Anova: generic and vector-based One-way ANOVA and Two-way ANOVA, with contrasts for One-way ANOVA.
@@ -134,10 +137,7 @@ Include:
   - Statsample::DominanceAnalysis class can report dominance analysis for a sample, using uni or multivariate dependent variables
   - Statsample::DominanceAnalysis::Bootstrap can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/].
 - Module Statsample::Codification, to help to codify open questions
-- Converters to import and export data:
-  - Statsample::Database : Can create sql to create tables, read and insert data
-  - Statsample::CSV : Read and write CSV files
-  - Statsample::Excel : Read and write Excel files
+- Converters to export data:
   - Statsample::Mx    : Write Mx Files
   - Statsample::GGobi : Write Ggobi files
 - Module Statsample::Crosstab provides function to create crosstab for categorical data
