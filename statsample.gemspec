@@ -79,7 +79,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'minitest', '~> 5.7'
   s.add_development_dependency 'gettext', '~> 3.1'
   s.add_development_dependency 'mocha', '~> 1.1'
-  s.add_development_dependency 'statsample-bivariate-extension', '~> 1.2'
   s.add_development_dependency 'nmatrix', '~> 0.1.0'
   s.add_development_dependency 'gsl-nmatrix', '~> 1.17.0'
 end
