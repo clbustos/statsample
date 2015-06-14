@@ -7,13 +7,13 @@ module Statsample
   #
   # == Use
   #
-  #  a=1000.times.collect {rand}.to_numeric
-  #  b=1000.times.collect {rand}.to_numeric
-  #  c=1000.times.collect {rand}.to_numeric
-  #  ds={'a'=>a,'b'=>b,'c'=>c}.to_dataset
-  #  ds['y']=ds.collect{|row| row['a']*5+row['b']*3+row['c']*2+rand()}
-  #  da=Statsample::DominanceAnalysis.new(ds,'y')
-  #  puts da.summary
+  # a = Daru::Vector.new(1000.times.collect {rand})
+  # b = Daru::Vector.new(1000.times.collect {rand})
+  # c = Daru::Vector.new(1000.times.collect {rand})
+  # ds= Daru::DataFrame.new({:a => a,:b => b,:c => c})
+  # ds[:y] = ds.collect_rows {|row| row[:a]*5 + row[:b]*3 + row[:c]*2 + rand()}
+  # da=Statsample::DominanceAnalysis.new(ds, :y)
+  # puts da.summary
   # 
   # === Output:
   #
@@ -115,21 +115,21 @@ module Statsample
       }
       @dependent=dependent
       @dependent=[@dependent] unless @dependent.is_a? Array
-      
-      @predictors ||= input.fields-@dependent
-      
-      @name=_("Dominance Analysis:  %s over %s") % [ @predictors.flatten.join(",") , @dependent.join(",")] if @name.nil?
-      
-      if input.is_a? Statsample::Dataset
+
+      if input.kind_of? Daru::DataFrame
+        @predictors ||= input.vectors.to_a - @dependent
         @ds=input
         @matrix=Statsample::Bivariate.correlation_matrix(input)
         @cases=Statsample::Bivariate.min_n_valid(input)
       elsif input.is_a? ::Matrix
+        @predictors ||= input.fields-@dependent
         @ds=nil
         @matrix=input
       else
         raise ArgumentError.new("You should use a Matrix or a Dataset")
       end
+
+      @name=_("Dominance Analysis:  %s over %s") % [ @predictors.flatten.join(",") , @dependent.join(",")] if @name.nil?
       @models=nil
       @models_data=nil
       @general_averages=nil
@@ -264,22 +264,21 @@ module Statsample
     end
     
     def md(m)
-      models_data[m.sort {|a,b| a.to_s<=>b.to_s}]
+      models_data[m.sort {|a,b| a.to_s <=> b.to_s}]
     end
     # Get all model of size k
     def md_k(k)
       out=[]
-      @models.each{|m| out.push(md(m)) if m.size==k }
+      @models.each{ |m| out.push(md(m)) if m.size==k }
       out
     end
     
     # For a hash with arrays of numbers as values
     # Returns a hash with same keys and 
     # value as the mean of values of original hash
-    
     def get_averages(averages)
       out={}
-      averages.each{|key,val| out[key]=val.to_vector(:numeric).mean }
+      averages.each{ |key,val| out[key] = Daru::Vector.new(val).mean }
       out
     end
     # Hash with average for each k size model.

@@ -22,6 +22,8 @@ require 'extendmatrix'
 require 'distribution'
 require 'dirty-memoize'
 require 'reportbuilder'
+require 'daru'
+require 'statsample/daru'
 
 class Numeric
   def square
@@ -52,42 +54,6 @@ class Module
 end
 
 class Array
-  # Recode repeated values on an array, adding the number of repetition
-  # at the end
-  # Example:
-  #   a=%w{a b c c d d d e}
-  #   a.recode_repeated
-  #   => ["a","b","c_1","c_2","d_1","d_2","d_3","e"]
-  def recode_repeated
-    if size != uniq.size
-      # Find repeated
-      repeated = inject({}) do |acc, v|
-        if acc[v].nil?
-          acc[v] = 1
-        else
-          acc[v] += 1
-        end
-        acc
-      end.select { |_k, v| v > 1 }.keys
-
-      ns = repeated.inject({}) do |acc, v|
-        acc[v] = 0
-        acc
-      end
-
-      collect do |f|
-        if repeated.include? f
-          ns[f] += 1
-          sprintf('%s_%d', f, ns[f])
-        else
-          f
-        end
-      end
-    else
-      self
-    end
-  end
-
   def sum
     inject(:+)
   end
@@ -218,7 +184,7 @@ module Statsample
       size = vs[0].size
 
       vs.each do |v|
-        fail ArgumentError, 'Arguments should be Vector' unless v.instance_of? Statsample::Vector
+        fail ArgumentError, 'Arguments should be Vector' unless v.instance_of? Daru::Vector
         fail ArgumentError, 'Vectors size should be the same' if v.size != size
       end
 
@@ -228,26 +194,26 @@ module Statsample
     # Returns a duplicate of the input vectors, without missing data
     # for any of the vectors.
     #
-    #  a=[1,2,3,6,7,nil,3,5].to_numeric
-    #  b=[nil,nil,5,6,4,5,10,2].to_numeric
-    #  c=[2,4,6,7,4,5,6,7].to_numeric
+    #  a = Daru::Vector.new([1,2,3,6,7,nil,3,5])
+    #  b = Daru::Vector.new([nil,nil,5,6,4,5,10,2])
+    #  c = Daru::Vector.new([2,4,6,7,4,5,6,7])
     #  a2,b2,c2=Statsample.only_valid(a,b,c)
-    #  => [#<Statsample::Scale:0xb748c8c8 @data=[3, 6, 7, 3, 5]>,
-    #        #<Statsample::Scale:0xb748c814 @data=[5, 6, 4, 10, 2]>,
-    #        #<Statsample::Scale:0xb748c760 @data=[6, 7, 4, 6, 7]>]
+    #  => [#<Daru::Vector:0xb748c8c8 @data=[3, 6, 7, 3, 5]>,
+    #        #<Daru::Vector:0xb748c814 @data=[5, 6, 4, 10, 2]>,
+    #        #<Daru::Vector:0xb748c760 @data=[6, 7, 4, 6, 7]>]
     #
     def only_valid(*vs)
       i = 1
-      h = vs.inject({}) { |acc, v| acc["v#{i}"] = v; i += 1; acc }
-      ds = Statsample::Dataset.new(h).dup_only_valid
-      ds.vectors.values
+      h = vs.inject({}) { |acc, v| acc["v#{i}".to_sym] = v; i += 1; acc }
+      df = Daru::DataFrame.new(h).dup_only_valid
+      df.map { |v| v }
     end
 
     # Cheap version of #only_valid.
     # If any vectors have missing_values, return only valid.
     # If not, return the vectors itself
     def only_valid_clone(*vs)
-      if vs.any?(&:flawed?)
+      if vs.any?(&:has_missing_data?)
         only_valid(*vs)
       else
         vs

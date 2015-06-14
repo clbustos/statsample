@@ -4,7 +4,6 @@ extend BenchPress
 cases=250
 vars=20
 
-
 name "gsl matrix based vs. manual ruby correlation matrix (#{vars} vars, #{cases} cases)"
 author 'Clbustos'
 date '2011-01-18'
@@ -17,10 +16,12 @@ In this test, we test the calculation using #{vars} variables with
 
 reps 200 #number of repetitions
 
-ds=vars.times.inject({}) {|ac,v|
-ac["x#{v}"]=Statsample::Vector.new_numeric(cases) {rand()}
-ac
-}.to_dataset
+ds = Daru::DataFrame.new(
+  vars.times.inject({}) do |ac,v|
+    ac["x#{v}".to_sym]=Daru::Vector.new_with_size(cases) {rand()}
+    ac
+  end
+)
     
 measure "Statsample::Bivariate.correlation_matrix_optimized" do
   Statsample::Bivariate.correlation_matrix_optimized(ds)

@@ -1,63 +1,36 @@
 require 'statsample/converter/spss'
 module Statsample
-    # Create and dumps Datasets on a database
+  # Create and dumps Datasets on a database
+  # 
+  # == NOTE
+  # 
+  # Deprecated. Use Daru::DataFrame.from_sql and Daru::DataFrame#write_sql
   module Database
     class << self
       # Read a database query and returns a Dataset
       #
-      # USE:
-      #
-      #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
-      #  Statsample.read(dbh, "SELECT * FROM test")
-      #
+      # == NOTE
+      # 
+      # Deprecated. Use Daru::DataFrame.from_sql instead.
       def read(dbh,query)
-        require 'dbi'
-        sth=dbh.execute(query)
-        vectors={}
-        fields=[]
-        sth.column_info.each {|c|
-            vectors[c['name']]=Statsample::Vector.new([])
-            vectors[c['name']].name=c['name']
-            vectors[c['name']].type= (c['type_name']=='INTEGER' or c['type_name']=='DOUBLE') ? :numeric : :object
-            fields.push(c['name'])
-        }
-        ds=Statsample::Dataset.new(vectors,fields)
-        sth.fetch do |row|
-            ds.add_case(row.to_a, false )
-        end
-        ds.update_valid_data
-        ds
+        raise NoMethodError, "Deprecated. Use Daru::DataFrame.from_sql instead."
       end
+
       # Insert each case of the Dataset on the selected table
       #
-      # USE:
-      #
-      #  ds={'id'=>[1,2,3].to_vector, 'name'=>["a","b","c"].to_vector}.to_dataset
-      #  dbh = DBI.connect("DBI:Mysql:database:localhost", "user", "password")
-      #  Statsample::Database.insert(ds,dbh,"test")
-      #
+      # == NOTE
+      # 
+      # Deprecated. Use Daru::DataFrame#write_sql instead
       def insert(ds, dbh, table)
-        require 'dbi'
-        query="INSERT INTO #{table} ("+ds.fields.join(",")+") VALUES ("+((["?"]*ds.fields.size).join(","))+")"
-        sth=dbh.prepare(query)
-        ds.each_array{|c| sth.execute(*c) }
-        return true
+        raise NoMethodError, "Deprecated. Use Daru::DataFrame#write_sql instead."
       end
       # Create a sql, basen on a given Dataset
       #
-      # USE:
-      #
-      #  ds={'id'=>[1,2,3,4,5].to_vector,'name'=>%w{Alex Peter Susan Mary John}.to_vector}.to_dataset
-      #  Statsample::Database.create_sql(ds,'names')
-      #   ==>"CREATE TABLE names (id INTEGER,\n name VARCHAR (255)) CHARACTER SET=UTF8;"
-      #
+      # == NOTE
+      # 
+      # Deprecated. Use Daru::DataFrame#create_sql instead.
       def create_sql(ds,table,charset="UTF8")
-        sql="CREATE TABLE #{table} ("
-        fields=ds.fields.collect{|f|
-            v=ds[f]
-            f+" "+v.db_type
-        }
-        sql+fields.join(",\n ")+") CHARACTER SET=#{charset};"
+        raise NoMethodError, "Deprecated. Use Daru::DataFrame#create_sql instead."
       end
     end
   end
@@ -65,182 +38,49 @@ module Statsample
     class << self
       def write(dataset,filename)
         File.open(filename,"wb") do |fp|
-          fp.puts dataset.fields.join("\t")
-          dataset.each_array_with_nils do |row|
-            row2=row.collect{|v| v.nil? ? "NA" : v.to_s.gsub(/\s+/,"_") }
+          fp.puts dataset.vectors.to_a.join("\t")
+          dataset.each_row do |row|
+            row2 = row.map { |v| v.nil? ? "NA" : v.to_s.gsub(/\s+/,"_") }
             fp.puts row2.join("\t")
           end
         end
       end
     end
   end
-  class SpreadsheetBase
+
+  class PlainText
     class << self
-      def extract_fields(row)
-        i=0;
-        fields=row.to_a.collect{|c|
-          if c.nil?
-            i+=1
-            "var%05d" % i
-          else
-            c.to_s.downcase
-          end
-        }
-        fields.recode_repeated
+      def read(filename, fields)
+        raise NoMethodError, "Deprecated. Use Daru::DataFrame.from_plaintext instead."
       end
-
-      def process_row(row,empty)
-        row.to_a.map do |c|
-          if empty.include?(c)
-              nil
-          else
-            if c.is_a? String and c.is_number?
-              if c=~/^\d+$/
-                c.to_i
-              else
-                c.gsub(",",".").to_f
-              end
-            else
-              c
-            end
-          end
-        end
-      end
-      def convert_to_numeric_and_date(ds,fields)
-        fields.each do |f|
-          if ds[f].can_be_numeric?
-            ds[f].type=:numeric
-          elsif ds[f].can_be_date?
-            ds[f].type=:date
-          end
-        end
-      end
-
     end
   end
-    class PlainText < SpreadsheetBase
-      class << self
-        def read(filename, fields)
-          ds=Statsample::Dataset.new(fields)
-          fp=File.open(filename,"r")
-          fp.each_line do |line|
-            row=process_row(line.strip.split(/\s+/),[""])
-            next if row==["\x1A"]
-            ds.add_case_array(row)
-          end
-          convert_to_numeric_and_date(ds,fields)
-          ds.update_valid_data
-          fields.each {|f|
-            ds[f].name=f
-          }
-          ds
-        end
-      end
-    end
-  class Excel < SpreadsheetBase
+    
+  # This class has been DEPRECATED. Use Daru::DataFrame::from_excel 
+  # Daru::DataFrame#write_excel for XLS file operations.
+  class Excel
     class << self
       # Write a Excel spreadsheet based on a dataset
       # * TODO: Format nicely date values
+      # 
+      # == NOTE
+      # 
+      # Deprecated. Use Daru::DataFrame#write_csv.
       def write(dataset,filename)
-        require 'spreadsheet'
-        book = Spreadsheet::Workbook.new
-        sheet = book.create_worksheet
-        format = Spreadsheet::Format.new :color => :blue,
-                           :weight => :bold
-        sheet.row(0).concat(dataset.fields.map {|i| i.dup}) # Unfreeze strings
-        sheet.row(0).default_format = format
-        i=1
-        dataset.each_array{|row|
-          sheet.row(i).concat(row)
-          i+=1
-        }
-        book.write(filename)
+        raise NoMethodError, "Deprecated. Use Daru::DataFrame#write_excel instead."
       end
-      # This should be fixed.
-      # If we have a Formula, should be resolver first
-
-      def preprocess_row(row, dates)
-        i=-1
-        row.collect!{|c|
-          i+=1
-          if c.is_a? Spreadsheet::Formula
-            if(c.value.is_a? Spreadsheet::Excel::Error)
-              nil
-            else
-              c.value
-            end
-          elsif dates.include? i and !c.nil? and c.is_a? Numeric
-              row.date(i)
-          else
-              c
-          end
-        }
-      end
-      private :process_row, :preprocess_row
 
       # Returns a dataset based on a xls file
-      # USE:
-      #     ds = Statsample::Excel.read("test.xls")
-      #
+      # 
+      # == NOTE
+      # 
+      # Deprecated. Use Daru::DataFrame.from_excel instead.
       def read(filename, opts=Hash.new)
-        require 'spreadsheet'
-        raise "options should be Hash" unless opts.is_a? Hash
-        opts_default={
-          :worksheet_id=>0,
-          :ignore_lines=>0,
-          :empty=>['']
-        }
-
-        opts=opts_default.merge opts
-
-        worksheet_id=opts[:worksheet_id]
-        ignore_lines=opts[:ignore_lines]
-        empty=opts[:empty]
-
-        first_row=true
-        fields=[]
-        ds=nil
-        line_number=0
-        book = Spreadsheet.open filename
-        sheet= book.worksheet worksheet_id
-        sheet.each do |row|
-          begin
-            dates=[]
-            row.formats.each_index{|i|
-              if !row.formats[i].nil? and row.formats[i].number_format=="DD/MM/YYYY"
-                dates.push(i)
-              end
-            }
-            line_number+=1
-            next if(line_number<=ignore_lines)
-
-            preprocess_row(row,dates)
-            if first_row
-              fields=extract_fields(row)
-              ds=Statsample::Dataset.new(fields)
-              first_row=false
-            else
-              rowa=process_row(row,empty)
-              (fields.size - rowa.size).times {
-                rowa << nil
-              }
-              ds.add_case(rowa,false)
-            end
-          rescue => e
-            error="#{e.to_s}\nError on Line # #{line_number}:#{row.join(",")}"
-            raise
-          end
-        end
-        convert_to_numeric_and_date(ds, fields)
-        ds.update_valid_data
-        fields.each {|f|
-          ds[f].name=f
-        }
-        ds.name=filename
-        ds
+        raise NoMethodError, "Deprecated. Use Daru::DataFrame.from_excel instead."
       end
     end
   end
+
   module Mx
     class << self
       def write(dataset,filename,type=:covariance)
@@ -249,12 +89,12 @@ module Statsample
           fp.puts "! #{filename}"
           fp.puts "! Output generated by Statsample"
           fp.puts "Data Ninput=#{dataset.fields.size} Nobservations=#{dataset.cases}"
-          fp.puts "Labels "+dataset.fields.join(" ")
+          fp.puts "Labels " + dataset.vectors.to_a.join(" ")
           case type
             when :raw
             fp.puts "Rectangular"
             dataset.each do |row|
-              out=dataset.fields.collect do |f|
+              out=dataset.vectors.to_a.collect do |f|
                 if dataset[f].is_valid? row[f]
                   row[f]
                 else
@@ -292,18 +132,18 @@ module Statsample
 				carrier=OpenStruct.new
 				carrier.categorials=[]
 				carrier.conversions={}
-				variables_def=dataset.fields.collect{|k|
+				variables_def=dataset.vectors.to_a.collect{|k|
 					variable_definition(carrier,dataset[k],k)
 				}.join("\n")
 
 				indexes=carrier.categorials.inject({}) {|s,c|
-					s[dataset.fields.index(c)]=c
+					s[dataset.vectors.to_a.index(c)]=c
 					s
 				}
 				records=""
-				dataset.each_array {|c|
-					indexes.each{|ik,iv|
-						c[ik]=carrier.conversions[iv][c[ik]]
+				dataset.each_row {|c|
+					indexes.each { |ik,iv|
+						c[ik] = carrier.conversions[iv][c[ik]]
 					}
 					records << "<record>#{values_definition(c, default_opt[:missing])}</record>\n"
 				}
@@ -345,7 +185,7 @@ out
 			# nickname = nickname
 			def variable_definition(carrier,v,name,nickname=nil)
 				nickname = (nickname.nil? ? "" : "nickname=\"#{nickname}\"" )
-				if v.type==:object or v.data.find {|d|  d.is_a? String }
+				if v.type==:object or v.to_a.find {|d|  d.is_a? String }
 					carrier.categorials.push(name)
 					carrier.conversions[name]={}
 					factors=v.factors
@@ -353,17 +193,16 @@ out
 					out << "<levels count=\"#{factors.size}\">\n"
 					out << (1..factors.size).to_a.collect{|i|
 						carrier.conversions[name][factors[i-1]]=i
-						"<level value=\"#{i}\">#{v.labeling(factors[i-1])}</level>"
+						"<level value=\"#{i}\">#{(v.labels[factors[i-1]] || factors[i-1])}</level>"
 					}.join("\n")
 					out << "</levels>\n</categoricalvariable>\n"
 					out
-				elsif v.data.find {|d| d.is_a? Float}
+				elsif v.to_a.find {|d| d.is_a? Float}
 					"<realvariable name=\"#{name}\" #{nickname} />"
 				else
 					"<integervariable name=\"#{name}\" #{nickname} />"
 				end
 			end
-
 		end
 	end
 end

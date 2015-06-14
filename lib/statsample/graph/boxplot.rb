@@ -8,12 +8,12 @@ module Statsample
     # 
     # == Usage
     # === Svg output
-    #  a=[1,2,3,4].to_numeric
-    #  b=[3,4,5,6].to_numeric
-    #  puts Statsample::Graph::Boxplot.new(:vectors=>[a,b]).to_svg
+    #  a = Daru::Vector.new([1,2,3,4])
+    #  b = Daru::Vector.new([3,4,5,6])
+    # puts Statsample::Graph::Boxplot.new(:vectors=>[a,b]).to_svg
     # === Using ReportBuilder
-    #  a=[1,2,3,4].to_numeric
-    #  b=[3,4,5,6].to_numeric
+    #  a = Daru::Vector.new([1,2,3,4])
+    #  b = Daru::Vector.new([3,4,5,6])
     #  rb=ReportBuilder.new
     #  rb.add(Statsample::Graph::Boxplot.new(:vectors=>[a,b]))
     #  rb.save_html('boxplot.html')
@@ -85,8 +85,6 @@ module Statsample
         min||=@vectors.map {|v| v.min}.min
         max||=@vectors.map {|v| v.max}.max
         
-        
-        
         margin_hor=margin_left + margin_right
         margin_vert=margin_top  + margin_bottom
         x_scale = pv.Scale.ordinal(@vectors.size.times.map.to_a).split_banded(0, width-margin_hor, 4.0/5)
@@ -115,12 +113,10 @@ module Statsample
           out[:low_whisker]=min
           out[:high_whisker]=max
           # And now, data outside whiskers
-          out[:outliers]=v.data_with_nils.find_all {|d| d < min or d > max }
+          out[:outliers]=v.to_a.find_all {|d| d < min or d > max }
           out
         }
-        
-
-        
+               
         vis=Rubyvis::Panel.new do |pan| 
           pan.width  width  - margin_hor
           pan.height height - margin_vert
@@ -157,7 +153,6 @@ module Statsample
             bp.left {|v|  x_scale[index]}
             bp.width x_scale.range_band
             
-            
             # Bar
             bp.bar do |b|
               b.bottom {|v| y_scale[v[:percentil_25]]}
@@ -168,9 +163,7 @@ module Statsample
                   colors.scale(that.groups[parent.index]).darker
                 else
                   colors.scale(index).darker
-                end
-              
-              
+                end  
               }
               b.fill_style {|v| 
                 if that.groups
@@ -237,7 +230,6 @@ module Statsample
         builder.section(:name=>name) do |b|
           b.image(to_svg, :type=>'svg', :width=>width, :height=>height)
         end
-        
       end
     end
   end

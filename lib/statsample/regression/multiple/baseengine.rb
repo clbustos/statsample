@@ -19,13 +19,12 @@ module Statsample
         end
         def initialize(ds, y_var, opts = Hash.new)
           @ds=ds
-          @predictors_n=@ds.fields.size-1
-          @total_cases=@ds.cases
-          @cases=@ds.cases
+          @predictors_n=@ds.vectors.size-1
+          @total_cases=@ds.nrows
+          @cases=@ds.nrows
           @y_var=y_var
           @r2=nil
-          @name=_("Multiple Regression:  %s over %s") % [ ds.fields.join(",") , @y_var]
-          
+          @name=_("Multiple Regression:  %s over %s") % [ ds.vectors.to_a.join(",") , @y_var]
           
           opts_default={:digits=>3}
           @opts=opts_default.merge opts
@@ -33,7 +32,6 @@ module Statsample
           @opts.each{|k,v|
             self.send("#{k}=",v) if self.respond_to? k
           }
-          
         end
         # Calculate F Test
         def anova
@@ -45,15 +43,17 @@ module Statsample
         end
         # Retrieves a vector with predicted values for y
         def predicted
-          @total_cases.times.collect { |i|
-            invalid=false
-            vect=@dep_columns.collect {|v| invalid=true if v[i].nil?; v[i]}
-            if invalid
-              nil
-            else
-              process(vect)
+          Daru::Vector.new(
+            @total_cases.times.collect do |i|
+              invalid = false
+              vect = @dep_columns.collect {|v| invalid = true if v[i].nil?; v[i]}
+              if invalid
+                nil
+              else
+                process(vect)
+              end
             end
-          }.to_vector(:numeric)
+          )
         end
         # Retrieves a vector with standarized values for y
         def standarized_predicted
@@ -61,15 +61,17 @@ module Statsample
         end
         # Retrieves a vector with residuals values for y
         def residuals
-          (0...@total_cases).collect{|i|
-            invalid=false
-            vect=@dep_columns.collect{|v| invalid=true if v[i].nil?; v[i]}
-            if invalid or @ds[@y_var][i].nil?
-              nil
-            else
-              @ds[@y_var][i] - process(vect)
+          Daru::Vector.new(
+            (0...@total_cases).collect do |i|
+              invalid=false
+              vect=@dep_columns.collect{|v| invalid=true if v[i].nil?; v[i]}
+              if invalid or @ds[@y_var][i].nil?
+                nil
+              else
+                @ds[@y_var][i] - process(vect)
+              end
             end
-          }.to_vector(:numeric)
+          )
         end
         # R Multiple
         def r
@@ -131,12 +133,10 @@ module Statsample
         # Tolerance for a given variable
         # http://talkstats.com/showthread.php?t=5056
         def tolerance(var)
-          ds=assign_names(@dep_columns)
-          ds.each{|k,v|
-          ds[k]=v.to_vector(:numeric)
-          }
-          lr=self.class.new(ds.to_dataset,var)
-          1-lr.r2
+          ds = assign_names(@dep_columns)
+          ds.each { |k,v| ds[k] = Daru::Vector.new(v) }
+          lr = self.class.new(Daru::DataFrame.new(ds),var)
+          1 - lr.r2
         end
         # Tolerances for each coefficient
         def coeffs_tolerances
@@ -165,12 +165,12 @@ module Statsample
         def estimated_variance_covariance_matrix
           #mse_p=mse
           columns=[]
-          @ds_valid.fields.each{|k|
-            v=@ds_valid[k]
-            columns.push(v.data) unless k==@y_var
+          @ds_valid.vectors.each{|k|
+            v = @ds_valid[k]
+            columns.push(v.to_a) unless k == @y_var
           }
           columns.unshift([1.0]*@valid_cases)
-          x=Matrix.columns(columns)
+          x=::Matrix.columns(columns)
           matrix=((x.t*x)).inverse * mse
           matrix.collect {|i| Math::sqrt(i) if i>=0 }
         end

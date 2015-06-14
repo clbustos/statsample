@@ -22,6 +22,7 @@ module Statsample
          end
          calculate
       end
+      
       def calculate
          d=0
         @d1.each {|x|
@@ -31,12 +32,13 @@ module Statsample
         }
         @d=d
       end
+
       # Make a wrapper EmpiricDistribution to any method which implements
-      # each
-      # On Statsample::Vector, only uses #valid_data
+      # each on Statsample::Vector, only uses non-missing data.
       def make_cdf(v)
-        v.is_a?(Statsample::Vector) ? EmpiricDistribution.new(v.valid_data) : EmpiricDistribution.new(v)
+        v.is_a?(Daru::Vector) ? EmpiricDistribution.new(v.only_valid.to_a) : EmpiricDistribution.new(v)
       end
+
       class EmpiricDistribution
         def initialize(data)
           @min=data.min

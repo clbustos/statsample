@@ -11,30 +11,20 @@ module Statsample
     ###
     # :section: R like methods
     ###
-    def read_with_cache(klass, filename,opts=Hash.new, cache=true)
-      file_ds=filename+".ds"
-      if cache and (File.exists? file_ds and File.mtime(file_ds)>File.mtime(filename))
-        ds=Statsample.load(file_ds)
-      else
-        ds=klass.read(filename)
-        ds.save(file_ds) if cache
-      end
-      ds
-    end
+
     # Import an Excel file. Cache result by default
-    def read_excel(filename, opts=Hash.new, cache=true)
-      read_with_cache(Statsample::Excel, filename, opts, cache)
-
+    def read_excel(filename, opts=Hash.new)
+      Daru::DataFrame.from_excel filename, opts
     end
-    # Import an CSV file. Cache result by default
 
-    def read_csv
-      read_with_cache(Statsample::CSV, filename, opts, cache)
+    # Import an CSV file. Cache result by default
+    def read_csv(filename, opts=Hash.new)
+      Daru::DataFrame.from_csv filename, opts
     end
     
     # Retrieve names (fields) from dataset
     def names(ds)
-      ds.fields
+      ds.vectors.to_a
     end
     # Create a correlation matrix from a dataset
     def cor(ds)
@@ -44,21 +34,25 @@ module Statsample
     def cov(ds)
       Statsample::Bivariate.covariate_matrix(ds)
     end
-    # Create a Statsample::Vector
+    # Create a Daru::Vector
     # Analog to R's c
     def vector(*args)
-      Statsample::Vector[*args]
+      Daru::Vector[*args]
     end
     # Random generation for the normal distribution
     def rnorm(n,mean=0,sd=1)
       rng=Distribution::Normal.rng(mean,sd)
-      Statsample::Vector.new_numeric(n) { rng.call}
+      Daru::Vector.new_with_size(n) { rng.call}
     end
-    # Creates a new Statsample::Dataset
-    # Each key is transformed into string
+    # Creates a new Daru::DataFrame
+    # Each key is transformed into a Symbol wherever possible.
     def dataset(vectors=Hash.new)
-      vectors=vectors.inject({}) {|ac,v| ac[v[0].to_s]=v[1];ac}
-      Statsample::Dataset.new(vectors)
+      vectors = vectors.inject({}) do |ac,v| 
+        n     = v[0].respond_to?(:to_sym) ? v[0].to_sym : v[0] 
+        ac[n] = v[1]
+        ac
+      end
+      Daru::DataFrame.new(vectors)
     end
     alias :data_frame :dataset
     # Returns a Statsample::Graph::Boxplot
@@ -78,13 +72,15 @@ module Statsample
     def levene(*args)
       Statsample::Test::Levene.new(*args)
     end
+
     def principal_axis(*args)
       Statsample::Factor::PrincipalAxis.new(*args)
-      
     end
+
     def polychoric(*args)
       Statsample::Bivariate::Polychoric.new(*args)
     end
+
     def tetrachoric(*args)
       Statsample::Bivariate::Tetrachoric.new(*args)
     end
@@ -95,27 +91,35 @@ module Statsample
     def lr(*args)
       Statsample::Regression.multiple(*args)
     end
+
     def pca(ds,opts=Hash.new)
       Statsample::Factor::PCA.new(ds,opts)
     end
+
     def dominance_analysis(*args)
       Statsample::DominanceAnalysis.new(*args)
     end
+
     def dominance_analysis_bootstrap(*args)
       Statsample::DominanceAnalysis::Bootstrap.new(*args)
     end
+
     def scale_analysis(*args)
       Statsample::Reliability::ScaleAnalysis.new(*args)
     end
+
     def skill_scale_analysis(*args)
       Statsample::Reliability::SkillScaleAnalysis.new(*args)
     end
+
     def multiscale_analysis(*args,&block)
       Statsample::Reliability::MultiScaleAnalysis.new(*args,&block)
     end
+
     def test_u(*args)
       Statsample::Test::UMannWhitney.new(*args)
     end
+    
     module_function :test_u, :rnorm
   end
 end

@@ -32,10 +32,49 @@ If you need to work on Structural Equation Modeling, you could see +statsample-s
 ```bash
 $ [sudo] gem install statsample-sem
 ```
+# Testing
+
+See CONTRIBUTING for information on testing and contributing to statsample.
 
 # Documentation
 
 You can see the latest documentation in [rubydoc.info](http://www.rubydoc.info/github/sciruby/statsample/master).
+
+# Usage
+
+## Notebooks
+
+You can see some iruby notebooks here:
+
+### Statistics
+
+* [Correlation Matrix with daru and statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Statistics/Correlation%20Matrix%20with%20daru%20and%20statsample.ipynb)
+* [Dominance Analysis with statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Statistics/Dominance%20Analysis%20with%20statsample.ipynb)
+* [Reliability ICC](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/Statistics/Reliability%20ICC%20with%20statsample.ipynb)
+* [Levene Test](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/Statistics/Levene%20Test.ipynb)
+* [Multiple Regression](http://nbviewer.ipython.org/github/v0dro/sciruby-notebooks/blob/master/Statistics/Multiple%20Regression.ipynb)
+* [Parallel Analysis on PCA](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Statistics/Parallel%20Analysis%20on%20PCA.ipynb)
+* [Polychoric Analysis](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Statistics/Polychoric%20Correlation.ipynb)
+* [Reliability Scale and Multiscale Analysis](https://github.com/SciRuby/sciruby-notebooks/blob/master/Statistics/Reliability%20Scale%20Analysis.ipynb)
+* [Velicer MAP Test](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Statistics/Velicer%20MAP%20test.ipynb)
+
+### Visualizations
+
+* [Creating Boxplots with daru and statsample](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Visualization/Boxplot%20with%20daru%20and%20statsample.ipynb)
+* [Creating A Histogram](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Visualization/Creating%20a%20Histogram.ipynb)
+* [Creating a Scatterplot](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Visualization/Scatterplot%20with%20statsample.ipynb)
+
+### Working with DataFrame and Vector
+
+* [Creating Vectors and DataFrames with daru](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Data%20Analysis/Creation%20of%20Vector%20and%20DataFrame.ipynb)
+* [Detailed Usage of Daru::Vector](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Data%20Analysis/Usage%20of%20Vector.ipynb)
+* [Detailed Usage of Daru::DataFrame](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Data%20Analysis/Usage%20of%20DataFrame.ipynb)
+* [Visualizing Data with Daru::DataFrame](http://nbviewer.ipython.org/github/SciRuby/sciruby-notebooks/blob/master/Visualization/Visualizing%20data%20with%20daru%20DataFrame.ipynb)
+
+## Examples
+
+See the /examples directory for some use cases. The notebooks listed above have mostly
+the same examples, and they look better so you might want to see that first.
 
 # Description
 
@@ -43,7 +82,6 @@ A suite for basic and advanced statistics on Ruby. Tested on CRuby 1.9.3, 2.0.0 
 
 Include:
 - Descriptive statistics: frequencies, median, mean, standard error, skew, kurtosis (and many others).
-- Imports and exports datasets from and to Excel, CSV and plain text files.
 - Correlations: Pearson's r, Spearman's rank correlation (rho), point biserial, tau a, tau b and  gamma.  Tetrachoric and Polychoric correlation provides by +statsample-bivariate-extension+ gem.
 - Intra-class correlation
 - Anova: generic and vector-based One-way ANOVA and Two-way ANOVA, with contrasts for One-way ANOVA.
@@ -75,8 +113,7 @@ Include:
 # Features
 
 - Classes for manipulation and storage of data:
-  - Statsample::Vector: An extension of an array, with statistical methods like sum, mean and standard deviation
-  - Statsample::Dataset: a group of Statsample::Vector, analog to a excel spreadsheet or a dataframe on R. The base of almost all operations on statsample.
+  - Uses [daru](https://github.com/v0dro/daru) for storing data and basic statistics.
   - Statsample::Multiset: multiple datasets with same fields and type of vectors
 - Anova module provides generic Statsample::Anova::OneWay and vector based Statsample::Anova::OneWayWithVectors. Also you can create contrast using Statsample::Anova::Contrast
 - Module Statsample::Bivariate provides covariance and pearson, spearman, point biserial, tau a, tau b, gamma, tetrachoric (see Bivariate::Tetrachoric) and polychoric (see Bivariate::Polychoric) correlations. Include methods to create correlation and covariance matrices
@@ -100,10 +137,7 @@ Include:
   - Statsample::DominanceAnalysis class can report dominance analysis for a sample, using uni or multivariate dependent variables
   - Statsample::DominanceAnalysis::Bootstrap can execute bootstrap analysis to determine dominance stability, as recomended by  Azen & Budescu (2003) link[http://psycnet.apa.org/journals/met/8/2/129/].
 - Module Statsample::Codification, to help to codify open questions
-- Converters to import and export data:
-  - Statsample::Database : Can create sql to create tables, read and insert data
-  - Statsample::CSV : Read and write CSV files
-  - Statsample::Excel : Read and write Excel files
+- Converters to export data:
   - Statsample::Mx    : Write Mx Files
   - Statsample::GGobi : Write Ggobi files
 - Module Statsample::Crosstab provides function to create crosstab for categorical data
@@ -129,52 +163,6 @@ Include:
 - Gem <tt>statsample-sem</tt> provides a DSL to R libraries +sem+ and +OpenMx+
 - Gem <tt>statsample-glm</tt> provides you with GML method, to work with Logistic, Poisson and Gaussian regression ,using ML or IRWLS.
 - Close integration with gem <tt>reportbuilder</tt>, to easily create reports on text, html and rtf formats.
-
-# Usage
-
-See the [examples folder](https://github.com/clbustos/statsample/tree/master/examples/) too.
-
-## Boxplot
-
-```ruby
-require 'statsample'
-
-ss_analysis(Statsample::Graph::Boxplot) do
-  n = 30
-  a = rnorm(n-1, 50, 10)
-  b = rnorm(n, 30, 5)
-  c = rnorm(n, 5, 1)
-  a.push(2)
-  boxplot(vectors: [a, b, c],
-          width: 300,
-          height: 300,
-          groups: %w{first first second},
-          minimum: 0)
-end
-
-Statsample::Analysis.run # Open svg file on *nix application defined
-```
-
-## Correlation matrix
-
-```ruby
-require 'statsample'
-# Note R like generation of random gaussian variable
-# and correlation matrix
-
-ss_analysis("Statsample::Bivariate.correlation_matrix") do
-  samples = 1000
-  ds = data_frame(
-    'a' => rnorm(samples),
-    'b' => rnorm(samples),
-    'c' => rnorm(samples),
-    'd' => rnorm(samples))
-  cm = cor(ds)
-  summary(cm)
-end
-
-Statsample::Analysis.run_batch # Echo output to console
-```
 
 # Resources
 

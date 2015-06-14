@@ -1,8 +1,8 @@
 require(File.expand_path(File.dirname(__FILE__) + '/helpers_tests.rb'))
 class StatsampleCrosstabTestCase < Minitest::Test
   def initialize(*args)
-    @v1 = %w(black blonde black black red black brown black blonde black red black blonde).to_vector
-    @v2 = %w(woman man man woman man man man woman man woman woman man man).to_vector
+    @v1 =Daru::Vector.new( %w(black blonde black black red black brown black blonde black red black blonde))
+    @v2 =Daru::Vector.new( %w(woman man man woman man man man woman man woman woman man man))
     @ct = Statsample::Crosstab.new(@v1, @v2)
     super
   end
@@ -12,7 +12,7 @@ class StatsampleCrosstabTestCase < Minitest::Test
     assert_raise ArgumentError do
       Statsample::Crosstab.new(e1, @v2)
     end
-    e2 = %w(black blonde black black red black brown black blonde black black).to_vector
+    e2 = Daru::Vector.new(%w(black blonde black black red black brown black blonde black black))
 
     assert_raise ArgumentError do
       Statsample::Crosstab.new(e2, @v2)
@@ -23,8 +23,8 @@ class StatsampleCrosstabTestCase < Minitest::Test
   end
 
   def test_crosstab_basic
-    assert_equal(%w(black blonde brown red), @ct.rows_names)
-    assert_equal(%w(man woman), @ct.cols_names)
+    assert_equal(Daru::Vector.new(%w(black blonde brown red)), @ct.rows_names)
+    assert_equal(Daru::Vector.new(%w(man woman)), @ct.cols_names)
     assert_equal({ 'black' => 7, 'blonde' => 3, 'red' => 2, 'brown' => 1 }, @ct.rows_total)
     assert_equal({ 'man' => 8, 'woman' => 5 }, @ct.cols_total)
   end
@@ -51,15 +51,15 @@ class StatsampleCrosstabTestCase < Minitest::Test
   end
 
   def test_expected
-    v1 = %w(1 1 1 1 1 0 0 0 0 0).to_vector
-    v2 = %w(0 0 0 0 0 1 1 1 1 1).to_vector
+    v1 = Daru::Vector.new(%w(1 1 1 1 1 0 0 0 0 0))
+    v2 = Daru::Vector.new(%w(0 0 0 0 0 1 1 1 1 1))
     ct = Statsample::Crosstab.new(v1, v2)
     assert_equal(Matrix[[2.5, 2.5], [2.5, 2.5]], ct.matrix_expected)
   end
 
   def test_crosstab_with_scale
-    v1 = %w(1 1 1 1 1 0 0 0 0 0).to_numeric
-    v2 = %w(0 0 0 0 0 1 1 1 1 1).to_numeric
+    v1 = Daru::Vector.new(%w(1 1 1 1 1 0 0 0 0 0))
+    v2 = Daru::Vector.new(%w(0 0 0 0 0 1 1 1 1 1))
     ct = Statsample::Crosstab.new(v1, v2)
     assert_equal(Matrix[[0, 5], [5, 0]], ct.to_matrix)
     assert_nothing_raised { ct.summary }

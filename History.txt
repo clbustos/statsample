@@ -1,3 +1,7 @@
+=== 2.0.0 / 2015-06-14
+  * Added dependency on daru and replaced Statsample::Vector and Dataset with
+    Daru::Vector and Daru::DataFrame.
+
 === 1.5.0 / 2015-06-11
   * Made sure all methods work properly with and without GSL.
   * Statsample works with either rb-gsl or gsl-nmatrix.

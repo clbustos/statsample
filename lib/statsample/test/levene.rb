@@ -5,8 +5,8 @@ module Statsample
     # <blockquote>Levene's test ( Levene, 1960) is used to test if k samples have equal variances. Equal variances across samples is called homogeneity of variance. Some statistical tests, for example the analysis of variance, assume that variances are equal across groups or samples. The Levene test can be used to verify that assumption.</blockquote>
     # Use:
     #   require 'statsample'
-    #   a=[1,2,3,4,5,6,7,8,100,10].to_numeric
-    #   b=[30,40,50,60,70,80,90,100,110,120].to_numeric
+    #   a = Daru::Vector.new([1,2,3,4,5,6,7,8,100,10])
+    #   b = Daru::Vector.new([30,40,50,60,70,80,90,100,110,120])
     # 
     #   levene=Statsample::Test::Levene.new([a,b])
     #   puts levene.summary
@@ -29,10 +29,10 @@ module Statsample
       attr_accessor :name
       # Input could be an array of vectors or a dataset
       def initialize(input, opts=Hash.new())
-        if input.is_a? Statsample::Dataset
-          @vectors=input.vectors.values
+        if input.is_a? Daru::DataFrame
+          @vectors = input.to_hash.values
         else
-          @vectors=input
+          @vectors = input
         end
         @name=_("Levene Test")
         opts.each{|k,v|
@@ -48,32 +48,34 @@ module Statsample
         builder.text "%s : F(%d, %d) = %0.4f , p = %0.4f" % [@name, @d1, @d2, f, probability]
       end
       def compute
-        n=@vectors.inject(0) {|ac,v| ac+v.n_valid}
+        n=@vectors.inject(0) { |ac,v| ac + v.n_valid}
         
-        zi=@vectors.collect {|vector|
+        zi=@vectors.collect do |vector|
           mean=vector.mean
-          vector.collect {|v| (v-mean).abs }.to_numeric
-        }
+          Daru::Vector.new(vector.collect { |v| (v - mean).abs })
+        end
         
-        total_mean=zi.inject([]) {|ac,vector|
-          ac+vector.valid_data
-        }.to_numeric.mean
+        total_mean = Daru::Vector.new(
+          zi.inject([]) do |ac,vector|
+            ac + vector.only_valid(:array)
+          end
+        ).mean
       
-        k=@vectors.size
+        k = @vectors.size
+        sum_num = zi.inject(0) do |ac,vector|
+          ac + (vector.size * (vector.mean - total_mean)**2)
+        end
         
-        sum_num=zi.inject(0) {|ac,vector|
-          ac+(vector.size*(vector.mean-total_mean)**2)
-        }
-        
-        sum_den=zi.inject(0) {|ac,vector|
-          z_mean=vector.mean
-          ac+vector.valid_data.inject(0) {|acp,zij|
-            acp+(zij-z_mean)**2
-          }
-        }
-        @w=((n-k)*sum_num).quo((k-1)*sum_den)
-        @d1=k-1
-        @d2=n-k
+        sum_den = zi.inject(0) do |ac,vector|
+          z_mean = vector.mean
+          ac + vector.only_valid(:array).inject(0) do |acp,zij|
+            acp + (zij - z_mean)**2
+          end
+        end
+
+        @w  = ((n - k) * sum_num).quo((k - 1) * sum_den)
+        @d1 = k - 1
+        @d2 = n - k
       end
       private :compute
       # Probability.
@@ -81,7 +83,6 @@ module Statsample
       def probability
         p_using_cdf(Distribution::F.cdf(f, @d1, @d2), :right)
       end
-      
     end
   end
 end

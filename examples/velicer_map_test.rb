@@ -1,5 +1,8 @@
 #!/usr/bin/ruby
 $:.unshift(File.dirname(__FILE__)+'/../lib/')
+# == Description
+#
+# Velicer MAP test.
 
 require 'statsample'
 
@@ -15,17 +18,18 @@ Statsample::Analysis.store(Statsample::Factor::MAP) do
   vectors={}
   
   variables.times do |i|
-  vectors["v#{i}"]=samples.times.collect {|nv|    
-  if i<5
-    f1[nv]*5 + f2[nv] *2 +rng.call
-  else
-    f1[nv]*2 + f2[nv] *3 +rng.call
-  end
-  }.to_numeric
+  vectors["v#{i}".to_sym]= Daru::Vector.new(
+    samples.times.collect do |nv|    
+      if i<5
+        f1[nv]*5 + f2[nv] *2 +rng.call
+      else
+        f1[nv]*2 + f2[nv] *3 +rng.call
+      end
+    end)
   end
   
   
-  ds=vectors.to_dataset
+  ds = Daru::DataFrame.new(vectors)
   cor=cor(ds)
   pca=pca(cor)
   

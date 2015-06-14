@@ -4,8 +4,8 @@ class StatsampleUMannWhitneyTestCase < Minitest::Test
   include Statsample::Test
   context Statsample::Test::UMannWhitney do
     setup do
-      @v1 = [1, 2, 3, 4, 7, 8, 9, 10, 14, 15].to_numeric
-      @v2 = [5, 6, 11, 12, 13, 16, 17, 18, 19].to_numeric
+      @v1 = Daru::Vector.new([1, 2, 3, 4, 7, 8, 9, 10, 14, 15])
+      @v2 = Daru::Vector.new([5, 6, 11, 12, 13, 16, 17, 18, 19])
       @u = Statsample::Test::UMannWhitney.new(@v1, @v2)
     end
     should 'have same result using class or Test#u_mannwhitney' do
