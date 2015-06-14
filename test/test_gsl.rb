@@ -1,10 +1,10 @@
 require(File.expand_path(File.dirname(__FILE__) + '/helpers_tests.rb'))
 class StatsampleGSLTestCase < Minitest::Test
   should_with_gsl 'matrix with gsl' do
-    a = [1, 2, 3, 4, 20].to_vector(:numeric)
-    b = [3, 2, 3, 4, 50].to_vector(:numeric)
-    c = [6, 2, 3, 4, 3].to_vector(:numeric)
-    ds = { 'a' => a, 'b' => b, 'c' => c }.to_dataset
+    a = Daru::Vector.new([1, 2, 3, 4, 20])
+    b = Daru::Vector.new([3, 2, 3, 4, 50])
+    c = Daru::Vector.new([6, 2, 3, 4, 3])
+    ds = Daru::DataFrame.new({ :a => a, :b => b, :c => c })
     gsl = ds.to_matrix.to_gsl
     assert_equal(5, gsl.size1)
     assert_equal(3, gsl.size2)

@@ -2,12 +2,12 @@ require(File.expand_path(File.dirname(__FILE__) + '/helpers_tests.rb'))
 class StatsampleAnovaContrastTestCase < Minitest::Test
   context(Statsample::Anova::Contrast) do
     setup do
-      constant = [12, 13, 11, 12, 12].to_numeric
-      frequent = [9, 10, 9, 13, 14].to_numeric
-      infrequent = [15, 16, 17, 16, 16].to_numeric
-      never = [17, 18, 12, 18, 20].to_numeric
-      @vectors = [constant, frequent, infrequent, never]
-      @c = Statsample::Anova::Contrast.new(vectors: @vectors)
+      constant   = Daru::Vector.new([12, 13, 11, 12, 12])
+      frequent   = Daru::Vector.new([9, 10, 9, 13, 14])
+      infrequent = Daru::Vector.new([15, 16, 17, 16, 16])
+      never      = Daru::Vector.new([17, 18, 12, 18, 20])
+      @vectors   = [constant, frequent, infrequent, never]
+      @c         = Statsample::Anova::Contrast.new(vectors: @vectors)
     end
     should 'return correct value using c' do
       @c.c([1, -1.quo(3), -1.quo(3), -1.quo(3)])

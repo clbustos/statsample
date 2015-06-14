@@ -6,17 +6,17 @@ module Statsample
     # PCA and Factor Analysis.
     # 
     # == Usage
-    #  @x1=[1,1,1,1,2,2,2,2,3,3,3,30].to_vector(:numeric)
-    #  @x2=[1,1,1,2,2,3,3,3,3,4,4,50].to_vector(:numeric)
-    #  @x3=[2,2,1,1,1,2,2,2,3,4,5,40].to_vector(:numeric)
-    #  @x4=[1,2,3,4,4,4,4,3,4,4,5,30].to_vector(:numeric)
-    #  ds={'x1'=>@x1,'x2'=>@x2,'x3'=>@x3,'x4'=>@x4}.to_dataset
+    #  @x1 = Daru::Vector.new([1,1,1,1,2,2,2,2,3,3,3,30])
+    #  @x2 = Daru::Vector.new([1,1,1,2,2,3,3,3,3,4,4,50])
+    #  @x3 = Daru::Vector.new([2,2,1,1,1,2,2,2,3,4,5,40])
+    #  @x4 = Daru::Vector.new([1,2,3,4,4,4,4,3,4,4,5,30])
+    #  ds  = Daru::DataFrame.new({:x1 => @x1,:x2 => @x2,:x3 => @x3,:x4 => @x4})
     #  opts={:name=>"Scales", # Name of analysis
     #        :summary_correlation_matrix=>true, # Add correlation matrix
     #        :summary_pca } # Add PCA between scales
     #  msa=Statsample::Reliability::MultiScaleAnalysis.new(opts) do |m|
-    #    m.scale :s1, ds.clone(%w{x1 x2})
-    #    m.scale :s2, ds.clone(%w{x3 x4}), {:name=>"Scale 2"}
+    #    m.scale :s1, ds.clone([:x1, :x2])
+    #    m.scale :s2, ds.clone([:x3, :x4]), {:name=>"Scale 2"}
     #  end
     #  # Retrieve summary
     #  puts msa.summary 
@@ -107,7 +107,7 @@ module Statsample
       # Retrieves a Principal Component Analysis (Factor::PCA)
       # using all scales, using <tt>opts</tt> a options.
       def pca(opts=nil)
-        opts||=pca_options        
+        opts ||= pca_options        
         Statsample::Factor::PCA.new(correlation_matrix, opts)
       end
       # Retrieve Velicer's MAP
@@ -123,14 +123,15 @@ module Statsample
         Statsample::Factor::PrincipalAxis.new(correlation_matrix, opts)
       end
       def dataset_from_scales
-        ds=Dataset.new(@scales_keys)
+        ds = Daru::DataFrame.new({}, order: @scales_keys.map(&:to_sym))
         @scales.each_pair do |code,scale|
-          ds[code.to_s]=scale.ds.vector_sum
-          ds[code.to_s].name=scale.name
+          ds[code.to_sym] = scale.ds.vector_sum
         end
-        ds.update_valid_data
+        
+        ds.update
         ds
       end
+
       def parallel_analysis(opts=nil)
         opts||=parallel_analysis_options
         Statsample::Factor::ParallelAnalysis.new(dataset_from_scales, opts)
@@ -140,6 +141,7 @@ module Statsample
       def correlation_matrix
         Statsample::Bivariate.correlation_matrix(dataset_from_scales)
       end
+
       def report_building(b) # :nodoc:
         b.section(:name=>name) do |s|
           s.section(:name=>_("Reliability analysis of scales")) do |s2|

@@ -4,30 +4,30 @@ module Statsample
       # Calculate Chonbach's alpha for a given dataset.
       # only uses tuples without missing data
       def cronbach_alpha(ods)
-        ds=ods.dup_only_valid
-        n_items=ds.fields.size
-        return nil if n_items<=1
-        s2_items=ds.vectors.inject(0) {|ac,v|
-        ac+v[1].variance }
-        total=ds.vector_sum
+        ds = ods.dup_only_valid
+        n_items = ds.ncols
+        return nil if n_items <= 1
+        s2_items = ds.to_hash.values.inject(0) { |ac,v| 
+          ac + v.variance }
+        total    = ds.vector_sum
         
-        (n_items.quo(n_items-1)) * (1-(s2_items.quo(total.variance)))
+        (n_items.quo(n_items - 1)) * (1 - (s2_items.quo(total.variance)))
       end
       # Calculate Chonbach's alpha for a given dataset
       # using standarized values for every vector.
       # Only uses tuples without missing data
       # Return nil if one or more vectors has 0 variance
       def cronbach_alpha_standarized(ods)
+        ds = ods.dup_only_valid
+        return nil if ds.any? { |v| v.variance==0}
         
-        ds=ods.dup_only_valid
-        
-        return nil if ds.vectors.any? {|k,v| v.variance==0}
-        
-        ds=ds.fields.inject({}){|a,f|
-          a[f]=ods[f].standarized; 
-          a
-        }.to_dataset
-        
+        ds = Daru::DataFrame.new(
+          ds.vectors.to_a.inject({}) { |a,i|
+            a[i] = ods[i].standardize
+            a
+          }
+        )
+                
         cronbach_alpha(ds)
       end
       # Predicted reliability of a test by replicating
@@ -54,10 +54,10 @@ module Statsample
       end
       # Get Cronbach's alpha from a covariance matrix
       def cronbach_alpha_from_covariance_matrix(cov)
-        n=cov.row_size
+        n = cov.row_size
         raise "covariance matrix should have at least 2 variables" if n < 2
-        s2=n.times.inject(0) {|ac,i| ac+cov[i,i]}
-        (n.quo(n-1))*(1-(s2.quo(cov.total_sum)))
+        s2 = n.times.inject(0) { |ac,i| ac + cov[i,i] }
+        (n.quo(n - 1)) * (1 - (s2.quo(cov.total_sum)))
       end
       # Returns n necessary to obtain specific alpha
       # given variance and covariance mean of items
@@ -82,8 +82,6 @@ module Statsample
           end
           c_a=cronbach_alpha_from_n_s2_cov(n,s2,cov)
           dif=c_a - alpha
-          #puts "#{n} , #{c_a}"
-          
         end
         n
       end
@@ -110,20 +108,20 @@ module Statsample
       attr_reader :totals, :counts, :vector_total
       def initialize (ds, vector_total=nil)
         vector_total||=ds.vector_sum
-        raise ArgumentError, "Total size != Dataset size" if vector_total.size!=ds.cases
+        raise ArgumentError, "Total size != Dataset size" if vector_total.size != ds.nrows
         @vector_total=vector_total
         @ds=ds
         @totals={}
-        @counts=@ds.fields.inject({}) {|a,v| a[v]={};a}
+        @counts=@ds.vectors.to_a.inject({}) {|a,v| a[v]={};a}
         process
       end
       def process
         i=0
-        @ds.each do |row|
+        @ds.each_row do |row|
           tot=@vector_total[i]
           @totals[tot]||=0
           @totals[tot]+=1
-          @ds.fields.each  do |f|
+          @ds.vectors.each  do |f|
             item=row[f].to_s
             @counts[f][tot]||={}
             @counts[f][tot][item]||=0

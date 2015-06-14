@@ -80,7 +80,7 @@ module Statsample
       
       def method_missing(name, *args,&block)
         @attached.reverse.each do |ds|
-          return ds[name.to_s] if ds.fields.include? (name.to_s)
+          return ds[name] if ds.vectors.to_a.include? (name)
         end
         raise "Method #{name} doesn't exists"
       end

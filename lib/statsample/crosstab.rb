@@ -8,24 +8,25 @@ module Statsample
     attr_reader :v_rows, :v_cols
     attr_accessor :row_label, :column_label, :name, :percentage_row, :percentage_column, :percentage_total
     def initialize(v1, v2, opts=Hash.new)
-      #raise ArgumentError, "Both arguments should be Vectors" unless v1.is_a? Statsample::Vector and v2.is_a? Statsample::Vector
       raise ArgumentError, "Vectors should be the same size" unless v1.size==v2.size
-      @v_rows, @v_cols=Statsample.only_valid_clone(v1.to_vector,v2.to_vector)
-      @cases=@v_rows.size
-      @row_label=v1.name
-      @column_label=v2.name
-      @name=nil
+      @v_rows, @v_cols = Statsample.only_valid_clone(
+        Daru::Vector.new(v1),
+        Daru::Vector.new(v2))
+      @cases          = @v_rows.size
+      @row_label      = v1.name
+      @column_label   = v2.name
+      @name           = nil
       @percentage_row = @percentage_column = @percentage_total=false
-      opts.each{|k,v|
+      opts.each do |k,v|
         self.send("#{k}=",v) if self.respond_to? k
-      }
-      @name||=_("Crosstab %s - %s") % [@row_label, @column_label]
+      end
+      @name ||= _("Crosstab %s - %s") % [@row_label, @column_label]
     end	
     def rows_names
-      @v_rows.factors.sort
+      @v_rows.factors.sort.reset_index!
     end
     def cols_names
-      @v_cols.factors.sort
+      @v_cols.factors.sort.reset_index!
     end
     def rows_total
       @v_rows.frequencies
@@ -35,18 +36,18 @@ module Statsample
     end
     
     def frequencies
-      base=rows_names.inject([]){|s,row| 
-        s+=cols_names.collect{|col| [row,col]}
-      }.inject({}) {|s,par|
+      base = rows_names.inject([]) do |s,row| 
+        s += cols_names.collect { |col| [row,col] }
+      end.inject({}) do |s,par|
         s[par]=0
         s
-      }
-      base.update(Statsample::vector_cols_matrix(@v_rows,@v_cols).to_a.to_vector.frequencies)
+      end
+      base.update(Daru::Vector.new(Statsample::vector_cols_matrix(@v_rows,@v_cols).to_a).frequencies)
     end
     def to_matrix
-      f=frequencies
-      rn=rows_names
-      cn=cols_names
+      f  = frequencies
+      rn = rows_names
+      cn = cols_names
       Matrix.rows(rn.collect{|row|
           cn.collect{|col| f[[row,col]]}
       })
@@ -67,8 +68,8 @@ module Statsample
     end
     # Chi square, based on expected and real matrix
     def chi_square
-        require 'statsample/test'
-        Statsample::Test.chi_square(self.to_matrix, matrix_expected)
+      require 'statsample/test'
+      Statsample::Test.chi_square(self.to_matrix, matrix_expected)
     end
     # Useful to obtain chi square
     def matrix_expected
@@ -98,10 +99,10 @@ module Statsample
         generator.text(_("Rows: %s") % @row_label) unless @row_label.nil?
         generator.text(_("Columns: %s") % @column_label) unless @column_label.nil?
         
-        t=ReportBuilder::Table.new(:name=>@name+" - "+_("Raw"), :header=>[""]+cols_names.collect {|c| @v_cols.labeling(c)}+[_("Total")])
+        t=ReportBuilder::Table.new(:name=>@name+" - "+_("Raw"), :header=>[""]+cols_names.collect {|c| @v_cols.index_of(c)}+[_("Total")])
         rn.each do |row|
           total_row=0
-          t_row=[@v_rows.labeling(row)]
+          t_row=[@v_rows.index_of(row)]
           cn.each do |col|
             data=fq[[row,col]]
             total_row+=fq[[row,col]]
@@ -148,9 +149,9 @@ module Statsample
         when :total   then  _("% Total")
       end
       
-      t=ReportBuilder::Table.new(:name=>@name+" - "+_(type_name), :header=>[""]+cols_names.collect {|c| @v_cols.labeling(c) } + [_("Total")])
+      t=ReportBuilder::Table.new(:name=>@name+" - "+_(type_name), :header=>[""]+cols_names.collect {|c| @v_cols.index_of(c) } + [_("Total")])
         rn.each do |row|
-          t_row=[@v_rows.labeling(row)]
+          t_row=[@v_rows.index_of(row)]
           cn.each do |col|
             total=case type
               when :row     then  rt[row]

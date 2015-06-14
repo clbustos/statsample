@@ -33,7 +33,7 @@ module Minitest
     def assert_similar_vector(exp, obs, delta = 1e-10, msg = nil)
       msg ||= "Different vectors #{exp} - #{obs}"
       assert_equal(exp.size, obs.size)
-      exp.data_with_nils.each_with_index {|v, i|
+      exp.to_a.each_with_index {|v, i|
         assert_in_delta(v, obs[i], delta)
       }
     end

@@ -4,17 +4,17 @@ class StatsampleMatrixTestCase < Minitest::Test
   def test_to_dataset
     m = Matrix[[1, 4], [2, 5], [3, 6]]
     m.extend Statsample::NamedMatrix
-    m.fields_y = %w(x1 x2)
+    m.fields_y = [:x1, :x2]
     m.name = 'test'
     samples = 100
-    x1 = [1, 2, 3].to_numeric
-    x2 = [4, 5, 6].to_numeric
-    ds = { 'x1' => x1, 'x2' => x2 }.to_dataset
-    ds.name = 'test'
-    obs = m.to_dataset
-    assert_equal(ds['x1'], obs['x1'])
-    assert_equal(ds['x2'], obs['x2'])
-    assert_equal(ds['x1'].mean, obs['x1'].mean)
+    x1 =Daru::Vector.new([1, 2, 3])
+    x2 =Daru::Vector.new([4, 5, 6])
+    ds = Daru::DataFrame.new({ :x1 => x1, :x2 => x2 })
+    ds.rename 'test'
+    obs = m.to_dataframe
+    assert_equal(ds[:x1], obs[:x1])
+    assert_equal(ds[:x2], obs[:x2])
+    assert_equal(ds[:x1].mean, obs[:x1].mean)
   end
 
   def test_covariate
@@ -33,10 +33,10 @@ class StatsampleMatrixTestCase < Minitest::Test
 
     assert_equal(:covariance, a._type)
 
-    a = 50.times.collect { rand }.to_numeric
-    b = 50.times.collect { rand }.to_numeric
-    c = 50.times.collect { rand }.to_numeric
-    ds = { 'a' => a, 'b' => b, 'c' => c }.to_dataset
+    a = Daru::Vector.new(50.times.collect { rand })
+    b = Daru::Vector.new(50.times.collect { rand })
+    c = Daru::Vector.new(50.times.collect { rand })
+    ds = Daru::DataFrame.new({ :a => a, :b => b, :c => c })
     corr = Statsample::Bivariate.correlation_matrix(ds)
     real = Statsample::Bivariate.covariance_matrix(ds).correlation
     corr.row_size.times do |i|

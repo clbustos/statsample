@@ -6,10 +6,10 @@ module Statsample
     # 
     # == Usage
     # === Svg output
-    #  a=[1,2,3,4].to_numeric
-    #  puts Statsample::Graph::Histogram.new(a).to_svg
+    # a = Daru::Vector.new([1,2,3,4])
+    # puts Statsample::Graph::Histogram.new(a).to_svg
     # === Using ReportBuilder
-    #  a=[1,2,3,4].to_numeric
+    #  a = Daru::Vector.new([1,2,3,4])
     #  rb=ReportBuilder.new
     #  rb.add(Statsample::Graph::Histogram.new(a))
     #  rb.save_html('histogram.html')
@@ -70,7 +70,7 @@ module Statsample
           @hist=@data
           @mean=@hist.estimated_mean
           @sd=@hist.estimated_standard_deviation
-        elsif @data.is_a? Statsample::Vector
+        elsif @data.is_a? Daru::Vector
           @mean=@data.mean
           @sd=@data.sd
           @bins||=Math::sqrt(@data.size).floor

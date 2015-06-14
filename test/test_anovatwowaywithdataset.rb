@@ -4,14 +4,14 @@ require(File.expand_path(File.dirname(__FILE__) + '/helpers_tests.rb'))
 class StatsampleAnovaTwoWayWithVectorsTestCase < Minitest::Test
   context(Statsample::Anova::TwoWayWithVectors) do
     setup do
-      @pa = [5, 4, 3, 4, 2, 18, 19, 14, 12, 15, 6, 7, 5, 8, 4, 6, 9, 5, 9, 3].to_numeric
-      @pa.name = 'Passive Avoidance'
-      @a = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1].to_vector
-      @a.labels = { 0 => '0%', 1 => '35%' }
-      @a.name = 'Diet'
-      @b = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].to_vector
-      @b.labels = { 0 => 'Young', 1 => 'Older' }
-      @b.name = 'Age'
+      @pa = Daru::Vector.new [5, 4, 3, 4, 2, 18, 19, 14, 12, 15, 6, 7, 5, 8, 4, 6, 9, 5, 9, 3]
+      @pa.rename 'Passive Avoidance'
+      @a = Daru::Vector.new [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+      # @a.labels = { 0 => '0%', 1 => '35%' }
+      @a.rename 'Diet'
+      @b = Daru::Vector.new [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+      # @b.labels = { 0 => 'Young', 1 => 'Older' }
+      @b.rename 'Age'
       @anova = Statsample::Anova::TwoWayWithVectors.new(a: @a, b: @b, dependent: @pa)
     end
     should 'Statsample::Anova respond to #twoway_with_vectors' do

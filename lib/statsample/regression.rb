@@ -25,8 +25,8 @@ module Statsample
       # * x: independent Vector
       # * y: dependent Vector
       # <b>Usage:</b>
-      #   x=100.times.collect {|i| rand(100)}.to_numeric
-      #   y=100.times.collect {|i| 2+x[i]*2+rand()}.to_numeric
+      #   x = Daru::Vector.new(100.times.collect {|i| rand(100)})
+      #   y = Daru::Vector.new(100.times.collect {|i| 2+x[i]*2+rand()})
       #   sr=Statsample::Regression.simple(x,y)
       #   sr.a
       #   => 2.51763295177808
@@ -49,7 +49,7 @@ module Statsample
       #     * :pairwise: uses correlation matrix. Use with caution.
       # 
       # <b>Usage:</b>
-      #   lr=Statsample::Regression::multiple(ds,'y')
+      #   lr=Statsample::Regression::multiple(ds,:y)
       def self.multiple(ds,y_var, opts=Hash.new)
         missing_data= (opts[:missing_data].nil? ) ? :listwise : opts.delete(:missing_data)
         if missing_data==:pairwise

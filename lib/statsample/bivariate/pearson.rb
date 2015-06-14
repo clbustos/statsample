@@ -7,8 +7,8 @@ module Statsample
     # variables.
     # 
     # == Usage
-    #   a = [1,2,3,4,5,6].to_numeric
-    #   b = [2,3,4,5,6,7].to_numeric
+    #   a = Daru::Vector.new([1,2,3,4,5,6])
+    #   b = Daru::Vector.new([2,3,4,5,6,7])
     #   pearson = Statsample::Bivariate::Pearson.new(a,b)
     #   puts pearson.r
     #   puts pearson.t

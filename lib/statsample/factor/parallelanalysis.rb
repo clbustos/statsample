@@ -22,13 +22,13 @@ module Statsample
 
     class ParallelAnalysis
       def self.with_random_data(cases,vars,opts=Hash.new)
-        require 'ostruct'
-        ds=OpenStruct.new
-        ds.fields=vars.times.map {|i| "v#{i+1}"}
-        ds.cases=cases
+        ds= Daru::DataFrame.new({}, 
+          order: vars.times.map {|i| "v#{i+1}".to_sym},
+          index: cases )
         opts=opts.merge({:bootstrap_method=> :random, :no_data=>true})
         new(ds, opts)
       end
+
       include DirtyMemoize
       include Summarizable
       # Number of random sets to produce. 50 by default
@@ -61,9 +61,9 @@ module Statsample
       attr_accessor :use_gsl
       def initialize(ds, opts=Hash.new)
         @ds=ds
-        @fields=@ds.fields
+        @fields=@ds.vectors.to_a
         @n_variables=@fields.size
-        @n_cases=ds.cases
+        @n_cases=ds.nrows
         opts_default={
           :name=>_("Parallel Analysis"),
           :iterations=>50, # See Liu and Rijmen (2008)
@@ -82,7 +82,7 @@ module Statsample
       # Number of factor to retent
       def number_of_factors
         total=0
-        ds_eigenvalues.fields.each_with_index do |f,i|
+        ds_eigenvalues.vectors.to_a.each_with_index do |f,i|
           if (@original[i]>0 and @original[i]>ds_eigenvalues[f].percentil(percentil))
             total+=1
           else
@@ -101,7 +101,7 @@ module Statsample
           s.text _("Number of iterations: %d") % @iterations
           if @no_data
             s.table(:name=>_("Eigenvalues"), :header=>[_("n"), _("generated eigenvalue"), "p.#{percentil}"]) do |t|
-              ds_eigenvalues.fields.each_with_index do |f,i|
+              ds_eigenvalues.vectors.to_a.each_with_index do |f,i|
                 v=ds_eigenvalues[f]
                 t.row [i+1, "%0.4f" %  v.mean, "%0.4f" %  v.percentil(percentil), ]
               end
@@ -109,7 +109,7 @@ module Statsample
           else
             s.text _("Number or factors to preserve: %d") % number_of_factors 
             s.table(:name=>_("Eigenvalues"), :header=>[_("n"), _("data eigenvalue"), _("generated eigenvalue"),"p.#{percentil}",_("preserve?")]) do |t|
-              ds_eigenvalues.fields.each_with_index do |f,i|
+              ds_eigenvalues.vectors.to_a.each_with_index do |f,i|
                 v=ds_eigenvalues[f]
                 t.row [i+1, "%0.4f" % @original[i], "%0.4f" %  v.mean, "%0.4f" %  v.percentil(percentil), (v.percentil(percentil)>0 and @original[i] > v.percentil(percentil)) ? "Yes":""]
               end
@@ -120,11 +120,9 @@ module Statsample
       end
       # Perform calculation. Shouldn't be called directly for the user
       def compute
+        @original=Statsample::Bivariate.send(matrix_method, @ds).eigenvalues unless no_data
+        @ds_eigenvalues=Daru::DataFrame.new({}, order: (1..@n_variables).map{|v| ("ev_%05d" % v).to_sym})
         
-        
-        @original=Statsample::Bivariate.send(matrix_method, @ds).eigenvalues unless no_data        
-        @ds_eigenvalues=Statsample::Dataset.new((1..@n_variables).map{|v| "ev_%05d" % v})
-        @ds_eigenvalues.fields.each {|f| @ds_eigenvalues[f].type=:numeric}
         if bootstrap_method==:parameter or bootstrap_method==:random
           rng = Distribution::Normal.rng
         end
@@ -133,18 +131,18 @@ module Statsample
           begin
             puts "#{@name}: Iteration #{i}" if $DEBUG or debug
             # Create a dataset of dummy values
-            ds_bootstrap=Statsample::Dataset.new(@ds.fields)
+            ds_bootstrap = Daru::DataFrame.new({}, order: @ds.vectors, index: @n_cases)
             
             @fields.each do |f|
               if bootstrap_method==:random
-                ds_bootstrap[f]=@n_cases.times.map {|c| rng.call}.to_numeric
+                ds_bootstrap[f] = Daru::Vector.new(@n_cases.times.map {|c| rng.call})
               elsif bootstrap_method==:data
-                ds_bootstrap[f]=ds[f].sample_with_replacement(@n_cases)
+                ds_bootstrap[f] = ds[f].sample_with_replacement(@n_cases)
               else
                 raise "bootstrap_method doesn't recogniced"
               end
             end
-            ds_bootstrap.update_valid_data
+            ds_bootstrap.update
             
             matrix=Statsample::Bivariate.send(matrix_method, ds_bootstrap)
             matrix=matrix.to_gsl if @use_gsl
@@ -155,13 +153,13 @@ module Statsample
                 end
             end
             ev=matrix.eigenvalues
-            @ds_eigenvalues.add_case_array(ev)
+            @ds_eigenvalues.add_row(ev)
           rescue Statsample::Bivariate::Tetrachoric::RequerimentNotMeet => e
             puts "Error: #{e}" if $DEBUG
             redo
           end
         end
-        @ds_eigenvalues.update_valid_data
+        @ds_eigenvalues.update
       end
       dirty_memoize :number_of_factors, :ds_eigenvalues
       dirty_writer :iterations, :bootstrap_method, :percentil, :smc

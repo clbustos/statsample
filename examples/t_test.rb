@@ -1,5 +1,12 @@
 #!/usr/bin/ruby
 $:.unshift(File.dirname(__FILE__)+'/../lib')
+# == Description
+#
+# This example illustrates how a T test can be done and summarized with statsample
+#
+# == References
+#
+# http://en.wikipedia.org/wiki/Student%27s_t-test
 require 'statsample'
 
 Statsample::Analysis.store(Statsample::Test::T) do
