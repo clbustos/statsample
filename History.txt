@@ -1,6 +1,7 @@
-=== 2.0.0 / 2015-06-14
+=== 2.0.0 / 2015-06-20
   * Added dependency on daru and replaced Statsample::Vector and Dataset with
     Daru::Vector and Daru::DataFrame.
+  * NMatrix and gsl-nmatrix are used as development dependencies.
 
 === 1.5.0 / 2015-06-11
   * Made sure all methods work properly with and without GSL.
