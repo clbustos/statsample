@@ -59,8 +59,8 @@ module Daru
         to_multiset_by_split_multiple_fields(*vecs)
       end
     end
+    
     # Creates a Statsample::Multiset, using one field
-
     def to_multiset_by_split_one_field(field)
       raise ArgumentError,"Should use a correct field name" if 
         !@vectors.include? field

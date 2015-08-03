@@ -43,8 +43,7 @@ module Statsample
       end
       
       @fields.each do |f|
-        union_field[f] = Daru::Vector.new(union_field[f])
-        union_field[f].rename names[f]
+        union_field[f] = Daru::Vector.new(union_field[f], name: names[f])
       end
 
       ds_union = Daru::DataFrame.new(union_field, order: @fields)
