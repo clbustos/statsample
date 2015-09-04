@@ -23,6 +23,20 @@ class StatsampleTestTestCase < Minitest::Test
     assert_equal(6, chi.df)
   end
 
+  def test_chi_square_vector
+    observed = Vector[20,30,15]
+    expected = Vector[20,20,20]
+    assert_nothing_raised do
+      Statsample::Test.chi_square(observed, expected)
+    end
+    chi = Statsample::Test.chi_square(observed, expected)
+
+    assert_in_delta(6.25, chi.chi_square, 0.0001)
+    assert_in_delta(0.04393, chi.probability, 0.00001)
+
+    assert_equal(2, chi.df)
+  end
+
   def test_u_mannwhitney
     a = Daru::Vector.new([1, 2, 3, 4, 5, 6])
     b = Daru::Vector.new([0, 5, 7, 9, 10, 11])
