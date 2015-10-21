@@ -59,13 +59,13 @@ class Array
   end
 
   def mean
-    self.sum / size
+    sum.fdiv(size)
   end
 
   # Calcualte sum of squares
   def sum_of_squares(m=nil)
     m ||= mean
-    self.inject(0) {|a,x| a + (x-m).square }
+    inject(0) {|a,x| a + (x-m).square }
   end
 
   # Calculate sample variance
