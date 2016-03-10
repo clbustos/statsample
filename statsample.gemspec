@@ -61,7 +61,7 @@ Gem::Specification.new do |s|
   s.executables = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
 
   s.add_runtime_dependency 'daru', '~> 0.1'
-  s.add_runtime_dependency 'spreadsheet', '~> 1.0.3'
+  s.add_runtime_dependency 'spreadsheet', '~> 1.1'
   s.add_runtime_dependency 'reportbuilder', '~> 1.4'
   s.add_runtime_dependency 'minimization', '~> 0.2'
   s.add_runtime_dependency 'dirty-memoize', '~> 0.0.4'
@@ -79,6 +79,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'minitest', '~> 5.7'
   s.add_development_dependency 'gettext', '~> 3.1'
   s.add_development_dependency 'mocha', '~> 1.1'
-  s.add_development_dependency 'nmatrix', '~> 0.1.0'
+  s.add_development_dependency 'nmatrix', '~> 0.2.1'
   s.add_development_dependency 'rb-gsl', '~> 1.16'
 end
