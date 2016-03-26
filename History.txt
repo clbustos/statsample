@@ -1,5 +1,5 @@
 === 2.0.2 / 2016-03-11
-  * Update dependencies.
+  * Update dependencies (spreadsheet, GSL)
 
 === 2.0.1 / 2015-08-19
   * Cleaned legacy containers in favor of `Daru::DataFrame` and `Daru::Vector`.
