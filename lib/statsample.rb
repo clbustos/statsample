@@ -124,6 +124,7 @@ module Statsample
       cv = "@@#{library}"
       unless class_variable_defined? cv
         begin
+          gem library.to_s # activate gem
           require library.to_s
           class_variable_set(cv, true)
         rescue LoadError

@@ -53,7 +53,7 @@ class StatsampleFactorTestCase < Minitest::Test
 
   def test_parallelanalysis
     pa = Statsample::Factor::ParallelAnalysis.with_random_data(305, 8, iterations: 100, percentil: 95)
-    assert_in_delta(1.2454, pa.ds_eigenvalues[:ev_00001].mean, 0.01)
+    assert_in_delta(1.2454, pa.ds_eigenvalues[:ev_00001].mean, 0.05)
     assert_in_delta(1.1542, pa.ds_eigenvalues[:ev_00002].mean, 0.01)
     assert_in_delta(1.0836, pa.ds_eigenvalues[:ev_00003].mean, 0.01)
     assert(pa.summary.size > 0)
