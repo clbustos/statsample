@@ -86,7 +86,7 @@ Include:
 - Intra-class correlation
 - Anova: generic and vector-based One-way ANOVA and Two-way ANOVA, with contrasts for One-way ANOVA.
 - Tests: F, T, Levene, U-Mannwhitney.
-- Regression: Simple, Multiple (OLS), Probit  and Logit
+- Regression: Simple, Multiple (OLS)
 - Factorial Analysis: Extraction (PCA and Principal Axis), Rotation (Varimax, Equimax, Quartimax) and Parallel Analysis and Velicer's MAP test, for estimation of number of factors.
 - Reliability analysis for simple scale and a DSL to easily analyze multiple scales using factor analysis and correlations, if you want it.
 - Basic time series support
@@ -120,8 +120,6 @@ Include:
 - Multiple types of regression.
   - Simple Regression :  Statsample::Regression::Simple
   - Multiple Regression: Statsample::Regression::Multiple
-  - Logit Regression:    Statsample::Regression::Binomial::Logit
-  - Probit Regression:    Statsample::Regression::Binomial::Probit
 - Factorial Analysis algorithms on Statsample::Factor module.
   - Classes for Extraction of factors:
     - Statsample::Factor::PCA

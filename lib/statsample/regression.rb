@@ -15,8 +15,6 @@ module Statsample
     # 
     # * Simple Regression :  Statsample::Regression::Simple
     # * Multiple Regression: Statsample::Regression::Multiple
-    # * Logit Regression:    Statsample::Regression::Binomial::Logit
-    # * Probit Regression:    Statsample::Regression::Binomial::Probit
     module Regression
       
       LinearDependency=Class.new(Exception)
