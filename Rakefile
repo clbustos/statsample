@@ -1,4 +1,5 @@
 $:.unshift File.expand_path("../lib/", __FILE__)
+lib_folder = File.expand_path("../lib", __FILE__)
 
 require 'statsample/version'
 require 'rake'
@@ -35,4 +36,9 @@ desc "Create mo-files"
 task "gettext:makemo" do
   require 'gettext/tools'
   GetText.create_mofiles()
+end
+
+desc 'Run pry'
+task :pry do |task|
+  sh "pry -r #{lib_folder}/statsample.rb"
 end
