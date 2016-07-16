@@ -160,6 +160,7 @@ module Statsample
   autoload(:StratifiedSample, 'statsample/multiset')
   autoload(:MLE, 'statsample/mle')
   autoload(:Regression, 'statsample/regression')
+  autoload(:FitModel, 'statsample/formula/fit_model')
   autoload(:Test, 'statsample/test')
   autoload(:Factor, 'statsample/factor')
   autoload(:Graph, 'statsample/graph')
