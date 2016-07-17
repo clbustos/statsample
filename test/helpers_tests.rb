@@ -30,6 +30,13 @@ module Minitest
   end
 
   module Assertions
+    def assert_vectors_from_formula(formula, names)
+      model = Statsample::FitModel.new formula, @df
+  
+      model.df_for_regression.vectors.to_a.sort
+        .must_equal names.sort    
+    end
+
     def assert_similar_vector(exp, obs, delta = 1e-10, msg = nil)
       msg ||= "Different vectors #{exp} - #{obs}"
       assert_equal(exp.size, obs.size)
