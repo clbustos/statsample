@@ -3,11 +3,9 @@ require 'statsample/formula/formula'
 module Statsample
   # Class for performing regression
   class FitModel
-    # def initialize(formula, df, method, opts = {})
     def initialize(formula, df, opts = {})
       @formula = FormulaWrapper.new formula, df
       @df = df
-      # @method = method
       @opts = opts
     end
 
@@ -37,11 +35,10 @@ module Statsample
     end
 
     def fit_model
-      # @opts[:constant] = 1 if @formula.canonical_tokens.include? Token.new('1')
+      # TODO: Add support for inclusion/exclusion of intercept
       @model = Statsample::Regression.multiple(
         df_for_regression,
         @formula.y.value,
-        # @method,
         @opts
       )
     end
