@@ -6,15 +6,12 @@ module Statsample
     attr_reader :tokens, :y, :canonical_tokens
 
     # Initializes formula wrapper object to parse a given formula into
-    # some tokens which do not overlap one another. @tokens stores
-    # equivalent of formula given as it is and @canonical_tokens contains
-    # non-redundant tokens which can be used to obtain design matrix.
+    # some tokens which do not overlap one another.
     # @note Specify 0 as a term in the formula if you do not want constant
     #   to be included in the parsed formula
     # @param [string] formula to parse
-    # @param [Daru::DataFrame] df dataframe requried to know what
+    # @param [Daru::DataFrame] df dataframe requried to know what vectors
     #   are numerical
-    # @return FormulaWrapper object containing information about parsed formula
     # @example
     #   df = Daru::DataFrame.from_csv 'spec/data/df.csv'
     #   df.to_category 'c', 'd', 'e'
