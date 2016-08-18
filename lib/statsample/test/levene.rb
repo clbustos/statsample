@@ -48,7 +48,7 @@ module Statsample
         builder.text "%s : F(%d, %d) = %0.4f , p = %0.4f" % [@name, @d1, @d2, f, probability]
       end
       def compute
-        n=@vectors.inject(0) { |ac,v| ac + v.n_valid}
+        n=@vectors.inject(0) { |ac,v| ac + v.reject_values(Daru::MISSING_VALUES).size }
         
         zi=@vectors.collect do |vector|
           mean=vector.mean
