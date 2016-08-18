@@ -248,7 +248,7 @@ module Statsample
         m = vectors.collect do |row|
           vectors.collect do |col|
             if row==col
-              ds[row].only_valid.size
+              ds[row].reject_values(Daru::MISSING_VALUES).size
             else
               rowa,rowb = Statsample.only_valid_clone(ds[row],ds[col])
               rowa.size

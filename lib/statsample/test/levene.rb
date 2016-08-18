@@ -57,7 +57,7 @@ module Statsample
         
         total_mean = Daru::Vector.new(
           zi.inject([]) do |ac,vector|
-            ac + vector.only_valid(:array)
+            ac + vector.reject_values(Daru::MISSING_VALUES).to_a
           end
         ).mean
       
@@ -68,7 +68,7 @@ module Statsample
         
         sum_den = zi.inject(0) do |ac,vector|
           z_mean = vector.mean
-          ac + vector.only_valid(:array).inject(0) do |acp,zij|
+          ac + vector.reject_values(Daru::MISSING_VALUES).to_a.inject(0) do |acp,zij|
             acp + (zij - z_mean)**2
           end
         end
