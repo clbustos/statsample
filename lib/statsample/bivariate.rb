@@ -159,7 +159,7 @@ module Statsample
       
       def covariance_matrix(ds)
         vars,cases = ds.ncols, ds.nrows
-        if !ds.has_missing_data? and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
+        if !ds.include_values?(Daru::MISSING_VALUES) and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
           cm=covariance_matrix_optimized(ds)
         else
           cm=covariance_matrix_pairwise(ds)
@@ -198,7 +198,7 @@ module Statsample
       # Order of rows and columns depends on Dataset#fields order
       def correlation_matrix(ds)
         vars, cases = ds.ncols, ds.nrows
-        if !ds.has_missing_data? and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
+        if !ds.include_values?(Daru::MISSING_VALUES) and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
           cm=correlation_matrix_optimized(ds)
         else
           cm=correlation_matrix_pairwise(ds)

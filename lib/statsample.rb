@@ -214,7 +214,7 @@ module Statsample
     # If any vectors have missing_values, return only valid.
     # If not, return the vectors itself
     def only_valid_clone(*vs)
-      if vs.any?(&:has_missing_data?)
+      if vs.any? { |v| v.include_values?(Daru::MISSING_VALUES) }
         only_valid(*vs)
       else
         vs
