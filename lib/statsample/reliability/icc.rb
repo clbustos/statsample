@@ -96,7 +96,7 @@ module Statsample
       attr_accessor :alpha
       attr_accessor :name
       def initialize(ds, opts=Hash.new)
-        @ds=ds.reject_values Daru::MISSING_VALUES
+        @ds=ds.reject_values(*Daru::MISSING_VALUES)
         @vectors=@ds.map { |e| e }
         @n=@ds.nrows
         @k=@ds.ncols

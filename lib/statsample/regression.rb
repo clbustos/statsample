@@ -56,7 +56,7 @@ module Statsample
           if Statsample.has_gsl? and false
             Statsample::Regression::Multiple::GslEngine.new(ds, y_var, opts)
           else
-            ds2=ds.reject_values Daru::MISSING_VALUES
+            ds2=ds.reject_values(*Daru::MISSING_VALUES)
             Statsample::Regression::Multiple::RubyEngine.new(ds2,y_var, opts)
           end
         end

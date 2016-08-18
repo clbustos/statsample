@@ -21,7 +21,7 @@ module Statsample
         }
         
         @ods = ds
-        @ds  = ds.reject_values(Daru::MISSING_VALUES).dup(ds.vectors.to_a - @dumped)
+        @ds  = ds.reject_values(*Daru::MISSING_VALUES).dup(ds.vectors.to_a - @dumped)
         @ds.rename ds.name
         
         @k     = @ds.ncols

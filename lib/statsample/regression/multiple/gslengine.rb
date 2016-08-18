@@ -19,7 +19,7 @@ if Statsample.has_gsl?
         class GslEngine < BaseEngine
           def initialize(ds,y_var, opts=Hash.new)
             super
-            @ds          = ds.reject_values Daru::MISSING_VALUES
+            @ds          = ds.reject_values(*Daru::MISSING_VALUES)
             @ds_valid    = @ds
             @valid_cases = @ds_valid.nrows
             @dy          = @ds[@y_var]

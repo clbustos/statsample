@@ -159,7 +159,7 @@ module Statsample
       
       def covariance_matrix(ds)
         vars,cases = ds.ncols, ds.nrows
-        if !ds.include_values?(Daru::MISSING_VALUES) and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
+        if !ds.include_values?(*Daru::MISSING_VALUES) and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
           cm=covariance_matrix_optimized(ds)
         else
           cm=covariance_matrix_pairwise(ds)
@@ -198,7 +198,7 @@ module Statsample
       # Order of rows and columns depends on Dataset#fields order
       def correlation_matrix(ds)
         vars, cases = ds.ncols, ds.nrows
-        if !ds.include_values?(Daru::MISSING_VALUES) and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
+        if !ds.include_values?(*Daru::MISSING_VALUES) and Statsample.has_gsl? and prediction_optimized(vars,cases) < prediction_pairwise(vars,cases)
           cm=correlation_matrix_optimized(ds)
         else
           cm=correlation_matrix_pairwise(ds)
@@ -248,7 +248,7 @@ module Statsample
         m = vectors.collect do |row|
           vectors.collect do |col|
             if row==col
-              ds[row].reject_values(Daru::MISSING_VALUES).size
+              ds[row].reject_values(*Daru::MISSING_VALUES).size
             else
               rowa,rowb = Statsample.only_valid_clone(ds[row],ds[col])
               rowa.size
@@ -281,7 +281,7 @@ module Statsample
       # Calculate Point biserial correlation. Equal to Pearson correlation, with
       # one dichotomous value replaced by "0" and the other by "1"
       def point_biserial(dichotomous,continous)
-        ds = Daru::DataFrame.new({:d=>dichotomous,:c=>continous}).reject_values Daru::MISSING_VALUES
+        ds = Daru::DataFrame.new({:d=>dichotomous,:c=>continous}).reject_values(*Daru::MISSING_VALUES)
         raise(TypeError, "First vector should be dichotomous") if ds[:d].factors.size != 2
         raise(TypeError, "Second vector should be continous") if ds[:c].type != :numeric
         f0=ds[:d].factors.sort.to_a[0]

@@ -7,7 +7,7 @@ module Statsample
       #   ds=Daru::DataFrame.from_excel("my_data.xls")
       #   puts Statsample::SPSS.tetrachoric_correlation_matrix(ds)
       def tetrachoric_correlation_matrix(ds)
-        dsv=ds.reject_values Daru::MISSING_VALUES
+        dsv=ds.reject_values(*Daru::MISSING_VALUES)
         # Delete all vectors doesn't have variation
         dsv.vectors.each { |f|
           if dsv[f].factors.size==1

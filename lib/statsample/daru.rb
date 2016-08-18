@@ -11,7 +11,7 @@ module Daru
         # ugly patch. The upper limit for a bin has the form
         # x < range
         #h=Statsample::Histogram.new(self, bins)
-        valid = reject_values(Daru::MISSING_VALUES)
+        valid = reject_values(*Daru::MISSING_VALUES)
         min,max=Statsample::Util.nice(valid.min,valid.max)
         # fix last data
         if max == valid.max
