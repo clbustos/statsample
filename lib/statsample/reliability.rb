@@ -4,7 +4,7 @@ module Statsample
       # Calculate Chonbach's alpha for a given dataset.
       # only uses tuples without missing data
       def cronbach_alpha(ods)
-        ds = ods.dup_only_valid
+        ds = ods.reject_values Daru::MISSING_VALUES
         n_items = ds.ncols
         return nil if n_items <= 1
         s2_items = ds.to_hash.values.inject(0) { |ac,v| 
@@ -18,7 +18,7 @@ module Statsample
       # Only uses tuples without missing data
       # Return nil if one or more vectors has 0 variance
       def cronbach_alpha_standarized(ods)
-        ds = ods.dup_only_valid
+        ds = ods.reject_values Daru::MISSING_VALUES
         return nil if ds.any? { |v| v.variance==0}
         
         ds = Daru::DataFrame.new(

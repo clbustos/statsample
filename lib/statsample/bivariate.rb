@@ -281,7 +281,7 @@ module Statsample
       # Calculate Point biserial correlation. Equal to Pearson correlation, with
       # one dichotomous value replaced by "0" and the other by "1"
       def point_biserial(dichotomous,continous)
-        ds = Daru::DataFrame.new({:d=>dichotomous,:c=>continous}).dup_only_valid
+        ds = Daru::DataFrame.new({:d=>dichotomous,:c=>continous}).reject_values Daru::MISSING_VALUES
         raise(TypeError, "First vector should be dichotomous") if ds[:d].factors.size != 2
         raise(TypeError, "Second vector should be continous") if ds[:c].type != :numeric
         f0=ds[:d].factors.sort.to_a[0]

@@ -206,7 +206,7 @@ module Statsample
     def only_valid(*vs)
       i = 1
       h = vs.inject({}) { |acc, v| acc["v#{i}".to_sym] = v; i += 1; acc }
-      df = Daru::DataFrame.new(h).dup_only_valid
+      df = Daru::DataFrame.new(h).reject_values Daru::MISSING_VALUES
       df.map { |v| v }
     end
 
