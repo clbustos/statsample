@@ -60,7 +60,6 @@ end
 
 rs[:c_v] = rs.collect {|row| row[:cases]*row[:vars]}
 
-rs.update
 rs.save("correlation_matrix.ds")
 Statsample::Excel.write(rs,"correlation_matrix.xls")
 

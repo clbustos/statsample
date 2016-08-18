@@ -72,7 +72,6 @@ module Daru
       end
       #puts "Ingreso a los dataset"
       ms.datasets.each do |k,ds|
-        ds.update
         ds.rename self[field].index_of(k)
       end
 
@@ -102,7 +101,6 @@ module Daru
       each_row { |r| p1.call(r) }
 
       ms.datasets.each do |k,ds|
-        ds.update 
         ds.rename(
           fields.size.times.map do |i|
             f  = fields[i]

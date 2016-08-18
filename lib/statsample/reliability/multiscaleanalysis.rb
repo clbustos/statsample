@@ -128,7 +128,6 @@ module Statsample
           ds[code.to_sym] = scale.ds.vector_sum
         end
         
-        ds.update
         ds
       end
 

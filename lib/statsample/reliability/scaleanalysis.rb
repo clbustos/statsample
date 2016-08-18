@@ -121,7 +121,6 @@ module Statsample
           dif_sort.each{ |variable,dif_value| row.push(case_row[variable]) }
           ds_new.add_row(row)
         end
-        ds_new.update
         ds_new
       end
       

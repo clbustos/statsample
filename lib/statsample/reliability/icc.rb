@@ -96,7 +96,6 @@ module Statsample
       attr_accessor :alpha
       attr_accessor :name
       def initialize(ds, opts=Hash.new)
-        ds.update
         @ds=ds.dup_only_valid
         @vectors=@ds.map { |e| e }
         @n=@ds.nrows

@@ -21,7 +21,6 @@ class ::Matrix
     row_size.times {|i|
       ds.add_row(self.row(i).to_a)
     }
-    ds.update
     ds.rename(self.name) if self.respond_to? :name
     ds
   end
@@ -95,7 +94,6 @@ module GSL
       row_size.times {|i|
         ds.add_row(self.row(i).to_a)
       }
-      ds.update
       ds.rename(self.name) if self.respond_to? :name
       ds
     end

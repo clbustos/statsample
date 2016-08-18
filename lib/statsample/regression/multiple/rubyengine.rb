@@ -55,7 +55,6 @@ class RubyEngine < MatrixEngine
       end
       i += 1
     end
-    @ds_indep.update
     set_dep_columns
   end
   def fix_with_regression
@@ -75,7 +74,6 @@ class RubyEngine < MatrixEngine
       end
       i+=1
     end
-    @ds_indep.update
     set_dep_columns
   end
   # Standard error for constant
