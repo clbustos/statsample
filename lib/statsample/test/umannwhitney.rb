@@ -118,8 +118,8 @@ module Statsample
       def initialize(v1,v2, opts=Hash.new)
         @v1      = v1
         @v2      = v2
-        v1_valid = v1.only_valid.reset_index!
-        v2_valid = v2.only_valid.reset_index!
+        v1_valid = v1.reject_values(*Daru::MISSING_VALUES).reset_index!
+        v2_valid = v2.reject_values(*Daru::MISSING_VALUES).reset_index!
         @n1      = v1_valid.size
         @n2      = v2_valid.size
         data     = Daru::Vector.new(v1_valid.to_a + v2_valid.to_a)

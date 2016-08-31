@@ -81,4 +81,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'mocha', '~> 1.1'
   s.add_development_dependency 'nmatrix', '~> 0.2.1'
   s.add_development_dependency 'gsl', '~> 2.1'
+  s.add_development_dependency 'activesupport', '~> 4.2'
 end

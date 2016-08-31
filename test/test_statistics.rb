@@ -16,7 +16,7 @@ class StatsampleStatisicsTestCase < Minitest::Test
   def test_recode_repeated
     a = %w(a b c c d d d e)
     exp = %w(a b c_1 c_2 d_1 d_2 d_3 e)
-    assert_equal(exp, a.recode_repeated)
+    assert_equal(exp, Daru::ArrayHelper.recode_repeated(a))
   end
 
   def test_is_number

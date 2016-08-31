@@ -30,7 +30,7 @@ class RubyEngine < MatrixEngine
     super(matrix, y_var, opts)
     @ds = ds
     @dy = ds[@y_var]
-    @ds_valid = ds.dup_only_valid
+    @ds_valid = ds.reject_values(*Daru::MISSING_VALUES)
     @total_cases = @ds.nrows
     @valid_cases = @ds_valid.nrows
     @ds_indep    = ds.dup(ds.vectors.to_a - [y_var])
@@ -55,7 +55,6 @@ class RubyEngine < MatrixEngine
       end
       i += 1
     end
-    @ds_indep.update
     set_dep_columns
   end
   def fix_with_regression
@@ -75,7 +74,6 @@ class RubyEngine < MatrixEngine
       end
       i+=1
     end
-    @ds_indep.update
     set_dep_columns
   end
   # Standard error for constant

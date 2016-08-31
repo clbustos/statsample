@@ -15,8 +15,6 @@ Statsample::Analysis.store(Statsample::Reliability) do
     ds["v#{i}".to_sym]= a + rnorm(samples,0,0.2)
   end
   
-  ds.update
-  
   rel=Statsample::Reliability::ScaleAnalysis.new(ds)
   summary rel
   

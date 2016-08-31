@@ -1,14 +1,6 @@
 require(File.expand_path(File.dirname(__FILE__) + '/helpers_tests.rb'))
 class StatsampleReliabilityTestCase < Minitest::Test
   context Statsample::Reliability do
-    setup do
-      Daru.lazy_update = true
-    end
-
-    teardown do
-      Daru.lazy_update = false
-    end
-
     should 'return correct r according to Spearman-Brown prophecy' do
       r = 0.6849
       n = 62.quo(15)
@@ -29,14 +21,12 @@ class StatsampleReliabilityTestCase < Minitest::Test
           @ds[i] = Daru::Vector.new(base.collect { |v| v + rand })
         end
 
-        @ds.update
         @k = @ds.ncols
         @cm = Statsample::Bivariate.covariance_matrix(@ds)
         @dse = @ds.dup
         @dse.vectors.each do |f|
           @dse[f] = @dse[f].standardize
         end
-        @dse.update
         @cme = Statsample::Bivariate.covariance_matrix(@dse)
         @a = Statsample::Reliability.cronbach_alpha(@ds)
         @as = Statsample::Reliability.cronbach_alpha_standarized(@ds)

@@ -206,7 +206,7 @@ module Statsample
     def only_valid(*vs)
       i = 1
       h = vs.inject({}) { |acc, v| acc["v#{i}".to_sym] = v; i += 1; acc }
-      df = Daru::DataFrame.new(h).dup_only_valid
+      df = Daru::DataFrame.new(h).reject_values(*Daru::MISSING_VALUES)
       df.map { |v| v }
     end
 
@@ -214,7 +214,7 @@ module Statsample
     # If any vectors have missing_values, return only valid.
     # If not, return the vectors itself
     def only_valid_clone(*vs)
-      if vs.any?(&:has_missing_data?)
+      if vs.any? { |v| v.include_values?(*Daru::MISSING_VALUES) }
         only_valid(*vs)
       else
         vs

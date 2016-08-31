@@ -63,7 +63,7 @@ module Statsample
             out = {}
             row.each_with_index do |v, k|
               if @key.has_key? k
-                if @ds[k].exists? v
+                if @ds[k].reject_values(*Daru::MISSING_VALUES).include_values? v
                   out[k]= @key[k] == v ? 1 : 0
                 else
                   out[k] = nil

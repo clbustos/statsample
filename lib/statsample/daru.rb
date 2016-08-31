@@ -11,7 +11,7 @@ module Daru
         # ugly patch. The upper limit for a bin has the form
         # x < range
         #h=Statsample::Histogram.new(self, bins)
-        valid = only_valid
+        valid = reject_values(*Daru::MISSING_VALUES)
         min,max=Statsample::Util.nice(valid.min,valid.max)
         # fix last data
         if max == valid.max
@@ -72,7 +72,6 @@ module Daru
       end
       #puts "Ingreso a los dataset"
       ms.datasets.each do |k,ds|
-        ds.update
         ds.rename self[field].index_of(k)
       end
 
@@ -102,7 +101,6 @@ module Daru
       each_row { |r| p1.call(r) }
 
       ms.datasets.each do |k,ds|
-        ds.update 
         ds.rename(
           fields.size.times.map do |i|
             f  = fields[i]

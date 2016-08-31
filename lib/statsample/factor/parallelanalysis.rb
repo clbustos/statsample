@@ -142,8 +142,7 @@ module Statsample
                 raise "bootstrap_method doesn't recogniced"
               end
             end
-            ds_bootstrap.update
-            
+
             matrix=Statsample::Bivariate.send(matrix_method, ds_bootstrap)
             matrix=matrix.to_gsl if @use_gsl
             if smc
@@ -159,7 +158,6 @@ module Statsample
             redo
           end
         end
-        @ds_eigenvalues.update
       end
       dirty_memoize :number_of_factors, :ds_eigenvalues
       dirty_writer :iterations, :bootstrap_method, :percentil, :smc

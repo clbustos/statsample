@@ -7,19 +7,14 @@ class StatsampleFactorTestCase < Minitest::Test
   # Based on Hardle and Simar
   def setup
     @fixtures_dir = File.expand_path(File.dirname(__FILE__) + '/fixtures')
-    Daru.lazy_update = true
   end
 
-  def teardown
-    Daru.lazy_update = false
-  end
   # Based on Hurdle example
   def test_covariance_matrix
     ds = Daru::DataFrame.from_plaintext(@fixtures_dir + '/bank2.dat', [:v1,:v2,:v3,:v4,:v5,:v6])
     ds.vectors.each {|f|
       ds[f] = ds[f].center
     }
-    ds.update
     cm = Statsample::Bivariate.covariance_matrix ds
     pca = Statsample::Factor::PCA.new(cm, m: 6)
     # puts pca.summary

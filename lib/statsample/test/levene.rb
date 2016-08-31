@@ -48,7 +48,7 @@ module Statsample
         builder.text "%s : F(%d, %d) = %0.4f , p = %0.4f" % [@name, @d1, @d2, f, probability]
       end
       def compute
-        n=@vectors.inject(0) { |ac,v| ac + v.n_valid}
+        n=@vectors.inject(0) { |ac,v| ac + v.reject_values(*Daru::MISSING_VALUES).size }
         
         zi=@vectors.collect do |vector|
           mean=vector.mean
@@ -57,7 +57,7 @@ module Statsample
         
         total_mean = Daru::Vector.new(
           zi.inject([]) do |ac,vector|
-            ac + vector.only_valid(:array)
+            ac + vector.reject_values(*Daru::MISSING_VALUES).to_a
           end
         ).mean
       
@@ -68,7 +68,7 @@ module Statsample
         
         sum_den = zi.inject(0) do |ac,vector|
           z_mean = vector.mean
-          ac + vector.only_valid(:array).inject(0) do |acp,zij|
+          ac + vector.reject_values(*Daru::MISSING_VALUES).to_a.inject(0) do |acp,zij|
             acp + (zij - z_mean)**2
           end
         end

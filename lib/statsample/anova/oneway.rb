@@ -164,7 +164,7 @@ module Statsample
           if summary_descriptives
             s.table(:name=>_("Descriptives"),:header=>%w{Name N Mean SD Min Max}.map {|v| _(v)}) do |t|
               @vectors.each do |v|
-                t.row [v.name, v.n_valid, "%0.4f" % v.mean, "%0.4f" %  v.sd, "%0.4f" % v.min, "%0.4f" % v.max]
+                t.row [v.name, v.reject_values(*Daru::MISSING_VALUES).size, "%0.4f" % v.mean, "%0.4f" %  v.sd, "%0.4f" % v.min, "%0.4f" % v.max]
               end
             end
           end

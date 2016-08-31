@@ -6,10 +6,6 @@ $:.unshift(File.dirname(__FILE__)+'/../lib/')
 require 'statsample'
 
 Statsample::Analysis.store(Daru::DataFrame) do
-  # We set lazy_update to *true* so that time is not wasted in updating
-  # metdata every time an assignment happens.
-  Daru.lazy_update = true
-
   samples = 1000
 
   # The 'new_with_size' function lets you specify the size of the 
@@ -26,9 +22,6 @@ Statsample::Analysis.store(Daru::DataFrame) do
   # order by default.
   ds = Daru::DataFrame.new({:a=>a,:b=>b}, order: [:b, :a])
   summary(ds)
-
-  # Reset lazy_update to *false* to prevent other code from breaking.
-  Daru.lazy_update = false
 end
 
 if __FILE__==$0

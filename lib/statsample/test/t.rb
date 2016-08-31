@@ -163,11 +163,11 @@ module Statsample
           @u=@opts[:u]
           @tails=@opts[:tails]
           @confidence_level=@opts[:confidence_level] || 0.95
-          @df= @vector.n_valid-1
+          @df= @vector.reject_values(*Daru::MISSING_VALUES).size-1
           @t=nil
         end        
         def t_object
-          T.new(@vector.mean-u, @vector.se, @vector.n_valid-1, opts)
+          T.new(@vector.mean-u, @vector.se, @vector.reject_values(*Daru::MISSING_VALUES).size-1, opts)
         end
         def t
           t_object.t
@@ -264,12 +264,12 @@ module Statsample
        
         # Set t and probability for given u
         def compute
-          @t_equal_variance= T.two_sample_independent(@v1.mean, @v2.mean, @v1.sd, @v2.sd, @v1.n_valid, @v2.n_valid,true)
+          @t_equal_variance= T.two_sample_independent(@v1.mean, @v2.mean, @v1.sd, @v2.sd, @v1.reject_values(*Daru::MISSING_VALUES).size, @v2.reject_values(*Daru::MISSING_VALUES).size,true)
           
-          @t_not_equal_variance= T.two_sample_independent(@v1.mean, @v2.mean, @v1.sd, @v2.sd, @v1.n_valid, @v2.n_valid, false)
+          @t_not_equal_variance= T.two_sample_independent(@v1.mean, @v2.mean, @v1.sd, @v2.sd, @v1.reject_values(*Daru::MISSING_VALUES).size, @v2.reject_values(*Daru::MISSING_VALUES).size, false)
 
-          @df_equal_variance=T.df_equal_variance(@v1.n_valid, @v2.n_valid)
-          @df_not_equal_variance=T.df_not_equal_variance(@v1.sd, @v2.sd, @v1.n_valid, @v2.n_valid)
+          @df_equal_variance=T.df_equal_variance(@v1.reject_values(*Daru::MISSING_VALUES).size, @v2.reject_values(*Daru::MISSING_VALUES).size)
+          @df_not_equal_variance=T.df_not_equal_variance(@v1.sd, @v2.sd, @v1.reject_values(*Daru::MISSING_VALUES).size, @v2.reject_values(*Daru::MISSING_VALUES).size)
           
           @probability_equal_variance = p_using_cdf(Distribution::T.cdf(@t_equal_variance, @df_equal_variance), tails)
           
@@ -278,8 +278,8 @@ module Statsample
         end
         # Cohen's d is a measure of effect size. Its defined as the difference between two means divided by a standard deviation for the data
         def d
-          n1=@v1.n_valid
-          n2=@v2.n_valid
+          n1=@v1.reject_values(*Daru::MISSING_VALUES).size
+          n2=@v2.reject_values(*Daru::MISSING_VALUES).size
           num=@v1.mean-@v2.mean
           den=Math::sqrt( ((n1-1)*@v1.sd+(n2-1)*@v2.sd).quo(n1+n2))
           num.quo(den)
@@ -288,8 +288,8 @@ module Statsample
         def report_building(b) # :nodoc:
           b.section(:name=>@name) {|g|
             g.table(:name=>_("Mean and standard deviation"), :header=>[_("Variable"), _("mean"), _("sd"),_("n")]) {|t|
-              t.row([@v1.name,"%0.4f" % @v1.mean,"%0.4f" % @v1.sd, @v1.n_valid])
-              t.row([@v2.name,"%0.4f" % @v2.mean,"%0.4f" % @v2.sd, @v2.n_valid])
+              t.row([@v1.name,"%0.4f" % @v1.mean,"%0.4f" % @v1.sd, @v1.reject_values(*Daru::MISSING_VALUES).size])
+              t.row([@v2.name,"%0.4f" % @v2.mean,"%0.4f" % @v2.sd, @v2.reject_values(*Daru::MISSING_VALUES).size])
             }
             g.parse_element(Statsample::Test.levene([@v1,@v2],:name=>_("Levene test for equality of variances")))
             

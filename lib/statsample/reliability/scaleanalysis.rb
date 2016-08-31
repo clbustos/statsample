@@ -21,7 +21,7 @@ module Statsample
         }
         
         @ods = ds
-        @ds  = ds.dup_only_valid(ds.vectors.to_a - @dumped)
+        @ds  = ds.reject_values(*Daru::MISSING_VALUES).dup(ds.vectors.to_a - @dumped)
         @ds.rename ds.name
         
         @k     = @ds.ncols
@@ -121,7 +121,6 @@ module Statsample
           dif_sort.each{ |variable,dif_value| row.push(case_row[variable]) }
           ds_new.add_row(row)
         end
-        ds_new.update
         ds_new
       end
       

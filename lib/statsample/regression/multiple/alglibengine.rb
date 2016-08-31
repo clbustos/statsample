@@ -19,7 +19,7 @@ module Multiple
 class AlglibEngine < BaseEngine
   def initialize(ds,y_var, opts=Hash.new)
     super    
-    @ds       = ds.dup_only_valid
+    @ds       = ds.reject_values(*Daru::MISSING_VALUES)
     @ds_valid = @ds
     @dy       = @ds[@y_var]
     @ds_indep = ds.dup(ds.vectors.to_a - [y_var])

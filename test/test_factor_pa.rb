@@ -7,11 +7,6 @@ class StatsampleFactorTestCase < Minitest::Test
   # Based on Hardle and Simar
   def setup
     @fixtures_dir = File.expand_path(File.dirname(__FILE__) + '/fixtures')
-    Daru.lazy_update = true
-  end
-
-  def teardown
-    Daru.lazy_update = false
   end
 
   def test_parallelanalysis_with_data
