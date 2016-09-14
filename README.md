@@ -11,7 +11,7 @@ Homepage :: https://github.com/sciruby/statsample
 You should have a recent version of GSL and R (with the `irr` and `Rserve` libraries) installed. In Ubuntu:
 
 ```bash
-$ sudo apt-get install libgs10-dev r-base r-base-dev
+$ sudo apt-get install libgsl0-dev r-base r-base-dev
 $ sudo Rscript -e "install.packages(c('Rserve', 'irr'))"
 ```
 
