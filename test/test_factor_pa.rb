@@ -39,7 +39,7 @@ class StatsampleFactorTestCase < Minitest::Test
       pa2 = Statsample::Factor::ParallelAnalysis.with_random_data(samples, variables, iterations: iterations, percentil: 95)
       3.times do |n|
         var = "ev_0000#{n + 1}".to_sym
-        assert_in_delta(pa1.ds_eigenvalues[var].mean, pa2.ds_eigenvalues[var].mean, 0.05)
+        assert_in_delta(pa1.ds_eigenvalues[var].mean, pa2.ds_eigenvalues[var].mean, 0.07)
       end
     else
       skip('Too slow without GSL')
