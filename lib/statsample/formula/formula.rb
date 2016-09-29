@@ -128,8 +128,7 @@ module Statsample
       canonical_tokens.join '+'
     end
 
-    # private
-    # TODO: Uncomment private after debuggin
+    private
 
     def parse_formula
       @tokens.inject([]) do |acc, token|
