@@ -30,7 +30,7 @@ class RubyEngine < MatrixEngine
     super(matrix, y_var, opts)
     @ds=ds
     @dy=ds[@y_var]
-    @ds_valid=ds.dup_only_valid
+    @ds_valid=ds.reject_values
     @total_cases=@ds.cases
     @valid_cases=@ds_valid.cases
     @ds_indep = ds.dup(ds.fields-[y_var])

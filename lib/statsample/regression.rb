@@ -58,7 +58,7 @@ module Statsample
           if Statsample.has_gsl? and false
             Statsample::Regression::Multiple::GslEngine.new(ds, y_var, opts)
           else
-            ds2=ds.dup_only_valid
+            ds2=ds.reject_values
             Statsample::Regression::Multiple::RubyEngine.new(ds2,y_var, opts)
           end
         end
