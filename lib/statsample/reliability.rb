@@ -7,7 +7,7 @@ module Statsample
         ds = ods.reject_values(*Daru::MISSING_VALUES)
         n_items = ds.ncols
         return nil if n_items <= 1
-        s2_items = ds.to_hash.values.inject(0) { |ac,v| 
+        s2_items = ds.to_h.values.inject(0) { |ac,v| 
           ac + v.variance }
         total    = ds.vector_sum
         
