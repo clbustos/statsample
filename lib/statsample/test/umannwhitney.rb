@@ -172,7 +172,7 @@ module Statsample
       # == Reference: 
       # * http://europe.isixsigma.com/library/content/c080806a.asp
       def adjust_for_ties(data)
-        @t = data.frequencies.find_all { |k,v| v > 1 }.inject(0) { |a,v|
+        @t = data.frequencies.to_h.find_all { |k,v| v > 1 }.inject(0) { |a,v|
           a + (v[1]**3 - v[1]).quo(12)
         }        
       end

@@ -117,7 +117,7 @@ module Statsample
         ds_new = Daru::DataFrame.new({}, order: ([:case,:score] + dif_sort.collect{|a,b| a.to_sym}))
         scores_sort.each do |i,score|
           row = [i, score]
-          case_row = @ds.row[i].to_hash
+          case_row = @ds.row[i].to_h
           dif_sort.each{ |variable,dif_value| row.push(case_row[variable]) }
           ds_new.add_row(row)
         end
