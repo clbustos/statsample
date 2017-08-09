@@ -30,7 +30,7 @@ module Statsample
       # Input could be an array of vectors or a dataset
       def initialize(input, opts=Hash.new())
         if input.is_a? Daru::DataFrame
-          @vectors = input.to_hash.values
+          @vectors = input.to_h.values
         else
           @vectors = input
         end

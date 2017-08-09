@@ -29,10 +29,10 @@ module Statsample
       @v_cols.factors.sort.reset_index!
     end
     def rows_total
-      @v_rows.frequencies
+      @v_rows.frequencies.to_h
     end
     def cols_total
-      @v_cols.frequencies
+      @v_cols.frequencies.to_h
     end
     
     def frequencies
@@ -42,7 +42,7 @@ module Statsample
         s[par]=0
         s
       end
-      base.update(Daru::Vector.new(Statsample::vector_cols_matrix(@v_rows,@v_cols).to_a).frequencies)
+      base.update(Daru::Vector.new(Statsample::vector_cols_matrix(@v_rows,@v_cols).to_a).frequencies.to_h)
     end
     def to_matrix
       f  = frequencies
