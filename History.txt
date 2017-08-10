@@ -1,3 +1,10 @@
+=== 2.1.0 / 2017-08-10
+  * Update documentation to reflect methods that have been removed (@lokeshh)
+  * Update daru dependency to v0.1.6 (@lokeshh)
+  * Remove pre-daru legacy methods like n_valid, missing value functions (@lokeshh)
+  * Update test suite with rubocop and rake. New tests for methods like Regression (@lokeshh)
+  * Introduce fitting a regression using string formulas (@lokeshh)
+
 === 2.0.2 / 2016-03-11
   * Update dependencies (spreadsheet, GSL)
 
