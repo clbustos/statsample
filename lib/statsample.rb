@@ -54,8 +54,10 @@ class Module
 end
 
 class Array
-  def sum
-    inject(:+)
+  unless method_defined?(:sum)
+    def sum
+      inject(:+)
+    end
   end
 
   def mean
