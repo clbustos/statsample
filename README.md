@@ -78,7 +78,7 @@ the same examples, and they look better so you might want to see that first.
 
 # Description
 
-A suite for basic and advanced statistics on Ruby. Tested on CRuby 1.9.3, 2.0.0 and 2.1.1. See `.travis.yml` for more information.
+A suite for basic and advanced statistics on Ruby. Tested on CRuby 2.0.0, 2.1.1, 2.2 and 2.3.0 See `.travis.yml` for more information.
 
 Include:
 - Descriptive statistics: frequencies, median, mean, standard error, skew, kurtosis (and many others).
